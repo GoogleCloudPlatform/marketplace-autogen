@@ -1,0 +1,27 @@
+{namespace vm.multi}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Generates top level template solution.jinja file. */
+{template .test_config kind="text"}
+{@param solutionId: string}
+{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+
+{let $template: $solutionId + '.jinja'/}
+
+imports:
+- path: {$template}
+{\n}
+resources:
+- name: {$solutionId}
+  type: {$template}
+
+  {if $spec.deployInput}
+  {let $testDefaultedFields: findInputsWithTestDefaultValues($spec.deployInput) /}
+  {if length($testDefaultedFields) > 0}
+  properties:
+  {for $field in $testDefaultedFields}
+    {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
+  {/for}
+  {/if}
+  {/if}
+{/template}

@@ -1,0 +1,280 @@
+{namespace vm.multi}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Generates a tier .jinja template, used for creating all VMs in a tier. */
+{template .tierJinja kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param packageSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+
+{let $waiterSpec:
+    $spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER
+    ? $spec.applicationStatus.waiter : null/}
+
+{% import "path_utils.jinja" as path_utils with context %}
+
+{\n}
+{% set instanceCount = properties["instanceCount"] %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{if length($spec.acceleratorsList) > 0}
+{% set acceleratorType = properties["acceleratorType"] %}
+{% set acceleratorCount = properties["acceleratorCount"] %}
+{/if}
+{% set network = path_utils.networkPath(properties["network"]) %}
+{% set subnetwork = properties["subnetwork"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+
+{% set hasExternalIP = properties["externalIP"] != "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+
+{if $spec.ipForwarding}
+{% set canIpForward = properties["ipForward"] == "On" %}
+{/if}
+
+{for $scope in $spec.gcpAuthScopesList}
+{let $propName kind="text"}{call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}{/let}
+{% set {$propName} = properties["{$propName}"] %}
+{/for}
+
+{if length($spec.imagesList) > 1}
+  {\n}
+  {% set imageProjects = [{nil}
+  {for $image in $spec.imagesList}
+    "{$image.project}"{if not isLast($image)}, {/if}{nil}
+  {/for}
+  ] %}
+  {% set imageNames = [{nil}
+  {for $image in $spec.imagesList}
+    "{$image.name}"{if not isLast($image)}, {/if}{nil}
+  {/for}
+  ] %}
+  {% set selectedImageIndex = properties["image"]|int %}
+{/if}
+
+{% if instanceCount <= 0 %}
+resources: []
+{% else %}
+resources:
+  {% for vmIndex in range(instanceCount) %}
+  {let $instanceName kind="text"}
+    {call .instanceName data="all"/}
+  {/let}
+  - name: {call .instanceTmplResourceName data="all"/}
+    type: vm_instance.py
+    properties:
+      instanceName: {$instanceName}
+      {if length($spec.imagesList) > 1}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      {else}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{$spec.imagesList[0].project}/global/images/{$spec.imagesList[0].name}
+      {/if}
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      network: {{ network }}
+      {% if subnetwork %}
+      subnetwork: {{ subnetwork }}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      {if length($spec.additionalDisksList) > 0}
+      disks:
+        {let $additionalDisksSection kind="text"}
+          {call renders.additionalDiskSection}
+            {param additionalDisksList: $spec.additionalDisksList/}
+            {param deployInputSpec: $packageSpec.deployInput/}
+            {param tierSpec: $spec/}
+            {param instanceName: $instanceName/}
+          {/call}
+        {/let}
+        {$additionalDisksSection |indent: 8, true}{nil}
+      {/if}
+      {if $spec.localSsds}
+      {let $localSsdItem kind="text"}
+        {call renders.localSsdPropertyItem}
+          {param localSsdSpec: $spec.localSsds/}
+          {param deployInput: $packageSpec.deployInput/}
+        {/call}
+      {/let}
+      {$localSsdItem |indent: 6}
+      {/if}
+      hasExternalIP: {{ hasExternalIP }}
+      {if $spec.ipForwarding}
+      canIpForward: {{ canIpForward }}
+      {/if}
+
+      {if length($spec.acceleratorsList) > 0}
+      {% if acceleratorCount > 0 %}
+      guestAccelerators:
+        - acceleratorType: {{ acceleratorType }}
+          acceleratorCount: {{ acceleratorCount }}
+      {% endif %}
+      {/if}
+
+      {let $serviceAccounts kind="text"}
+        {call renders.serviceAccountsSection}
+          {param gcpAuthScopesList: $spec.gcpAuthScopesList/}
+          {param waiterSpec: $waiterSpec/}
+        {/call}
+      {/let}
+      {$serviceAccounts |indent: 6, true}{nil}
+
+      //TODO(b/70201062) Extract metadata items to renders template.
+      {let $passwordMetadataItems kind="text"}
+        {call .passwordMetadataItems}{param spec: $packageSpec/}{/call}
+      {/let}
+      {let $startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
+        {call renders.startupScriptAndWaiterMetadataItemsUnconditional}
+          {param waiterSpec: $waiterSpec/}
+          {param startupSpec: $spec.gceStartupScript/}
+        {/call}
+      {/let}
+      {let $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled kind="text"}
+        {call renders.startupScriptAndWaiterMetadataItemsConditional}
+          {param waiterSpec: $waiterSpec/}
+          {param startupSpec: $spec.gceStartupScript/}
+          {param statusWaiterEnabled: true/}
+        {/call}
+      {/let}
+      {let $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled kind="text"}
+        {call renders.startupScriptAndWaiterMetadataItemsConditional}
+          {param waiterSpec: $waiterSpec/}
+          {param startupSpec: $spec.gceStartupScript/}
+          {param statusWaiterEnabled: false/}
+        {/call}
+      {/let}
+      {let $startupScriptAndWaiterMetadataItemsConditional kind="text"}
+        {call renders.jinjaConditionalContent}
+          {param enabledContent: $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled/}
+          {param disabledContent: $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled/}
+          {param jinjaConditionalVariableName: 'enableStatusWaiter'/}
+        {/call}
+      {/let}
+      {let $gceMetadataItems kind="text"}
+        {call renders.gceMetadataItems}
+          {param specList: $spec.gceMetadataItemsList/}
+          {param tierSpecList: $packageSpec.tiersList/}
+          {param deployInput: $packageSpec.deployInput/}
+        {/call}
+      {/let}
+
+      {if strLen($passwordMetadataItems)
+          + strLen($gceMetadataItems)
+          + strLen($startupScriptAndWaiterMetadataItemsUnconditional)> 0}
+      metadata:
+        items:
+          {$passwordMetadataItems |indent: 10, true}{nil}
+          {$startupScriptAndWaiterMetadataItemsUnconditional |indent: 10, true}{nil}
+          {$startupScriptAndWaiterMetadataItemsConditional |indent: 10, true}{nil}
+          {$gceMetadataItems |indent: 10, true}{nil}
+      {elseif strLen($startupScriptAndWaiterMetadataItemsStatusWaiterDisabled) == 0
+              and strLen($startupScriptAndWaiterMetadataItemsStatusWaiterEnabled) > 0}
+      {% if enableStatusWaiter %}
+      metadata:
+        items:
+          {$startupScriptAndWaiterMetadataItemsStatusWaiterEnabled |indent: 10, true}{nil}
+      {% endif %}
+      {elseif strLen($startupScriptAndWaiterMetadataItemsStatusWaiterEnabled) == 0
+              and strLen($startupScriptAndWaiterMetadataItemsStatusWaiterDisabled) > 0}
+      {% if not enableStatusWaiter %}
+      metadata:
+        items:
+          {$startupScriptAndWaiterMetadataItemsStatusWaiterDisabled |indent: 10, true}{nil}
+      {% endif %}
+      {elseif strLen($startupScriptAndWaiterMetadataItemsStatusWaiterEnabled) > 0
+              and strLen($startupScriptAndWaiterMetadataItemsStatusWaiterDisabled) > 0}
+      metadata:
+        items:
+          {% if enableStatusWaiter %}
+          {$startupScriptAndWaiterMetadataItemsStatusWaiterEnabled |indent: 10, true}{nil}
+          {% else %}
+          {$startupScriptAndWaiterMetadataItemsStatusWaiterDisabled |indent: 10, true}{nil}
+          {% endif %}
+      {/if}
+
+      // Always apply firewall tags. This makes it easier to add firewall rules in
+      // post-deploy should the user select not to add the rules when deploying.
+      {let $firewallRuleTags kind="text"}
+        {call renders.firewallRuleTags}
+          {param specList: $spec.firewallRulesList/}
+          {param tierSpec: $spec/}
+        {/call}
+      {/let}
+      tags:
+        items:
+          - {call utilities.deploymentTag data="all"/}
+          - {call utilities.tierTag data="all"/}
+          {if strLen($firewallRuleTags) > 0}
+          {$firewallRuleTags |indent: 10, true}{nil}
+          {/if}
+
+  {% endfor %}
+
+  {let $waiterResources kind="text"}
+    {call renders.startupScriptAndWaiterResources}
+      {param waiterSpec: $waiterSpec/}
+      {param startupSpec: $spec.gceStartupScript/}
+      {param enableJinjaVarName: 'enableStatusWaiter'/}
+      {param dependsOnTierSpec: $spec/}
+      {param dependsOnTierInstanceCountJinjaVarName: 'instanceCount'/}
+    {/call}
+  {/let}
+  {$waiterResources |indent: 2, true}{nil}
+
+  {let $firewallResources kind="text"}
+    {call renders.firewallResources}
+      {param specList: $spec.firewallRulesList/}
+      {param tierSpec: $spec/}
+    {/call}
+  {/let}
+  {$firewallResources |indent: 2, true}{nil}
+
+{\n}
+outputs:
+  {% for vmIndex in range(instanceCount) %}
+  - name: vmId{{ vmIndex }}
+    value: $(ref.{call .instanceName data="all"/}.id)
+  - name: vmExternalIP{{ vmIndex }}
+    {% if hasExternalIP %}
+    value: $(ref.{call .instanceTmplResourceName data="all"/}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP{{ vmIndex }}
+    value: $(ref.{call .instanceTmplResourceName data="all"/}.internalIP)
+  - name: vmName{{ vmIndex }}
+    value: {call .instanceName data="all"/}
+  - name: vmSelfLink{{ vmIndex }}
+    value: $(ref.{call .instanceName data="all"/}.selfLink)
+  {% endfor %}
+
+{% endif %}
+
+{/template}
+
+
+{template .passwordMetadataItems kind="text" /* visibility="private" */}
+{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{for $password in $spec.passwordsList}
+{let $passwordMetadata kind="text"}
+{call renders.passwordMetadataFromProperty}
+  {param password: $password/}
+  {param passwordIndex: index($password)/}
+{/call}
+{/let}
+{$passwordMetadata}{nil}
+{/for}
+{/template}
+
+
+{template .instanceName kind="text" /* visibility="private" */}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{call utilities.tierVmPrefix data="all"/}-{{ vmIndex }}{nil}
+{/template}
+
+{template .instanceTmplResourceName kind="text" /* visibility="private" */}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{call utilities.tierVmPrefix data="all"/}-tmpl-{{ vmIndex }}{nil}
+{/template}

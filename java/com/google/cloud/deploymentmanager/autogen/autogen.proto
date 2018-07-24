@@ -1,0 +1,84 @@
+// Defines inputs and outputs for the autogen library.
+// For now these protos are not intended for storage or for use in a public API.
+
+syntax = "proto3";
+
+package cloud.deploymentmanager.autogen;
+
+option java_multiple_files = true;
+option java_package = "com.google.cloud.deploymentmanager.autogen.proto";
+option java_outer_classname = "AutogenProtos";
+
+import "java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto";
+import "java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto";
+
+// Input for generating a deployment package.
+message DeploymentPackageInput {
+  // The partner ID. Required.
+  string partner_id = 1;
+  // The solution ID. Required.
+  string solution_id = 2;
+  // Partner marketing info. Optional.
+  PartnerMarketingInfo partner_info = 3;
+  // Solution marketing info. Optional.
+  SolutionMarketingInfo solution_info = 4;
+  // Autogen spec. Required.
+  DeploymentPackageAutogenSpec spec = 5;
+  // Image to use as the logo. Optional.
+  Image logo = 6;
+  // Image to use as the icon. Optional.
+  Image icon = 7;
+  // Image to use as the architecture diagram. Optional.
+  Image architecture_diagram = 8;
+}
+
+// Describes an image to be generated into the deployment package, or
+// a reference to one.
+message Image {
+  // Provides the raw bytes and type of the image.
+  message RawImage {
+    enum ContentType {
+      CONTENT_TYPE_UNSPECIFIED = 0;
+      PNG = 1;
+      JPEG = 2;
+    }
+    // Content type of the image bytes. Required.
+    ContentType content_type = 1;
+    // Raw binary bytes of the image. Required.
+    bytes content = 2;
+  }
+
+  // The image bytes are supplied directly.
+  RawImage raw = 1;
+
+  string description = 2;
+}
+
+// Used as an input for batch generating many deployment packages as once.
+// See BatchAutogenApp.
+message BatchInput {
+  repeated DeploymentPackageInput solutions = 1;
+}
+
+// Used as an output of batch generating many deployment packages as once.
+// See BatchAutogenApp.
+message BatchOutput {
+  message SolutionOutput {
+    string partner_id = 1;
+    string solution_id = 2;
+    SolutionPackage package = 3;
+  }
+  repeated SolutionOutput solutions = 1;
+}
+
+message SolutionPackage {
+  // Represents a file entry in the [SolutionPackage][].
+  message File {
+    // The relative path of the file within the [SolutionPackage][].
+    string path = 1;
+    // The contents of the file. Binary data gets encoded with Base64.
+    string content = 2;
+  }
+  // The full set of files within the [SolutionPackage][].
+  repeated File files = 1;
+}

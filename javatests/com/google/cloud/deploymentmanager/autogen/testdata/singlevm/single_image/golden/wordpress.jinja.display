@@ -1,0 +1,184 @@
+description:
+  author:
+    title: Bitnami
+    descriptionHtml: Bitnami is a library of popular server applications and development environments that can be installed in a single click, either on your laptop, in a virtual machine, or hosted in the cloud. With over a million deployments each month, Bitnami.com has become a leading source of many of today's most popular applications. Bitnami-packaged apps provide a consistent, secure and up-to-date, optimized end user experience on any platform. We take care of compiling and configuring the application and all of its dependencies (third party libraries, language run times, databases) so it works out of the box. The company is also the largest source of applications for the leading cloud marketplaces. Bitnami is headquartered in San Francisco, CA and has a major development center in Seville, Spain. For more information, visit www.bitnami.com, or follow us on Twitter (@bitnami) and Facebook
+    shortDescription: Bitnami provides a catalog of over 120 curated server applications and development environments that can be installed with one click, either locally, in a VM, or in the cloud.  Bitnami apps work out of the box, with no dependency or compiling worries, and regularly updated images.
+    url: http://bitnami.com
+  descriptionHtml: WordPress is one of the world's most popular web publishing platforms for building blogs and websites. It can be customized via a wide selection of themes, extensions and plug-ins.
+  logo: '@media/wordpress_store.png'
+  tagline: The most popular and ready-to-go CMS
+  title: WordPress
+  url: https://bitnami.com/stack/wordpress
+  version: 4.5.3-1
+  eulaUrl: https://bitnami.com/agreement
+  softwareGroups:
+  - type: SOFTWARE_GROUP_OS
+    software:
+    - title: Debian
+      version: '8'
+  - software:
+    - title: Apache
+      version: 2.4.23
+    - title: MySQL
+      version: 5.7.13
+    - title: OpenSSL
+      version: 1.0.2h
+    - title: PHP
+      version: 7.0.9
+    - title: phpMyAdmin
+      version: 4.6.3
+    - title: SQLite
+      version: 3.7.15.1
+    - title: Varnish
+      version: 4.1.0
+    - title: WordPress
+      version: 4.5.3
+  documentations:
+  - title: Getting Started
+    url: https://docs.bitnami.com/google/apps/wordpress
+    description: Get started with Bitnami WordPress Stack.
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  support:
+  - title: Support
+    descriptionHtml: Bitnami provides technical support for installation and setup issues through <a href="https://bitnami.com/support/google">our support center</a>.
+    url: https://bitnami.com/support/google
+
+input:
+  properties:
+    - name: zone
+      title: Zone
+    - name: machineType
+      title: Machine type
+    - name: bootDiskType
+      title: Boot disk type
+      section: BOOT_DISK
+    - name: bootDiskSizeGb
+      title: Boot disk size in GB
+      section: BOOT_DISK
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+    - name: externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: NETWORKING
+      level: 1
+    - name: tcp80SourceRanges
+      title: Source IP ranges for HTTP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+      level: 1
+    - name: tcp443SourceRanges
+      title: Source IP ranges for HTTPS traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+      level: 1
+    - name: enableTcp80
+      title: Allow HTTP traffic
+      section: NETWORKING
+      boolean_group: FIREWALL
+    - name: enableTcp443
+      title: Allow HTTPS traffic
+      section: NETWORKING
+      boolean_group: FIREWALL
+    - name: input_localSsdsCount
+      title: Local SSDs
+  sections:
+    - name: BOOT_DISK
+      title: Boot Disk
+      tooltip: Each instance requires a disk to boot from.
+    - name: NETWORKING
+      title: Networking
+  boolean_groups:
+    - name: FIREWALL
+      title: Firewall
+      tooltip: 'By default all incoming traffic from outside a network is blocked. Select the type of network traffic you want to allow. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      subtext: Add tags and firewall rules to allow specific network traffic from the Internet
+
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      - label: Site address
+        value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/">http://{{ externalIp(outputs().vmSelfLink) }}/</a>
+        showIf: '{{ properties().externalIP != "None" }}'
+      - label: Site address (internal IP)
+        value: http://{{ outputs().vmInternalIP }}/
+        showIf: '{{ properties().externalIP == "None" }}'
+      - label: Admin URL
+        value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/">http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/</a>
+        showIf: '{{ properties().externalIP != "None" }}'
+      - label: Admin URL (internal IP)
+        value: http://{{ outputs().vmInternalIP }}/wp-admin/
+        showIf: '{{ properties().externalIP == "None" }}'
+      - label: Admin user
+        value: user
+      - label: Admin password (Temporary)
+        value: '{{ outputs().password0 }}'
+      - label: Instance
+        value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
+      - label: Instance zone
+        value: '{{ properties().zone }}'
+      - label: Instance machine type
+        value: '{{ properties().machineType }}'
+  primaryButton:
+    label: Log into the admin panel
+    type: TYPE_URL
+    action: http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/
+  secondaryButton:
+    label: Fancy SSH label
+    type: TYPE_GCE_VM_SSH
+    action: '{{ outputs().vmSelfLink }}'
+  suggestedActions:
+    - heading: No external IP configured
+      description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
+      showIf: '{{ properties().externalIP == "None" }}'
+    - heading: Open HTTP traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTP traffic
+        for target tag "{{ outputs().deployment }}-tcp-80".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tcp-80"
+        --network {{ properties().network }}
+        --allow tcp:80
+        --target-tags "{{ outputs().deployment }}-tcp-80"
+      showIf: '{{ !properties().enableTcp80 }}'
+    - heading: Open HTTPS traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTPS traffic
+        for target tag "{{ outputs().deployment }}-tcp-443".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tcp-443"
+        --network {{ properties().network }}
+        --allow tcp:443
+        --target-tags "{{ outputs().deployment }}-tcp-443"
+      showIf: '{{ !properties().enableTcp443 }}'
+    - heading: Change the temporary password
+      description: For additional security, it is recommended that you change the password.
+    - heading: Assign a static external IP address to your VM instance
+      description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
+      showIf: '{{ properties().externalIP == "Ephemeral" }}'
+
+annotations:
+  autogenSpecType: 'SINGLE_VM'
+  vmImage0: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
+
+metadata_version: v1

@@ -1,0 +1,254 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
+{% set instanceCount = properties["instanceCount"] %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set network = path_utils.networkPath(properties["network"]) %}
+{% set subnetwork = properties["subnetwork"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+{% set hasExternalIP = properties["externalIP"] != "None" %}
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+{% set enableCloudReadonlyApi = properties["enableCloudReadonlyApi"] %}
+{% set enableCloudApi = properties["enableCloudApi"] %}
+{% set enableComputeReadonlyApi = properties["enableComputeReadonlyApi"] %}
+{% set enableComputeApi = properties["enableComputeApi"] %}
+{% set enableSourceReadWriteApi = properties["enableSourceReadWriteApi"] %}
+{% set enableProjecthostingApi = properties["enableProjecthostingApi"] %}
+
+{% set imageProjects = ["click-to-deploy-images", "click-to-deploy-images"  ] %}
+{% set imageNames = ["jenkins-v20180130", "jenkins-v20180123"  ] %}
+  {% set selectedImageIndex = properties["image"]|int %}
+{% if instanceCount <= 0 %}
+resources: []
+{% else %}
+resources:
+  {% for vmIndex in range(instanceCount) %}
+  - name: {{ env["deployment"] }}-main-vm-tmpl-{{ vmIndex }}
+    type: vm_instance.py
+    properties:
+      instanceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      network: {{ network }}
+      {% if subnetwork %}
+      subnetwork: {{ subnetwork }}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      disks:
+        - deviceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}-super-disk
+          type: PERSISTENT
+          diskType: {{ properties["main_disk1_type"] }}
+          diskSizeGb: {{ properties["main_disk1_sizeGb"] }}
+          boot: False
+          autoDelete: True
+        - deviceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}-extra-disk
+          type: PERSISTENT
+          diskType: {{ properties["main_disk2_type"] }}
+          diskSizeGb: {{ properties["main_disk2_sizeGb"] }}
+          boot: False
+          autoDelete: True
+        - deviceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}-{{ properties["input_superExtraDiskName"] }}
+          type: PERSISTENT
+          diskType: {{ properties["main_disk3_type"] }}
+          diskSizeGb: {{ properties["main_disk3_sizeGb"] }}
+          boot: False
+          autoDelete: True
+      localSSDs: 2
+      hasExternalIP: {{ hasExternalIP }}
+      serviceAccounts:
+        - email: default
+          scopes:
+            - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+            - 'https://www.googleapis.com/auth/devstorage.read_only'
+            - 'https://www.googleapis.com/auth/logging.write'
+            - 'https://www.googleapis.com/auth/monitoring.write'
+            {% if enableCloudReadonlyApi %}
+            - 'https://www.googleapis.com/auth/cloud-platform.read-only'
+            {% endif %}
+            {% if enableCloudApi %}
+            - 'https://www.googleapis.com/auth/cloud-platform'
+            {% endif %}
+            {% if enableComputeReadonlyApi %}
+            - 'https://www.googleapis.com/auth/compute.readonly'
+            {% endif %}
+            {% if enableComputeApi %}
+            - 'https://www.googleapis.com/auth/compute'
+            {% endif %}
+            {% if enableSourceReadWriteApi %}
+            - 'https://www.googleapis.com/auth/source.read_write'
+            {% endif %}
+            {% if enableProjecthostingApi %}
+            - 'https://www.googleapis.com/auth/projecthosting'
+            {% endif %}
+            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+      metadata:
+        items:
+          - key: admin-password
+            value: {{ properties["generatedPassword0"] }}
+          - key: ghost-db-password
+            value: {{ properties["generatedPassword1"] }}
+          {% if properties["input_generateOptionalPassword"] %}
+          - key: optional-password
+            value: {{ properties["generatedPassword2"] }}
+          {% endif %}
+          - key: startup-script
+            value: |-
+              #!/bin/bash
+              start_up.sh
+              echo done
+              echo SUCCESS
+          {% if enableStatusWaiter %}
+          - key: status-config-url
+            value: $(ref.software-status.config-url)
+          - key: status-variable-path
+            value: $(ref.software-status.variable-path)
+          - key: status-uptime-deadline
+            value: 300
+          {% endif %}
+          - key: fixed-key
+            value: fixed-value
+          - key: tier2-addresses
+            {% set delimiter = joiner("|") %}
+            value: {% for vmIndex in range(properties["tier2_instanceCount"]) -%}
+              {{- delimiter() }}{{ env["deployment"] }}-tier2-vm-{{ vmIndex -}}
+            {%- endfor %}
+          - key: domain-name
+            value: |-
+                   {{ properties["input_domain"] }}
+          - key: condition-to-generate-password
+            value: |-
+                   {{ properties["input_generateOptionalPassword"] }}
+          - key: image-caching
+            value: |-
+                   {{ properties["input_imageCaching"] }}
+          - key: image-compression
+            value: |-
+                   {{ properties["input_imageCompression"] }}
+          - key: image-sizing
+            value: |-
+                   {{ properties["input_imageSizing"] }}
+          - key: extra-lb-zone0
+            value: |-
+                   {{ properties["input_extraLbZone0"] }}
+          - key: extra-lb-zone1
+            value: |-
+                   {{ properties["input_extraLbZone1"] }}
+      tags:
+        items:
+          - {{ env["deployment"] }}-deployment
+          - {{ env["deployment"] }}-main-tier
+          - {{ env["deployment"] }}-main-tcp-80
+          - {{ env["deployment"] }}-main-tcp-443
+          - {{ env["deployment"] }}-main-udp
+  {% endfor %}
+  {% if enableStatusWaiter %}
+  {% if instanceCount > 0 %}
+  - name: software-status
+    type: software_status.py
+    properties:
+      timeout: 300
+      prefix: {{ env['deployment'] }}-main
+      waiterDependsOn:
+        {% for vmIndex in range(instanceCount) %}
+        - {{ env["deployment"] }}-main-vm-{{ vmIndex }}
+        {% endfor %}
+      {% if instanceCount > 1 %}
+      successNumber: {{ instanceCount }}
+      {% endif %}
+  {% endif %}
+  {% endif %}
+  {% if properties["enableTcp80"] %}
+  - name: {{ env["deployment"] }}-main-tcp-80
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      {% if properties.get("tcp80SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp80SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-main-tcp-80"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["80"]
+  {% endif %}
+  {% if properties["enableTcp443"] %}
+  - name: {{ env["deployment"] }}-main-tcp-443
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      {% if properties.get("tcp443SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp443SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-main-tcp-443"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["443"]
+  {% endif %}
+  - name: {{ env["deployment"] }}-icmp
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      sourceTags:
+      - {{ env["deployment"] }}-deployment
+      targetTags: ["{{ env["deployment"] }}-deployment"]
+      allowed:
+        - IPProtocol: ICMP
+  - name: {{ env["deployment"] }}-main-tcp-7000-7001
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      sourceTags:
+      - {{ env["deployment"] }}-main-tier
+      targetTags: ["{{ env["deployment"] }}-main-tier"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["7000-7001"]
+  {% if properties["enableUdp"] %}
+  - name: {{ env["deployment"] }}-main-udp
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      {% if properties.get("udpSourceRanges") %}
+      sourceRanges:
+        {% for source in properties["udpSourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-main-udp"]
+      allowed:
+        - IPProtocol: UDP
+  {% endif %}
+
+outputs:
+  {% for vmIndex in range(instanceCount) %}
+  - name: vmId{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-main-vm-{{ vmIndex }}.id)
+  - name: vmExternalIP{{ vmIndex }}
+    {% if hasExternalIP %}
+    value: $(ref.{{ env["deployment"] }}-main-vm-tmpl-{{ vmIndex }}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-main-vm-tmpl-{{ vmIndex }}.internalIP)
+  - name: vmName{{ vmIndex }}
+    value: {{ env["deployment"] }}-main-vm-{{ vmIndex }}
+  - name: vmSelfLink{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-main-vm-{{ vmIndex }}.selfLink)
+  {% endfor %}
+{% endif %}

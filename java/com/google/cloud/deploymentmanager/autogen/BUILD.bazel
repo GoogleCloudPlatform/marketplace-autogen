@@ -1,0 +1,78 @@
+package(default_visibility = ["//visibility:public"])
+
+java_plugin(
+    name = "auto_value_plugin",
+    processor_class = "com.google.auto.value.processor.AutoValueProcessor",
+    deps = ["@com_google_auto_value_auto_value//jar"],
+)
+
+java_library(
+    name = "auto_value",
+    exported_plugins = [":auto_value_plugin"],
+    exports = ["@com_google_auto_value_auto_value//jar"],
+)
+
+proto_library(
+    name = "deployment_package_autogen_spec_proto",
+    srcs = ["deployment_package_autogen_spec.proto"],
+)
+
+java_proto_library(
+    name = "deployment_package_autogen_spec_java_proto",
+    strict_deps = 0,
+    deps = [":deployment_package_autogen_spec_proto"],
+)
+
+proto_library(
+    name = "marketing_info_proto",
+    srcs = ["marketing_info.proto"],
+)
+
+java_proto_library(
+    name = "marketing_info_java_proto",
+    strict_deps = 0,
+    deps = [":marketing_info_proto"],
+)
+
+proto_library(
+    name = "autogen_proto",
+    srcs = ["autogen.proto"],
+    deps = [
+        ":deployment_package_autogen_spec_proto",
+        ":marketing_info_proto",
+    ],
+)
+
+java_proto_library(
+    name = "autogen_java_proto",
+    strict_deps = 0,
+    deps = [":autogen_proto"],
+)
+
+java_library(
+    name = "autogen",
+    srcs = glob(["*.java"]),
+    resources = glob(["templates/**"]),
+    deps = [
+        ":autogen_java_proto",
+        ":deployment_package_autogen_spec_java_proto",
+        ":marketing_info_java_proto",
+        ":auto_value",
+        "//java/com/google/cloud/deploymentmanager/autogen/soy",
+        "@commons_cli_commons_cli//jar",
+        "@com_google_auto_value_auto_value//jar",
+        "@com_google_guava_guava//jar",
+        "@com_google_inject_guice//jar",
+        "@com_google_protobuf_protobuf_java//jar",
+        "@com_google_protobuf_protobuf_java_util//jar",
+        "@com_google_template_soy//jar",
+        "@com_google_code_findbugs_jsr305//jar",
+        "@org_yaml_snakeyaml//jar",
+    ],
+)
+
+java_binary(
+    name = "BatchAutogenApp",
+    main_class = "com.google.cloud.deploymentmanager.autogen.BatchAutogenApp",
+    runtime_deps = [":autogen"],
+)

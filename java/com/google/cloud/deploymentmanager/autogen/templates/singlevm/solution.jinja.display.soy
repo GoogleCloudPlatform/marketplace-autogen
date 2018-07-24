@@ -1,0 +1,305 @@
+{namespace vm.single}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Generates solution.jinja.display file. */
+{template .display kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
+{@param? partnerId: string}
+{@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
+{@param? descriptionYaml: string}
+
+{let $solutionHasGpus: solutionHasGpus($spec)/}
+
+{let $partnerName kind="text"}
+{if $partnerInfo}
+  {$partnerInfo.name}{nil}
+{elseif $partnerId}
+  {$partnerId}{nil}
+{/if}
+{/let}
+
+// TODO(huyhuynh): Move all strings to resources.
+
+{if $descriptionYaml}
+description:
+  {$descriptionYaml |indent: 2}
+  {\n}
+{/if}
+
+input:
+  properties:
+    {if length($spec.imagesList) > 1}
+    - name: image
+      title: Image version
+      enumLabels:
+        {for $image in $spec.imagesList}
+        {if $image.label}
+        '{index($image)}': '{$image.label}'
+        {else}
+        '{index($image)}': '{$image.name}'
+        {/if}
+        {/for}
+    {/if}
+    - name: zone
+      title: Zone
+      {if $solutionHasGpus}
+      {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
+      {$acceleratorZoneSubtext |indent: 6, true}{nil}
+      {/if}
+    - name: machineType
+      title: Machine type
+    {if $solutionHasGpus}
+    {let $acceleratorCheck kind="text"}{call display.acceleratorCheckProperty/}{/let}
+    {$acceleratorCheck |indent: 4, true}{nil}
+    {/if}
+    - name: bootDiskType
+      title: {$spec.bootDisk.displayLabel} type
+      section: BOOT_DISK
+    - name: bootDiskSizeGb
+      title: {$spec.bootDisk.displayLabel} size in GB
+      section: BOOT_DISK
+
+    {for $disk in $spec.additionalDisksList}
+    - name: {diskTypePropertyName(index($disk)) |yamlprimitive: 2}
+      title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
+      section: ADDITIONAL_DISKS
+    - name: {diskSizePropertyName(index($disk)) |yamlprimitive: 2}
+      title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
+      section: ADDITIONAL_DISKS
+    {/for}
+
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+    - name: externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: NETWORKING
+      level: 1
+
+    {for $firewallRule in $spec.firewallRulesList}
+    {let $propName kind="text"}{call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}{/let}
+    {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallRule/}{/call}{/let}
+    - name: {$propName}
+      title: Source IP ranges for {$firewallTitle} traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+      level: 1
+    {/for}
+
+    {for $firewallRule in $spec.firewallRulesList}
+    {let $propName kind="text"}{call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}{/let}
+    {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallRule/}{/call}{/let}
+    - name: {$propName}
+      title: Allow {$firewallTitle} traffic
+      section: NETWORKING
+      boolean_group: FIREWALL
+    {/for}
+
+    {if $spec.ipForwarding}
+    - name: ipForward
+      title: IP forwarding
+      tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+      section: NETWORKING
+      level: 1
+    {/if}
+
+    {for $scope in $spec.gcpAuthScopesList}
+    - name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}
+      title: Allow {call display.authScopeDescription}{param spec: $scope/}{/call} on the VM
+      section: API_ACCESS
+      boolean_group: {call display.authScopeBoolGroupName}{param spec: $scope/}{/call}
+    {/for}
+
+    {if $spec.deployInput}
+    {for $section in $spec.deployInput.sectionsList}
+    {for $field in $section.fieldsList}
+    {let $fieldDisplay kind="text"}
+      {call display.deployInputFieldDisplay}
+        {param section: $section/}
+        {param field: $field/}
+      {/call}
+    {/let}
+    - {$fieldDisplay |indent: 6 |trim}
+    {/for}
+    {/for}
+    {/if}
+
+  sections:
+    {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
+
+    {if $solutionHasGpus}
+    {let $acceleratorsSection kind="text"}{call display.acceleratorsSection/}{/let}
+    {$acceleratorsSection |indent: 4, true}{nil}
+    {/if}
+    - name: BOOT_DISK
+      title: Boot Disk
+      tooltip: Each instance requires a disk to boot from.
+    {if length($spec.additionalDisksList) == 1}
+    - name: ADDITIONAL_DISKS
+      title: Additional Disk
+      tooltip: The additional disk will be attached to the instance.
+    {/if}
+    {if length($spec.additionalDisksList) > 1}
+    - name: ADDITIONAL_DISKS
+      title: Additional Disks
+      tooltip: The additional disks will be attached to the instance.
+    {/if}
+    - name: NETWORKING
+      title: Networking
+    {if length($spec.gcpAuthScopesList) > 0}
+    - name: API_ACCESS
+      title: API Access
+      tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
+    {/if}
+
+    {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+
+  {let $firewallBooleanGroups kind="text"}
+    {call display.firewallBooleanGroups}{param singleVmSpec: $spec/}{/call}
+  {/let}
+  {let $authScopeBooleanGroups kind="text"}
+    {call display.authScopeBooleanGroups}{param singleVmSpec: $spec/}{/call}
+  {/let}
+  {let $customBooleanGroups kind="text"}
+    {call display.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
+  {/let}
+  {if (strLen($firewallBooleanGroups) +
+       strLen($authScopeBooleanGroups) +
+       strLen($customBooleanGroups)) > 0}
+  boolean_groups:
+    {$firewallBooleanGroups |indent: 4, true}{nil}
+    {$authScopeBooleanGroups |indent: 4, true}{nil}
+    {$customBooleanGroups |indent: 4, true}{nil}
+  {/if}
+
+{\n}
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      {if $spec.siteUrl}
+      {let $row kind="text"}
+        {call display.siteUrlApplicationTableRow}{param spec: $spec.siteUrl/}{/call}
+      {/let}
+      {$row |indent: 6, true}{nil}
+      {/if}
+
+      {if $spec.adminUrl}
+      {let $row kind="text"}
+        {call display.adminUrlApplicationTableRow}{param spec: $spec.adminUrl/}{/call}
+      {/let}
+      {$row |indent: 6, true}{nil}
+      {/if}
+
+      {let $passwordRows kind="text"}
+        {call display.passwordApplicationTableRows}
+          {param passwordsList: $spec.passwordsList/}
+          {param deployInput: $spec.deployInput/}
+        {/call}
+      {/let}
+      {$passwordRows |indent: 6, true}{nil}
+
+      - label: Instance
+        value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
+      - label: Instance zone
+        value: '{{ properties().zone }}'
+      - label: Instance machine type
+        value: '{{ properties().machineType }}'
+
+      {if $spec.postDeploy}
+      {for $row in $spec.postDeploy.infoRowsList}
+      {let $rowDisplay kind="text"}
+        {call display.infoRowApplicationTableRow}
+          {param infoRow: $row/}
+          {param deployInput: $spec.deployInput/}
+        {/call}
+      {/let}
+      {$rowDisplay |indent: 6, true}{nil}
+      {/for}
+      {/if}
+
+  {let $adminButton kind="text"}
+    {if $spec.adminUrl}
+      {call display.adminActionButton}{param spec: $spec.adminUrl/}{/call}
+    {/if}
+  {/let}
+  {let $siteButton kind="text"}
+    {if $spec.siteUrl}
+      {call display.siteActionButton}{param spec: $spec.siteUrl/}{/call}
+    {/if}
+  {/let}
+  {let $connectButton kind="text"} // The connect button spec is always present for single vm.
+    {call display.connectActionButton}{param button: $spec.postDeploy.connectButton/}{/call}
+  {/let}
+
+
+  {if strLen($adminButton) > 0}
+  primaryButton:
+    {$adminButton |indent: 4, true}{nil}
+  secondaryButton:
+    {$connectButton |indent: 4, true}{nil}
+
+  {elseif strLen($siteButton) > 0}  // if strLen($adminButton) > 0
+  primaryButton:
+    {$siteButton |indent: 4, true}{nil}
+  secondaryButton:
+    {$connectButton |indent: 4, true}{nil}
+
+  {else}  // elseif strLen(siteButton) > 0
+  primaryButton:
+    {$connectButton |indent: 4, true}{nil}
+  {/if}
+
+  suggestedActions:
+    - heading: No external IP configured
+      description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
+      showIf: '{{ properties().externalIP == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" }}'
+
+  {if $spec.postDeploy}
+    {for $action in $spec.postDeploy.actionItemsList}
+    - heading: {$action.heading |yamlprimitive: 6}
+      {if $action.description}
+      description: {$action.description |yamlprimitive: 6}
+      {/if}
+      {if $action.snippet}
+      snippet: {$action.snippet |yamlprimitive: 6}
+      {/if}
+      {if $action.showIf}
+      showIf: '{{ {booleanExpressionDisplayCondition($action.showIf)} }}'
+      {/if}
+    {/for}
+    {/if}
+
+    {for $firewallRule in $spec.firewallRulesList}
+    {let $item kind="text"}{call display.openPortAction}{param spec: $firewallRule/}{/call}{/let}
+    {$item |indent: 4}
+    {/for}
+
+    {if length($spec.passwordsList) > 1}
+    - heading: Change the temporary passwords
+      description: For additional security, it is recommended that you change the passwords.
+    {elseif length($spec.passwordsList) > 0}
+    - heading: Change the temporary password
+      description: For additional security, it is recommended that you change the password.
+    {/if}
+
+    - heading: Assign a static external IP address to your VM instance
+      description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
+      showIf: '{{ properties().externalIP == "{externalIpTypeName(proto.ExternalIpSpec.Type.EPHEMERAL)}" }}'
+
+{\n}
+annotations:
+  autogenSpecType: 'SINGLE_VM'
+  {for $image in $spec.imagesList}
+  vmImage{index($image)}: https://www.googleapis.com/compute/v1/projects/{$image.project}/global/images/{$image.name}
+  {/for}
+
+{\n}
+metadata_version: v1
+
+{/template}

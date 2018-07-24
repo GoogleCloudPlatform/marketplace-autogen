@@ -1,0 +1,26 @@
+java_library(
+    name = "tests",
+    testonly = 1,
+    srcs = glob(["*.java"]),
+    resources = glob(["testdata/*"]),
+    deps = [
+        "//java/com/google/cloud/deploymentmanager/autogen/soy",
+        "@aopalliance_aopalliance//jar",
+        "@org_ow2_asm_asm_all//jar",
+        "@com_google_guava_guava//jar",
+        "@com_google_template_soy//jar",
+        "@com_google_truth_truth//jar",
+        "@com_ibm_icu_icu4j//jar",
+        "@junit_junit//jar",
+        "@com_google_common_html_types_types//jar",
+    ],
+)
+
+java_test(
+    name = "test_suite",
+    size = "small",
+    test_class = "com.google.cloud.deploymentmanager.autogen.soy.AutogenSoyTestSuite",
+    runtime_deps = [
+        ":tests",
+    ],
+)

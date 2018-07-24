@@ -1,0 +1,260 @@
+{namespace utilities}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Produces the property name for a firewall rule. */
+{template .firewallRulePropName kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{switch $spec.protocol}
+  {case proto.FirewallRuleSpec.Protocol.TCP}
+    {'enableTcp' + $spec.port |tierprefixed: $tierSpec}{nil}
+  {case proto.FirewallRuleSpec.Protocol.UDP}
+    {'enableUdp' + $spec.port |tierprefixed: $tierSpec}{nil}
+  {case proto.FirewallRuleSpec.Protocol.ICMP}
+    {'enableIcmp' + $spec.port |tierprefixed: $tierSpec}{nil}
+{/switch}
+{/template}
+
+
+/** Produces the targetTag for a firewall rule. */
+{template .firewallRuleTag kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{switch $spec.allowedSource}
+{case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{{ env["deployment"] }}{call .firewallRuleTagSuffix data="all"/}{nil}
+{case proto.FirewallRuleSpec.TrafficSource.TIER}
+{if $tierSpec}
+{call utilities.tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
+{/if}
+{case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+{{ env["deployment"] }}-deployment{nil}
+{/switch}
+{/template}
+
+
+/** Produces the name for a firewall rule. */
+{template .firewallRuleName kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{{ env["deployment"] }}{call .firewallRuleTagSuffix data="all"/}{nil}
+{/template}
+
+
+/**
+ * Produces the suffix of the targetTag for a firewall rule.
+ * The suffix includes only the "-TCP-80" part.
+ */
+{template .firewallRuleTagSuffix kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+  {let $portSuffix kind="text"}
+    {call .firewallRulePortSuffix}
+      {param spec: $spec /}
+    {/call}
+  {/let}
+{switch $spec.protocol}
+  {case proto.FirewallRuleSpec.Protocol.TCP}
+    -{'tcp' + $portSuffix |tierprefixed: $tierSpec, '-'}{nil}
+  {case proto.FirewallRuleSpec.Protocol.UDP}
+    -{'udp' + $portSuffix |tierprefixed: $tierSpec, '-'}{nil}
+  {case proto.FirewallRuleSpec.Protocol.ICMP}
+    -{'icmp'}{nil}
+{/switch}
+{/template}
+
+
+/**
+ * Produces "-{PORT}" if port is provided for firewall rule.
+ * In other case it returns "", empty string.
+ */
+{template .firewallRulePortSuffix kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{if strLen($spec.port) > 0}
+-{$spec.port}{nil}
+{/if}
+{/template}
+
+
+/*
+ * Produces source information for firewall rule according Traffic enum in allowedSource.
+ */
+{template .firewallRuleSource kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{switch $spec.allowedSource}
+  {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+    {call renders.firewallRuleSpecPublicSource data="all"/}
+  {case proto.FirewallRuleSpec.TrafficSource.TIER}
+    {call renders.firewallRuleSpecTierSource data="all"/}
+  {case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+    {call renders.firewallRuleSpecDeploymentSource data="all"/}
+{/switch}
+{/template}
+
+
+/** Produces the protocol as an uppercased string. */
+{template .firewallRuleProtocol kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{switch $spec.protocol}
+  {case proto.FirewallRuleSpec.Protocol.TCP}
+    TCP{nil}
+  {case proto.FirewallRuleSpec.Protocol.UDP}
+    UDP{nil}
+  {case proto.FirewallRuleSpec.Protocol.ICMP}
+    ICMP{nil}
+{/switch}
+{/template}
+
+
+/**
+ * Produces a human-readable title for a firewall rule such as
+ * "TCP 123" or "HTTPS".
+ */
+{template .firewallRuleTitle kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{if strLen($spec.port) > 0}
+{switch $spec.protocol}
+  {case proto.FirewallRuleSpec.Protocol.TCP}
+    {if $spec.port == 80}
+      HTTP{nil}
+    {elseif $spec.port == 443 }
+      HTTPS{nil}
+    {else}
+      TCP port {$spec.port}{nil}
+    {/if}
+  {case proto.FirewallRuleSpec.Protocol.UDP}
+    UDP port {$spec.port}{nil}
+{/switch}
+{else}
+  {call .firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
+{/if}
+{/template}
+
+
+
+/** Produces the property name for firewall rule source ranges. */
+{template .firewallRuleSourceRangesPropName kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{switch $spec.protocol}
+  {case proto.FirewallRuleSpec.Protocol.TCP}
+    {'tcp' + $spec.port + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
+  {case proto.FirewallRuleSpec.Protocol.UDP}
+    {'udp' + $spec.port + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
+  {case proto.FirewallRuleSpec.Protocol.ICMP}
+    {'icmp' + $spec.port + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
+{/switch}
+{/template}
+
+
+/** Produces the property name for an API scope. */
+{template .gcpAuthScopePropertyName kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{switch $spec.scope}
+  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    {'enableCloudReadonlyApi' |tierprefixed: $tierSpec}{nil}
+  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    {'enableCloudApi' |tierprefixed: $tierSpec}{nil}
+  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    {'enableComputeReadonlyApi' |tierprefixed: $tierSpec}{nil}
+  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+    {'enableComputeApi' |tierprefixed: $tierSpec}{nil}
+  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    {'enableSourceReadWriteApi' |tierprefixed: $tierSpec}{nil}
+  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    {'enableProjecthostingApi' |tierprefixed: $tierSpec}{nil}
+{/switch}
+{/template}
+
+
+/** Produces the URL for an API scope. */
+{template .gcpAuthScopeUrl kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
+{switch $spec.scope}
+  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    https://www.googleapis.com/auth/cloud-platform.read-only{nil}
+  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    https://www.googleapis.com/auth/cloud-platform{nil}
+  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    https://www.googleapis.com/auth/compute.readonly{nil}
+  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+    https://www.googleapis.com/auth/compute{nil}
+  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    https://www.googleapis.com/auth/source.read_write{nil}
+  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    https://www.googleapis.com/auth/projecthosting{nil}
+{/switch}
+{/template}
+
+
+/** Produces the URL for an InstanceUrlSpec. */
+{template .makeUrl kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
+{@param ip: string}
+{let $scheme kind="text"}
+  {switch $spec.scheme}
+    {case proto.InstanceUrlSpec.Scheme.HTTP}
+      http{nil}
+    {case proto.InstanceUrlSpec.Scheme.HTTPS}
+      https{nil}
+  {/switch}
+{/let}
+{let $port: $spec.port ? ':' + $spec.port : ''/}
+{let $path: $spec.path ? $spec.path : ''/}
+{let $query: $spec.query ? '?' + $spec.query : ''/}
+{let $fragment: $spec.fragment ? '#' + $spec.fragment : ''/}
+{$scheme}://{$ip}{$port}/{$path}{$query}{$fragment}{nil}
+{/template}
+
+
+{template .tierVmPrefix kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{{ env["deployment"] }}-{$spec.name}-vm{nil}
+{/template}
+
+
+/** Constructs an optionally conditional expression to print text
+ * related to password generation condition */
+{template .passwordConditional kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param conditionalContent: string}
+{if $password.generateIf}
+{% if {booleanExpressionJinjaExpression($password.generateIf)} %}
+{$conditionalContent}{nil}
+{% endif %}
+{else}
+{$conditionalContent}{nil}
+{/if}
+{/template}
+
+
+{template .passwordPropertyName kind="text"}
+{@param passwordIndex: int}
+generatedPassword{$passwordIndex}{nil}
+{/template}
+
+
+{template .passwordResourceName kind="text"}
+{@param passwordIndex: int}
+generated-password-{$passwordIndex}{nil}
+{/template}
+
+
+{template .passwordResourceOutputReference kind="text"}
+{@param passwordIndex: int}
+{let $resourceName kind="text"}
+  {call .passwordResourceName}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+$(ref.{$resourceName}.password){nil}
+{/template}
+
+{template .deploymentTag kind="text"}
+{{ env["deployment"] }}-deployment{nil}
+{/template}
+
+{template .tierTag kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{{ env["deployment"] }}-{$spec.name}-tier{nil}
+{/template}

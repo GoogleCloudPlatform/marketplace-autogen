@@ -1,0 +1,104 @@
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
+  - name: software_status_script.py
+    path: common/software_status_script.py
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+info:
+  version: '1.0'
+  title: WordPress Template
+
+required:
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+
+properties:
+  zone:
+    type: string
+    default: us-central1-f
+    x-googleProperty:
+      type: GCE_ZONE
+  machineType:
+    type: string
+    default: f1-micro
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+  network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+  subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  externalIP:
+    type: string
+    enum:
+      - Ephemeral
+    default: Ephemeral
+  bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: bootDiskType
+  enableTcp80:
+    type: boolean
+    default: True
+  enableTcp443:
+    type: boolean
+    default: True
+  tcp80SourceRanges:
+    type: string
+  tcp443SourceRanges:
+    type: string
+  input_localSsdsCount:
+    type: integer
+    default: 0
+    minimum: 0
+    maximum: 3
+
+outputs:
+  deployment:
+    type: string
+  password0:
+    type: string
+  project:
+    type: string
+  vmId:
+    type: string
+  vmExternalIP:
+    type: string
+  vmInternalIP:
+    type: string
+  vmName:
+    type: string
+  vmSelfLink:
+    type: string

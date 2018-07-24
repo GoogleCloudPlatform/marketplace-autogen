@@ -1,0 +1,762 @@
+{namespace renders}
+{alias cloud.deploymentmanager.autogen as proto}
+
+
+/** Constructs all firewall resources. */
+{template .firewallResources kind="text"}
+{@param specList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{for $spec in $specList}
+{call .firewallResource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+{/for}
+{/template}
+
+
+/** Constructs a firewall resource. */
+{template .firewallResource kind="text" /* visibility="private" */}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+/* Note that prop names don't take into account the tier. */
+{let $propName kind="text"}
+  {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: null/}{/call}
+{/let}
+{let $source kind="text"}
+  {call utilities.firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+{/let}
+{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{% if properties["{$propName}"] %}
+{/if}
+- name: {call utilities.firewallRuleName data="all"/}
+  type: compute.v1.firewall
+  properties:
+    network: {{ network }}
+    {$source |indent: 4}
+    targetTags: ["{call utilities.firewallRuleTag data="all"/}"]
+    allowed:
+      - IPProtocol: {call utilities.firewallRuleProtocol}{param spec: $spec/}{/call}
+        {if strLen($spec.port) > 0}
+        ports: ["{$spec.port}"]
+        {/if}
+{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{% endif %}
+{/if}
+{/template}
+
+
+/** Lists all the firewall rule tags for a VM. */
+{template .firewallRuleTags kind="text"}
+{@param specList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{for $firewallRule in $specList}
+{if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{let $item kind="text"}
+  {call utilities.firewallRuleTag}
+    {param spec: $firewallRule/}
+    {param tierSpec: $tierSpec/}
+  {/call}
+{/let}
+- {$item}
+{/if}
+{/for}
+{/template}
+
+
+/** Source for firewall rule with source Traffic.Public */
+{template .firewallRuleSpecPublicSource kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{let $sourcesPropName kind="text"}
+  {call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: null/}{/call}
+{/let}
+{% if properties.get("{$sourcesPropName}") %}
+sourceRanges:
+  {% for source in properties["{$sourcesPropName}"].split(',') %}
+  - '{{ source | trim }}'
+  {% endfor %}
+{% else %}
+sourceRanges: ["0.0.0.0/0"]
+{% endif %}{nil}
+{/template}
+
+
+/** Source for firewall rule with source Traffic.Tier */
+{template .firewallRuleSpecTierSource kind="text"}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{if $tierSpec}
+sourceTags:
+  - {call utilities.tierTag data="all"} {param spec: $tierSpec /}{/call}{nil}
+{/if}
+{/template}
+
+
+/** Source for firewall rule with source Traffic.Deployment */
+{template .firewallRuleSpecDeploymentSource kind="text"}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{if $tierSpec}
+sourceTags:
+  - {{ env["deployment"] }}-deployment{nil}
+{/if}
+{/template}
+
+
+/** Constructs password instance property */
+{template .passwordProperty kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $propertyName kind="text"}
+  {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{let $outputReference kind="text"}
+  {call utilities.passwordResourceOutputReference}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{call utilities.passwordConditional}
+{param password: $password/}
+{param conditionalContent kind="text"}
+{$propertyName}: {$outputReference}
+{/param}
+{/call}
+{/template}
+
+
+/** Constructs password resource */
+{template .passwordResource kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $resourceName kind="text"}
+  {call utilities.passwordResourceName}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{call utilities.passwordConditional}
+{param password: $password/}
+{param conditionalContent kind="text"}
+- name: {$resourceName}
+  type: password.py
+  properties:
+    length: {$password.length}
+    includeSymbols: {if $password.allowSpecialChars}True{else}False{/if}
+{/param}
+{/call}
+{/template}
+
+
+/** Constructs password output */
+{template .passwordOutput kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $outputReference kind="text"}
+  {call utilities.passwordResourceOutputReference}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{call utilities.passwordConditional}
+{param password: $password/}
+{param conditionalContent kind="text"}
+- name: password{$passwordIndex}
+  value: {$outputReference}
+{/param}
+{/call}
+{/template}
+
+
+/** Constructs password metadata entry */
+{template .passwordMetadataFromOutput kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $outputReference kind="text"}
+  {call utilities.passwordResourceOutputReference}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{call utilities.passwordConditional}
+{param password: $password/}
+{param conditionalContent kind="text"}
+- key: {$password.metadataKey |yamlprimitive: 12}
+  value: {$outputReference}
+{/param}
+{/call}
+{/template}
+
+/** Constructs password property metadata entry */
+{template .passwordMetadataFromProperty kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $propertyName kind="text"}
+  {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{call utilities.passwordConditional}
+{param password: $password/}
+{param conditionalContent kind="text"}
+- key: {$password.metadataKey |yamlprimitive: 12}
+  value: {{ properties["{$propertyName}"] }}
+{/param}
+{/call}
+{/template}
+
+/** Constructs password property schema entry */
+{template .passwordRequiredSchema kind="text"}
+{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param passwordIndex: int}
+{let $propertyName kind="text"}
+  {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
+{/let}
+{if not $password.generateIf}
+- {$propertyName}
+{/if}
+{/template}
+
+/** Constructs waiter resources. */
+{template .startupScriptAndWaiterResources kind="text"}
+{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
+{@param? enableJinjaVarName: string}
+/*
+ * Only one of the following should be specified:
+ * - No dependencies
+ * - dependsOnList
+ * - Both dependsOnTierSpec and dependsOnTierInstanceCountJinjaVarName
+ */
+{@param? dependsOnList: list<string>}
+{@param? dependsOnTierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? dependsOnTierInstanceCountJinjaVarName: string}
+{if $waiterSpec}
+
+{if $enableJinjaVarName}
+{% if {$enableJinjaVarName} %}
+{/if}
+{if $dependsOnTierInstanceCountJinjaVarName}
+{% if {$dependsOnTierInstanceCountJinjaVarName} > 0 %}
+{/if}
+
+- name: software-status
+  type: software_status.py
+  properties:
+    timeout: {$waiterSpec.waiterTimeoutSecs}
+    {if $dependsOnTierSpec}
+    prefix: {{ env['deployment'] }}-{$dependsOnTierSpec.name}
+    {/if}
+    waiterDependsOn:
+      {if $dependsOnList}
+      {for $dependsOn in $dependsOnList}
+      - {$dependsOn}
+      {/for}
+      {elseif $dependsOnTierSpec}
+      {% for vmIndex in range({$dependsOnTierInstanceCountJinjaVarName}) %}
+      - {call utilities.tierVmPrefix}{param spec: $dependsOnTierSpec/}{/call}-{{ vmIndex }}
+      {% endfor %}
+      {/if}
+
+    {if $dependsOnList and length($dependsOnList) > 1}
+    successNumber: {length($dependsOnList)}
+    {elseif $dependsOnTierSpec}
+    {% if {$dependsOnTierInstanceCountJinjaVarName} > 1 %}
+    successNumber: {{ {$dependsOnTierInstanceCountJinjaVarName} }}
+    {% endif %}
+    {/if}
+
+{if $waiterSpec.script}
+- name: software-status-script
+  type: software_status_script.py
+
+  properties:
+    {if $startupSpec}
+    initScript: |-
+      {$startupSpec.bashScriptContent |indent: 6}
+    {/if}
+    {if $waiterSpec.script.checkScriptContent}
+    checkScript: |-
+      {$waiterSpec.script.checkScriptContent |indent: 6}
+    {/if}
+{/if}
+
+{if $dependsOnTierInstanceCountJinjaVarName}
+{% endif %}
+{/if}
+{if $enableJinjaVarName}
+{% endif %}
+{/if}
+
+{/if}
+{/template}
+
+
+{template .startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
+{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
+{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{if $startupSpec?.bashScriptContent and not $waiterSpec?.script}
+- key: startup-script
+  value: |-
+    #!/bin/bash
+    {$startupSpec.bashScriptContent |indent: 4, false}
+{/if}
+{/template}
+
+/**
+ * Lists all metadata items for a startup script and waiter related configuration
+ * that are included conditionally (depending on waiter being enabled or not).
+ */
+{template .startupScriptAndWaiterMetadataItemsConditional kind="text"}
+{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
+{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{@param statusWaiterEnabled: bool}
+
+{if $statusWaiterEnabled}
+
+{if $waiterSpec}
+- key: status-config-url
+  value: $(ref.software-status.config-url)
+- key: status-variable-path
+  value: $(ref.software-status.variable-path)
+
+{if $waiterSpec.script}
+- key: status-uptime-deadline
+  value: {$waiterSpec.script.checkTimeoutSecs}
+{else}
+- key: status-uptime-deadline
+  value: {$waiterSpec.waiterTimeoutSecs}
+{/if}
+
+{if $waiterSpec.script}
+// When the waiter script is defined, we use software_status_script.py resource
+// to define the startup procedure.
+- key: startup-script
+  value: $(ref.software-status-script.startup-script)
+{/if}
+
+{if $waiterSpec.script?.disableStartupScriptUrl}
+- key: startup-script-url
+  value: ''
+{/if}
+
+{/if} // $waiterSpec
+
+{else} // $statusWaiterEnabled
+
+/* If startup script and waiter are defined, use the startup script directly
+ * when waiter usage is disabled. */
+{if $startupSpec?.bashScriptContent and $waiterSpec?.script}
+- key: startup-script
+  value: |-
+         #!/bin/bash
+         {$startupSpec.bashScriptContent}
+{/if}
+
+{/if} // $statusWaiterEnabled
+
+{/template}
+
+
+/** List all metadata items for GceMetadataItem specs. */
+{template .gceMetadataItems kind="text"}
+{@param specList: list<cloud.deploymentmanager.autogen.GceMetadataItem>}
+{@param? tierSpecList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param? deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
+{for $metadata in $specList}
+- key: {$metadata.key |yamlprimitive: 2}
+
+  {if $metadata.value}
+  value: {$metadata.value |yamlprimitive: 2}
+
+  {elseif $metadata.tierVmNames}
+  {let $tierVmNames: $metadata.tierVmNames/}
+  {let $tier: findVmTier($tierVmNames.tier, $tierSpecList)/}
+  {let $vmPrefix kind="text"}{call utilities.tierVmPrefix}{param spec: $tier/}{/call}{/let}
+  {let $instanceCount kind="text"}
+    properties["{'instanceCount' |tierprefixed: $tier}"]{nil}
+  {/let}
+
+  {if $metadata.tierVmNames.allVms}
+  {% set delimiter = joiner("{$metadata.tierVmNames.allVms.delimiter |doublequoted}") %}
+  value: {% for vmIndex in range({$instanceCount}) -%}
+    {{- delimiter() }}{$vmPrefix}-{{ vmIndex -}}
+  {%- endfor %}
+
+  {else}
+  {let $vmIndex: $tierVmNames.vmIndex ?: 0/}
+  {if $vmIndex >= 0}
+  value: {$vmPrefix}-{$vmIndex}
+  {else}
+  value: {$vmPrefix}-{{ {$instanceCount} - {-$vmIndex} }}
+  {/if}
+
+  {/if /* $metadata.tierVmNames.allVms */}
+
+  {elseif $metadata.valueFromDeployInputField}
+  {let $field: findDeployInputField($metadata.valueFromDeployInputField, $deployInput)/}
+  value: |-
+         {{ properties["{deployInputFieldName($field)}"] }}
+
+  {/if /* $metadata.value */}
+{/for}
+{/template}
+
+
+/** Defines serviceAccounts section of a VM. */
+{template .serviceAccountsSection kind="text"}
+{@param gcpAuthScopesList: list<cloud.deploymentmanager.autogen.GcpAuthScopeSpec>}
+{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+serviceAccounts:
+  - email: default
+    scopes:
+      - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+      - 'https://www.googleapis.com/auth/devstorage.read_only'
+      - 'https://www.googleapis.com/auth/logging.write'
+      - 'https://www.googleapis.com/auth/monitoring.write'
+
+      {for $scope in $gcpAuthScopesList}
+      {% if {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call} %}
+      {let $url kind="text"}{call utilities.gcpAuthScopeUrl}{param spec: $scope/}{/call}{/let}
+      - '{$url |quoted}'
+      {% endif %}
+      {/for}
+
+      {if $waiterSpec}
+      - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+      {/if}
+{/template}
+
+
+{template .zonePropertySchema kind="text"}
+{@param name: string}
+{@param? zoneSpec: cloud.deploymentmanager.autogen.ZoneSpec}
+{$name}:
+  type: string
+  {if $zoneSpec and $zoneSpec.defaultZone}
+  default: {$zoneSpec.defaultZone}
+  {else}
+  default: us-central1-f
+  {/if}
+  x-googleProperty:
+    type: GCE_ZONE
+{/template}
+
+
+{template .imagePropertySchema kind="text"}
+{@param name: string}
+{@param imagesList: list<cloud.deploymentmanager.autogen.ImageSpec>}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$name |tierprefixed: $tier}:
+  type: string
+  enum:
+    {for $image in $imagesList}
+    - '{index($image)}'
+    {/for}
+  default: '0'
+{/template}
+
+
+{template .machineTypePropertySchema kind="text"}
+{@param name: string}
+{@param spec: cloud.deploymentmanager.autogen.MachineTypeSpec}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$name |tierprefixed: $tier}:
+  type: string
+  default: {$spec.defaultMachineType.gceMachineType}
+  x-googleProperty:
+    type: GCE_MACHINE_TYPE
+    zoneProperty: zone
+    {if $spec.minimum}
+    gceMachineType:
+      {if $spec.minimum.cpu}
+      minCpu: {$spec.minimum.cpu}
+      {/if}
+      {if $spec.minimum.ramGb}
+      minRamGb: {$spec.minimum.ramGb}
+      {/if}
+    {/if}
+{/template}
+
+
+{template .acceleratorPropertiesSchema kind="text"}
+{@param namePrefix: string}
+{@param spec: cloud.deploymentmanager.autogen.AcceleratorSpec}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$namePrefix + 'Type' |tierprefixed: $tier}:
+  type: string
+  default: {$spec.defaultType}
+  x-googleProperty:
+    type: GCE_GPU_TYPE
+    gceGpuType:
+      machineTypeProperty: {'machineType' |tierprefixed: $tier}
+      gpuType:
+        {for $gpuType in $spec.typesList}
+        - {$gpuType}
+        {/for}
+
+{$namePrefix + 'Count' |tierprefixed: $tier}:
+  type: integer
+  default: {$spec.defaultCount ?: 0}
+  x-googleProperty:
+    type: GCE_GPU_COUNT
+    gceGpuCount:
+      machineTypeProperty: {'machineType' |tierprefixed: $tier}
+{/template}
+
+
+{template .networkPropertiesSchema kind="text"}
+{@param nameSuffix: string}
+{@param zonePropertyName: string}
+{$nameSuffix}:
+  type: string
+  default: default
+  x-googleProperty:
+    type: GCE_NETWORK
+sub{$nameSuffix}:
+  type: string
+  x-googleProperty:
+    type: GCE_SUBNETWORK
+    zoneProperty: {$zonePropertyName}
+    gceSubnetwork:
+      networkProperty: network
+{/template}
+
+
+{template .externalIpPropertySchema kind="text"}
+{@param name: string}
+{@param spec: cloud.deploymentmanager.autogen.ExternalIpSpec}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$name |tierprefixed: $tier}:
+  type: string
+  enum:
+    {if $spec.notConfigurable}
+    - {externalIpTypeName($spec.defaultType)}
+    {else}
+    - {externalIpTypeName(proto.ExternalIpSpec.Type.EPHEMERAL)}
+    - {externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}
+    {/if}
+  default: {externalIpTypeName($spec.defaultType)}
+{/template}
+
+
+{template .ipForwardingPropertySchema kind="text"}
+{@param name: string}
+{@param spec: cloud.deploymentmanager.autogen.IpForwardingSpec}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$name |tierprefixed: $tier}:
+  type: string
+  enum:
+    - 'On'
+    - 'Off'
+  default: {if $spec.defaultOff}'Off'{else}'On'{/if}
+{/template}
+
+
+{template .bootDiskPropertiesSchema kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.DiskSpec}
+{@param zonePropertyName: string}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{'bootDiskType' |tierprefixed: $tier}:
+  type: string
+  default: {$spec.diskType.defaultType}
+  x-googleProperty:
+    type: GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
+{'bootDiskSizeGb' |tierprefixed: $tier}:
+  type: integer
+  default: {$spec.diskSize.defaultSizeGb}
+  {if $spec.diskSize.minSizeGb}
+  minimum: {$spec.diskSize.minSizeGb}
+  {/if}
+  maximum: 10000
+  x-googleProperty:
+    type: GCE_DISK_SIZE
+    gceDiskSize:
+      diskTypeProperty: {'bootDiskType' |tierprefixed: $tier}
+{/template}
+
+{template .additionalDiskPropertiesSchema kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.DiskSpec}
+{@param diskIndex: int}
+{@param zonePropertyName: string}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{diskTypePropertyName($diskIndex, $tier)}:
+  type: string
+  default: {$spec.diskType.defaultType}
+  x-googleProperty:
+    type: GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
+{diskSizePropertyName($diskIndex, $tier)}:
+  type: integer
+  default: {$spec.diskSize.defaultSizeGb}
+  {if $spec.diskSize.minSizeGb}
+  minimum: {$spec.diskSize.minSizeGb}
+  {/if}
+  maximum: 10000
+  x-googleProperty:
+    type: GCE_DISK_SIZE
+    gceDiskSize:
+      diskTypeProperty: {diskTypePropertyName($diskIndex, $tier)}
+{/template}
+
+{template .tierInstanceAcountPropertySchema kind="text"}
+{@param name: string}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec.TierInstanceCount}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$name |tierprefixed: $tier}:
+  type: integer
+  default: {$spec.defaultValue}
+  {if $spec.range}
+  minimum: {$spec.range.startValue}
+  maximum: {$spec.range.endValue}
+  {elseif $spec.list}
+  enum:
+    {for $value in $spec.list.valuesList}
+    - {$value}
+    {/for}
+  {/if}
+{/template}
+
+
+{template .deployInputPropertiesSchema kind="text"}
+{@param inputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{let $fields: $tierSpec ?
+  listDeployInputFields($inputSpec, $tierSpec)
+  : listDeployInputFields($inputSpec)/}
+{for $field in $fields}
+{let $fieldSchema kind="text"}
+  {call .deployInputFieldSchema}{param field: $field/}{/call}
+{/let}
+{$fieldSchema}{nil}
+{/for}
+{/template}
+
+
+{template .deployInputFieldSchema /* visibility = "private" */ kind="text"}
+{@param field: cloud.deploymentmanager.autogen.DeployInputField}
+{deployInputFieldName($field) |yamlprimitive: 0}:
+{if $field.booleanCheckbox}
+  type: boolean
+  default: {if $field.booleanCheckbox.defaultValue}True{else}False{/if}
+{elseif $field.groupedBooleanCheckbox}
+  type: boolean
+  default: {if $field.groupedBooleanCheckbox.defaultValue}True{else}False{/if}
+{elseif $field.integerBox}
+  {let $box: $field.integerBox/}
+  type: integer
+  {if $box.defaultValue}
+  default: {$box.defaultValue.value ?: 0}
+  {/if}
+  {if $box.validation.min}
+  minimum: {$box.validation.min.value ?: 0}
+  {/if}
+  {if $box.validation.max}
+  maximum: {$box.validation.max.value ?: 0}
+  {/if}
+{elseif $field.integerDropdown}
+  {let $dropdown: $field.integerDropdown/}
+  type: integer
+  {if $dropdown.defaultValueIndex}
+  {let $defaultIndex: $dropdown.defaultValueIndex.value ?: 0/}
+  default: {$dropdown.valuesList[$defaultIndex]}
+  {/if}
+  enum:
+  {for $value in $dropdown.valuesList}
+  - {$value}
+  {/for}
+{elseif $field.stringBox}
+  {let $box: $field.stringBox/}
+  type: string
+  {if $box.defaultValue}
+  default: {$box.defaultValue |yamlprimitive: 2}
+  {/if}
+  {if $box.validation?.regex}
+  pattern: {$box.validation.regex |yamlprimitive: 2}
+  {/if}
+{elseif $field.emailBox}
+  {let $box: $field.emailBox/}
+  type: string
+  {if $box.defaultValue}
+  default: {$box.defaultValue |yamlprimitive: 2}
+  {/if}
+  {if $box.validation?.regex}
+  pattern: {$box.validation.regex |yamlprimitive: 2}
+  {/if}
+  x-googleProperty:
+    type: EMAIL_ADDRESS
+{elseif $field.stringDropdown}
+  {let $dropdown: $field.stringDropdown/}
+  type: string
+  {if $dropdown.defaultValueIndex}
+  {let $defaultIndex: $dropdown.defaultValueIndex.value ?: 0/}
+  default: {$dropdown.valuesList[$defaultIndex] |yamlprimitive: 2}
+  {/if}
+  enum:
+  {for $value in $dropdown.valuesList}
+  - {$value |yamlprimitive: 4}
+  {/for}
+{elseif $field.zoneDropdown}
+  {let $dropdown: $field.zoneDropdown/}
+  type: string
+  {if $dropdown.defaultValue}
+  default: {$dropdown.defaultValue.value ?: '' |yamlprimitive: 2}
+  {/if}
+  x-googleProperty:
+    type: GCE_ZONE
+{/if}
+{/template}
+
+
+{template .deployInputRequiredSchema kind="text"}
+{@param? inputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{if $inputSpec}
+{let $fields: $tierSpec ?
+  listDeployInputFields($inputSpec, $tierSpec)
+  : listDeployInputFields($inputSpec)/}
+{for $field in $fields}
+{if $field.required}
+- {deployInputFieldName($field)}
+{/if}
+{/for}
+{/if}
+{/template}
+
+
+{template .jinjaConditionalContent kind="text"}
+{@param enabledContent: string}
+{@param disabledContent: string}
+{@param jinjaConditionalVariableName: string}
+{if strLen($enabledContent) > 0}
+{% if {$jinjaConditionalVariableName} %}
+{$enabledContent}{nil}
+{if strLen($disabledContent) > 0}
+{% else %}
+{$disabledContent}{nil}
+{/if}
+{% endif %}
+{elseif strLen($disabledContent) > 0}
+{% if not {$jinjaConditionalVariableName} %}
+{$disabledContent}{nil}
+{% endif %}
+{/if}
+{/template}
+
+
+{template .localSsdPropertyItem kind="text"}
+{@param localSsdSpec: cloud.deploymentmanager.autogen.LocalSsdSpec}
+{@param deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
+{if $localSsdSpec.count and $localSsdSpec.count > 0}
+localSSDs: {$localSsdSpec.count}{nil}
+{elseif $localSsdSpec.countFromDeployInputField}
+{let $field: findDeployInputField($localSsdSpec.countFromDeployInputField, $deployInput)/}
+localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
+{/if}
+{/template}
+
+
+{template .additionalDiskSection kind="text"}
+{@param additionalDisksList: list<cloud.deploymentmanager.autogen.DiskSpec>}
+{@param deployInputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param instanceName: string}
+{for $disk in $additionalDisksList}
+{let $deviceNameSuffix kind="text"}
+  {if $disk.deviceNameSuffix.name}
+    {$disk.deviceNameSuffix.name}{nil}
+  {elseif $disk.deviceNameSuffix.nameFromDeployInputField}
+    {let $field: findDeployInputField($disk.deviceNameSuffix.nameFromDeployInputField, $deployInputSpec)/}
+    {{ properties["{deployInputFieldName($field)}"] }}{nil}
+  {/if}
+{/let}
+- deviceName: {$instanceName}-{$deviceNameSuffix}
+  type: PERSISTENT
+  diskType: {{ properties["{diskTypePropertyName(index($disk), $tierSpec)}"] }}
+  diskSizeGb: {{ properties["{diskSizePropertyName(index($disk), $tierSpec)}"] }}
+  boot: False
+  autoDelete: True
+{/for}
+{/template}
