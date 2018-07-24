@@ -1,0 +1,12 @@
+java_library(
+    name = "soy",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_guava_guava//jar",
+        "@com_google_inject_guice//jar",
+        "@com_google_protobuf_protobuf_java//jar",
+        "@com_google_template_soy//jar",
+        "@org_yaml_snakeyaml//jar",
+    ],
+)

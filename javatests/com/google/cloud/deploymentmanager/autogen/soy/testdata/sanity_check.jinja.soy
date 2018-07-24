@@ -1,0 +1,114 @@
+{namespace test}
+
+/**
+ * Notes about comments:
+ *  - Soy comments are not present in the generated jinja file (of course!).
+ *  - Use jinja's {# ... #} and # ... for comments that should be in the
+ *    generated jinja file. Note that these will not be in the final yaml file.
+ *    Remember, this soy file is a super-template that generates a jinja
+ *    template that generates a yaml file!
+ *  - Use {{ '# ...' }} for comments/strings that should be in the final yaml
+ *    file.
+ */
+
+/** IMPORTANT: All templates should have type "text". */
+{template .sanityCheck kind="text"}
+{@param supportFirewall: bool}
+{@param supportStaticIp: bool}
+{@param description: string}
+{@param zone: string}
+{@param port: int}
+
+// When "if" block is used on one line, custom line breaks should be used, or
+// it will result in empty lines when "if" evaluates to false (without "else").
+// For this reason, prefer using multiline version of "if" block.
+{if $supportFirewall}{% set openFirewall = properties["openFirewall"] %}{\n}{/if}
+{if $supportStaticIp}{% set staticIp = properties["staticIp"] %}{\n}{/if}
+{% set network = properties["network"] %}{\n}
+
+{\n}  // Forces an empty line. Empty lines by default are removed.
+info:
+  {let $title kind="text"}World's best{/let}{nil}
+  title: {$title |yamlprimitive: 2}
+{\n}
+resources:
+  - type: compute.v1.instance
+    name: vm
+    properties:
+      // Quoted yaml text should use |quoted directive.
+      description: '{$description |quoted}'
+      zone: {$zone}
+      network: {{ network }}
+      // When "if" command is by itself, no needs for custom line breaks.
+      // This is in contrast with putting the entire "if" block on one line.
+      {if $supportFirewall}
+      tags:
+        - FIREWALLED
+      {/if}
+      {if $supportStaticIp}
+      staticIp: $(ref.address.ip)
+      {/if}
+      metadata:
+        items:
+          - key: startup-script
+            value: |
+              /* This demonstrates calling a subtemplate. */
+              {let $script kind="text"}
+                {call .startupScript}{param additionalContent: 'func a {}'/}{/call}
+              {/let}
+              { $script        // This
+                |indent: 14 }  // should work
+          - key: startup-script1
+            value: |
+              // This demonstrates calling a subtemplate.
+              {let $script1 kind="text"}
+                {call .startupScript}{/call}
+              {/let}
+              {$script1 |indent: 14}
+
+  {if                    // This
+      $supportFirewall}  // should work
+  {\n}  /* Forces an empty line. Note that leading spaces are still stripped. */
+  {# Firewall #}
+  {% if openFirewall %}
+  - type: compute.v1.firewall
+    name: firewall
+    properties:
+      port: {$port}
+      network: {{ network }}
+      sourceTags:
+        - FIREWALLED
+  {% endif %}
+  {/if}
+
+  {if $supportStaticIp}
+  {\n}
+  {# Static IP address #}
+  {% if staticIp %}
+  - type: compute.v1.address
+    name: address
+  {% endif %}
+  {/if}
+
+{\n}
+outputs:
+  - name: vm_ip
+    value: $(ref.vm.ip)
+
+{/template}
+
+//----------------------------------------
+
+{template .startupScript /* visibility="private" */ kind="text"}
+{@param? additionalContent: string}
+{let $shebang: '{{ "#! /bin/bash" }}'/}
+{$shebang}
+wget "http://metadata"
+{if $additionalContent}
+wget "http://www.google.com"
+{$additionalContent}{nil}  // Don't end with a new line.
+{else}
+wget \
+  "http://www.google.com"{plsp}  // Don't end with a new line but preserve leading spaces.
+{/if}
+{/template}

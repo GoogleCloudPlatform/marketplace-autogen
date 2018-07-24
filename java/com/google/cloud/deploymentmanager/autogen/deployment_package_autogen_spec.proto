@@ -1,0 +1,912 @@
+// Defines specifications used for auto-generating deployment packages.
+// The deployment package is deployable in Deployment Manager but missing
+// solution description. Solution description must be injected into the
+// generated package to make it fully viewable in Deployment Manager UIs.
+//
+// TODO(huyhuynh): We should drop all "Spec" suffixes in the message names
+// except the top level one.
+
+syntax = "proto3";
+
+package cloud.deploymentmanager.autogen;
+
+option java_multiple_files = true;
+option java_package = "com.google.cloud.deploymentmanager.autogen.proto";
+option java_outer_classname = "DeploymentPackageAutogenSpecProtos";
+
+// Top level spec.
+message DeploymentPackageAutogenSpec {
+  oneof spec {
+    // For solution deploying a single VM.
+    SingleVmDeploymentPackageSpec single_vm = 1;
+    // For solution deploying multiple tiers of VMs.
+    MultiVmDeploymentPackageSpec multi_vm = 2;
+  }
+  // Human readable version of the deployment package.
+  string version = 3;
+}
+
+// Specifies a solution that deploys a single VM.
+// Next ID: 20
+message SingleVmDeploymentPackageSpec {
+  // Defines the disk images. If there are more than one, the user can select
+  // which image to deploy with. The 1st image is the default.
+  // Required.
+  repeated ImageSpec images = 1;
+
+  // Specifies the default machine type, and any size constraints which
+  // restrict what the user can select.
+  // Will use defaults if not specified.
+  MachineTypeSpec machine_type = 2;
+
+  // Defines boot disk. Will use defaults if not specified.
+  DiskSpec boot_disk = 3;
+
+  // Specifies additionally added local SSD disks
+  // (with a default naming convention).
+  LocalSsdSpec local_ssds = 17;
+
+  // Defines additional persistent disks. Optional.
+  repeated DiskSpec additional_disks = 16;
+
+  // If not specified, IP forwarding is forced off and not user-configurable.
+  IpForwardingSpec ip_forwarding = 4;
+
+  // Specifies the default firewall rules to access the deployed application.
+  // They could be off by default, but should still be listed so that the user
+  // can get instructions on how to enable them post-deployment.
+  repeated FirewallRuleSpec firewall_rules = 5;
+
+  // Declares a URL to access the deployed application.
+  InstanceUrlSpec site_url = 6;
+  // Declares a URL to administer the deployed application.
+  InstanceUrlSpec admin_url = 7;
+
+  // Defines how to generate passwords at deployment time.
+  repeated PasswordSpec passwords = 8;
+
+  // Declares what GCP APIs should be available to the VM.
+  repeated GcpAuthScopeSpec gcp_auth_scopes = 9;
+
+  // Specifies a startup script for a VM instance.
+  GceStartupScriptSpec gce_startup_script = 18;
+
+  // Defines how to determine the application installation status in
+  // post-deployment. This tells when the application is ready for consumption.
+  ApplicationStatusSpec application_status = 10;
+
+  // Defines how the VM is accessible from the Internet.
+  // Will use defaults if not specified.
+  ExternalIpSpec external_ip = 11;
+
+  // Customizes post-deploy information displayed to the user.
+  // This helps get the user started with using the deployed solution.
+  PostDeployInfo post_deploy = 12;
+
+  // Customizes metadata items on a GCE VM instance.
+  repeated GceMetadataItem gce_metadata_items = 13;
+
+  // Attach accelerator hardware (GPU) to the VM.
+  // Currently at most accelerator is supported.
+  repeated AcceleratorSpec accelerators = 14;
+
+  // Customizes additional inputs configured by user prior to deployment.
+  // Currently, the configured values can be passed through to the VM via
+  // metadata items.
+  DeployInputSpec deploy_input = 15;
+
+  // Customizes the zone selector.
+  ZoneSpec zone = 19;
+}
+
+message MultiVmDeploymentPackageSpec {
+  // One or more tiers.
+  repeated VmTierSpec tiers = 1;
+
+  // Declares a URL to access the deployed application.
+  InstanceUrlSpec site_url = 2;
+
+  // Declares a URL to administer the deployed application.
+  InstanceUrlSpec admin_url = 3;
+
+  // Defines how to generate passwords at deployment time.
+  repeated PasswordSpec passwords = 4;
+
+  // Customizes post-deploy information displayed to the user.
+  // This helps get the user started with using the deployed solution.
+  PostDeployInfo post_deploy = 5;
+
+  // Customizes additional inputs configured by user prior to deployment.
+  // Currently, the configured values can be passed through to the VM via
+  // metadata items.
+  DeployInputSpec deploy_input = 6;
+
+  // Customizes the zone selector.
+  ZoneSpec zone = 7;
+}
+
+// A tier consists of one or more VMs of the same type. Each VM is
+// uniquely identified by its index.
+// Next ID: 17
+message VmTierSpec {
+
+  // Unique name for this tier. Only lowercases. Required.
+  string name = 1;
+
+  // Display title for this tier. Required.
+  string title = 2;
+
+  // Defines the number of VM instances in this tier.
+  TierInstanceCount instance_count = 3;
+
+  // Defines the disk images. If there are more than one, the user can select
+  // which image to deploy with. The 1st image is the default.
+  // Required.
+  repeated ImageSpec images = 4;
+
+  // Specifies the default machine type, and any size constraints which
+  // restrict what the user can select.
+  // Will use defaults if not specified.
+  MachineTypeSpec machine_type = 5;
+
+  // Defines boot disk. Will use defaults if not specified.
+  DiskSpec boot_disk = 6;
+
+  // Defines additional persistent disks to attach to each VM. Optional
+  repeated DiskSpec additional_disks = 14;
+
+  // Specifies additionally added local SSD disks
+  // (with a default naming convention).
+  LocalSsdSpec local_ssds = 15;
+
+  // If not specified, IP forwarding is forced off and not user-configurable.
+  IpForwardingSpec ip_forwarding = 7;
+
+  // Declares what GCP APIs should be available to the VM.
+  repeated GcpAuthScopeSpec gcp_auth_scopes = 8;
+
+  // Specifies a startup script for each VM instance in this tier.
+  GceStartupScriptSpec gce_startup_script = 16;
+
+  // Defines how to determine that VMs in this tier are ready to serve.
+  // The entire deployment is ready to serve when all tiers are.
+  ApplicationStatusSpec application_status = 9;
+
+  // Defines how the VMs are accessible from the Internet.
+  // Will use defaults if not specified.
+  ExternalIpSpec external_ip = 10;
+
+  // Customizes metadata items on each GCE VM instance.
+  repeated GceMetadataItem gce_metadata_items = 11;
+
+  // Attach accelerator hardware (GPU) to the VM.
+  // Currently at most accelerator is supported.
+  repeated AcceleratorSpec accelerators = 12;
+
+  // Specifies the default firewall rules to access the VMs in this tier.
+  // They could be off by default, but should still be listed so that the user
+  // can get instructions on how to enable them post-deployment.
+  repeated FirewallRuleSpec firewall_rules = 13;
+
+  message TierInstanceCount {
+    // The default number of instances. Must satisfy the constraint.
+    int32 default_value = 1;
+
+    oneof constraint {
+      // Specifies a range of contiguous values.
+      Int32Range range = 2;
+
+      // Explicitly lists out the supported values.
+      Int32List list = 3;
+    }
+
+    // Optional. Specify the tooltip text.
+    // If not specified, it will get a default value.
+    string tooltip = 4;
+
+    // Optional. Field's description.
+    string description = 5;
+  }
+}
+
+// Specifies a disk image resource.
+message ImageSpec {
+  // The GCP project containing the image. Required.
+  string project = 1;
+  // The name of the image. Required.
+  string name = 2;
+  // A descriptive label for this image, useful in a list of
+  // images for the user to select from.
+  string label = 3;
+}
+
+// Specifies the default machine type, and any size constraints which
+// restrict what the user can select.
+message MachineTypeSpec {
+
+  // Specifies a machine type.
+  message MachineType {
+    // A predefined or custom machine type. Required.
+    // See http://cloud.google.com/compute/docs/machine-types.
+    string gce_machine_type = 1;
+  }
+  // Specifies the machine type that should be selecteed by default. Required.
+  MachineType default_machine_type = 1;
+
+  // Specifies an upper- or lower-bound constraint.
+  message MachineTypeConstraint {
+    int32 cpu = 1;
+    float ram_gb = 2;
+  }
+  // Specifies the minimum requirement for a user-selected machine type.
+  MachineTypeConstraint minimum = 2;
+  // Specifies the minimum requirement for a user-selected machine type.
+  // Not supported yet (no max).
+  MachineTypeConstraint maximum = 3;
+  // Whether to restrict the user from changing away from the default settings.
+  // Not supported yet (always false).
+  bool not_configurable = 4;
+}
+
+message LocalSsdSpec {
+  oneof count_spec {
+    // Specifies the number of local SSDs to be attached to a vm instance.
+    int32 count = 1;
+    // Specifies the number of local SSDs by referencing a value from a deploy
+    // input field.
+    string count_from_deploy_input_field = 2;
+  }
+}
+
+// Specifies a persistent disk.
+message DiskSpec {
+  // Previously used for the 'name' property.
+  reserved 3;
+
+  message DiskSize {
+    // The default disk size in GB. Required.
+    int32 default_size_gb = 1;
+    // Specifies the min disk size allowed in GB.
+    int32 min_size_gb = 2;
+    // Specifies the max disk size allowed in GB. Not supported yet.
+    int32 max_size_gb = 3;
+    // Whether to restrict the user from changing away from the default settings.
+    // Not supported yet (always false).
+    bool not_configurable = 4;
+  }
+  DiskSize disk_size = 1;
+
+  message DiskType {
+    // The default disk type. Required.
+    // See http://cloud.google.com/compute/docs/reference/latest/diskTypes.
+    string default_type = 1;
+    // Whether to restrict the user from changing away from the default settings.
+    // Not supported yet (always false).
+    bool not_configurable = 2;
+  }
+  DiskType disk_type = 2;
+
+  // A short descriptive label for this disk.
+  // Optional for boot disk; default is 'Boot disk'.
+  // Optional if this is the only one additional disk; default is 'Data disk'.
+  // Required otherwise.
+  string display_label = 4;
+
+  message DeviceName {
+    oneof device_name {
+      // Device name specified as a constant string. Optional.
+      // By default takes the value of disk's name.
+      string name = 1;
+
+      // Specifies a deploy input field name from which the device name
+      // should be read.
+      string name_from_deploy_input_field = 2;
+    }
+  }
+
+  // Specifies the device name suffix. Ignored for boot disk. Optional.
+  // The final device name will be a concatenation of an instance name with
+  // the specified device name.
+  DeviceName device_name_suffix = 5;
+}
+
+// Specifies if the VM can route IP packets.
+// See http://cloud.google.com/compute/docs/networking#eventualconsistency.
+message IpForwardingSpec {
+  // Specifies that by default it should be off.
+  bool default_off = 1;
+  // Whether to restrict the user from changing away from the default settings.
+  // Not supported yet (always false).
+  bool not_configurable = 2;
+}
+
+// Specifies a firewall rule.
+message FirewallRuleSpec {
+  // The IP Protocol that the firewall rule allows.
+  enum Protocol {
+    PROTOCOL_UNSPECIFIED = 0;
+    TCP = 1;
+    UDP = 2;
+    ICMP = 3;
+  }
+  // Description of network source.
+  enum TrafficSource {
+    // Defaults to Public to keep backward compatibility.
+    SOURCE_UNSPECIFIED = 0;
+    // Applies to traffic incoming from the internet, with default source range
+    // of 0.0.0.0/0 or configurable by end user.
+    // This rule can be enabled or disabled by end user.
+    PUBLIC = 1;
+    // Applies to traffic between instances within a tier.
+    // This rule is not configurable (enable/disable) by end user.
+    TIER = 2;
+    // Applies to traffic between all instances in the deployment.
+    // This rule is not configurable (enable/disable) by end user.
+    DEPLOYMENT = 3;
+  }
+  // The IP Protocol that the firewall rule allows. Required.
+  Protocol protocol = 1;
+  // The target ports on the VM, which could be a single port number like "80"
+  // or a port range like "32768-40000".
+  string port = 2;
+  // Specifies that by default it should be off.
+  // Applicable to TrafficSource.PUBLIC only.
+  bool default_off = 3;
+  // Whether to restrict the user from changing away from the default settings.
+  // Not supported yet (always false).
+  // Applicable to TrafficSource.PUBLIC only.
+  bool not_configurable = 4;
+  // Source of traffic, wrapping range/tags with friendly enum.
+  // Defaults to TrafficSource.PUBLIC.
+  TrafficSource allowed_source = 5;
+}
+
+// Specifies a URL used for accessing the application on the VM.
+// The domain is implied as the VM instance address.
+// Currently the machine IP is used, but that might change to
+// another endpoint in the future.
+message InstanceUrlSpec {
+  // The URL scheme. Required.
+  enum Scheme {
+    SCHEME_UNSPECIFIED = 0;
+    HTTP = 1;
+    HTTPS = 2;
+  }
+  // The URL scheme.
+  Scheme scheme = 1;
+  // The URL port.
+  int32 port = 2;
+  // The URL path, without the leading forward slash.
+  string path = 3;
+  // The URL query, without the leading question mark.
+  string query = 4;
+  // The URL fragment, without the leading hash sign.
+  string fragment = 5;
+  // Specifies a VM from tier whose address would be used. Required in a
+  // multi-VM configuration.
+  TierVmInstance tier_vm = 6;
+}
+
+// Identifies a specific VM in a tier.
+message TierVmInstance {
+  // Name of the tier.
+  string tier = 1;
+  // 0-based index of the VM in the tier. A negative index can be used, with
+  // -1 referring the last, -2 the second last, etc.
+  int32 index = 2;
+}
+
+// Specifies a generated password and username combination.
+message PasswordSpec {
+  // Specifies the name of the metadata entry, whose value contains the
+  // generated password, accessible to the VM. Must be unique per password spec
+  // in the same package spec.
+  // Required.
+  string metadata_key = 1;
+  // The length of the generated password. Required.
+  int32 length = 2;
+  // Whether special characters should be included in the generated password.
+  bool allow_special_chars = 3;
+  oneof username_spec {
+    // Specifies a static username accompanying this password.
+    string username = 4;
+    // Specifies that the username should come from a deploy input field whose
+    // name is specified here.
+    string username_from_deploy_input_field = 6;
+  }
+  // A label describing the purpose of this username/password.
+  // Required, unless this is the only password, in which case the label
+  // defaults to "Admin".
+  string display_label = 5;
+  // Specifies a condition to decide if password should be generated or not.
+  // Optional. If it is not specified, the password is generated.
+  BooleanExpression generate_if = 7;
+}
+
+// Specifies access to an GCP API on the VM. This effectively
+// configures the corresponding scope under the VM's service account.
+message GcpAuthScopeSpec {
+  // API scope.
+  enum Scope {
+    SCOPE_UNSPECIFIED = 0;
+    // https://www.googleapis.com/auth/cloud-platform.read-only
+    CLOUD_PLATFORM_READONLY = 1;
+    // https://www.googleapis.com/auth/cloud-platform
+    CLOUD_PLATFORM = 2;
+    // https://www.googleapis.com/auth/compute.readonly
+    COMPUTE_READONLY = 3;
+    // https://www.googleapis.com/auth/compute
+    COMPUTE = 4;
+    // https://www.googleapis.com/auth/source.read_write
+    SOURCE_READ_WRITE = 5;
+    // https://www.googleapis.com/auth/projecthosting
+    PROJECTHOSTING = 6;
+  }
+  // API scope. Required.
+  Scope scope = 1;
+  // Specifies that by default it should be off.
+  bool default_off = 2;
+  // Whether to restrict the user from changing away from the default settings.
+  // Not supported yet (always false).
+  bool not_configurable = 3;
+}
+
+// Specifies the initial startup script for a VM instance.
+message GceStartupScriptSpec {
+  // Specifies a complete startup script. If waiter specifies its check script,
+  // those two will be combined with a software_status_script.py resource.
+  // Required.
+  string bash_script_content = 1;
+}
+
+// Specifies how to monitor application installation status in order to
+// detect when the application is ready or has failed.
+message ApplicationStatusSpec {
+  // Defines how to monitor application installation status.
+  enum StatusType {
+    NONE = 0;
+    // Deprecated.
+    LEGACY_DETECTOR = 1;
+    // Uses runtime config waiter to block the deployment until the
+    // the application finishes installing. Accompanied by WaiterSpec.
+    WAITER = 2;
+  }
+  // Defines how to monitor application installation status. Required.
+  StatusType type = 1;
+
+  // Specifies how the waiter is setup.
+  message WaiterSpec {
+    // Timeout when the waiter fails itself in absence of status signals.
+    // Required.
+    int32 waiter_timeout_secs = 1;
+
+    // Specifies the integration with the VM to signal the waiter via
+    // startup-script.
+    message ScriptSpec {
+      // If not set, the waiter timeout will be used.
+      int32 check_timeout_secs = 1;
+      // Optional bash script to check the status. This should return 0 if
+      // the application is ready, 1 if the application is not yet ready but the
+      // check should be retried, and greater than 1 if the check has failed
+      // permanently.
+      // If the script is not present, the waiter is signaled as soon as the
+      // VM finishes booting.
+      string check_script_content = 2;
+      // If true, the generated template will include an empty
+      // "startup-script-url" VM metadata value. This effectively disables
+      // project-wide startup_script_url settings which took precedence over
+      // instance-level startup_script settings in older versions of the
+      // Google instance init logic.
+      // This option is not necessary for images that use Google base packages
+      // newer than June, 2016. See b/31729022 for more context.
+      // TODO(volkman): Remove this once all images (Brocade, etc.) have moved
+      // to the new base package version.
+      bool disable_startup_script_url = 3;
+    }
+    // Optional integration with the VM to signal the waiter via startup-script.
+    // If the script spec is not present, the application is expected to
+    // directly signal the waiter.
+    ScriptSpec script = 2;
+  }
+  // Required if type is WAITER.
+  WaiterSpec waiter = 2;
+}
+
+// Defines how a VM is exposed on the Internet.
+message ExternalIpSpec {
+  // How the VM is exposed on the Internet.
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    // The VM is not accessible from the Internet.
+    NONE = 1;
+    // The VM is accessible from the Internet with an ephemeral IP.
+    EPHEMERAL = 2;
+  }
+
+  // Required.
+  Type default_type = 1;
+
+  // Whether to restrict the user from changing away from the default settings.
+  bool not_configurable = 2;
+}
+
+// Customizes post-deploy information displayed to the user.
+// This information helps get the user started with using the deployed solution.
+message PostDeployInfo {
+  // Specifies an action item for the user to take.
+  // Text content fields can either contain non-localized en-US text or a
+  // reference (e.g. @ACTION_1_HEADING) into a localized text file. The latter
+  // is not yet implemented, so only en-US text for now.
+  message ActionItem {
+    // Summary heading for the item. UTF-8 text. No markup. At most 64 characters.
+    // Required.
+    string heading = 1;
+
+    // Longer description of the item. UTF-8 text.
+    // HTML <code>&lt;a href&gt;</code> tags only. At most 512 characters.
+    // Optional. At least one of description or snippet is required.
+    string description = 2;
+
+    // Fixed-width formatted code snippet.
+    // Accepts string expressions. UTF-8 text. No markup. At most 512 characters.
+    // Optional. At least one of description or snippet is required.
+    string snippet = 3;
+
+    // Specify the condition to display this action item. Optional.
+    BooleanExpression show_if = 4;
+  }
+
+  // Specifies a row in the application info table.
+  // Text content fields can either contain non-localized en-US text or a
+  // reference (e.g. @ROW_1_HEADING) into a localized text file. The latter
+  // is not yet implemented, so only en-US text for now.
+  message InfoRow {
+    // Row label.
+    // Required. Accepts string expressions. UTF-8 text. No markup.
+    // At most 64 characters.
+    string label = 1;
+
+    // Required.
+    oneof value_spec {
+      // Row value.
+      // Accepts string expressions. UTF-8 text. HTML
+      // <code>&lt;a href&gt;</code> tags only. At most 128 characters.
+      string value = 2;
+
+      // Row value referenced from deploy input field.
+      // Should specify existing input field's name.
+      string value_from_deploy_input_field = 4;
+    }
+
+    // Specify the condition to display this row. Optional.
+    BooleanExpression show_if = 3;
+  }
+
+  // Specifies a connect button configuration.
+  message ConnectToInstanceSpec {
+    // Specifies a VM from tier whose address would be used. Required in a
+    // multi-vm configuration. Mustn't be specified for a single-vm.
+    TierVmInstance tier_vm = 1;
+
+    // Optional label to use for the button that connects to the VM.
+    string display_label = 2;
+  }
+
+  repeated ActionItem action_items = 1;
+
+  repeated InfoRow info_rows = 2;
+
+  // Optional label to use for the button that connects to the VM.
+  // Deprecated in favor of connect_button.display_label.
+  string connect_button_label = 3 [deprecated=true];
+
+  ConnectToInstanceSpec connect_button = 4;
+}
+
+message GceMetadataItem {
+  // Metadata item key. Required.
+  string key = 1;
+
+  oneof value_spec {
+    // Static metadata item value.
+    string value = 2;
+    // The value is the names of one or more VMs in a tier.
+    TierVmNames tier_vm_names = 3;
+    // Value referenced from deploy input field.
+    // Should specify existing input field's name.
+    string value_from_deploy_input_field = 4;
+  }
+
+  message TierVmNames {
+    // The tier name.
+    string tier = 1;
+
+    oneof vm_selection_spec {
+      // 0-based index of a VM. A negative index can be used,
+      // with -1 referring the last, -2 the second last, etc.
+      int32 vm_index = 2;
+      // All VM names as a string list.
+      AllVmList all_vms = 3;
+    }
+
+    message AllVmList {
+      // Delimiter for the VM names in the list, for example a comma.
+      // Required.
+      string delimiter = 1;
+    }
+  }
+}
+
+message AcceleratorSpec {
+  // One or more accelerator types. If the list contains exactly one item, the
+  // type will not be selectable by the user.
+  // Currently avaiable types: "nvidia-tesla-k80", "nvidia-tesla-p100",
+  // "nvidia-tesla-v100".
+  repeated string types = 1;
+
+  // Default accelerator type, which should be one of those listed above
+  string default_type = 2;
+
+  // Default number of accelerators.
+  // Currently, only values of 0, 1, 2, 4, and 8 are supported.
+  int32 default_count = 3;
+
+  // Minimum number of accelerators (inclusive) that may be selected.
+  // Currently, only values of 0, 1, 2, 4, and 8 are supported.
+  int32 min_count = 4;
+
+  // Maximum number of accelerators (inclusive) that may be selected.
+  // Currently, only values of 0, 1, 2, 4, and 8 are supported.
+  int32 max_count = 5;
+}
+
+message ZoneSpec {
+  // Sets the default zone.
+  string default_zone = 1;
+}
+
+message DeployInputSpec {
+  // One or more sections containing input fields.
+  repeated DeployInputSection sections = 1;
+}
+
+message DeployInputSection {
+  // Defines where this section should be placed.
+  enum Placement {
+    PLACEMENT_UNSPECIFIED = 0;
+    // The predefined untitled section that appears at the top.
+    // Image, zone, machine type fields are in this section.
+    // Custom fields  will appear below the predefined ones.
+    // Only one such section can be defined.
+    MAIN = 1;
+    // A custom section sitting right below the main section.
+    // Sections of this type appear in the order they are defined.
+    CUSTOM_TOP = 2;
+    // A custom section sitting after all other sections.
+    // Sections of this type appear in the order they are defined.
+    CUSTOM_BOTTOM = 3;
+    // In a multi-VM configuration, each VM tier has its own section.
+    // This placement enables adding input fields into a tier section.
+    TIER = 4;
+  }
+
+  // Required.
+  Placement placement = 1;
+
+  // Section name, required if this section is a custom one.
+  // Must be unique among all sections.
+  // Convention is to use an UPPERCASE_UNDERSCORE name.
+  string name = 2;
+
+  // For Placement.TIER, this specifies the required tier name.
+  string tier = 7;
+
+  // Section title, required if this section is a custom one.
+  string title = 3;
+
+  // Optional description appearing below the title.
+  string description = 4;
+
+  // Optional tooltip.
+  string tooltip = 5;
+
+  repeated DeployInputField fields = 6;
+}
+
+message DeployInputField {
+
+  // Name of the field. Letters, numbers, dashes, and underscores only.
+  // Required.
+  string name = 1;
+
+  // Title of the field. Required.
+  string title = 2;
+
+  // Optional description appearing below the title.
+  string description = 3;
+
+  // Optional tooltip.
+  string tooltip = 4;
+
+  // Indicates the "advanced" level of the input property. Level 0 (default)
+  // will always be shown. Level 1 corresponds to one expansion (user clicks
+  // "show advanced options" or "more options"). Higher levels correspond to
+  // further expansions, or they may be collapsed to level 1 by the UI
+  // implementation. Optional.
+  int32 level = 5;
+
+  // If required, the user must input a valid value.
+  bool required = 6;
+
+  oneof type {
+    BooleanCheckbox boolean_checkbox = 101;
+    GroupedBooleanCheckbox grouped_boolean_checkbox = 102;
+    IntegerBox integer_box = 103;
+    IntegerDropdown integer_dropdown = 104;
+    StringBox string_box = 105;
+    StringDropdown string_dropdown = 106;
+    GceZoneDropdown zone_dropdown = 107;
+    EmailBox email_box = 108;
+  }
+
+  // A checkbox for a boolean value.
+  message BooleanCheckbox {
+    bool default_value = 1;
+  }
+
+  // A checkbox displayed next to other checkboxes under a common group title.
+  // The group is intended for display purposes only. This is not a radio group;
+  // the checkboxes are still independently selectable by the user.
+  //
+  // The first checkbox in the group should define the display_group.
+  // The immediately following GroupedBooleanCheckboxes without a display_group
+  // are part of such group. In other words, the group ends when either
+  // a different field type or one with a display_group is encountered.
+  message GroupedBooleanCheckbox {
+    message DisplayGroup {
+      // Name of the group. Required.
+      // Convention is to use an UPPERCASE_UNDERSCORE name.
+      string name = 1;
+
+      // Title of the group. Required.
+      string title = 2;
+      // Optional description appearing below the title.
+      string description = 3;
+      // Optional tooltip.
+      string tooltip = 4;
+    }
+
+    bool default_value = 1;
+    DisplayGroup display_group = 2;
+  }
+
+  // A textbox for entering an integer, with optional validation.
+  message IntegerBox {
+    message Validation {
+      // Description shown to the user if the input value fails validation.
+      string description = 1;
+      // Optional inclusive minimum value.
+      OptionalInt32 min = 2;
+      // Optional inclusive maximum value.
+      OptionalInt32 max = 3;
+    }
+
+    OptionalInt32 default_value = 1;
+    Validation validation = 2;
+    string placeholder = 3;
+    // This attribute is used as field's value in automated tests.
+    // If present, it overrides the default_value. For required fields without
+    // default_value, it is required to set test_default_value.
+    OptionalInt32 test_default_value = 4;
+  }
+
+  // A dropdown with integer values, with optional labels.
+  message IntegerDropdown {
+    repeated int32 values = 1;
+    OptionalInt32 default_value_index = 2;
+    // Optional labels for values (not indices). If a value does not have a
+    // corresponding label, its numeric string is used.
+    map<int32, string> value_labels = 3;
+  }
+
+  // A textbox for entering a string, with optional validation.
+  message StringBox {
+    message Validation {
+      // Description shown to the user if the input value fails validation.
+      string description = 1;
+      // Optional pattern.
+      string regex = 2;
+    }
+
+    string default_value = 1;
+    Validation validation = 2;
+    string placeholder = 3;
+    // This attribute is used as field's value in automated tests.
+    // If present, it overrides the default_value. For required fields without
+    // default_value, it is required to set test_default_value.
+    string test_default_value = 4;
+  }
+
+  // A specialized textbox for email addresses.
+  message EmailBox {
+    message Validation {
+      // Description shown to the user if the input value fails validation.
+      // If not specified, a default message is used.
+      string description = 1;
+      // Optional pattern.
+      string regex = 2;
+    }
+
+    string default_value = 1;
+    Validation validation = 2;
+    // A placeholder to hint the user what to enter here.
+    // If not specified, user@example.com is used.
+    string placeholder = 3;
+    // This attribute is used as field's value in automated tests.
+    // Defaults to default-user@example.com if this field is required unless
+    // the default_value or this field is explicitly present.
+    // If present, it overrides the default_value.
+    string test_default_value = 4;
+  }
+
+  // A dropdown with string values, with optional labels.
+  message StringDropdown {
+    repeated string values = 1;
+    OptionalInt32 default_value_index = 2;
+    // Optional labels for values. If a value does not have a corresponding
+    // label, its raw value will be displayed.
+    map<string, string> value_labels = 3;
+  }
+
+  // A dropdown with GCE zones as values.
+  message GceZoneDropdown {
+    OptionalString default_value = 1;
+  }
+
+}
+
+// Allows to build an expression which value should be evaluated to boolean.
+message BooleanExpression {
+  oneof expression {
+    ExternalIpAvailability has_external_ip = 1;
+    BooleanDeployInputField boolean_deploy_input_field = 2;
+  }
+
+  // Uses the value of a deploy input field of type boolean.
+  message BooleanDeployInputField {
+    // Name of the deploy input field. Required.
+    string name = 1;
+
+    // If true, negate the value of the input field.
+    bool negated = 2;
+  }
+
+  // Allows to specify a condition based on external ip configuration for
+  // a single instance (for single vm) or all instances in a tier (multi vm).
+  message ExternalIpAvailability {
+    // Specifies if expression is based on external IP being available or not.
+    bool negated = 1;
+    // Multi-vm's tier name. It is required for multi vm spec.
+    string tier = 2;
+  }
+}
+
+message OptionalInt32 {
+  int32 value = 1;
+}
+
+message OptionalString {
+  string value = 2;
+}
+
+message Int32Range {
+  // The inclusive starting value. Required.
+  int32 start_value = 1;
+
+  // The inclusive ending value. Required.
+  int32 end_value = 2;
+}
+
+message Int32List {
+  repeated int32 values = 1;
+}

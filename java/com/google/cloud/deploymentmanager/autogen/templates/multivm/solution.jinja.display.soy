@@ -1,0 +1,352 @@
+{namespace vm.multi}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Generates solution.jinja.display file. */
+{template .display kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param? partnerId: string}
+{@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
+{@param? descriptionYaml: string}
+
+{let $solutionHasGpus: solutionHasGpus($spec)/}
+
+{let $partnerName kind="text"}
+{if $partnerInfo}
+  {$partnerInfo.name}{nil}
+{elseif $partnerId}
+  {$partnerId}{nil}
+{/if}
+{/let}
+
+// TODO(huyhuynh): Move all strings to resources.
+
+{if $descriptionYaml}
+description:
+  {$descriptionYaml |indent: 2}
+  {\n}
+{/if}
+
+input:
+  properties:
+    - name: zone
+      title: Zone
+      {if $solutionHasGpus}
+      {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
+      {$acceleratorZoneSubtext |indent: 6, true}{nil}
+      {/if}
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+
+    {for $tier in $spec.tiersList}
+    {let $tierProperties kind="text"}{call .displayTierProperties}{param spec: $tier/}{/call}{/let}
+    {$tierProperties |indent: 4, true}{nil}
+    {/for}
+
+    {if $solutionHasGpus}
+    {let $acceleratorCheck kind="text"}{call display.acceleratorCheckProperty/}{/let}
+    {$acceleratorCheck |indent: 4, true}{nil}
+    {/if}
+
+    {if $spec.deployInput}
+    {for $section in $spec.deployInput.sectionsList}
+    {for $field in $section.fieldsList}
+    {let $fieldDisplay kind="text"}
+      {call display.deployInputFieldDisplay}
+        {param section: $section/}
+        {param field: $field/}
+        {param tierList: $spec.tiersList/}
+      {/call}
+    {/let}
+    - {$fieldDisplay |indent: 6 |trim}
+    {/for}
+    {/for}
+    {/if}
+
+  sections:
+    {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
+
+    {for $tier in $spec.tiersList}
+    - name: {call display.tierSectionName}{param spec: $tier/}{/call}
+      title: {$tier.title |yamlprimitive: 6}
+    {/for}
+    {if $solutionHasGpus}
+    {let $acceleratorsSection kind="text"}{call display.acceleratorsSection/}{/let}
+    {$acceleratorsSection |indent: 4, true}{nil}
+    {/if}
+    - name: NETWORKING
+      title: Networking
+
+    {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+
+  {let $firewallBooleanGroups kind="text"}
+    {call display.firewallBooleanGroups}{param multiVmSpec: $spec/}{/call}
+  {/let}
+  {let $authScopeBooleanGroups kind="text"}
+    {call display.authScopeBooleanGroups}{param multiVmSpec: $spec/}{/call}
+  {/let}
+  {let $customBooleanGroups kind="text"}
+    {call display.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
+  {/let}
+  {if (strLen($firewallBooleanGroups) +
+       strLen($authScopeBooleanGroups)) > 0}
+  boolean_groups:
+    {$firewallBooleanGroups |indent: 4, true}{nil}
+    {$authScopeBooleanGroups |indent: 4, true}{nil}
+    {$customBooleanGroups |indent: 4, true}{nil}
+  {/if}
+
+{\n}
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      {if $spec.siteUrl}
+      {let $row kind="text"}
+        {call display.siteUrlApplicationTableRow}
+          {param spec: $spec.siteUrl/}
+          {param tiersList: $spec.tiersList/}
+        {/call}
+      {/let}
+      {$row |indent: 6, true}{nil}
+      {/if}
+
+      {if $spec.adminUrl}
+      {let $row kind="text"}
+        {call display.adminUrlApplicationTableRow}
+          {param spec: $spec.adminUrl/}
+          {param tiersList: $spec.tiersList/}
+        {/call}
+      {/let}
+      {$row |indent: 6, true}{nil}
+      {/if}
+
+      {let $passwordRows kind="text"}
+        {call display.passwordApplicationTableRows}
+          {param passwordsList: $spec.passwordsList/}
+          {param deployInput: $spec.deployInput/}
+          {param tiersList: $spec.tiersList/}
+        {/call}
+      {/let}
+      {$passwordRows |indent: 6, true}{nil}
+
+      - label: Zone
+        value: '{{ properties().zone }}'
+
+      {if $spec.postDeploy}
+      {for $row in $spec.postDeploy.infoRowsList}
+      {let $rowDisplay kind="text"}
+        {call display.infoRowApplicationTableRow}
+          {param infoRow: $row/}
+          {param deployInput: $spec.deployInput/}
+          {param tiersList: $spec.tiersList/}
+        {/call}
+      {/let}
+      {$rowDisplay |indent: 6, true}{nil}
+      {/for}
+      {/if}
+
+  {let $adminButton kind="text"}
+    {if $spec.adminUrl}
+      {call display.adminActionButton}{param spec: $spec.adminUrl/}{param tiersList: $spec.tiersList/}{/call}
+    {/if}
+  {/let}
+  {let $siteButton kind="text"}
+    {if $spec.siteUrl}
+      {call display.siteActionButton}{param spec: $spec.siteUrl/}{param tiersList: $spec.tiersList/}{/call}
+    {/if}
+  {/let}
+  {let $connectButton kind="text"}
+    {if $spec.postDeploy.connectButton}
+      {call display.connectActionButton}
+        {param button: $spec.postDeploy.connectButton/}
+        {param tiersList: $spec.tiersList/}
+      {/call}
+    {/if}
+  {/let}
+
+  {if strLen($adminButton) > 0}
+  primaryButton:
+    {$adminButton |indent: 4, true}{nil}
+  {if strLen($siteButton) > 0}
+  secondaryButton:
+    {$siteButton |indent: 4, true}{nil}
+  {elseif strLen($connectButton) > 0}
+  secondaryButton:
+    {$connectButton |indent: 4, true}{nil}
+  {/if}
+
+  {elseif strLen($siteButton) > 0}  // if strLen($adminButton) > 0
+  primaryButton:
+    {$siteButton |indent: 4, true}{nil}
+  {if strLen($connectButton) > 0}
+  secondaryButton:
+    {$connectButton |indent: 4, true}{nil}
+  {/if}
+
+  {elseif strLen($connectButton) > 0}  // elseif strLen(siteButton) > 0
+  primaryButton:
+    {$connectButton |indent: 4, true}{nil}
+  {/if}
+
+  suggestedActions:
+    - heading: No external IP configured on any tier
+      description: 'All VM instances have been configured with no external IP or internet access. Connecting to them directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access these VMs.'
+      showIf: "{{ outputs().tiersWithNoExternalIPStatus == 'ALL' }}"
+
+    - heading: No external IP configured on some tiers
+      description: 'Some VM instances have been configured with no external IP or internet access. Connecting to them directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access these VMs.'
+      showIf: "{{ outputs().tiersWithNoExternalIPStatus == 'SOME' }}"
+
+    {if $spec.postDeploy}
+    {for $action in $spec.postDeploy.actionItemsList}
+    - heading: {$action.heading |yamlprimitive: 6}
+      {if $action.description}
+      description: {$action.description |yamlprimitive: 6}
+      {/if}
+      {if $action.snippet}
+      snippet: {$action.snippet |yamlprimitive: 6}
+      {/if}
+      {if $action.showIf}
+      showIf: '{{ {booleanExpressionDisplayCondition($action.showIf, $spec.tiersList)} }}'
+      {/if}
+    {/for}
+    {/if}
+
+    {for $tier in $spec.tiersList}
+    {for $firewallRule in $tier.firewallRulesList}
+    {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+    {let $item kind="text"}
+      {call display.openPortAction}{param spec: $firewallRule/}{param tierSpec: $tier/}{/call}
+    {/let}
+    {$item |indent: 4}
+    {/if}
+    {/for}
+    {/for}
+
+    {if length($spec.passwordsList) > 1}
+    - heading: Change the temporary passwords
+      description: For additional security, it is recommended that you change the passwords.
+    {elseif length($spec.passwordsList) > 0}
+    - heading: Change the temporary password
+      description: For additional security, it is recommended that you change the password.
+    {/if}
+
+{\n}
+annotations:
+  autogenSpecType: 'MULTI_VM'
+{\n}
+metadata_version: v1
+
+{/template}
+
+
+{template .displayTierProperties kind="text" /*visibility="private"*/}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{let $section kind="text"}
+section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
+{/let}
+
+- name: {'instanceCount' |tierprefixed: $spec}
+  title: Instance Count
+  {if $spec.instanceCount.tooltip}
+  tooltip: {$spec.instanceCount.tooltip}
+  {/if}
+  {if $spec.instanceCount.description}
+  subtext: {$spec.instanceCount.description}
+  {/if}
+  {$section}
+
+{if length($spec.imagesList) > 1}
+- name: {'image' |tierprefixed: $spec}
+  title: Image version
+  {$section}
+  enumLabels:
+    {for $image in $spec.imagesList}
+    {if $image.label}
+    '{index($image)}': '{$image.label}'
+    {else}
+    '{index($image)}': '{$image.name}'
+    {/if}
+    {/for}
+{/if}
+
+- name: {'machineType' |tierprefixed: $spec}
+  title: Machine type
+  {$section}
+
+- name: {'bootDiskType' |tierprefixed: $spec}
+  title: {$spec.bootDisk.displayLabel + ' type' |yamlprimitive: 2}
+  {$section}
+- name: {'bootDiskSizeGb' |tierprefixed: $spec}
+  title: {$spec.bootDisk.displayLabel + ' size in GB' |yamlprimitive: 2}
+  {$section}
+
+{for $disk in $spec.additionalDisksList}
+- name: {diskTypePropertyName(index($disk), $spec) |yamlprimitive: 2}
+  title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
+  {$section}
+- name: {diskSizePropertyName(index($disk), $spec) |yamlprimitive: 2}
+  title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
+  {$section}
+{/for}
+
+- name: {'externalIP' |tierprefixed: $spec}
+  title: External IP
+  tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+  {$section}
+  level: 1
+
+{for $firewallRule in $spec.firewallRulesList}
+{if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{let $propName kind="text"}
+  {call utilities.firewallRuleSourceRangesPropName}
+    {param spec: $firewallRule/}
+    {param tierSpec: $spec/}
+  {/call}
+{/let}
+{let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallRule/}{/call}{/let}
+- name: {$propName}
+  title: Source IP ranges for {$firewallTitle} traffic
+  tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+  placeholder: '0.0.0.0/0, 192.169.0.2/24'
+  {$section}
+  level: 1
+{/if}
+{/for}
+
+{for $firewallRule in $spec.firewallRulesList}
+{if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{let $propName kind="text"}
+  {call utilities.firewallRulePropName}
+    {param spec: $firewallRule/}
+    {param tierSpec: $spec/}
+  {/call}
+{/let}
+{let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallRule/}{/call}{/let}
+- name: {$propName}
+  title: Allow {$firewallTitle} traffic
+  {$section}
+  boolean_group: {call display.firewallBooleanGroupName}{param tier: $spec/}{/call}
+{/if}
+{/for}
+
+{if $spec.ipForwarding}
+- name: {'ipForward' |tierprefixed: $spec}
+  title: IP forwarding
+  tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+  {$section}
+  level: 1
+{/if}
+
+{for $scope in $spec.gcpAuthScopesList}
+- name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{param tierSpec: $spec/}{/call}
+  title: Allow {call display.authScopeDescription}{param spec: $scope/}{/call} on the VM
+  {$section}
+  boolean_group: {call display.authScopeBoolGroupName}{param spec: $scope/}{param tier: $spec/}{/call}
+{/for}
+
+{/template}

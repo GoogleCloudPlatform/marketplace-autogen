@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+package cloud.deploymentmanager.autogen;
+
+option java_multiple_files = true;
+option java_package = "com.google.cloud.deploymentmanager.autogen.proto";
+option java_outer_classname = "MarketingInfoProtos";
+
+// Marketing information provided by a partner.
+message PartnerMarketingInfo {
+  // Name displayed to customers.
+  // Plain text (length min: 1, max: 128).
+  // Required.
+  string name = 1;
+
+  // Description of partner.
+  // Plain text (length min: 1, max: 2048).
+  // Required.
+  string description = 2;
+
+  // Url to Partner's site.
+  // Url (max length: 2047).
+  // Optional.
+  string url = 3;
+
+  // Short description of the partner.
+  // Plain text (length min: 1, max: 300).
+  // Required.
+  string short_description = 4;
+}
+
+// Publicly visible marketing information pertaining to a solution.
+message SolutionMarketingInfo {
+  // Name of the solution that is displayed to the end user.
+  // Plain text (length min: 1, max: 64).
+  // Required.
+  string name = 1;
+
+  // Version text for the solution that is displayed to the end user.
+  // Plain text (length min: 1, max: 64).
+  // Required.
+  string version = 2;
+
+  // Description of the solution that is displayed to the user in the UI.
+  // Html (length min: 1, max: 2048; <p>, <b>, <i>, <a href> and list tags).
+  // Required.
+  string description = 3;
+
+  // Link to an external marketing site describing this solution.
+  // Url (max length: 2047).
+  // Optional.
+  string url = 4;
+
+  // A short description of the solution displayed to the end user.
+  // Plain text (length min: 1, max: 100).
+  // Optional.
+  string tagline = 5;
+
+  // Link to a page providing support for this solution. This is treated as the
+  // primary means of getting support and displayed prominently.
+  // URL may contain a template of format {external_account_id} that will be
+  // replaced by a valid end user identifier for providing support validation.
+  // Url (max length: 2047).
+  // Optional.
+  string support_url = 6;
+
+  // A description of the support provided for this solution.
+  // Html (length min: 1, max: 2048; <p>, <b>, <i>, <a href> and list tags).
+  // Required.
+  string support_info = 7;
+
+  // Link to the end user license agreement.
+  // Url (max length: 2047).
+  // Optional.
+  string eula_url = 8;
+
+  // A list of documentation and video links for the solution.
+  // At most one youtube video link can be provided.
+  // Optional.
+  repeated LinkInfo documentations = 9;
+
+  // A list of software groups packaged with the solution.
+  // Optional.
+  repeated PackagedSoftwareGroup packaged_software_groups = 10;
+
+  // True to show the customer's support ID in the post-deploy UI.
+  // Optional.
+  bool show_support_id = 11;
+}
+
+// Describes a software group packaged in a deployable solution.
+message PackagedSoftwareGroup {
+  // Defines the type for the software group.
+  enum SoftwareGroupType {
+    // Unspecified.
+    SOFTWARE_GROUP_TYPE_UNSPECIFIED = 0;
+    // OS software group.
+    SOFTWARE_GROUP_OS = 1;
+  }
+  // Software group type.
+  // Optional.
+  SoftwareGroupType type = 1;
+
+  // Defines the component of a software group.
+  message SoftwareComponent {
+    // The name for the software component.
+    // Plain text (length min:1, max: 30).
+    // Required.
+    string name = 1;
+
+    // Version.
+    // Plain text (length min:1, max: 16).
+    // Optional.
+    string version = 2;
+
+    // Link to development site or marketing page for this software component.
+    // Url (max length: 2047).
+    // Optional.
+    string url = 3;
+
+    // License title.
+    // Optional.
+    string license_title = 4;
+
+    // License url.
+    // Optional.
+    string license_url = 5;
+  }
+  // List of software components of this type.
+  // Required.
+  repeated SoftwareComponent components = 2;
+}
+
+message LinkInfo {
+  // The URL, for example for a video, website, pdf etc.
+  // Url (max length: 2047)
+  // Required.
+  string url = 1;
+
+  // The title for the link.
+  // Plain text (length min:1, max: 40).
+  // Required.
+  string title = 2;
+
+  // The description for the link.
+  // Plain text (length min:1, max: 80).
+  // Optional.
+  string description = 3;
+
+  // Defines the destinations where the link is to be displayed.
+  enum DestinationType {
+    // Unspecified destination.
+    DESTINATION_TYPE_UNSPECIFIED = 0;
+    // Solution details page.
+    DESTINATION_SOLUTION_DETAILS = 1;
+    // Configuration page.
+    DESTINATION_CONFIGURATION = 2;
+    // Post deployment page.
+    DESTINATION_POST_DEPLOY = 3;
+    // Call-to-action area.
+    DESTINATION_SOLUTION_CALL_TO_ACTION = 4;
+  }
+  // Destinations where the link is to be displayed.
+  // Optional.
+  repeated DestinationType destinations = 4;
+
+  // Defines the link types.
+  enum LinkType {
+    // General URL.
+    LINK_GENERAL = 0;
+    // Video link. Currently only youtube video links are supported.
+    LINK_VIDEO = 1;
+  }
+  // Type of link.
+  // Optional.
+  LinkType type = 5;
+}

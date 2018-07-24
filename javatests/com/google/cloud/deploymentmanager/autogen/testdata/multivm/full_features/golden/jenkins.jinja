@@ -1,0 +1,205 @@
+{% set allTiersCount = 3 %}
+{% set tiersWithNoExternalIPCount = 0 %}
+{% if properties["main_externalIP"] == "None" %}
+{% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+{% if properties["tier2_externalIP"] == "None" %}
+{% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+{% if properties["tier3_externalIP"] == "None" %}
+{% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+
+resources:
+  - name: main-tier
+    type: main_tier.jinja
+    properties:
+      instanceCount: {{ properties["main_instanceCount"] }}
+      zone: {{ properties["zone"] }}
+      network: {{ properties["network"] }}
+      {% if properties.get("subnetwork") %}
+      subnetwork: {{ properties["subnetwork"] }}
+      {% endif %}
+      {% if properties.get("main_externalIP") %}
+      externalIP: {{ properties["main_externalIP"] }}
+      {% endif %}
+      machineType: {{ properties["main_machineType"] }}
+      bootDiskType: {{ properties["main_bootDiskType"] }}
+      bootDiskSizeGb: {{ properties["main_bootDiskSizeGb"] }}
+      image: '{{ properties["main_image"] }}'
+      enableCloudReadonlyApi: {{ properties["main_enableCloudReadonlyApi"] }}
+      enableCloudApi: {{ properties["main_enableCloudApi"] }}
+      enableComputeReadonlyApi: {{ properties["main_enableComputeReadonlyApi"] }}
+      enableComputeApi: {{ properties["main_enableComputeApi"] }}
+      enableSourceReadWriteApi: {{ properties["main_enableSourceReadWriteApi"] }}
+      enableProjecthostingApi: {{ properties["main_enableProjecthostingApi"] }}
+      generatedPassword0: $(ref.generated-password-0.password)
+      generatedPassword1: $(ref.generated-password-1.password)
+      {% if properties["input_generateOptionalPassword"] %}
+      generatedPassword2: $(ref.generated-password-2.password)
+      {% endif %}
+      enableTcp80: {{ properties["main_enableTcp80"] }}
+      {% if properties.get("main_tcp80SourceRanges") %}
+      tcp80SourceRanges: {{ properties["main_tcp80SourceRanges"] }}
+      {% endif %}
+      enableTcp443: {{ properties["main_enableTcp443"] }}
+      {% if properties.get("main_tcp443SourceRanges") %}
+      tcp443SourceRanges: {{ properties["main_tcp443SourceRanges"] }}
+      {% endif %}
+      enableUdp: {{ properties["main_enableUdp"] }}
+      {% if properties.get("main_udpSourceRanges") %}
+      udpSourceRanges: {{ properties["main_udpSourceRanges"] }}
+      {% endif %}
+      input_domain: |-
+        {{ properties["input_domain"] }}
+      input_generateOptionalPassword: {{ properties["input_generateOptionalPassword"] }}
+      input_superExtraDiskName: |-
+        {{ properties["input_superExtraDiskName"] }}
+      input_imageCaching: |-
+        {{ properties["input_imageCaching"] }}
+      input_imageCompression: {{ properties["input_imageCompression"] }}
+      input_imageSizing: {{ properties["input_imageSizing"] }}
+      input_extraLbZone0: |-
+        {{ properties["input_extraLbZone0"] }}
+      input_extraLbZone1: |-
+        {{ properties["input_extraLbZone1"] }}
+      tier2_instanceCount: {{ properties["tier2_instanceCount"] }}
+      main_disk1_type: {{ properties["main_disk1_type"] }}
+      main_disk1_sizeGb: {{ properties["main_disk1_sizeGb"] }}
+      main_disk2_type: {{ properties["main_disk2_type"] }}
+      main_disk2_sizeGb: {{ properties["main_disk2_sizeGb"] }}
+      main_disk3_type: {{ properties["main_disk3_type"] }}
+      main_disk3_sizeGb: {{ properties["main_disk3_sizeGb"] }}
+  - name: tier2-tier
+    type: tier2_tier.jinja
+    properties:
+      instanceCount: {{ properties["tier2_instanceCount"] }}
+      zone: {{ properties["zone"] }}
+      network: {{ properties["network"] }}
+      {% if properties.get("subnetwork") %}
+      subnetwork: {{ properties["subnetwork"] }}
+      {% endif %}
+      {% if properties.get("tier2_externalIP") %}
+      externalIP: {{ properties["tier2_externalIP"] }}
+      {% endif %}
+      machineType: {{ properties["tier2_machineType"] }}
+      bootDiskType: {{ properties["tier2_bootDiskType"] }}
+      bootDiskSizeGb: {{ properties["tier2_bootDiskSizeGb"] }}
+      acceleratorType: {{ properties["tier2_acceleratorType"] }}
+      acceleratorCount: {{ properties["tier2_acceleratorCount"] }}
+      generatedPassword0: $(ref.generated-password-0.password)
+      generatedPassword1: $(ref.generated-password-1.password)
+      {% if properties["input_generateOptionalPassword"] %}
+      generatedPassword2: $(ref.generated-password-2.password)
+      {% endif %}
+      input_domain: |-
+        {{ properties["input_domain"] }}
+      input_showConditionals: {{ properties["input_showConditionals"] }}
+      input_generateOptionalPassword: {{ properties["input_generateOptionalPassword"] }}
+      input_tier2LocalSSDs: {{ properties["input_tier2LocalSSDs"] }}
+      input_imageCaching: |-
+        {{ properties["input_imageCaching"] }}
+      input_imageCompression: {{ properties["input_imageCompression"] }}
+      input_imageSizing: {{ properties["input_imageSizing"] }}
+      input_extraLbZone0: |-
+        {{ properties["input_extraLbZone0"] }}
+      input_extraLbZone1: |-
+        {{ properties["input_extraLbZone1"] }}
+      main_instanceCount: {{ properties["main_instanceCount"] }}
+  - name: tier3-tier
+    type: tier3_tier.jinja
+    properties:
+      instanceCount: {{ properties["tier3_instanceCount"] }}
+      zone: {{ properties["zone"] }}
+      network: {{ properties["network"] }}
+      {% if properties.get("subnetwork") %}
+      subnetwork: {{ properties["subnetwork"] }}
+      {% endif %}
+      {% if properties.get("tier3_externalIP") %}
+      externalIP: {{ properties["tier3_externalIP"] }}
+      {% endif %}
+      machineType: {{ properties["tier3_machineType"] }}
+      bootDiskType: {{ properties["tier3_bootDiskType"] }}
+      bootDiskSizeGb: {{ properties["tier3_bootDiskSizeGb"] }}
+      acceleratorType: {{ properties["tier3_acceleratorType"] }}
+      acceleratorCount: {{ properties["tier3_acceleratorCount"] }}
+      generatedPassword0: $(ref.generated-password-0.password)
+      generatedPassword1: $(ref.generated-password-1.password)
+      {% if properties["input_generateOptionalPassword"] %}
+      generatedPassword2: $(ref.generated-password-2.password)
+      {% endif %}
+  - name: generated-password-0
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: False
+  - name: generated-password-1
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: False
+  {% if properties["input_generateOptionalPassword"] %}
+  - name: generated-password-2
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: False
+  {% endif %}
+
+outputs:
+  - name: deployment
+    value: {{ env["deployment"] }}
+  - name: project
+    value: {{ env["project"] }}
+  - name: password0
+    value: $(ref.generated-password-0.password)
+  - name: password1
+    value: $(ref.generated-password-1.password)
+  {% if properties["input_generateOptionalPassword"] %}
+  - name: password2
+    value: $(ref.generated-password-2.password)
+  {% endif %}
+  {% for vmIndex in range(properties["main_instanceCount"]) %}
+  - name: main_vmId{{ vmIndex }}
+    value: $(ref.main-tier.vmId{{ vmIndex }})
+  - name: main_vmExternalIP{{ vmIndex }}
+    value: $(ref.main-tier.vmExternalIP{{ vmIndex }})
+  - name: main_vmInternalIP{{ vmIndex }}
+    value: $(ref.main-tier.vmInternalIP{{ vmIndex }})
+  - name: main_vmName{{ vmIndex }}
+    value: $(ref.main-tier.vmName{{ vmIndex }})
+  - name: main_vmSelfLink{{ vmIndex }}
+    value: $(ref.main-tier.vmSelfLink{{ vmIndex }})
+  {% endfor %}
+  {% for vmIndex in range(properties["tier2_instanceCount"]) %}
+  - name: tier2_vmId{{ vmIndex }}
+    value: $(ref.tier2-tier.vmId{{ vmIndex }})
+  - name: tier2_vmExternalIP{{ vmIndex }}
+    value: $(ref.tier2-tier.vmExternalIP{{ vmIndex }})
+  - name: tier2_vmInternalIP{{ vmIndex }}
+    value: $(ref.tier2-tier.vmInternalIP{{ vmIndex }})
+  - name: tier2_vmName{{ vmIndex }}
+    value: $(ref.tier2-tier.vmName{{ vmIndex }})
+  - name: tier2_vmSelfLink{{ vmIndex }}
+    value: $(ref.tier2-tier.vmSelfLink{{ vmIndex }})
+  {% endfor %}
+  {% for vmIndex in range(properties["tier3_instanceCount"]) %}
+  - name: tier3_vmId{{ vmIndex }}
+    value: $(ref.tier3-tier.vmId{{ vmIndex }})
+  - name: tier3_vmExternalIP{{ vmIndex }}
+    value: $(ref.tier3-tier.vmExternalIP{{ vmIndex }})
+  - name: tier3_vmInternalIP{{ vmIndex }}
+    value: $(ref.tier3-tier.vmInternalIP{{ vmIndex }})
+  - name: tier3_vmName{{ vmIndex }}
+    value: $(ref.tier3-tier.vmName{{ vmIndex }})
+  - name: tier3_vmSelfLink{{ vmIndex }}
+    value: $(ref.tier3-tier.vmSelfLink{{ vmIndex }})
+  {% endfor %}
+  - name: tiersWithNoExternalIPStatus
+    {% if tiersWithNoExternalIPCount == 0 %}
+    value: 'NONE'
+    {% elif tiersWithNoExternalIPCount < allTiersCount %}
+    value: 'SOME'
+    {% else %}
+    value: 'ALL'
+    {% endif %}

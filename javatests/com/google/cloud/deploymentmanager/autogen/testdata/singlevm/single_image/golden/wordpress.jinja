@@ -1,0 +1,139 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
+{% set project = env["project"] %}
+{% set deployment = env["deployment"] %}
+{% set name = "%s-vm-tmpl" % env["name"] %}
+{% set instanceName = "%s-vm" % deployment %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set network = path_utils.networkPath(properties["network"]) %}
+{% set subnetwork = properties["subnetwork"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+{% set hasExternalIP = properties["externalIP"] != "None" %}
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+
+resources:
+  - name: {{ name }}
+    type: vm_instance.py
+    properties:
+      instanceName: {{ instanceName }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      network: {{ network }}
+      {% if subnetwork %}
+      subnetwork: {{ subnetwork }}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      localSSDs: {{ properties["input_localSsdsCount"] }}
+      hasExternalIP: {{ hasExternalIP }}
+      serviceAccounts:
+        - email: default
+          scopes:
+            - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+            - 'https://www.googleapis.com/auth/devstorage.read_only'
+            - 'https://www.googleapis.com/auth/logging.write'
+            - 'https://www.googleapis.com/auth/monitoring.write'
+            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+      metadata:
+        items:
+          - key: bitnami-base-password
+            value: $(ref.generated-password-0.password)
+          {% if enableStatusWaiter %}
+          - key: status-config-url
+            value: $(ref.software-status.config-url)
+          - key: status-variable-path
+            value: $(ref.software-status.variable-path)
+          - key: status-uptime-deadline
+            value: 420
+          - key: startup-script
+            value: $(ref.software-status-script.startup-script)
+          {% endif %}
+      tags:
+        items:
+          - {{ env["deployment"] }}-tcp-80
+          - {{ env["deployment"] }}-tcp-443
+  - name: generated-password-0
+    type: password.py
+    properties:
+      length: 8
+      includeSymbols: False
+  {% if enableStatusWaiter %}
+  - name: software-status
+    type: software_status.py
+    properties:
+      timeout: 480
+      waiterDependsOn:
+        - {{ instanceName }}
+  - name: software-status-script
+    type: software_status_script.py
+    properties:
+      checkScript: |-
+        failed=$(/etc/init.d/bitnami status \
+            | grep "not running" | cut -d" " -f1 | tr "\n" " ")
+        if [ ! -z "$failed" ]; then
+          echo "Processes failed to start: $failed"
+          exit 1
+        fi
+  {% endif %}
+  {% if properties["enableTcp80"] %}
+  - name: {{ env["deployment"] }}-tcp-80
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      {% if properties.get("tcp80SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp80SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-tcp-80"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["80"]
+  {% endif %}
+  {% if properties["enableTcp443"] %}
+  - name: {{ env["deployment"] }}-tcp-443
+    type: compute.v1.firewall
+    properties:
+      network: {{ network }}
+      {% if properties.get("tcp443SourceRanges") %}
+      sourceRanges:
+        {% for source in properties["tcp443SourceRanges"].split(',') %}
+        - '{{ source | trim }}'
+        {% endfor %}
+      {% else %}
+      sourceRanges: ["0.0.0.0/0"]
+      {% endif %}
+      targetTags: ["{{ env["deployment"] }}-tcp-443"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["443"]
+  {% endif %}
+
+outputs:
+  - name: deployment
+    value: {{ deployment }}
+  - name: password0
+    value: $(ref.generated-password-0.password)
+  - name: project
+    value: {{ project }}
+  - name: vmId
+    value: $(ref.{{ instanceName }}.id)
+  - name: vmExternalIP
+    {% if hasExternalIP %}
+    value: $(ref.{{ name }}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP
+    value: $(ref.{{ name }}.internalIP)
+  - name: vmName
+    value: {{ instanceName }}
+  - name: vmSelfLink
+    value: $(ref.{{ instanceName }}.selfLink)

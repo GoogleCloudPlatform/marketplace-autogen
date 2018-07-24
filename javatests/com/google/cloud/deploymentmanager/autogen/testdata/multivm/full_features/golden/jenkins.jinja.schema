@@ -1,0 +1,337 @@
+imports:
+  - path: main_tier.jinja
+  - path: tier2_tier.jinja
+  - path: tier3_tier.jinja
+
+info:
+  version: '1.00'
+  title: Jenkins Template
+
+required:
+  - zone
+  - network
+  - main_instanceCount
+  - main_machineType
+  - main_bootDiskType
+  - main_bootDiskSizeGb
+  - main_image
+  - tier2_instanceCount
+  - tier2_machineType
+  - tier2_bootDiskType
+  - tier2_bootDiskSizeGb
+  - tier3_instanceCount
+  - tier3_machineType
+  - tier3_bootDiskType
+  - tier3_bootDiskSizeGb
+  - input_domain
+  - input_adminEmailAddress
+  - input_showConditionals
+  - input_superExtraDiskName
+  - acceleratorCheck
+
+properties:
+  zone:
+    type: string
+    default: us-west1-b
+    x-googleProperty:
+      type: GCE_ZONE
+  network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+  subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  main_instanceCount:
+    type: integer
+    default: 3
+    minimum: 1
+    maximum: 10
+  main_image:
+    type: string
+    enum:
+      - '0'
+      - '1'
+    default: '0'
+  main_machineType:
+    type: string
+    default: n1-standard-1
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.7000000476837158
+  main_externalIP:
+    type: string
+    enum:
+      - Ephemeral
+      - None
+    default: None
+  main_enableCloudReadonlyApi:
+    type: boolean
+    default: True
+  main_enableCloudApi:
+    type: boolean
+    default: True
+  main_enableComputeReadonlyApi:
+    type: boolean
+    default: True
+  main_enableComputeApi:
+    type: boolean
+    default: True
+  main_enableSourceReadWriteApi:
+    type: boolean
+    default: True
+  main_enableProjecthostingApi:
+    type: boolean
+    default: True
+  main_bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_bootDiskType
+  main_disk1_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk1_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk1_type
+  main_disk2_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk2_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk2_type
+  main_disk3_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk3_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk3_type
+  main_enableTcp80:
+    type: boolean
+    default: True
+  main_tcp80SourceRanges:
+    type: string
+  main_enableTcp443:
+    type: boolean
+    default: True
+  main_tcp443SourceRanges:
+    type: string
+  main_enableUdp:
+    type: boolean
+    default: True
+  main_udpSourceRanges:
+    type: string
+  tier2_instanceCount:
+    type: integer
+    default: 2
+    enum:
+      - 1
+      - 2
+      - 4
+  tier2_machineType:
+    type: string
+    default: n1-standard-1
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.7000000476837158
+  tier2_acceleratorType:
+    type: string
+    default: nvidia-tesla-k80
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: tier2_machineType
+        gpuType:
+          - nvidia-tesla-k80
+          - nvidia-tesla-p100
+  tier2_acceleratorCount:
+    type: integer
+    default: 2
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: tier2_machineType
+  tier2_externalIP:
+    type: string
+    enum:
+      - Ephemeral
+    default: Ephemeral
+  tier2_bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  tier2_bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: tier2_bootDiskType
+  tier3_instanceCount:
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 10
+  tier3_machineType:
+    type: string
+    default: n1-standard-1
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.690000057220459
+  tier3_acceleratorType:
+    type: string
+    default: nvidia-tesla-v100
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: tier3_machineType
+        gpuType:
+          - nvidia-tesla-k80
+          - nvidia-tesla-v100
+  tier3_acceleratorCount:
+    type: integer
+    default: 0
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: tier3_machineType
+  tier3_externalIP:
+    type: string
+    enum:
+      - Ephemeral
+      - None
+    default: Ephemeral
+  tier3_bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  tier3_bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: tier3_bootDiskType
+  acceleratorCheck:
+    type: string
+  input_domain:
+    type: string
+    default: google.com
+    pattern: '[a-zA-Z0-9-]+.[a-z]{2,}'
+  input_adminEmailAddress:
+    type: string
+    default: aX9-YD_8W.3@example.com
+    pattern: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+$
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_optionalEmailAddress:
+    type: string
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_showConditionals:
+    type: boolean
+    default: True
+  input_generateOptionalPassword:
+    type: boolean
+    default: True
+  input_tier2LocalSSDs:
+    type: integer
+    default: 0
+    minimum: 0
+    maximum: 5
+  input_superExtraDiskName:
+    type: string
+    default: the-super-extra-disk
+  input_imageCaching:
+    type: string
+    default: none
+    enum:
+    - none
+    - redis
+    - memcached
+  input_imageCompression:
+    type: boolean
+    default: False
+  input_imageSizing:
+    type: boolean
+    default: True
+  input_extraLbZone0:
+    type: string
+    default: us-west1-a
+    x-googleProperty:
+      type: GCE_ZONE
+  input_extraLbZone1:
+    type: string
+    x-googleProperty:
+      type: GCE_ZONE
+
+outputs:
+  deployment:
+    type: string
+  project:
+    type: string
+  password0:
+    type: string
+  password1:
+    type: string
+  password2:
+    type: string

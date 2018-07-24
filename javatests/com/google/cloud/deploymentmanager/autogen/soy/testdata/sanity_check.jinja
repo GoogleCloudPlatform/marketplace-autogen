@@ -1,0 +1,44 @@
+{% set openFirewall = properties["openFirewall"] %}
+{% set network = properties["network"] %}
+
+info:
+  title: World's best
+
+resources:
+  - type: compute.v1.instance
+    name: vm
+    properties:
+      description: 'World''s best'
+      zone: myZone
+      network: {{ network }}
+      tags:
+        - FIREWALLED
+      metadata:
+        items:
+          - key: startup-script
+            value: |
+              {{ "#! /bin/bash" }}
+              wget "http://metadata"
+              wget "http://www.google.com"
+              func a {}
+          - key: startup-script1
+            value: |
+              {{ "#! /bin/bash" }}
+              wget "http://metadata"
+              wget \
+                "http://www.google.com"
+
+  {# Firewall #}
+  {% if openFirewall %}
+  - type: compute.v1.firewall
+    name: firewall
+    properties:
+      port: 12345
+      network: {{ network }}
+      sourceTags:
+        - FIREWALLED
+  {% endif %}
+
+outputs:
+  - name: vm_ip
+    value: $(ref.vm.ip)

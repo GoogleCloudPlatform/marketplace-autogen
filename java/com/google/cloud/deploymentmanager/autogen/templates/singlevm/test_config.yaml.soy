@@ -1,0 +1,27 @@
+{namespace vm.single}
+{alias cloud.deploymentmanager.autogen as proto}
+
+/** Generates top level template solution.jinja file. */
+{template .test_config kind="text"}
+{@param solutionId: string}
+{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
+
+{let $template: $solutionId + '.jinja'/}
+
+imports:
+- path: {$template}
+{\n}
+resources:
+- name: {$solutionId}
+  type: {$template}
+  {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
+  {if length($testDefaultedFields) > 0 or length($spec.acceleratorsList) > 0}
+  properties:
+  {/if}
+    {for $field in $testDefaultedFields}
+    {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
+    {/for}
+    {if length($spec.acceleratorsList) > 0}
+    acceleratorCheck: 'yes'
+    {/if}
+{/template}

@@ -1,0 +1,104 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
+{% set instanceCount = properties["instanceCount"] %}
+{% set zone = properties["zone"] %}
+{% set machineType = properties["machineType"] %}
+{% set acceleratorType = properties["acceleratorType"] %}
+{% set acceleratorCount = properties["acceleratorCount"] %}
+{% set network = path_utils.networkPath(properties["network"]) %}
+{% set subnetwork = properties["subnetwork"] %}
+{% set bootDiskType = properties["bootDiskType"] %}
+{% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
+{% set hasExternalIP = properties["externalIP"] != "None" %}
+{# Software status only works if the VM has an external IP. #}
+{% set enableStatusWaiter = hasExternalIP %}
+{% if instanceCount <= 0 %}
+resources: []
+{% else %}
+resources:
+  {% for vmIndex in range(instanceCount) %}
+  - name: {{ env["deployment"] }}-tier3-vm-tmpl-{{ vmIndex }}
+    type: vm_instance.py
+    properties:
+      instanceName: {{ env["deployment"] }}-tier3-vm-{{ vmIndex }}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/click-to-deploy-images/global/images/jenkins-v20180130
+      zone: {{ zone }}
+      machineType: {{ machineType }}
+      network: {{ network }}
+      {% if subnetwork %}
+      subnetwork: {{ subnetwork }}
+      {% endif %}
+      bootDiskType: {{ bootDiskType }}
+      bootDiskSizeGb: {{ bootDiskSizeGb }}
+      hasExternalIP: {{ hasExternalIP }}
+      {% if acceleratorCount > 0 %}
+      guestAccelerators:
+        - acceleratorType: {{ acceleratorType }}
+          acceleratorCount: {{ acceleratorCount }}
+      {% endif %}
+      serviceAccounts:
+        - email: default
+          scopes:
+            - 'https://www.googleapis.com/auth/cloud.useraccounts.readonly'
+            - 'https://www.googleapis.com/auth/devstorage.read_only'
+            - 'https://www.googleapis.com/auth/logging.write'
+            - 'https://www.googleapis.com/auth/monitoring.write'
+            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
+      metadata:
+        items:
+          - key: admin-password
+            value: {{ properties["generatedPassword0"] }}
+          - key: ghost-db-password
+            value: {{ properties["generatedPassword1"] }}
+          {% if properties["input_generateOptionalPassword"] %}
+          - key: optional-password
+            value: {{ properties["generatedPassword2"] }}
+          {% endif %}
+          {% if enableStatusWaiter %}
+          - key: status-config-url
+            value: $(ref.software-status.config-url)
+          - key: status-variable-path
+            value: $(ref.software-status.variable-path)
+          - key: status-uptime-deadline
+            value: 300
+          {% endif %}
+      tags:
+        items:
+          - {{ env["deployment"] }}-deployment
+          - {{ env["deployment"] }}-tier3-tier
+  {% endfor %}
+  {% if enableStatusWaiter %}
+  {% if instanceCount > 0 %}
+  - name: software-status
+    type: software_status.py
+    properties:
+      timeout: 300
+      prefix: {{ env['deployment'] }}-tier3
+      waiterDependsOn:
+        {% for vmIndex in range(instanceCount) %}
+        - {{ env["deployment"] }}-tier3-vm-{{ vmIndex }}
+        {% endfor %}
+      {% if instanceCount > 1 %}
+      successNumber: {{ instanceCount }}
+      {% endif %}
+  {% endif %}
+  {% endif %}
+
+outputs:
+  {% for vmIndex in range(instanceCount) %}
+  - name: vmId{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-tier3-vm-{{ vmIndex }}.id)
+  - name: vmExternalIP{{ vmIndex }}
+    {% if hasExternalIP %}
+    value: $(ref.{{ env["deployment"] }}-tier3-vm-tmpl-{{ vmIndex }}.ip)
+    {% else %}
+    value: NONE
+    {% endif %}
+  - name: vmInternalIP{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-tier3-vm-tmpl-{{ vmIndex }}.internalIP)
+  - name: vmName{{ vmIndex }}
+    value: {{ env["deployment"] }}-tier3-vm-{{ vmIndex }}
+  - name: vmSelfLink{{ vmIndex }}
+    value: $(ref.{{ env["deployment"] }}-tier3-vm-{{ vmIndex }}.selfLink)
+  {% endfor %}
+{% endif %}
