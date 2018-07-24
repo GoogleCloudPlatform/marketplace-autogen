@@ -1,0 +1,40 @@
+package(features = ["-jpl_strict_deps"])
+
+java_library(
+    name = "tests",
+    testonly = 1,
+    srcs = glob(["*.java"]),
+    data = glob(["testdata/**"]),
+    deps = [
+        "//java/com/google/cloud/deploymentmanager/autogen",
+        "//java/com/google/cloud/deploymentmanager/autogen:autogen_java_proto",
+        "@aopalliance_aopalliance//jar",
+        "@com_google_code_findbugs_jsr305//jar",
+        "@com_google_common_html_types_types//jar",
+        "@com_google_guava_guava//jar",
+        "@com_google_inject_guice//jar",
+        "@com_google_template_soy//jar",
+        "@com_google_truth_truth//jar",
+        "@com_ibm_icu_icu4j//jar",
+        "@junit_junit//jar",
+        "@org_apache_commons_commons_lang3//jar",
+        "@org_hamcrest_hamcrest_core//jar",
+        "@org_hamcrest_hamcrest_library//jar",
+        "@org_ow2_asm_asm_all//jar",
+        "@org_yaml_snakeyaml//jar",
+    ],
+)
+
+java_test(
+    name = "SmallTests",
+    size = "small",
+    test_class = "com.google.cloud.deploymentmanager.autogen.AutogenSmallTestsSuite",
+    runtime_deps = [":tests"],
+)
+
+java_test(
+    name = "MediumTests",
+    size = "small",
+    test_class = "com.google.cloud.deploymentmanager.autogen.AutogenMediumTestsSuite",
+    runtime_deps = [":tests"],
+)

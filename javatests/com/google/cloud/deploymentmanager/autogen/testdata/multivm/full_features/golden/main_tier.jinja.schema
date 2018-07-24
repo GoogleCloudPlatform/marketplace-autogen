@@ -1,0 +1,205 @@
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+required:
+  - instanceCount
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+  - image
+  - generatedPassword0
+  - generatedPassword1
+  - tier2_instanceCount
+  - input_domain
+  - input_superExtraDiskName
+
+properties:
+  instanceCount:
+    type: integer
+    default: 3
+    minimum: 1
+    maximum: 10
+  zone:
+    type: string
+    default: us-central1-f
+    x-googleProperty:
+      type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - '0'
+      - '1'
+    default: '0'
+  machineType:
+    type: string
+    default: n1-standard-1
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.7000000476837158
+  network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+  subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  externalIP:
+    type: string
+    enum:
+      - Ephemeral
+      - None
+    default: None
+  enableCloudReadonlyApi:
+    type: boolean
+    default: True
+  enableCloudApi:
+    type: boolean
+    default: True
+  enableComputeReadonlyApi:
+    type: boolean
+    default: True
+  enableComputeApi:
+    type: boolean
+    default: True
+  enableSourceReadWriteApi:
+    type: boolean
+    default: True
+  enableProjecthostingApi:
+    type: boolean
+    default: True
+  bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: bootDiskType
+  main_disk1_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk1_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk1_type
+  main_disk2_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk2_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk2_type
+  main_disk3_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk3_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk3_type
+  enableTcp80:
+    type: boolean
+    default: True
+  tcp80SourceRanges:
+    type: string
+  enableTcp443:
+    type: boolean
+    default: True
+  tcp443SourceRanges:
+    type: string
+  enableUdp:
+    type: boolean
+    default: True
+  udpSourceRanges:
+    type: string
+  input_domain:
+    type: string
+    default: google.com
+    pattern: '[a-zA-Z0-9-]+.[a-z]{2,}'
+  input_generateOptionalPassword:
+    type: boolean
+    default: True
+  input_superExtraDiskName:
+    type: string
+    default: the-super-extra-disk
+  input_imageCaching:
+    type: string
+    default: none
+    enum:
+    - none
+    - redis
+    - memcached
+  input_imageCompression:
+    type: boolean
+    default: False
+  input_imageSizing:
+    type: boolean
+    default: True
+  input_extraLbZone0:
+    type: string
+    default: us-west1-a
+    x-googleProperty:
+      type: GCE_ZONE
+  input_extraLbZone1:
+    type: string
+    x-googleProperty:
+      type: GCE_ZONE
+  generatedPassword0:
+    type: string
+  generatedPassword1:
+    type: string
+  generatedPassword2:
+    type: string
+  tier2_instanceCount:
+    type: integer

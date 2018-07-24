@@ -1,0 +1,195 @@
+{namespace vm.multi}
+{alias cloud.deploymentmanager.autogen as proto}
+
+{template .tierJinjaSchema kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param packageSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+
+{let $waiterSpec:
+    ($spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER)
+    ? $spec.applicationStatus.waiter : null/}
+
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+
+  {if $waiterSpec}
+  - name: software_status.py
+    path: common/software_status.py
+  {if $waiterSpec.script}
+  - name: software_status_script.py
+    path: common/software_status_script.py
+  {/if}
+  {/if}
+
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+{\n}
+required:
+  - instanceCount
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+
+  {if length($spec.imagesList) > 1}
+  - image
+  {/if}
+
+  {for $password in $packageSpec.passwordsList}
+  {let $passwordRequiredSchema kind="text"}
+    {call renders.passwordRequiredSchema}
+      {param password: $password/}
+      {param passwordIndex: index($password)/}
+    {/call}
+  {/let}
+  {$passwordRequiredSchema |indent: 2, true}{nil}
+  {/for}
+
+  {for $depTier in dependentTiers($spec, $packageSpec)}
+  - {'instanceCount' |tierprefixed: $depTier}
+  {/for}
+
+  {let $deployInputRequiredList kind="text"}
+    {call renders.deployInputRequiredSchema}
+      {param inputSpec: $packageSpec.deployInput/}
+      {param tierSpec: $spec/}
+    {/call}
+  {/let}
+  {$deployInputRequiredList |indent: 2, true}{nil}
+
+{\n}
+properties:
+  {let $instanceCountProp kind="text"}
+    {call renders.tierInstanceAcountPropertySchema}
+      {param name: 'instanceCount'/}
+      {param spec: $spec.instanceCount/}
+    {/call}
+  {/let}
+  {$instanceCountProp |indent: 2, true}{nil}
+
+  {let $zoneProp kind="text"}{call renders.zonePropertySchema}{param name: 'zone'/}{/call}{/let}
+  {$zoneProp |indent: 2, true}{nil}
+
+  {if length($spec.imagesList) > 1}
+  {let $imageProp kind="text"}
+    {call renders.imagePropertySchema}
+      {param name: 'image'/}
+      {param imagesList: $spec.imagesList/}
+    {/call}
+  {/let}
+  {$imageProp |indent: 2, true}{nil}
+  {/if}
+
+  {let $machineTypeProp kind="text"}
+    {call renders.machineTypePropertySchema}
+      {param name: 'machineType'/}
+      {param spec: $spec.machineType/}
+    {/call}
+  {/let}
+  {$machineTypeProp |indent: 2, true}{nil}
+
+  {if length($spec.acceleratorsList) > 0}
+  {let $acceleratorProps kind="text"}
+    {call renders.acceleratorPropertiesSchema}
+      {param namePrefix: 'accelerator'/}
+      {param spec: $spec.acceleratorsList[0]/}
+    {/call}
+  {/let}
+  {$acceleratorProps |indent: 2, true}{nil}
+  {/if}
+
+  {let $networkProps kind="text"}
+    {call renders.networkPropertiesSchema}
+      {param nameSuffix: 'network'/}
+      {param zonePropertyName: 'zone'/}
+    {/call}
+  {/let}
+  {$networkProps |indent: 2, true}{nil}
+
+  {let $externalIpProp kind="text"}
+    {call renders.externalIpPropertySchema}
+      {param name: 'externalIP'/}
+      {param spec: $spec.externalIp/}
+    {/call}
+  {/let}
+  {$externalIpProp |indent: 2, true}{nil}
+
+  {if $spec.ipForwarding}
+  {let $ipForwardingProp kind="text"}
+    {call renders.ipForwardingPropertySchema}
+      {param name: 'ipForward'/}
+      {param spec: $spec.ipForwarding/}
+    {/call}
+  {/let}
+  {$ipForwardingProp |indent: 2, true}{nil}
+  {/if}
+
+  {for $scope in $spec.gcpAuthScopesList}
+  {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}:
+    type: boolean
+    default: {if $scope.defaultOff}False{else}True{/if}
+  {/for}
+
+  {let $bootDiskProps kind="text"}
+    {call renders.bootDiskPropertiesSchema}
+      {param spec: $spec.bootDisk/}
+      {param zonePropertyName: 'zone'/}
+    {/call}
+  {/let}
+  {$bootDiskProps |indent: 2, true}{nil}
+
+  {for $disk in $spec.additionalDisksList}
+  {let $diskProps kind="text"}
+    {call renders.additionalDiskPropertiesSchema}
+      {param spec: $spec.additionalDisksList[index($disk)]/}
+      {param diskIndex: index($disk)/}
+      {param zonePropertyName: 'zone'/}
+      {param tier: $spec/}
+    {/call}
+  {/let}
+  {$diskProps |indent: 2, true}{nil}
+  {/for}
+
+  {for $firewallRule in $spec.firewallRulesList}
+  {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+  {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}:
+    type: boolean
+    default: {if $firewallRule.defaultOff}False{else}True{/if}
+  {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}:
+    type: string
+  {/if}
+  {/for}
+
+  {if $packageSpec.deployInput}
+  {let $deployInputProps kind="text"}
+    {call renders.deployInputPropertiesSchema}
+      {param inputSpec: $packageSpec.deployInput/}
+      {param tierSpec: $spec/}
+    {/call}
+  {/let}
+  {$deployInputProps |indent: 2, true}{nil}
+  {/if}
+
+  {for $password in $packageSpec.passwordsList}
+  {let $propertyName kind="text"}
+    {call utilities.passwordPropertyName}{param passwordIndex: index($password)/}{/call}
+  {/let}
+  {$propertyName}:
+    type: string
+  {/for}
+
+  {for $depTier in dependentTiers($spec, $packageSpec)}
+  {'instanceCount' |tierprefixed: $depTier}:
+    type: integer
+  {/for}
+
+{/template}

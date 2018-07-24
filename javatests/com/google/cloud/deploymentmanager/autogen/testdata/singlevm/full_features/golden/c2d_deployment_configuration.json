@@ -1,0 +1,7 @@
+{
+  "defaultDeploymentType": "SINGLE_VM",
+  "imageName": "bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64",
+  "projectId": "bitnami-launchpad",
+  "templateName": "nonexistent_template",
+  "useSolutionPackage": true
+}

@@ -1,0 +1,155 @@
+{namespace vm.multi}
+{alias cloud.deploymentmanager.autogen as proto}
+
+{template .jinja kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+
+{% set allTiersCount = {length($spec.tiersList)} %}
+{% set tiersWithNoExternalIPCount = 0 %}
+{for $tier in $spec.tiersList}
+{% if properties["{$tier.name}_externalIP"] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+{% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+{/for}
+{\n}
+
+resources:
+  {for $tier in $spec.tiersList}
+  - name: {$tier.name}-tier
+    type: {tierTemplateName($tier)}
+    properties:
+      instanceCount: {{ properties["{'instanceCount' |tierprefixed: $tier}"] }}
+      zone: {{ properties["zone"] }}
+      network: {{ properties["network"] }}
+      {% if properties.get("subnetwork") %}
+      subnetwork: {{ properties["subnetwork"] }}
+      {% endif %}
+      {% if properties.get("{'externalIP' |tierprefixed: $tier}") %}
+      externalIP: {{ properties["{'externalIP' |tierprefixed: $tier}"] }}
+      {% endif %}
+      machineType: {{ properties["{'machineType' |tierprefixed: $tier}"] }}
+      bootDiskType: {{ properties["{'bootDiskType' |tierprefixed: $tier}"] }}
+      bootDiskSizeGb: {{ properties["{'bootDiskSizeGb' |tierprefixed: $tier}"] }}
+      {if length($tier.imagesList) > 1}
+      image: '{{ properties["{'image' |tierprefixed: $tier}"] }}'
+      {/if}
+
+      {if length($tier.acceleratorsList) > 0}
+      {let $accelerator: $tier.acceleratorsList[0]/}
+      acceleratorType: {{ properties["{'acceleratorType' |tierprefixed: $tier}"] }}
+      acceleratorCount: {{ properties["{'acceleratorCount' |tierprefixed: $tier}"] }}
+      {/if}
+
+      {if $tier.ipForwarding}
+      ipForward: {{ properties["{'ipForward' |tierprefixed: $tier}"] }}
+      {/if}
+
+      {for $scope in $tier.gcpAuthScopesList}
+      {let $propName kind="text"}
+        {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}
+      {/let}
+      {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
+      {/for}
+
+      {for $password in $spec.passwordsList}
+      {let $passwordProperty kind="text"}
+        {call renders.passwordProperty}
+          {param password: $password/}
+          {param passwordIndex: index($password)/}
+        {/call}
+      {/let}
+      {$passwordProperty |indent: 6, true}{nil}
+      {/for}
+
+      {for $firewallRule in $tier.firewallRulesList}
+      {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+      {let $propName kind="text"}
+        {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}
+      {/let}
+      {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
+      {let $sourcesPropName kind="text"}
+        {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}
+      {/let}
+      {% if properties.get("{$sourcesPropName |tierprefixed: $tier}") %}
+      {$sourcesPropName}: {{ properties["{$sourcesPropName |tierprefixed: $tier}"] }}
+      {% endif %}
+      {/if}
+      {/for}
+
+      {if $spec.deployInput}
+
+      {for $field in listDeployInputFields($spec.deployInput, $tier)}
+      {if deployInputFieldIsString($field)}
+      {deployInputFieldName($field) |yamlprimitive: 6}: |-
+        {{ properties["{deployInputFieldName($field)}"] }}
+      {else}
+      {deployInputFieldName($field) |yamlprimitive: 6}: {{ properties["{deployInputFieldName($field)}"] }}
+      {/if}
+      {/for}
+      {/if}
+
+      {for $depTier in dependentTiers($tier, $spec)}
+      {let $propName kind="text"}
+        {'instanceCount' |tierprefixed: $depTier}{nil}
+      {/let}
+      {$propName}: {{ properties["{$propName}"] }}
+      {/for}
+
+      {for $disk in $tier.additionalDisksList}
+      {diskTypePropertyName(index($disk), $tier)}: {{ properties["{diskTypePropertyName(index($disk), $tier)}"] }}
+      {diskSizePropertyName(index($disk), $tier)}: {{ properties["{diskSizePropertyName(index($disk), $tier)}"] }}
+      {/for}
+  {/for}
+
+  {for $password in $spec.passwordsList}
+  {let $passwordResource kind="text"}
+    {call renders.passwordResource}
+      {param password: $password/}
+      {param passwordIndex: index($password)/}
+    {/call}
+  {/let}
+  {$passwordResource |indent: 2, true}{nil}
+  {/for}
+
+{\n}
+outputs:
+  - name: deployment
+    value: {{ env["deployment"] }}
+  - name: project
+    value: {{ env["project"] }}
+
+  {for $password in $spec.passwordsList}
+  {let $passwordOutput kind="text"}
+    {call renders.passwordOutput}
+      {param password: $password/}
+      {param passwordIndex: index($password)/}
+    {/call}
+  {/let}
+  {$passwordOutput |indent: 2, true}{nil}
+  {/for}
+
+  {for $tier in $spec.tiersList}
+  {% for vmIndex in range(properties["{'instanceCount' |tierprefixed: $tier}"]) %}
+  - name: {'vmId{{ vmIndex }}' |tierprefixed: $tier}
+    value: $(ref.{$tier.name}-tier.vmId{{ vmIndex }})
+  - name: {'vmExternalIP{{ vmIndex }}' |tierprefixed: $tier}
+    value: $(ref.{$tier.name}-tier.vmExternalIP{{ vmIndex }})
+  - name: {'vmInternalIP{{ vmIndex }}' |tierprefixed: $tier}
+    value: $(ref.{$tier.name}-tier.vmInternalIP{{ vmIndex }})
+  - name: {'vmName{{ vmIndex }}' |tierprefixed: $tier}
+    value: $(ref.{$tier.name}-tier.vmName{{ vmIndex }})
+  - name: {'vmSelfLink{{ vmIndex }}' |tierprefixed: $tier}
+    value: $(ref.{$tier.name}-tier.vmSelfLink{{ vmIndex }})
+  {% endfor %}
+  {/for}
+
+  - name: tiersWithNoExternalIPStatus
+    {% if tiersWithNoExternalIPCount == 0 %}
+    value: 'NONE'
+    {% elif tiersWithNoExternalIPCount < allTiersCount %}
+    value: 'SOME'
+    {% else %}
+    value: 'ALL'
+    {% endif %}
+
+{/template}
