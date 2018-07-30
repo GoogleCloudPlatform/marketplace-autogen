@@ -23,6 +23,7 @@ import java.io.PrintStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -31,6 +32,7 @@ import org.apache.commons.cli.ParseException;
  */
 public final class BatchAutogenApp {
 
+  private static final String OPTION_NAME_HELP = "help";
   private static final String OPTION_NAME_MODE = "mode";
   private static final String OPTION_NAME_INPUT = "input";
   private static final String OPTION_NAME_OUTPUT = "output";
@@ -39,6 +41,7 @@ public final class BatchAutogenApp {
   private static final String OPTION_NAME_INCLUDE_SHARED_SUPPORT_FILES =
       "include_shared_support_files";
 
+  private static boolean printUsage = false;
   private static AutogenMode mode = AutogenMode.MULTIPLE;
   private static String input = "";
   private static String output = "";
@@ -101,6 +104,7 @@ public final class BatchAutogenApp {
 
   private static Options buildCommandOptions() {
     Options options = new Options();
+    options.addOption(null, OPTION_NAME_HELP, false, "Prints usage help");
     options.addOption(null, OPTION_NAME_MODE,
         true, "Mode for input convertion - single or multiple solutions");
     options.addOption(null, OPTION_NAME_INPUT,
@@ -116,10 +120,13 @@ public final class BatchAutogenApp {
     return options;
   }
 
-  private static void parseCommandOptions(String[] args) throws ParseException {
+  private static Options parseCommandOptions(String[] args) throws ParseException {
     Options options = buildCommandOptions();
     CommandLineParser parser = new DefaultParser();
     CommandLine cmd = parser.parse(options, args);
+    if (cmd.hasOption(OPTION_NAME_HELP)) {
+      printUsage = true;
+    }
     if (cmd.hasOption(OPTION_NAME_MODE)) {
       mode = AutogenMode.valueOf(cmd.getOptionValue(OPTION_NAME_MODE));
     }
@@ -139,10 +146,15 @@ public final class BatchAutogenApp {
       String value = cmd.getOptionValue(OPTION_NAME_INCLUDE_SHARED_SUPPORT_FILES);
       includeSharedSupportFiles = value.isEmpty() || Boolean.parseBoolean(value);
     }
+    return options;
   }
 
   public static void main(String[] args) throws IOException, ParseException {
-    parseCommandOptions(args);
+    Options options = parseCommandOptions(args);
+    if (printUsage) {
+      printUsage(options);
+      return;
+    }
 
     BatchInput input = mode.readInput();
     BatchOutput.Builder builder = BatchOutput.newBuilder();
@@ -161,6 +173,11 @@ public final class BatchAutogenApp {
           .setPackage(dp);
     }
     writeOutput(builder.build());
+  }
+
+  private static void printUsage(Options options) {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("BatchAutogenApp", options);
   }
 
   private static void writeOutput(BatchOutput data) throws IOException {
