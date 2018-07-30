@@ -31,6 +31,7 @@ import org.apache.commons.cli.ParseException;
  */
 public final class BatchAutogenApp {
 
+  private static final String OPTION_NAME_MODE = "mode";
   private static final String OPTION_NAME_INPUT = "input";
   private static final String OPTION_NAME_OUTPUT = "output";
   private static final String OPTION_NAME_INPUT_TYPE = "input_type";
@@ -38,11 +39,27 @@ public final class BatchAutogenApp {
   private static final String OPTION_NAME_INCLUDE_SHARED_SUPPORT_FILES =
       "include_shared_support_files";
 
+  private static AutogenMode mode = AutogenMode.MULTIPLE;
   private static String input = "";
   private static String output = "";
   private static ContentType inputType = ContentType.PROTOTEXT;
   private static ContentType outputType = ContentType.PROTOTEXT;
   private static boolean includeSharedSupportFiles = false;
+
+  private enum AutogenMode {
+    MULTIPLE(new MultipleSolutionsReader()),
+    SINGLE(new SingleSolutionReader());
+
+    private final SolutionReader reader;
+
+    AutogenMode(SolutionReader reader) {
+      this.reader = reader;
+    }
+
+    public BatchInput readInput() throws IOException {
+      return reader.readInput();
+    }
+  }
 
   private enum ContentType {
     PROTOTEXT,
@@ -82,9 +99,10 @@ public final class BatchAutogenApp {
     }
   }
 
-
   private static Options buildCommandOptions() {
     Options options = new Options();
+    options.addOption(null, OPTION_NAME_MODE,
+        true, "Mode for input convertion - single or multiple solutions");
     options.addOption(null, OPTION_NAME_INPUT,
         true, "Input source, a filename or empty for stdin");
     options.addOption(null, OPTION_NAME_OUTPUT,
@@ -102,6 +120,9 @@ public final class BatchAutogenApp {
     Options options = buildCommandOptions();
     CommandLineParser parser = new DefaultParser();
     CommandLine cmd = parser.parse(options, args);
+    if (cmd.hasOption(OPTION_NAME_MODE)) {
+      mode = AutogenMode.valueOf(cmd.getOptionValue(OPTION_NAME_MODE));
+    }
     if (cmd.hasOption(OPTION_NAME_INPUT)) {
       input = cmd.getOptionValue(OPTION_NAME_INPUT);
     }
@@ -123,7 +144,7 @@ public final class BatchAutogenApp {
   public static void main(String[] args) throws IOException, ParseException {
     parseCommandOptions(args);
 
-    BatchInput input = readInput();
+    BatchInput input = mode.readInput();
     BatchOutput.Builder builder = BatchOutput.newBuilder();
     for (DeploymentPackageInput solution : input.getSolutionsList()) {
       SolutionPackage dp =
@@ -142,18 +163,6 @@ public final class BatchAutogenApp {
     writeOutput(builder.build());
   }
 
-  private static BatchInput readInput() throws IOException {
-    BatchInput.Builder builder = BatchInput.newBuilder();
-    if (input.isEmpty()) {
-      inputType.read(builder, System.in);
-    } else {
-      try (InputStream fi = new BufferedInputStream(new FileInputStream(input))) {
-        inputType.read(builder, fi);
-      }
-    }
-    return builder.build();
-  }
-
   private static void writeOutput(BatchOutput data) throws IOException {
     if (output.isEmpty()) {
       outputType.write(data, System.out);
@@ -161,6 +170,41 @@ public final class BatchAutogenApp {
       try (OutputStream fo = new BufferedOutputStream(new FileOutputStream(output))) {
         outputType.write(data, fo);
       }
+    }
+  }
+
+  private static abstract class SolutionReader {
+
+    public abstract BatchInput readInput() throws IOException;
+
+    void loadInputToMessageBuilder(Message.Builder builder) throws IOException {
+      if (input.isEmpty()) {
+        inputType.read(builder, System.in);
+      } else {
+        try (InputStream fi = new BufferedInputStream(new FileInputStream(input))) {
+          inputType.read(builder, fi);
+        }
+      }
+    }
+  }
+
+  private static class SingleSolutionReader extends SolutionReader {
+    @Override
+    public BatchInput readInput() throws IOException {
+      DeploymentPackageInput.Builder builder = DeploymentPackageInput.newBuilder();
+      loadInputToMessageBuilder(builder);
+      return BatchInput.newBuilder()
+          .addSolutions(builder.build())
+          .build();
+    }
+  }
+
+  private static class MultipleSolutionsReader extends SolutionReader {
+    @Override
+    public BatchInput readInput() throws IOException {
+      BatchInput.Builder builder = BatchInput.newBuilder();
+      loadInputToMessageBuilder(builder);
+      return builder.build();
     }
   }
 }
