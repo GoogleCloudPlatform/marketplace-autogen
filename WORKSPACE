@@ -9,11 +9,6 @@ http_archive(
 )
 
 maven_jar(
-    name = "javax_inject",
-    artifact = "javax.inject:javax.inject:1",
-)
-
-maven_jar(
     name = "aopalliance_aopalliance",
     artifact = "aopalliance:aopalliance:1.0",
 )
@@ -34,13 +29,8 @@ maven_jar(
 )
 
 maven_jar(
-    name = "com_google_code_gson",
-    artifact = "com.google.code.gson:gson:2.8.5",
-)
-
-maven_jar(
     name = "com_google_common_html_types_types",
-    artifact = "com.google.common.html.types:types:1.0.8",
+    artifact = "com.google.common.html.types:types:1.0.8"
 )
 
 maven_jar(
@@ -85,17 +75,17 @@ maven_jar(
 
 maven_jar(
     name = "org_apache_commons_commons_lang3",
-    artifact = "org.apache.commons:commons-lang3:3.6",
+    artifact = "org.apache.commons:commons-lang3:3.6"
 )
 
 maven_jar(
     name = "org_hamcrest_hamcrest_core",
-    artifact = "org.hamcrest:hamcrest-core:1.3",
+    artifact = "org.hamcrest:hamcrest-core:1.3"
 )
 
 maven_jar(
     name = "org_hamcrest_hamcrest_library",
-    artifact = "org.hamcrest:hamcrest-library:1.3",
+    artifact = "org.hamcrest:hamcrest-library:1.3"
 )
 
 maven_jar(
@@ -107,3 +97,4 @@ maven_jar(
     name = "org_yaml_snakeyaml",
     artifact = "org.yaml:snakeyaml:1.19",
 )
+

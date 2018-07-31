@@ -74,13 +74,5 @@ java_library(
 java_binary(
     name = "BatchAutogenApp",
     main_class = "com.google.cloud.deploymentmanager.autogen.BatchAutogenApp",
-    runtime_deps = [
-        ":autogen",
-        "@aopalliance_aopalliance//jar",
-        "@com_google_code_gson//jar",
-        "@com_google_common_html_types_types//jar",
-        "@com_ibm_icu_icu4j//jar",
-        "@javax_inject//jar",
-        "@org_ow2_asm_asm_all//jar",
-    ],
+    runtime_deps = [":autogen"],
 )
