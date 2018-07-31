@@ -23,3 +23,28 @@ bazel test javatests/com/google/cloud/deploymentmanager/autogen:all
 Sample configurations are available in tests data
 [directory](https://github.com/GoogleCloudPlatform/deploymentmanager-autogen/tree/master/javatests/com/google/cloud/deploymentmanager/autogen/testdata).
 
+### Run a sample transformation
+
+Build the BatchAutogenApp target - we will use its deployment package:
+
+```shell
+bazel build java/com/google/cloud/deploymentmanager/autogen:BatchAutogenApp_deploy.jar
+```
+
+To run a sample test proto definition transformation with printing the deployment package in JSON
+format, run the following command:
+
+```shell
+java -jar bazel-bin/java/com/google/cloud/deploymentmanager/autogen/BatchAutogenApp_deploy.jar \
+  --mode SINGLE \
+  --input_type PROTOTEXT \
+  --input javatests/com/google/cloud/deploymentmanager/autogen/testdata/singlevm/full_features/input.prototext \
+  --output_type JSON \
+  --include_shared_support_files true
+```
+
+To get more information about all the supported options of BatchAutogenApp, use:
+
+```shell
+java -jar bazel-bin/java/com/google/cloud/deploymentmanager/autogen/BatchAutogenApp_deploy.jar --help
+```
