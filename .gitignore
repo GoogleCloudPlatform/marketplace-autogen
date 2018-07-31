@@ -1,3 +1,28 @@
+# Bazel
 /bazel-*
-/.idea
-/.project
+
+# Java
+*.class
+
+# intellij
+.idea/
+*.iml
+
+# Eclipse files
+.project
+.classpath
+.settings
+
+# vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+Session.vim
+.netrwhist
+*~
+tags
+
+# VS Code
+.vscode/
+
+# OSX
+.DS_Store
