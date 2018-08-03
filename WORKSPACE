@@ -29,6 +29,11 @@ maven_jar(
 )
 
 maven_jar(
+    name = "com_google_code_gson",
+    artifact = "com.google.code.gson:gson:2.8.4",
+)
+
+maven_jar(
     name = "com_google_common_html_types_types",
     artifact = "com.google.common.html.types:types:1.0.8"
 )

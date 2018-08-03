@@ -21,6 +21,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.BatchInput;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
+import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
@@ -34,11 +35,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * An app that autogens a batch of solutions.
@@ -61,6 +64,7 @@ public final class BatchAutogenApp {
   private enum ContentType {
     PROTOTEXT,
     JSON,
+    YAML,
     WIRE;
 
     public void write(Message message, OutputStream stream) throws IOException {
@@ -69,11 +73,11 @@ public final class BatchAutogenApp {
           new PrintStream(stream).print(TextFormat.printToString(message));
           break;
         case JSON:
-          try {
-            new PrintStream(stream).print(JsonFormat.printer().print(message));
-          } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException("Cannot convert to JSON", e);
-          }
+          new PrintStream(stream).print(getJsonFromMessage(message));
+          break;
+        case YAML:
+          Yaml yaml = new Yaml();
+          new PrintStream(stream).print(yaml.dump(yaml.load(getJsonFromMessage(message))));
           break;
         case WIRE:
           message.writeTo(stream);
@@ -89,6 +93,12 @@ public final class BatchAutogenApp {
         case JSON:
           JsonFormat.parser().merge(new InputStreamReader(stream, UTF_8), builder);
           break;
+        case YAML:
+          Yaml yaml = new Yaml();
+          Gson gson = new Gson();
+          String json = gson.toJson(yaml.loadAs(new InputStreamReader(stream, UTF_8), Map.class));
+          JsonFormat.parser().merge(json, builder);
+          break;
         case WIRE:
           builder.mergeFrom(stream);
           break;
@@ -96,6 +106,13 @@ public final class BatchAutogenApp {
     }
   }
 
+  private static String getJsonFromMessage(Message message) {
+    try {
+      return JsonFormat.printer().print(message);
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException("Cannot convert to JSON", e);
+    }
+  }
 
   private static Options buildCommandOptions() {
     Options options = new Options();
