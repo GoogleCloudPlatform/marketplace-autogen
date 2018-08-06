@@ -23,6 +23,5 @@ tags
 
 # VS Code
 .vscode/
-
-# OSX
+ # OSX
 .DS_Store
