@@ -117,6 +117,7 @@ def GenerateComputeVM(context, create_disks_separately=True):
 
   machine_type = prop.setdefault(MACHINETYPE, DEFAULT_MACHINETYPE)
   metadata = prop.setdefault(METADATA, dict())
+  SetMetadataDefaults(metadata)
   network = prop.setdefault(NETWORK, DEFAULT_NETWORK)
   vm_name = MakeVMName(context)
   provide_boot = prop.setdefault(PROVIDE_BOOT, DEFAULT_PROVIDE_BOOT)
@@ -213,6 +214,20 @@ def GenerateComputeVM(context, create_disks_separately=True):
     resource[0]['properties'].update(
         {'scheduling': {'onHostMaintenance': 'terminate'}})
   return resource
+
+
+def SetMetadataDefaults(metadata):
+  """Set default metadata items."""
+  # Disable stackdriver monitoring by default.
+  items = metadata.setdefault('items', list())
+  if not [True for x in items
+          if x.get('key', None) == 'google-monitoring-enable']:
+    items.append({'key': 'google-monitoring-enable',
+                  'value': '0'})
+  if not [True for x in items
+          if x.get('key', None) == 'google-logging-enable']:
+    items.append({'key': 'google-logging-enable',
+                  'value': '0'})
 
 
 def MakeStaticAddress(vm_name, zone):
