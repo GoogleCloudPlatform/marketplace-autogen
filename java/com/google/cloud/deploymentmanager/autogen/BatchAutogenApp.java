@@ -1,3 +1,17 @@
+// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package com.google.cloud.deploymentmanager.autogen;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -7,6 +21,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.BatchInput;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
+import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
@@ -20,20 +35,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * An app that autogens a batch of solutions.
  */
 public final class BatchAutogenApp {
 
-  private static final String OPTION_NAME_HELP = "help";
-  private static final String OPTION_NAME_MODE = "mode";
   private static final String OPTION_NAME_INPUT = "input";
   private static final String OPTION_NAME_OUTPUT = "output";
   private static final String OPTION_NAME_INPUT_TYPE = "input_type";
@@ -41,32 +55,16 @@ public final class BatchAutogenApp {
   private static final String OPTION_NAME_INCLUDE_SHARED_SUPPORT_FILES =
       "include_shared_support_files";
 
-  private static boolean printUsage = false;
-  private static AutogenMode mode = AutogenMode.MULTIPLE;
   private static String input = "";
   private static String output = "";
   private static ContentType inputType = ContentType.PROTOTEXT;
   private static ContentType outputType = ContentType.PROTOTEXT;
   private static boolean includeSharedSupportFiles = false;
 
-  private enum AutogenMode {
-    MULTIPLE(new MultipleSolutionsReader()),
-    SINGLE(new SingleSolutionReader());
-
-    private final SolutionReader reader;
-
-    AutogenMode(SolutionReader reader) {
-      this.reader = reader;
-    }
-
-    public BatchInput readInput() throws IOException {
-      return reader.readInput();
-    }
-  }
-
   private enum ContentType {
     PROTOTEXT,
     JSON,
+    YAML,
     WIRE;
 
     public void write(Message message, OutputStream stream) throws IOException {
@@ -75,11 +73,11 @@ public final class BatchAutogenApp {
           new PrintStream(stream).print(TextFormat.printToString(message));
           break;
         case JSON:
-          try {
-            new PrintStream(stream).print(JsonFormat.printer().print(message));
-          } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException("Cannot convert to JSON", e);
-          }
+          new PrintStream(stream).print(getJsonFromMessage(message));
+          break;
+        case YAML:
+          Yaml yaml = new Yaml();
+          new PrintStream(stream).print(yaml.dump(yaml.load(getJsonFromMessage(message))));
           break;
         case WIRE:
           message.writeTo(stream);
@@ -95,6 +93,12 @@ public final class BatchAutogenApp {
         case JSON:
           JsonFormat.parser().merge(new InputStreamReader(stream, UTF_8), builder);
           break;
+        case YAML:
+          Yaml yaml = new Yaml();
+          Gson gson = new Gson();
+          String json = gson.toJson(yaml.loadAs(new InputStreamReader(stream, UTF_8), Map.class));
+          JsonFormat.parser().merge(json, builder);
+          break;
         case WIRE:
           builder.mergeFrom(stream);
           break;
@@ -102,11 +106,16 @@ public final class BatchAutogenApp {
     }
   }
 
+  private static String getJsonFromMessage(Message message) {
+    try {
+      return JsonFormat.printer().print(message);
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalArgumentException("Cannot convert to JSON", e);
+    }
+  }
+
   private static Options buildCommandOptions() {
     Options options = new Options();
-    options.addOption(null, OPTION_NAME_HELP, false, "Prints usage help");
-    options.addOption(null, OPTION_NAME_MODE,
-        true, "Mode for input convertion - single or multiple solutions");
     options.addOption(null, OPTION_NAME_INPUT,
         true, "Input source, a filename or empty for stdin");
     options.addOption(null, OPTION_NAME_OUTPUT,
@@ -120,16 +129,10 @@ public final class BatchAutogenApp {
     return options;
   }
 
-  private static Options parseCommandOptions(String[] args) throws ParseException {
+  private static void parseCommandOptions(String[] args) throws ParseException {
     Options options = buildCommandOptions();
     CommandLineParser parser = new DefaultParser();
     CommandLine cmd = parser.parse(options, args);
-    if (cmd.hasOption(OPTION_NAME_HELP)) {
-      printUsage = true;
-    }
-    if (cmd.hasOption(OPTION_NAME_MODE)) {
-      mode = AutogenMode.valueOf(cmd.getOptionValue(OPTION_NAME_MODE));
-    }
     if (cmd.hasOption(OPTION_NAME_INPUT)) {
       input = cmd.getOptionValue(OPTION_NAME_INPUT);
     }
@@ -146,17 +149,12 @@ public final class BatchAutogenApp {
       String value = cmd.getOptionValue(OPTION_NAME_INCLUDE_SHARED_SUPPORT_FILES);
       includeSharedSupportFiles = value.isEmpty() || Boolean.parseBoolean(value);
     }
-    return options;
   }
 
   public static void main(String[] args) throws IOException, ParseException {
-    Options options = parseCommandOptions(args);
-    if (printUsage) {
-      printUsage(options);
-      return;
-    }
+    parseCommandOptions(args);
 
-    BatchInput input = mode.readInput();
+    BatchInput input = readInput();
     BatchOutput.Builder builder = BatchOutput.newBuilder();
     for (DeploymentPackageInput solution : input.getSolutionsList()) {
       SolutionPackage dp =
@@ -175,9 +173,16 @@ public final class BatchAutogenApp {
     writeOutput(builder.build());
   }
 
-  private static void printUsage(Options options) {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("BatchAutogenApp", options);
+  private static BatchInput readInput() throws IOException {
+    BatchInput.Builder builder = BatchInput.newBuilder();
+    if (input.isEmpty()) {
+      inputType.read(builder, System.in);
+    } else {
+      try (InputStream fi = new BufferedInputStream(new FileInputStream(input))) {
+        inputType.read(builder, fi);
+      }
+    }
+    return builder.build();
   }
 
   private static void writeOutput(BatchOutput data) throws IOException {
@@ -187,41 +192,6 @@ public final class BatchAutogenApp {
       try (OutputStream fo = new BufferedOutputStream(new FileOutputStream(output))) {
         outputType.write(data, fo);
       }
-    }
-  }
-
-  private static abstract class SolutionReader {
-
-    public abstract BatchInput readInput() throws IOException;
-
-    void loadInputToMessageBuilder(Message.Builder builder) throws IOException {
-      if (input.isEmpty()) {
-        inputType.read(builder, System.in);
-      } else {
-        try (InputStream fi = new BufferedInputStream(new FileInputStream(input))) {
-          inputType.read(builder, fi);
-        }
-      }
-    }
-  }
-
-  private static class SingleSolutionReader extends SolutionReader {
-    @Override
-    public BatchInput readInput() throws IOException {
-      DeploymentPackageInput.Builder builder = DeploymentPackageInput.newBuilder();
-      loadInputToMessageBuilder(builder);
-      return BatchInput.newBuilder()
-          .addSolutions(builder.build())
-          .build();
-    }
-  }
-
-  private static class MultipleSolutionsReader extends SolutionReader {
-    @Override
-    public BatchInput readInput() throws IOException {
-      BatchInput.Builder builder = BatchInput.newBuilder();
-      loadInputToMessageBuilder(builder);
-      return builder.build();
     }
   }
 }
