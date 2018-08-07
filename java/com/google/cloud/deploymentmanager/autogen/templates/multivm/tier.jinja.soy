@@ -121,7 +121,7 @@ resources:
       {/let}
       {$serviceAccounts |indent: 6, true}{nil}
 
-      //TODO(b/70201062) Extract metadata items to renders template.
+      //TODO(khajduczenia) Extract metadata items to renders template.
       {let $passwordMetadataItems kind="text"}
         {call .passwordMetadataItems}{param spec: $packageSpec/}{/call}
       {/let}
