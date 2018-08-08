@@ -1,0 +1,19 @@
+dist: trusty
+language: generic
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - wget
+    - pkg-config
+env:
+- BAZEL_VERSION=0.16.0
+
+before_install:
+- wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb
+- sudo dpkg -i bazel_${BAZEL_VERSION}-linux-x86_64.deb
+
+script:
+- bazel build java/com/google/cloud/deploymentmanager/autogen/...
+- bazel test javatests/com/google/cloud/deploymentmanager/autogen/...
