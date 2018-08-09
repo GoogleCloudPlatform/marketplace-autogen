@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 java_library(
     name = "cli",
-    srcs = ["AutogenCli.java"],
+    srcs = glob(["*.java"]),
     deps = [
         "//java/com/google/cloud/deploymentmanager/autogen",
         "//java/com/google/cloud/deploymentmanager/autogen:autogen_java_proto",
