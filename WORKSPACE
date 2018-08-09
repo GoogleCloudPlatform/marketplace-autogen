@@ -24,11 +24,6 @@ maven_jar(
 )
 
 maven_jar(
-    name = "com_google_errorprone_annotations",
-    artifact = "com.google.errorprone:error_prone_annotations:2.3.1",
-)
-
-maven_jar(
     name = "com_google_auto_value_auto_value",
     artifact = "com.google.auto.value:auto-value:1.5.4",
 )

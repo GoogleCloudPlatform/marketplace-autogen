@@ -1,0 +1,23 @@
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "cli",
+    srcs = ["AutogenCli.java"],
+    deps = [
+        "//java/com/google/cloud/deploymentmanager/autogen",
+        "//java/com/google/cloud/deploymentmanager/autogen:autogen_java_proto",
+        "@com_google_code_gson//jar",
+        "@com_google_protobuf_protobuf_java//jar",
+        "@com_google_protobuf_protobuf_java_util//jar",
+        "@commons_cli_commons_cli//jar",
+        "@org_yaml_snakeyaml//jar",
+    ],
+)
+
+java_binary(
+    name = "AutogenCli",
+    main_class = "com.google.cloud.deploymentmanager.autogen.cli.AutogenCli",
+    runtime_deps = [
+        ":cli",
+    ],
+)
