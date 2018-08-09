@@ -69,13 +69,13 @@ message Image {
 }
 
 // Used as an input for batch generating many deployment packages as once.
-// See BatchAutogenApp.
+// See AutogenCli.
 message BatchInput {
   repeated DeploymentPackageInput solutions = 1;
 }
 
 // Used as an output of batch generating many deployment packages as once.
-// See BatchAutogenApp.
+// See AutogenCli.
 message BatchOutput {
   message SolutionOutput {
     string partner_id = 1;
