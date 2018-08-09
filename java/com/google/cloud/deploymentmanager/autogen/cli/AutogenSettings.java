@@ -39,8 +39,9 @@ final class AutogenSettings {
       + " for single Solution processing. See DeploymentPackageInput proto";
   private static final String BATCH_INPUT_DESC = "Input source, a filename or empty for stdin,"
       + " for batch Solution processing. See BatchInput proto";
-  private static final String OUTPUT_DESC =
-      "Output destination filename (Optional, if option not present stdout will be used)";
+  private static final String OUTPUT_DESC = "Output destination folder if output_type is PACKAGE,"
+      + " or filename otherwise (Optional, current directory will be used for output_type PACKAGE"
+      + " and stdout for other types, if option not present)";
   private static final String INPUT_TYPE_DESC = "Input content type";
   private static final String OUTPUT_TYPE_DESC = "Output content type";
   private static final String INCLUDE_SHARED_SUPPORT_FILES_DESC =
@@ -49,15 +50,23 @@ final class AutogenSettings {
   private boolean singleMode;
   private String input;
   private String output;
-  private ContentType inputType;
-  private ContentType outputType;
+  private InputType inputType;
+  private OutputType outputType;
   private boolean includeSharedSupportFiles;
 
-  enum ContentType {
+  enum InputType {
     PROTOTEXT,
     JSON,
     YAML,
     WIRE
+  }
+
+  enum OutputType {
+    PROTOTEXT,
+    JSON,
+    YAML,
+    WIRE,
+    PACKAGE
   }
 
   private static void printUsage(Options options) {
@@ -123,9 +132,9 @@ final class AutogenSettings {
     }
     settings.output = cmd.getOptionValue(OPTION_OUTPUT, settings.output);
     settings.inputType =
-        ContentType.valueOf(cmd.getOptionValue(OPTION_INPUT_TYPE, settings.inputType.name()));
+        InputType.valueOf(cmd.getOptionValue(OPTION_INPUT_TYPE, settings.inputType.name()));
     settings.outputType =
-        ContentType.valueOf(cmd.getOptionValue(OPTION_OUTPUT_TYPE, settings.outputType.name()));
+        OutputType.valueOf(cmd.getOptionValue(OPTION_OUTPUT_TYPE, settings.outputType.name()));
     settings.includeSharedSupportFiles = cmd.hasOption(OPTION_INCLUDE_SHARED_SUPPORT_FILES);
 
     return settings;
@@ -135,8 +144,8 @@ final class AutogenSettings {
     this.singleMode = true;
     this.input = "";
     this.output = "";
-    this.inputType = ContentType.PROTOTEXT;
-    this.outputType = ContentType.PROTOTEXT;
+    this.inputType = InputType.PROTOTEXT;
+    this.outputType = OutputType.PROTOTEXT;
     this.includeSharedSupportFiles = false;
   }
 
@@ -148,11 +157,11 @@ final class AutogenSettings {
     return this.output;
   }
 
-  public ContentType getInputType() {
+  public InputType getInputType() {
     return this.inputType;
   }
 
-  public ContentType getOutputType() {
+  public OutputType getOutputType() {
     return this.outputType;
   }
 

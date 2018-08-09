@@ -9,6 +9,7 @@ java_library(
         "@aopalliance_aopalliance//jar",
         "@com_google_code_gson//jar",
         "@com_google_common_html_types_types//jar",
+        "@com_google_guava_guava//jar",
         "@com_google_protobuf_protobuf_java//jar",
         "@com_google_protobuf_protobuf_java_util//jar",
         "@com_ibm_icu_icu4j//jar",

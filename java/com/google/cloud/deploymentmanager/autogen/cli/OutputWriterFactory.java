@@ -14,14 +14,25 @@
 
 package com.google.cloud.deploymentmanager.autogen.cli;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
+import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.BaseEncoding;
+import com.google.common.io.Files;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import com.google.protobuf.util.JsonFormat;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Paths;
+import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
 class OutputWriterFactory {
@@ -35,26 +46,25 @@ class OutputWriterFactory {
         return new YamlWriter(settings);
       case WIRE:
         return new WireWriter(settings);
+      case PACKAGE:
+        return new PackageWriter(settings);
     }
     throw new IllegalArgumentException("Unknown output type: " + settings.getOutputType());
   }
 
   abstract static class OutputWriter {
-    private final AutogenSettings settings;
+    protected final AutogenSettings settings;
 
     OutputWriter(AutogenSettings settings) {
       this.settings = settings;
     }
 
-    void writeOutput(Message message) throws IOException {
+    OutputStream newOutputStream() throws FileNotFoundException {
       final String output = settings.getOutput();
-      try (OutputStream stream = output.isEmpty()
-          ? System.out : new BufferedOutputStream(new FileOutputStream(output))) {
-        doWriteOutput(stream, message);
-      }
+      return output.isEmpty() ? System.out : new BufferedOutputStream(new FileOutputStream(output));
     }
 
-    abstract void doWriteOutput(OutputStream stream, Message message) throws IOException;
+    abstract void writeOutput(Message message) throws IOException;
   }
 
   static class PrototextWriter extends OutputWriter {
@@ -63,8 +73,10 @@ class OutputWriterFactory {
     }
 
     @Override
-    void doWriteOutput(OutputStream stream, Message message) throws IOException {
-      new PrintStream(stream).print(TextFormat.printToString(message));
+    void writeOutput(Message message) throws IOException {
+      try (OutputStream stream = newOutputStream()) {
+        new PrintStream(stream).print(TextFormat.printToString(message));
+      }
     }
   }
 
@@ -74,8 +86,10 @@ class OutputWriterFactory {
     }
 
     @Override
-    void doWriteOutput(OutputStream stream, Message message) throws IOException {
-      new PrintStream(stream).print(JsonFormat.printer().print(message));
+    void writeOutput(Message message) throws IOException {
+      try (OutputStream stream = newOutputStream()) {
+        new PrintStream(stream).print(JsonFormat.printer().print(message));
+      }
     }
   }
 
@@ -85,9 +99,11 @@ class OutputWriterFactory {
     }
 
     @Override
-    void doWriteOutput(OutputStream stream, Message message) throws IOException {
-      Yaml yaml = new Yaml();
-      new PrintStream(stream).print(yaml.dump(yaml.load(JsonFormat.printer().print(message))));
+    void writeOutput(Message message) throws IOException {
+      try (OutputStream stream = newOutputStream()) {
+        Yaml yaml = new Yaml();
+        new PrintStream(stream).print(yaml.dump(yaml.load(JsonFormat.printer().print(message))));
+      }
     }
   }
 
@@ -97,8 +113,46 @@ class OutputWriterFactory {
     }
 
     @Override
-    void doWriteOutput(OutputStream stream, Message message) throws IOException {
-      message.writeTo(stream);
+    void writeOutput(Message message) throws IOException {
+      try (OutputStream stream = newOutputStream()) {
+        message.writeTo(stream);
+      }
+    }
+  }
+
+  static class PackageWriter extends OutputWriter {
+    PackageWriter(AutogenSettings settings) {
+      super(settings);
+    }
+
+    @Override
+    void writeOutput(Message message) throws IOException {
+      Map<String, SolutionPackage> solutions;
+      if (message instanceof BatchOutput) {
+        final BatchOutput batchMessage = (BatchOutput) message;
+        ImmutableMap.Builder<String, SolutionPackage> builder = ImmutableMap.builder();
+        for (BatchOutput.SolutionOutput solution : batchMessage.getSolutionsList()) {
+          builder.put(solution.getPartnerId() + "/" + solution.getSolutionId(),
+              solution.getPackage());
+        }
+        solutions = builder.build();
+      } else {
+        solutions = ImmutableMap.of("", (SolutionPackage) message);
+      }
+
+      for (Map.Entry<String, SolutionPackage> entry : solutions.entrySet()) {
+        for (SolutionPackage.File file : entry.getValue().getFilesList()) {
+          String filePath =
+              Paths.get(this.settings.getOutput(), entry.getKey(), file.getPath()).toString();
+          File outputFile = new File(filePath);
+          Files.createParentDirs(outputFile);
+          if (filePath.endsWith(".png") || filePath.endsWith(".jpg")) {
+            Files.write(BaseEncoding.base64().decode(file.getContent()), outputFile);
+          } else {
+            Files.asCharSink(outputFile, UTF_8).write(file.getContent());
+          }
+        }
+      }
     }
   }
 }
