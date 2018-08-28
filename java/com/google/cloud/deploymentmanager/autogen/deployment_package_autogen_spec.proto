@@ -101,7 +101,7 @@ message SingleVmDeploymentPackageSpec {
   repeated GceMetadataItem gce_metadata_items = 13;
 
   // Attach accelerator hardware (GPU) to the VM.
-  // Currently at most accelerator is supported.
+  // Currently at most one accelerator spec is supported.
   repeated AcceleratorSpec accelerators = 14;
 
   // Customizes additional inputs configured by user prior to deployment.
