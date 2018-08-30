@@ -757,6 +757,6 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
   diskType: {{ properties["{diskTypePropertyName(index($disk), $tierSpec)}"] }}
   diskSizeGb: {{ properties["{diskSizePropertyName(index($disk), $tierSpec)}"] }}
   boot: False
-  autoDelete: True
+  autoDelete: {$disk.preventAutoDeletion ? 'False' : 'True'}
 {/for}
 {/template}

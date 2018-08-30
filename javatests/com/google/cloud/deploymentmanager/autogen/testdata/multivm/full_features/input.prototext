@@ -101,6 +101,7 @@ spec {
           device_name_suffix {
             name: "extra-disk"
           }
+          prevent_auto_deletion: true
         },
         {
           display_label: "Super Extra disk"
