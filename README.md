@@ -82,7 +82,7 @@ bazel-bin/java/com/google/cloud/deploymentmanager/autogen/cli/AutogenCli \
   --include_shared_support_files
 ```
 
-Then compress the solution_folder folder and use partner portal to upload your deployment package: https://pantheon.corp.google.com/partner
+Then compress the solution_folder folder and use partner portal to upload your deployment package: https://console.cloud.google.com/partner
 
 Other sample configurations are also available in [testdata](javatests/com/google/cloud/deploymentmanager/autogen/testdata) folder.
 
