@@ -32,7 +32,7 @@ final class AutogenSettings {
   private static final String OPTION_OUTPUT = "output";
   private static final String OPTION_INPUT_TYPE = "input_type";
   private static final String OPTION_OUTPUT_TYPE = "output_type";
-  private static final String OPTION_INCLUDE_SHARED_SUPPORT_FILES = "include_shared_support_files";
+  private static final String OPTION_EXCLUDE_SHARED_SUPPORT_FILES = "exclude_shared_support_files";
 
   private static final String HELP_DESC = "Prints usage help";
   private static final String SINGLE_INPUT_DESC = "Input source, a filename or empty for stdin,"
@@ -44,15 +44,15 @@ final class AutogenSettings {
       + " and stdout for other types, if option not present)";
   private static final String INPUT_TYPE_DESC = "Input content type";
   private static final String OUTPUT_TYPE_DESC = "Output content type";
-  private static final String INCLUDE_SHARED_SUPPORT_FILES_DESC =
-      "Whether to include symlinkable shared support files";
+  private static final String EXCLUDE_SHARED_SUPPORT_FILES_DESC =
+      "Whether to exclude symlinkable shared support files";
 
   private boolean singleMode;
   private String input;
   private String output;
   private InputType inputType;
   private OutputType outputType;
-  private boolean includeSharedSupportFiles;
+  private boolean excludeSharedSupportFiles;
 
   enum InputType {
     PROTOTEXT,
@@ -88,7 +88,7 @@ final class AutogenSettings {
         .addOption(null, OPTION_INPUT_TYPE, true, INPUT_TYPE_DESC)
         .addOption(null, OPTION_OUTPUT_TYPE, true, OUTPUT_TYPE_DESC)
         .addOption(
-            null, OPTION_INCLUDE_SHARED_SUPPORT_FILES, false, INCLUDE_SHARED_SUPPORT_FILES_DESC);
+            null, OPTION_EXCLUDE_SHARED_SUPPORT_FILES, false, EXCLUDE_SHARED_SUPPORT_FILES_DESC);
   }
 
   private static void validateCliOptions(CommandLine cmd) {
@@ -135,7 +135,7 @@ final class AutogenSettings {
         InputType.valueOf(cmd.getOptionValue(OPTION_INPUT_TYPE, settings.inputType.name()));
     settings.outputType =
         OutputType.valueOf(cmd.getOptionValue(OPTION_OUTPUT_TYPE, settings.outputType.name()));
-    settings.includeSharedSupportFiles = cmd.hasOption(OPTION_INCLUDE_SHARED_SUPPORT_FILES);
+    settings.excludeSharedSupportFiles = cmd.hasOption(OPTION_EXCLUDE_SHARED_SUPPORT_FILES);
 
     return settings;
   }
@@ -146,7 +146,7 @@ final class AutogenSettings {
     this.output = "";
     this.inputType = InputType.PROTOTEXT;
     this.outputType = OutputType.PROTOTEXT;
-    this.includeSharedSupportFiles = false;
+    this.excludeSharedSupportFiles = false;
   }
 
   public String getInput() {
@@ -165,8 +165,8 @@ final class AutogenSettings {
     return this.outputType;
   }
 
-  public boolean shouldIncludeSharedSupportFiles() {
-    return this.includeSharedSupportFiles;
+  public boolean shouldExcludeSharedSupportFiles() {
+    return this.excludeSharedSupportFiles;
   }
 
   public boolean isSingleMode() {

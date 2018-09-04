@@ -46,7 +46,7 @@ resources:
           diskType: {{ properties["disk2_type"] }}
           diskSizeGb: {{ properties["disk2_sizeGb"] }}
           boot: False
-          autoDelete: True
+          autoDelete: False
         - deviceName: {{ instanceName }}-{{ properties["input_thirdDiskName"] }}
           type: PERSISTENT
           diskType: {{ properties["disk3_type"] }}
