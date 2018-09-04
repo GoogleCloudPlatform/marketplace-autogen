@@ -55,9 +55,9 @@ can be found in [autogen.proto](java/com/google/cloud/deploymentmanager/autogen/
   If --output_type is `PACKAGE`, the argument of this option will be interpreted as a destination folder for the deployment files to be written to. If left empty or not provided, it will use the current directory that the binary is being run.\
   For all other --output_type options, the argument of this option will be interpreted as a path to file to write the output to. If empty or not provided, it will defaults to stdout.
 
-* `--include_shared_support_files` (optional)
+* `--exclude_shared_support_files` (optional)
 
-  If provided, Autogen will include the shared support files used for deployment in this solution (look [here](java/com/google/cloud/deploymentmanager/autogen/templates/sharedsupport/common) for those files).
+  If provided, Autogen will NOT include the shared support files used for deployment in this solution (look [here](java/com/google/cloud/deploymentmanager/autogen/templates/sharedsupport/common) for those files). By default Autogen always include those files (recommended).
 
 You can also see those options by providing `--help` as the argument for AutogenCli
 
@@ -78,8 +78,7 @@ bazel-bin/java/com/google/cloud/deploymentmanager/autogen/cli/AutogenCli \
   --input_type YAML \
   --single_input example-config/solution.yaml \
   --output_type PACKAGE \
-  --output solution_folder \
-  --include_shared_support_files
+  --output solution_folder
 ```
 
 Then compress the solution_folder folder and use partner portal to upload your deployment package: https://console.cloud.google.com/partner
@@ -95,6 +94,5 @@ format, run the following command:
 bazel-bin/java/com/google/cloud/deploymentmanager/autogen/cli/AutogenCli \
   --input_type PROTOTEXT \
   --single_input javatests/com/google/cloud/deploymentmanager/autogen/testdata/singlevm/full_features/input.prototext \
-  --output_type JSON \
-  --include_shared_support_files
+  --output_type JSON
 ```

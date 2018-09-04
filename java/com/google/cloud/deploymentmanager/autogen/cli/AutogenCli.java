@@ -31,8 +31,8 @@ import org.apache.commons.cli.ParseException;
 public final class AutogenCli {
   private static SolutionPackage getSolutionPackage(
       DeploymentPackageInput solution, AutogenSettings settings) {
-    SharedSupportFilesStrategy strategy = settings.shouldIncludeSharedSupportFiles()
-            ? SharedSupportFilesStrategy.INCLUDED : SharedSupportFilesStrategy.EXCLUDED;
+    SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
+            ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
     return Autogen.getInstance().generateDeploymentPackage(solution, strategy);
   }
 
