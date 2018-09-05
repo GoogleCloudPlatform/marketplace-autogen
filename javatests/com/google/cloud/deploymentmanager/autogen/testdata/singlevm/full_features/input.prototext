@@ -121,6 +121,7 @@ spec {
           min_size_gb: 15
         }
         display_label: "The less great disk"
+        prevent_auto_deletion: true
       },
       {
         display_label: "The third disk"

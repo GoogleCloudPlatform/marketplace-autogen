@@ -50,7 +50,7 @@ resources:
           diskType: {{ properties["main_disk2_type"] }}
           diskSizeGb: {{ properties["main_disk2_sizeGb"] }}
           boot: False
-          autoDelete: True
+          autoDelete: False
         - deviceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}-{{ properties["input_superExtraDiskName"] }}
           type: PERSISTENT
           diskType: {{ properties["main_disk3_type"] }}
