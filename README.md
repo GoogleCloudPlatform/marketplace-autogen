@@ -4,6 +4,11 @@
 
 It currently supports single and multi VM configurations.
 
+## Prerequisites
+
+* **bazel**: Install [here](https://docs.bazel.build/versions/master/install.html).
+* **Java**: Check [bazel docs](https://docs.bazel.build/versions/master/tutorial/java.html) on how to install and setup a Java environment.
+
 ## Build
 
 To build all the artifacts, run the following `bazel` command:
