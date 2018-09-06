@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@io_bazel_rules_docker//java:image.bzl", "java_image")
+
 java_library(
     name = "cli",
     srcs = glob(["*.java"]),
@@ -26,4 +28,11 @@ java_binary(
     runtime_deps = [
         ":cli",
     ],
+)
+
+java_image(
+    name = "docker_image",
+    #layers = [":cli"],
+    main_class = "com.google.cloud.deploymentmanager.autogen.cli.AutogenCli",
+    runtime_deps = [":cli"],
 )
