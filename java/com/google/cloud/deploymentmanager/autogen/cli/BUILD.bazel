@@ -32,7 +32,6 @@ java_binary(
 
 java_image(
     name = "docker_image",
-    #layers = [":cli"],
     main_class = "com.google.cloud.deploymentmanager.autogen.cli.AutogenCli",
     runtime_deps = [":cli"],
 )

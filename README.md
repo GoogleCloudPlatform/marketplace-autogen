@@ -52,7 +52,7 @@ You can then change the fields to reflect the configuration of your solution and
 
 ### Example commands
 
-It's easiest to use our released docker images. If you want to build and run the tool from source, see the [Development](#Development) section below.
+It's easiest to use our released docker images. If you want to build and run the tool from source, see the [Development](#development) section below.
 
 Make sure [docker](https://www.docker.com/) has been installed.
 
