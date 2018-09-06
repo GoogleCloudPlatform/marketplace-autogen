@@ -78,8 +78,14 @@ final class SpecValidations {
 
   private static final Pattern TIER_NAME_REGEX = Pattern.compile("[a-z0-9]+");
 
-  private static final ImmutableSet<String> ACCELERATOR_TYPES = ImmutableSet.of(
-      "nvidia-tesla-k80", "nvidia-tesla-p100", "nvidia-tesla-v100");
+  private static final ImmutableSet<String> SUPPORTED_ACCELERATOR_TYPES =
+      ImmutableSet.of(
+          "nvidia-tesla-k80",
+          "nvidia-tesla-p100",
+          "nvidia-tesla-v100",
+          "nvidia-tesla-p100-vws",
+          "nvidia-tesla-p4",
+          "nvidia-tesla-p4-vws");
 
   /**
    * Validates that a spec is complete and reasonable.
@@ -547,7 +553,7 @@ final class SpecValidations {
     checkArgument(accelerator.getTypesList().size() >= 1,
         "Accelerators must have at least one type.");
     Set<String> gpuTypes = ImmutableSet.copyOf(accelerator.getTypesList());
-    Set<String> unsupportedTypes = Sets.difference(gpuTypes, ACCELERATOR_TYPES);
+    Set<String> unsupportedTypes = Sets.difference(gpuTypes, SUPPORTED_ACCELERATOR_TYPES);
     checkArgument(unsupportedTypes.isEmpty(),
         "Unsupported accelerator types: %s", unsupportedTypes);
     checkArgument(accelerator.getMinCount() >= 0, "Accelerator min count must not be negative.");

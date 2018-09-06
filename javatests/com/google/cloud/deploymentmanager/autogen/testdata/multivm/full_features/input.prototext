@@ -101,6 +101,7 @@ spec {
           device_name_suffix {
             name: "extra-disk"
           }
+          prevent_auto_deletion: true
         },
         {
           display_label: "Super Extra disk"
@@ -346,7 +347,7 @@ spec {
         }
       }
       accelerators {
-        types: ["nvidia-tesla-k80", "nvidia-tesla-v100"]
+        types: ["nvidia-tesla-k80", "nvidia-tesla-v100", "nvidia-tesla-p4-vws"]
         default_type: "nvidia-tesla-v100"
       }
     }

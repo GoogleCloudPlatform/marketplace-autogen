@@ -79,7 +79,8 @@ public class Autogen {
       "common/software_status.sh.tmpl",
       "common/software_status_script.py",
       "common/software_status_script.py.schema",
-      "common/vm_instance.py");
+      "common/vm_instance.py",
+      "common/vm_instance.py.schema");
 
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()

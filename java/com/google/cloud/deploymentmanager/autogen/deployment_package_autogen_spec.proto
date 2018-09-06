@@ -322,6 +322,10 @@ message DiskSpec {
   // The final device name will be a concatenation of an instance name with
   // the specified device name.
   DeviceName device_name_suffix = 5;
+
+  // Whether to leave the disk when the instance is deleted.
+  // Ignored for boot disk.
+  bool prevent_auto_deletion = 6;
 }
 
 // Specifies if the VM can route IP packets.
