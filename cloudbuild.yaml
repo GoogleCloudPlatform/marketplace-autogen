@@ -1,0 +1,54 @@
+options:
+  machineType: 'N1_HIGHCPU_8'
+
+steps:
+- id: &BUILD_ALL Build all
+  name: gcr.io/cloud-builders/bazel
+  args:
+  - build
+  - java/com/google/cloud/deploymentmanager/autogen/...:all
+  - javatests/com/google/cloud/deploymentmanager/autogen/...:all
+
+- id: &TEST_ALL Test all
+  name: gcr.io/cloud-builders/bazel
+  waitFor: [*BUILD_ALL]
+  args:
+  - test
+  - javatests/com/google/cloud/deploymentmanager/autogen/...:all
+
+- id: &BUILD Build image
+  waitFor: [*BUILD_ALL, *TEST_ALL]
+  name: gcr.io/cloud-builders/bazel
+  args:
+  # This bazel run command installs the built image into docker.
+  - run
+  - java/com/google/cloud/deploymentmanager/autogen/cli:docker_image
+  - --
+  - --norun
+
+- id: Retag image latest
+  waitFor: [*BUILD]
+  name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - bazel/java/com/google/cloud/deploymentmanager/autogen/cli:docker_image
+  - gcr.io/$PROJECT_ID/dm/autogen:latest
+- id: Retag image full SHA
+  waitFor: [*BUILD]
+  name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - bazel/java/com/google/cloud/deploymentmanager/autogen/cli:docker_image
+  - gcr.io/$PROJECT_ID/dm/autogen:sha_$COMMIT_SHA
+- id: Retag image short SHA
+  waitFor: [*BUILD]
+  name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - bazel/java/com/google/cloud/deploymentmanager/autogen/cli:docker_image
+  - gcr.io/$PROJECT_ID/dm/autogen:sha_$SHORT_SHA
+
+images:
+- gcr.io/$PROJECT_ID/dm/autogen:latest
+- gcr.io/$PROJECT_ID/dm/autogen:sha_$SHORT_SHA
+- gcr.io/$PROJECT_ID/dm/autogen:sha_$COMMIT_SHA
