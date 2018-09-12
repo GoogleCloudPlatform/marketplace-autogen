@@ -21,7 +21,4 @@ resources:
     {for $field in $testDefaultedFields}
     {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
     {/for}
-    {if length($spec.acceleratorsList) > 0}
-    acceleratorCheck: 'yes'
-    {/if}
 {/template}

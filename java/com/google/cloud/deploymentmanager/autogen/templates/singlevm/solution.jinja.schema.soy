@@ -60,9 +60,6 @@ required:
     {call renders.deployInputRequiredSchema}{param inputSpec: $spec.deployInput/}{/call}
   {/let}
   {$deployInputRequiredList |indent: 2, true}{nil}
-  {if length($spec.acceleratorsList) > 0}
-  - acceleratorCheck
-  {/if}
 
 {\n}
 properties:
@@ -100,8 +97,6 @@ properties:
     {/call}
   {/let}
   {$acceleratorProps |indent: 2, true}{nil}
-  acceleratorCheck:
-    type: string
   {/if}
 
   {let $networkProps kind="text"}

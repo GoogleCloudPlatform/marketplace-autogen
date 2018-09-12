@@ -176,10 +176,6 @@ input:
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: TIER3_TIER
       level: 1
-    - name: acceleratorCheck
-      title: Did you check for GPU quota?
-      subtext: "Before proceeding, ensure GPUs are available on your project's <a href=\"iam-admin/quotas?&service=compute.googleapis.com&metric=NVIDIA%20K80%20GPUs,NVIDIA%20P100%20GPUs,NVIDIA%20V100%20GPUs,NVIDIA%20P4%20GPUs,NVIDIA%20P100%20Virtual%20Workstation%20GPUs,NVIDIA%20P4%20Virtual%20Workstation%20GPUs\">quotas page</a>. Use the 'EDIT QUOTAS' button to request a quota increase. Also check <a href=\"https://cloud.google.com/compute/docs/gpus\">GPU requirements</a> for zone and machine type compatibility.<p><p>Type 'yes' to proceed."
-      section: ACCELERATORS
     - name: input_domain
       title: Domain
       subtext: Your domain
@@ -235,8 +231,6 @@ input:
       title: Secondary Tier
     - name: TIER3_TIER
       title: Third Tier
-    - name: ACCELERATORS
-      title: GPU
     - name: NETWORKING
       title: Networking
     - name: LOAD_BALANCERS

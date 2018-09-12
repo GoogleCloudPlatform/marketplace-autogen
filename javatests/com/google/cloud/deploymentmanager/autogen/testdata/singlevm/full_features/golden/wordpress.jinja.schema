@@ -29,7 +29,6 @@ required:
   - input_imageCacheSize
   - input_cacheExpiration
   - input_thirdDiskName
-  - acceleratorCheck
 
 properties:
   zone:
@@ -68,8 +67,6 @@ properties:
       type: GCE_GPU_COUNT
       gceGpuCount:
         machineTypeProperty: machineType
-  acceleratorCheck:
-    type: string
   network:
     type: string
     default: default

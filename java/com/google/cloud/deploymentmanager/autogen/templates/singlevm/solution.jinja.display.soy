@@ -8,8 +8,6 @@
 {@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
-{let $solutionHasGpus: solutionHasGpus($spec)/}
-
 {let $partnerName kind="text"}
 {if $partnerInfo}
   {$partnerInfo.name}{nil}
@@ -42,16 +40,12 @@ input:
     {/if}
     - name: zone
       title: Zone
-      {if $solutionHasGpus}
+      {if solutionHasGpus($spec)}
       {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
     - name: machineType
       title: Machine type
-    {if $solutionHasGpus}
-    {let $acceleratorCheck kind="text"}{call display.acceleratorCheckProperty/}{/let}
-    {$acceleratorCheck |indent: 4, true}{nil}
-    {/if}
     - name: bootDiskType
       title: {$spec.bootDisk.displayLabel} type
       section: BOOT_DISK
@@ -132,10 +126,6 @@ input:
   sections:
     {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
 
-    {if $solutionHasGpus}
-    {let $acceleratorsSection kind="text"}{call display.acceleratorsSection/}{/let}
-    {$acceleratorsSection |indent: 4, true}{nil}
-    {/if}
     - name: BOOT_DISK
       title: Boot Disk
       tooltip: Each instance requires a disk to boot from.
