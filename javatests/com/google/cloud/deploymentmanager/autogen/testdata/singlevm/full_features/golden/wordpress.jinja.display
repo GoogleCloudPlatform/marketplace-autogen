@@ -57,10 +57,6 @@ input:
       subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
     - name: machineType
       title: Machine type
-    - name: acceleratorCheck
-      title: Did you check for GPU quota?
-      subtext: "Before proceeding, ensure GPUs are available on your project's <a href=\"iam-admin/quotas?&service=compute.googleapis.com&metric=NVIDIA%20K80%20GPUs,NVIDIA%20P100%20GPUs,NVIDIA%20V100%20GPUs,NVIDIA%20P4%20GPUs,NVIDIA%20P100%20Virtual%20Workstation%20GPUs,NVIDIA%20P4%20Virtual%20Workstation%20GPUs\">quotas page</a>. Use the 'EDIT QUOTAS' button to request a quota increase. Also check <a href=\"https://cloud.google.com/compute/docs/gpus\">GPU requirements</a> for zone and machine type compatibility.<p><p>Type 'yes' to proceed."
-      section: ACCELERATORS
     - name: bootDiskType
       title: Boot disk type
       section: BOOT_DISK
@@ -195,8 +191,6 @@ input:
     - name: PHPMYADMIN
       title: phpMyAdmin
       tooltip: phpMyAdmin makes administer your Wordpress installation much easier.
-    - name: ACCELERATORS
-      title: GPU
     - name: BOOT_DISK
       title: Boot Disk
       tooltip: Each instance requires a disk to boot from.

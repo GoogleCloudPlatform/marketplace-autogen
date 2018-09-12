@@ -8,8 +8,6 @@
 {@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
-{let $solutionHasGpus: solutionHasGpus($spec)/}
-
 {let $partnerName kind="text"}
 {if $partnerInfo}
   {$partnerInfo.name}{nil}
@@ -30,7 +28,7 @@ input:
   properties:
     - name: zone
       title: Zone
-      {if $solutionHasGpus}
+      {if solutionHasGpus($spec)}
       {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
@@ -45,11 +43,6 @@ input:
     {let $tierProperties kind="text"}{call .displayTierProperties}{param spec: $tier/}{/call}{/let}
     {$tierProperties |indent: 4, true}{nil}
     {/for}
-
-    {if $solutionHasGpus}
-    {let $acceleratorCheck kind="text"}{call display.acceleratorCheckProperty/}{/let}
-    {$acceleratorCheck |indent: 4, true}{nil}
-    {/if}
 
     {if $spec.deployInput}
     {for $section in $spec.deployInput.sectionsList}
@@ -73,10 +66,6 @@ input:
     - name: {call display.tierSectionName}{param spec: $tier/}{/call}
       title: {$tier.title |yamlprimitive: 6}
     {/for}
-    {if $solutionHasGpus}
-    {let $acceleratorsSection kind="text"}{call display.acceleratorsSection/}{/let}
-    {$acceleratorsSection |indent: 4, true}{nil}
-    {/if}
     - name: NETWORKING
       title: Networking
 

@@ -7,8 +7,6 @@
 {@param? solutionInfo: cloud.deploymentmanager.autogen.SolutionMarketingInfo}
 {@param? templateVersion: string}
 
-{let $solutionHasGpus: solutionHasGpus($spec)/}
-
 imports:
   {for $tier in $spec.tiersList}
   - path: {tierTemplateName($tier)}
@@ -41,9 +39,6 @@ required:
     {call renders.deployInputRequiredSchema}{param inputSpec: $spec.deployInput/}{/call}
   {/let}
   {$deployInputRequiredList |indent: 2, true}{nil}
-  {if $solutionHasGpus}
-  - acceleratorCheck
-  {/if}
 
 {\n}
 properties:
@@ -68,10 +63,6 @@ properties:
   {$tierProperties |indent: 2, true}{nil}
   {/for}
 
-  {if $solutionHasGpus}
-  acceleratorCheck:
-    type: string
-  {/if}
   {if $spec.deployInput}
   {let $deployInputProps kind="text"}
     {call renders.deployInputPropertiesSchema}

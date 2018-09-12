@@ -27,7 +27,6 @@ required:
   - input_adminEmailAddress
   - input_showConditionals
   - input_superExtraDiskName
-  - acceleratorCheck
 
 properties:
   zone:
@@ -272,8 +271,6 @@ properties:
       type: GCE_DISK_SIZE
       gceDiskSize:
         diskTypeProperty: tier3_bootDiskType
-  acceleratorCheck:
-    type: string
   input_domain:
     type: string
     default: google.com
