@@ -64,10 +64,14 @@ public class VerifyAutogenFileContent {
     } else {
       Files.asCharSink(actualFile, StandardCharsets.UTF_8).write(fileContent);
       String expected = Files.asCharSource(goldenFile, StandardCharsets.UTF_8).read();
-      String diff = StringUtils.difference(expected, fileContent);
-      assertWithMessage(generateDiffMessage(solutionName, fileRelativePath, tempSolutionDir))
-          .that(diff)
-          .isEmpty();
+      // From StringUtils.difference docs:
+      // "returns the remainder of the second String, starting from where it's different from the
+      // first. This means that the difference between "abc" and "ab" is the empty String and not
+      // "c".
+      // Because of that we need to compare actual vs expected as well
+      String diffMessage = generateDiffMessage(solutionName, fileRelativePath, tempSolutionDir);
+      assertWithMessage(diffMessage).that(StringUtils.difference(expected, fileContent)).isEmpty();
+      assertWithMessage(diffMessage).that(StringUtils.difference(fileContent, expected)).isEmpty();
     }
   }
 
