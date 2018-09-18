@@ -15,7 +15,7 @@ resources:
 - name: {$solutionId}
   type: {$template}
   {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
-  {if length($testDefaultedFields) > 0 or length($spec.acceleratorsList) > 0}
+  {if length($testDefaultedFields) > 0}
   properties:
   {/if}
     {for $field in $testDefaultedFields}
