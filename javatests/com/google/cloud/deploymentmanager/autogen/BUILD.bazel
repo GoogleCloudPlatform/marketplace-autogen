@@ -1,5 +1,3 @@
-package(features = ["-jpl_strict_deps"])
-
 java_library(
     name = "tests",
     testonly = 1,
