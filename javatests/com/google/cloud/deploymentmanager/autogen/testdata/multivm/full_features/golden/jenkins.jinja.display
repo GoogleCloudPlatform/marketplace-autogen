@@ -147,6 +147,9 @@ input:
     - name: tier2_machineType
       title: Machine type
       section: TIER2_TIER
+    - name: tier2_acceleratorType
+      title: GPUs
+      section: TIER2_TIER
     - name: tier2_bootDiskType
       title: Boot disk type
       section: TIER2_TIER
@@ -164,6 +167,9 @@ input:
       section: TIER3_TIER
     - name: tier3_machineType
       title: Machine type
+      section: TIER3_TIER
+    - name: tier3_acceleratorType
+      title: GPUs
       section: TIER3_TIER
     - name: tier3_bootDiskType
       title: Boot disk type

@@ -266,7 +266,9 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
 - name: {'machineType' |tierprefixed: $spec}
   title: Machine type
   {$section}
-
+{if length($spec.acceleratorsList) > 0}
+{call display.acceleratorProperty}{param tier: $spec/}{/call}
+{/if}
 - name: {'bootDiskType' |tierprefixed: $spec}
   title: {$spec.bootDisk.displayLabel + ' type' |yamlprimitive: 2}
   {$section}
