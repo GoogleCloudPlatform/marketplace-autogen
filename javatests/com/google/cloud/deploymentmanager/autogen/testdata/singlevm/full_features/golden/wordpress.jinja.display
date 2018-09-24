@@ -57,6 +57,8 @@ input:
       subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
     - name: machineType
       title: Machine type
+    - name: acceleratorType
+      title: GPUs
     - name: bootDiskType
       title: Boot disk type
       section: BOOT_DISK

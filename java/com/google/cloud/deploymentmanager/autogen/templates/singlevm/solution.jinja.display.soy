@@ -8,6 +8,8 @@
 {@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
+{let $solutionHasGpus: solutionHasGpus($spec)/}
+
 {let $partnerName kind="text"}
 {if $partnerInfo}
   {$partnerInfo.name}{nil}
@@ -40,12 +42,16 @@ input:
     {/if}
     - name: zone
       title: Zone
-      {if solutionHasGpus($spec)}
+      {if $solutionHasGpus}
       {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
     - name: machineType
       title: Machine type
+    {if $solutionHasGpus}
+    {let $acceleratorProperty kind="text"}{call display.acceleratorProperty/}{/let}
+    {$acceleratorProperty |indent: 4, true}{nil}
+    {/if}
     - name: bootDiskType
       title: {$spec.bootDisk.displayLabel} type
       section: BOOT_DISK

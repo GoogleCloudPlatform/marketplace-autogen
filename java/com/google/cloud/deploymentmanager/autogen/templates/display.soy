@@ -489,6 +489,15 @@ type: TYPE_GCE_VM_SSH
 action: '{{ {$output} }}'
 {/template}
 
+{template .acceleratorProperty kind="text"}
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+- name: {'acceleratorType' |tierprefixed: $tier}
+  title: GPUs
+{if $tier}
+  section: {call .tierSectionName}{param spec: $tier/}{/call}
+{/if}
+{/template}
+
 {template .acceleratorZoneSubtext kind="text"}
 subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
 {/template}
