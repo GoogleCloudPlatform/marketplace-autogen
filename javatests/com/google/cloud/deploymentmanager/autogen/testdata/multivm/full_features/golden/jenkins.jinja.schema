@@ -194,6 +194,7 @@ properties:
   tier2_acceleratorCount:
     type: integer
     default: 2
+    minimum: 2
     x-googleProperty:
       type: GCE_GPU_COUNT
       gceGpuCount:
