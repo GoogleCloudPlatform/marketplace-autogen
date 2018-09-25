@@ -479,6 +479,9 @@ serviceAccounts:
 {$namePrefix + 'Count' |tierprefixed: $tier}:
   type: integer
   default: {$spec.defaultCount ?: 0}
+  {if $spec.minCount > 0}
+  minimum: {$spec.minCount}
+  {/if}
   x-googleProperty:
     type: GCE_GPU_COUNT
     gceGpuCount:
