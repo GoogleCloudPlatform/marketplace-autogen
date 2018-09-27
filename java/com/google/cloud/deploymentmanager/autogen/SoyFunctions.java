@@ -37,7 +37,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -50,8 +49,11 @@ import com.google.template.soy.data.SoyValue;
 import com.google.template.soy.data.SoyValueConverter;
 import com.google.template.soy.data.restricted.NullData;
 import com.google.template.soy.data.restricted.StringData;
+import com.google.template.soy.shared.restricted.Signature;
 import com.google.template.soy.shared.restricted.SoyFunction;
+import com.google.template.soy.shared.restricted.SoyFunctionSignature;
 import com.google.template.soy.shared.restricted.SoyJavaFunction;
+import com.google.template.soy.shared.restricted.TypedSoyFunction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -95,18 +97,18 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class DependentTiers implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "dependentTiers",
+      value = {
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.VmTierSpec",
+              "cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec"
+            },
+            returnType = "list<cloud.deploymentmanager.autogen.VmTierSpec>")
+      })
+  static final class DependentTiers extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "dependentTiers";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -146,18 +148,16 @@ final class SoyFunctions {
   }
 
   @Singleton
-  private static final class DeployInputFieldIsString implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "deployInputFieldIsString",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputField"},
+            returnType = "bool")
+      })
+  private static final class DeployInputFieldIsString extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "deployInputFieldIsString";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -183,17 +183,14 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class DeployInputFieldName implements SoyJavaFunction {
-    @Override
-    public String getName() {
-      return "deployInputFieldName";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
-
+  @SoyFunctionSignature(
+      name = "deployInputFieldName",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputField"},
+            returnType = "string")
+      })
+  static final class DeployInputFieldName extends TypedSoyFunction implements SoyJavaFunction {
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       DeployInputField field = (DeployInputField) ((SoyProtoValue) args.get(0)).getProto();
@@ -210,18 +207,15 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class FindDeployInputField implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "findDeployInputField",
+      value = {
+        @Signature(
+            parameterTypes = {"string", "cloud.deploymentmanager.autogen.DeployInputSpec|null"},
+            returnType = "cloud.deploymentmanager.autogen.DeployInputField")
+      })
+  static final class FindDeployInputField extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "findDeployInputField";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> list) {
@@ -243,18 +237,16 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class FindInputsWithTestDefaultValues implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "findInputsWithTestDefaultValues",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputSpec"},
+            returnType = "list<cloud.deploymentmanager.autogen.DeployInputField>")
+      })
+  static final class FindInputsWithTestDefaultValues extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "findInputsWithTestDefaultValues";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -289,18 +281,15 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class FindInputTestDefaultValue implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "findInputTestDefaultValue",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputField"},
+            returnType = "string|int")
+      })
+  static final class FindInputTestDefaultValue extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "findInputTestDefaultValue";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -332,18 +321,19 @@ final class SoyFunctions {
    */
   @VisibleForTesting
   @Singleton
-  static final class FindDisplayGroup implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "findDisplayGroup",
+      value = {
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.DeployInputField",
+              "cloud.deploymentmanager.autogen.DeployInputSection"
+            },
+            returnType =
+                "cloud.deploymentmanager.autogen.DeployInputField.GroupedBooleanCheckbox.DisplayGroup")
+      })
+  static final class FindDisplayGroup extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "findDisplayGroup";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -375,18 +365,15 @@ final class SoyFunctions {
   /** Finds the corresponding {@code VmTierSpec} given its name. */
   @VisibleForTesting
   @Singleton
-  static final class FindVmTier implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "findVmTier",
+      value = {
+        @Signature(
+            parameterTypes = {"string", "list<cloud.deploymentmanager.autogen.VmTierSpec>|null"},
+            returnType = "cloud.deploymentmanager.autogen.VmTierSpec")
+      })
+  static final class FindVmTier extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "findVmTier";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -408,18 +395,16 @@ final class SoyFunctions {
 
   /** Extracts the map of value labels for a deploy input field if any. */
   @Singleton
-  private static final class FieldValueLabelMap implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "fieldValueLabelMap",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputField"},
+            returnType = "map<string, string>")
+      })
+  private static final class FieldValueLabelMap extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Inject SoyValueConverter soyValueConverter;
-
-    @Override
-    public String getName() {
-      return "fieldValueLabelMap";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -450,18 +435,22 @@ final class SoyFunctions {
   /** Prefixes a string with a tier name. */
   @VisibleForTesting
   @Singleton
-  static final class TierPrefixed implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "tierPrefixed",
+      value = {
+        @Signature(
+            parameterTypes = {"string", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            returnType = "string"),
+        @Signature(
+            parameterTypes = {
+              "string",
+              "cloud.deploymentmanager.autogen.VmTierSpec|null",
+              "string"
+            },
+            returnType = "string")
+      })
+  static final class TierPrefixed extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyDirectives.TierPrefixed directive;
-
-    @Override
-    public String getName() {
-      return "tierPrefixed";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(2, 3);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -470,17 +459,14 @@ final class SoyFunctions {
   }
 
   @Singleton
-  static final class TierTemplateName implements SoyJavaFunction {
-    @Override
-    public String getName() {
-      return "tierTemplateName";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
-
+  @SoyFunctionSignature(
+      name = "tierTemplateName",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.VmTierSpec"},
+            returnType = "string")
+      })
+  static final class TierTemplateName extends TypedSoyFunction implements SoyJavaFunction {
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       VmTierSpec spec = (VmTierSpec) ((SoyProtoValue) args.get(0)).getProto();
@@ -493,22 +479,26 @@ final class SoyFunctions {
   }
 
   @Singleton
-  static final class BooleanExpressionDisplayCondition implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "booleanExpressionDisplayCondition",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.BooleanExpression"},
+            returnType = "string"),
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.BooleanExpression",
+              "list<cloud.deploymentmanager.autogen.VmTierSpec>|null"
+            },
+            returnType = "string")
+      })
+  static final class BooleanExpressionDisplayCondition extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Inject
     protected SoyFunctions.TierPrefixed tierPrefixedFunction;
 
     @Inject
     protected SoyFunctions.FindVmTier findVmTierFunction;
-
-    @Override
-    public String getName() {
-      return "booleanExpressionDisplayCondition";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1, 2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -557,17 +547,15 @@ final class SoyFunctions {
   }
 
   @Singleton
-  static final class BooleanExpressionJinjaExpression implements SoyJavaFunction {
-    @Override
-    public String getName() {
-      return "booleanExpressionJinjaExpression";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
-
+  @SoyFunctionSignature(
+      name = "booleanExpressionJinjaExpression",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.BooleanExpression"},
+            returnType = "string")
+      })
+  static final class BooleanExpressionJinjaExpression extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       BooleanExpression spec = (BooleanExpression) ((SoyProtoValue) args.get(0)).getProto();
@@ -596,18 +584,17 @@ final class SoyFunctions {
    * AcceleratorSpec}
    */
   @Singleton
-  static final class SolutionHasGpus implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "solutionHasGpus",
+      value = {
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec|cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec"
+            },
+            returnType = "bool")
+      })
+  static final class SolutionHasGpus extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "solutionHasGpus";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
 
     /**
      * Argument can be either a {@code SingleVmDeploymentPackageSpec} or a {@code
@@ -645,18 +632,21 @@ final class SoyFunctions {
    * will return only fields that are used by the specified tier.
    */
   @Singleton
-  static final class ListDeployInputFields implements SoyJavaFunction {
+  @SoyFunctionSignature(
+      name = "listDeployInputFields",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.DeployInputSpec"},
+            returnType = "list<cloud.deploymentmanager.autogen.DeployInputField>"),
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.DeployInputSpec",
+              "cloud.deploymentmanager.autogen.VmTierSpec"
+            },
+            returnType = "list<cloud.deploymentmanager.autogen.DeployInputField>")
+      })
+  static final class ListDeployInputFields extends TypedSoyFunction implements SoyJavaFunction {
     @Inject SoyValueConverter converter;
-
-    @Override
-    public String getName() {
-      return "listDeployInputFields";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1, 2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -730,15 +720,10 @@ final class SoyFunctions {
     }
   }
 
-
-  abstract static class AbstractDiskPropertyName implements SoyJavaFunction {
+  abstract static class AbstractDiskPropertyName extends TypedSoyFunction
+      implements SoyJavaFunction {
     @Inject
     protected SoyFunctions.TierPrefixed tierPrefixedFunction;
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1, 2);
-    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -756,12 +741,17 @@ final class SoyFunctions {
   }
 
   @Singleton
+  @SoyFunctionSignature(
+      name = "diskTypePropertyName",
+      value = {
+        @Signature(
+            parameterTypes = {"int"},
+            returnType = "string"),
+        @Signature(
+            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            returnType = "string")
+      })
   static final class AdditionalDiskTypePropertyName extends AbstractDiskPropertyName {
-    @Override
-    public String getName() {
-      return "diskTypePropertyName";
-    }
-
     @Override
     protected String getPropertyBaseName(int diskPosition) {
       return String.format("%s_type", additionalDiskPropertyName(diskPosition));
@@ -769,12 +759,17 @@ final class SoyFunctions {
   }
 
   @Singleton
+  @SoyFunctionSignature(
+      name = "diskSizePropertyName",
+      value = {
+        @Signature(
+            parameterTypes = {"int"},
+            returnType = "string"),
+        @Signature(
+            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            returnType = "string")
+      })
   static final class AdditionalDiskSizePropertyName extends AbstractDiskPropertyName {
-    @Override
-    public String getName() {
-      return "diskSizePropertyName";
-    }
-
     @Override
     protected String getPropertyBaseName(int diskPosition) {
       return String.format("%s_sizeGb", additionalDiskPropertyName(diskPosition));
@@ -782,17 +777,14 @@ final class SoyFunctions {
   }
 
   @Singleton
-  static final class ExternalIpTypeName implements SoyJavaFunction {
-    @Override
-    public String getName() {
-      return "externalIpTypeName";
-    }
-
-    @Override
-    public Set<Integer> getValidArgsSizes() {
-      return ImmutableSet.of(1);
-    }
-
+  @SoyFunctionSignature(
+      name = "externalIpTypeName",
+      value = {
+        @Signature(
+            parameterTypes = {"cloud.deploymentmanager.autogen.ExternalIpSpec.Type"},
+            returnType = "string")
+      })
+  static final class ExternalIpTypeName extends TypedSoyFunction implements SoyJavaFunction {
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       ExternalIpSpec.Type type = ExternalIpSpec.Type.forNumber(args.get(0).integerValue());
