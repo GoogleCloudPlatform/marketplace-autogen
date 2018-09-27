@@ -222,7 +222,7 @@ placeholder: {$box.placeholder |yamlprimitive: 0}
 {let $valueLabels: fieldValueLabelMap($field)/}
 {if $valueLabels}
 enumLabels:
-  {for $key in keys($valueLabels)}
+  {for $key in mapKeys($valueLabels)}
   '{$key}': {$valueLabels[$key] |yamlprimitive: 2}
   {/for}
 {/if}
