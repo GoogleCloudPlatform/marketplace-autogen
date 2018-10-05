@@ -78,7 +78,6 @@ final class SoyDirectives {
       return ImmutableSet.of(0);
     }
 
-    @Override
     public boolean shouldCancelAutoescape() {
       return false;
     }
