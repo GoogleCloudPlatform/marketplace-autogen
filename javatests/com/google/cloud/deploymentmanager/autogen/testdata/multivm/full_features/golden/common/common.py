@@ -126,6 +126,9 @@ def MakeGlobalComputeLink(context, key):
 def MakeSubnetworkComputeLink(context, key):
   project, zone, value = ReadContext(context, key)
   region = ZoneToRegion(zone)
+  if IsComputeLink(value):
+    return value
+
   return ''.join([default.COMPUTE_URL_BASE, 'projects/', project, '/regions/',
                   region, '/subnetworks/', value])
 
