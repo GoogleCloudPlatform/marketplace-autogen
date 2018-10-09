@@ -48,6 +48,10 @@ final class SoyDirectives {
     public Set<Integer> getValidArgsSizes() {
       return ImmutableSet.of(0);
     }
+
+    public boolean shouldCancelAutoescape() {
+      return false;
+    }
   }
 
   /** Prefix with the specified tier's name. */
