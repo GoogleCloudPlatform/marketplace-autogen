@@ -72,6 +72,8 @@ properties:
     default: default
     x-googleProperty:
       type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
   subnetwork:
     type: string
     x-googleProperty:

@@ -497,6 +497,8 @@ serviceAccounts:
   default: default
   x-googleProperty:
     type: GCE_NETWORK
+    gceNetwork:
+      allowSharedVpcs: True
 sub{$nameSuffix}:
   type: string
   x-googleProperty:
