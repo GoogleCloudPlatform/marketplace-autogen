@@ -16,9 +16,9 @@ resources:
     properties:
       instanceCount: {{ properties["main_instanceCount"] }}
       zone: {{ properties["zone"] }}
-      network: {{ properties["network"] }}
-      {% if properties.get("subnetwork") %}
-      subnetwork: {{ properties["subnetwork"] }}
+      network: {{ properties["main_network"] }}
+      {% if properties.get("main_subnetwork") %}
+      subnetwork: {{ properties["main_subnetwork"] }}
       {% endif %}
       {% if properties.get("main_externalIP") %}
       externalIP: {{ properties["main_externalIP"] }}
@@ -75,9 +75,9 @@ resources:
     properties:
       instanceCount: {{ properties["tier2_instanceCount"] }}
       zone: {{ properties["zone"] }}
-      network: {{ properties["network"] }}
-      {% if properties.get("subnetwork") %}
-      subnetwork: {{ properties["subnetwork"] }}
+      network: {{ properties["tier2_network"] }}
+      {% if properties.get("tier2_subnetwork") %}
+      subnetwork: {{ properties["tier2_subnetwork"] }}
       {% endif %}
       {% if properties.get("tier2_externalIP") %}
       externalIP: {{ properties["tier2_externalIP"] }}
@@ -111,9 +111,9 @@ resources:
     properties:
       instanceCount: {{ properties["tier3_instanceCount"] }}
       zone: {{ properties["zone"] }}
-      network: {{ properties["network"] }}
-      {% if properties.get("subnetwork") %}
-      subnetwork: {{ properties["subnetwork"] }}
+      network: {{ properties["tier3_network"] }}
+      {% if properties.get("tier3_subnetwork") %}
+      subnetwork: {{ properties["tier3_subnetwork"] }}
       {% endif %}
       {% if properties.get("tier3_externalIP") %}
       externalIP: {{ properties["tier3_externalIP"] }}

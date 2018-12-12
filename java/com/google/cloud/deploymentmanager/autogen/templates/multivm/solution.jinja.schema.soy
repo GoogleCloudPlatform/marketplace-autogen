@@ -28,7 +28,6 @@ info:
 {\n}
 required:
   - zone
-  - network
 
   {for $tier in $spec.tiersList}
   {let $list kind="text"}{call .tierRequiredList}{param spec: $tier/}{/call}{/let}
@@ -49,14 +48,6 @@ properties:
     {/call}
   {/let}
   {$zoneProp |indent: 2, true}{nil}
-
-  {let $networkProps kind="text"}
-    {call renders.networkPropertiesSchema}
-      {param nameSuffix: 'network'/}
-      {param zonePropertyName: 'zone'/}
-    {/call}
-  {/let}
-  {$networkProps |indent: 2, true}{nil}
 
   {for $tier in $spec.tiersList}
   {let $tierProperties kind="text"}{call .tierProperties}{param spec: $tier/}{/call}{/let}
@@ -92,6 +83,7 @@ outputs:
 - {'machineType' |tierprefixed: $spec}
 - {'bootDiskType' |tierprefixed: $spec}
 - {'bootDiskSizeGb' |tierprefixed: $spec}
+- {'network' |tierprefixed: $spec}
 {if length($spec.imagesList) > 1}
 - {'image' |tierprefixed: $spec}
 {/if}
@@ -139,6 +131,15 @@ outputs:
 {/let}
 {$acceleratorProps}{nil}
 {/if}
+
+{let $networkProps kind="text"}
+  {call renders.networkPropertiesSchema}
+    {param nameSuffix: 'network'/}
+    {param zonePropertyName: 'zone'/}
+    {param tier: $spec/}
+  {/call}
+{/let}
+{$networkProps}{nil}
 
 {let $externalIpProp kind="text"}
   {call renders.externalIpPropertySchema}
