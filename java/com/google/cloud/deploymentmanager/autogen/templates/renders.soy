@@ -500,6 +500,7 @@ serviceAccounts:
     type: GCE_NETWORK
     gceNetwork:
       allowSharedVpcs: True
+      machineTypeProperty: {'machineType' |tierprefixed: $tier}
 {'sub' + $nameSuffix |tierprefixed: $tier}:
   type: string
   x-googleProperty:

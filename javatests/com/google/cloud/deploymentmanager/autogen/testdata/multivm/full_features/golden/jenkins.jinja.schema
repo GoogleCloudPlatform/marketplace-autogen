@@ -63,6 +63,7 @@ properties:
       type: GCE_NETWORK
       gceNetwork:
         allowSharedVpcs: True
+        machineTypeProperty: main_machineType
   main_subnetwork:
     type: string
     x-googleProperty:
@@ -210,6 +211,7 @@ properties:
       type: GCE_NETWORK
       gceNetwork:
         allowSharedVpcs: True
+        machineTypeProperty: tier2_machineType
   tier2_subnetwork:
     type: string
     x-googleProperty:
@@ -276,6 +278,7 @@ properties:
       type: GCE_NETWORK
       gceNetwork:
         allowSharedVpcs: True
+        machineTypeProperty: tier3_machineType
   tier3_subnetwork:
     type: string
     x-googleProperty:
