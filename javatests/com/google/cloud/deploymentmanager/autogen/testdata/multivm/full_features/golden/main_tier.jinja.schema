@@ -59,6 +59,7 @@ properties:
       type: GCE_NETWORK
       gceNetwork:
         allowSharedVpcs: True
+        machineTypeProperty: machineType
   subnetwork:
     type: string
     x-googleProperty:
