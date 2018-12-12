@@ -20,9 +20,9 @@ resources:
     properties:
       instanceCount: {{ properties["{'instanceCount' |tierprefixed: $tier}"] }}
       zone: {{ properties["zone"] }}
-      network: {{ properties["network"] }}
-      {% if properties.get("subnetwork") %}
-      subnetwork: {{ properties["subnetwork"] }}
+      network: {{ properties["{'network' |tierprefixed: $tier}"] }}
+      {% if properties.get("{'subnetwork' |tierprefixed: $tier}") %}
+      subnetwork: {{ properties["{'subnetwork' |tierprefixed: $tier}"] }}
       {% endif %}
       {% if properties.get("{'externalIP' |tierprefixed: $tier}") %}
       externalIP: {{ properties["{'externalIP' |tierprefixed: $tier}"] }}

@@ -492,20 +492,21 @@ serviceAccounts:
 {template .networkPropertiesSchema kind="text"}
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
-{$nameSuffix}:
+{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{$nameSuffix |tierprefixed: $tier}:
   type: string
   default: default
   x-googleProperty:
     type: GCE_NETWORK
     gceNetwork:
       allowSharedVpcs: True
-sub{$nameSuffix}:
+{'sub' + $nameSuffix |tierprefixed: $tier}:
   type: string
   x-googleProperty:
     type: GCE_SUBNETWORK
     zoneProperty: {$zonePropertyName}
     gceSubnetwork:
-      networkProperty: network
+      networkProperty: {$nameSuffix |tierprefixed: $tier}
 {/template}
 
 

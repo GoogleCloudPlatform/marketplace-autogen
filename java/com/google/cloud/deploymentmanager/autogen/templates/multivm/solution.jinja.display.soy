@@ -32,12 +32,6 @@ input:
       {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
-    - name: network
-      title: Network name
-      section: NETWORKING
-    - name: subnetwork
-      title: Subnetwork name
-      section: NETWORKING
 
     {for $tier in $spec.tiersList}
     {let $tierProperties kind="text"}{call .displayTierProperties}{param spec: $tier/}{/call}{/let}
@@ -66,8 +60,6 @@ input:
     - name: {call display.tierSectionName}{param spec: $tier/}{/call}
       title: {$tier.title |yamlprimitive: 6}
     {/for}
-    - name: NETWORKING
-      title: Networking
 
     {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
 
@@ -284,6 +276,13 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
   {$section}
 {/for}
+
+- name: {'network' |tierprefixed: $spec}
+  title: Network name
+  {$section}
+- name: {'subnetwork' |tierprefixed: $spec}
+  title: Subnetwork name
+  {$section}
 
 - name: {'externalIP' |tierprefixed: $spec}
   title: External IP

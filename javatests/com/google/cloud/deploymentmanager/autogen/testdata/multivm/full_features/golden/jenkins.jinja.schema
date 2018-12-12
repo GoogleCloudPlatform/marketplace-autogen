@@ -9,20 +9,22 @@ info:
 
 required:
   - zone
-  - network
   - main_instanceCount
   - main_machineType
   - main_bootDiskType
   - main_bootDiskSizeGb
+  - main_network
   - main_image
   - tier2_instanceCount
   - tier2_machineType
   - tier2_bootDiskType
   - tier2_bootDiskSizeGb
+  - tier2_network
   - tier3_instanceCount
   - tier3_machineType
   - tier3_bootDiskType
   - tier3_bootDiskSizeGb
+  - tier3_network
   - input_domain
   - input_adminEmailAddress
   - input_showConditionals
@@ -34,20 +36,6 @@ properties:
     default: us-west1-b
     x-googleProperty:
       type: GCE_ZONE
-  network:
-    type: string
-    default: default
-    x-googleProperty:
-      type: GCE_NETWORK
-      gceNetwork:
-        allowSharedVpcs: True
-  subnetwork:
-    type: string
-    x-googleProperty:
-      type: GCE_SUBNETWORK
-      zoneProperty: zone
-      gceSubnetwork:
-        networkProperty: network
   main_instanceCount:
     type: integer
     default: 3
@@ -68,6 +56,20 @@ properties:
       gceMachineType:
         minCpu: 1
         minRamGb: 1.7000000476837158
+  main_network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+  main_subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: main_network
   main_externalIP:
     type: string
     enum:
@@ -201,6 +203,20 @@ properties:
       type: GCE_GPU_COUNT
       gceGpuCount:
         machineTypeProperty: tier2_machineType
+  tier2_network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+  tier2_subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: tier2_network
   tier2_externalIP:
     type: string
     enum:
@@ -253,6 +269,20 @@ properties:
       type: GCE_GPU_COUNT
       gceGpuCount:
         machineTypeProperty: tier3_machineType
+  tier3_network:
+    type: string
+    default: default
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+  tier3_subnetwork:
+    type: string
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: tier3_network
   tier3_externalIP:
     type: string
     enum:
