@@ -90,12 +90,10 @@ def GeneratePassword(length=8, include_symbols=False):
   if length < MIN_LENGTH:
     raise InputError('Password length must be at least %d' % MIN_LENGTH)
 
-  if include_symbols:
-    candidates = CANDIDATES_WITH_SYMBOLS
-    categories = CATEGORIES_WITH_SYMBOLS
-  else:
-    candidates = CANDIDATES_WITHOUT_SYMBOLS
-    categories = CATEGORIES_WITHOUT_SYMBOLS
+  candidates = (CANDIDATES_WITH_SYMBOLS if include_symbols
+                else CANDIDATES_WITHOUT_SYMBOLS)
+  categories = (CATEGORIES_WITH_SYMBOLS if include_symbols
+                else CATEGORIES_WITHOUT_SYMBOLS)
 
   # Generates up to the specified length minus the number of categories.
   # Then inserts one character for each category, ensuring that the character
