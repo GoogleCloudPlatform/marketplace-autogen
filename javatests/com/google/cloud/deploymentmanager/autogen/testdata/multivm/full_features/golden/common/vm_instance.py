@@ -81,9 +81,9 @@ def MakeVMName(context):
   """Generates the VM name."""
   name = context.env['name']
   prop = context.properties
-  if INSTANCE_NAME in prop:
-    return prop[INSTANCE_NAME]
-  return common.AutoName(name, default.INSTANCE)
+  named = INSTANCE_NAME in prop
+  return prop[INSTANCE_NAME] if named else common.AutoName(name,
+                                                           default.INSTANCE)
 
 
 def GenerateComputeVM(context, create_disks_separately=True):
