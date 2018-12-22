@@ -452,7 +452,7 @@ public class SoyFunctionsTest {
         .build();
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
-        .isEqualTo("properties().externalIP == \"None\"");
+        .isEqualTo("properties().externalIP == \"NONE\"");
   }
 
   @Test
@@ -470,7 +470,7 @@ public class SoyFunctionsTest {
     );
     assertFunctionCall(booleanExpressionDisplayCondition, expression, tiersList)
         .hasResultThat()
-        .isEqualTo("properties().tier0_externalIP != \"None\"");
+        .isEqualTo("properties().tier0_externalIP != \"NONE\"");
   }
 
   @Test
@@ -547,13 +547,13 @@ public class SoyFunctionsTest {
     ThrowableSubject throwsExceptionThat(Class<? extends Throwable> throwableClass) {
       try {
         callable.call();
-        fail("Should have thrown exception of type " + throwableClass.getName());
-        return null;
       } catch (Throwable throwable) {
         assertWithMessage("Expected exception of type " + throwableClass.getName())
             .that(throwable).isInstanceOf(throwableClass);
         return assertThat(throwable);
       }
+      fail("Should have thrown exception of type " + throwableClass.getName());
+      return null;
     }
 
     void throwsException(Class<? extends Throwable> throwableClass) {

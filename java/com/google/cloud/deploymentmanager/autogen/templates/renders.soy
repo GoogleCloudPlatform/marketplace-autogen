@@ -517,14 +517,12 @@ serviceAccounts:
 {@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
-  enum:
-    {if $spec.notConfigurable}
-    - {externalIpTypeName($spec.defaultType)}
-    {else}
-    - {externalIpTypeName(proto.ExternalIpSpec.Type.EPHEMERAL)}
-    - {externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}
-    {/if}
   default: {externalIpTypeName($spec.defaultType)}
+  x-googleProperty:
+    type: GCE_EXTERNAL_IP
+    gceExternalIp:
+      networkProperty: {'network' |tierprefixed: $tier}
+      notConfigurable: {if $spec.notConfigurable}True{else}False{/if}
 {/template}
 
 
