@@ -86,7 +86,6 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: MAIN_TIER
-      level: 1
     - name: main_tcp80SourceRanges
       title: Source IP ranges for HTTP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
@@ -166,7 +165,6 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: TIER2_TIER
-      level: 1
     - name: tier3_instanceCount
       title: Instance Count
       tooltip: Specify a value between 1 and 10.
@@ -193,7 +191,6 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: TIER3_TIER
-      level: 1
     - name: input_domain
       title: Domain
       subtext: Your domain
@@ -279,10 +276,10 @@ runtime:
     rows:
       - label: Site address
         value: <a href="http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/">http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/</a>
-        showIf: '{{ properties().main_externalIP != "None" }}'
+        showIf: '{{ properties().main_externalIP != "NONE" }}'
       - label: Site address (internal IP)
         value: http://{{ outputs()["main_vmInternalIP" + 0] }}/
-        showIf: '{{ properties().main_externalIP == "None" }}'
+        showIf: '{{ properties().main_externalIP == "NONE" }}'
       - label: Admin user
         value: '{{ properties().input_domain }}'
       - label: Admin password (Temporary)
@@ -309,10 +306,10 @@ runtime:
         value: '{{ properties().input_showConditionals }}'
       - label: External IP row
         value: Some value
-        showIf: '{{ properties().tier2_externalIP != "None" }}'
+        showIf: '{{ properties().tier2_externalIP != "NONE" }}'
       - label: Internal IP row
         value: Some value
-        showIf: '{{ properties().tier2_externalIP == "None" }}'
+        showIf: '{{ properties().tier2_externalIP == "NONE" }}'
   primaryButton:
     label: Visit the site
     type: TYPE_URL
@@ -338,10 +335,10 @@ runtime:
       showIf: '{{ !properties().input_showConditionals }}'
     - heading: External IP action
       description: Some action
-      showIf: '{{ properties().main_externalIP != "None" }}'
+      showIf: '{{ properties().main_externalIP != "NONE" }}'
     - heading: Internal IP action
       description: Some action
-      showIf: '{{ properties().main_externalIP == "None" }}'
+      showIf: '{{ properties().main_externalIP == "NONE" }}'
     - heading: Open HTTP traffic for Main Tier
       description: >-
         This firewall rule is not enabled.
