@@ -84,12 +84,9 @@ properties:
         networkProperty: network
   externalIP:
     type: string
-    default: EPHEMERAL
-    x-googleProperty:
-      type: GCE_EXTERNAL_IP
-      gceExternalIp:
-        networkProperty: network
-        notConfigurable: True
+    enum:
+      - Ephemeral
+    default: Ephemeral
   bootDiskType:
     type: string
     default: pd-standard

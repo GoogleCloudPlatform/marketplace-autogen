@@ -66,6 +66,7 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: NETWORKING
+      level: 1
     - name: tcp80SourceRanges
       title: Source IP ranges for HTTP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
@@ -106,16 +107,16 @@ runtime:
     rows:
       - label: Site address
         value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/">http://{{ externalIp(outputs().vmSelfLink) }}/</a>
-        showIf: '{{ properties().externalIP != "NONE" }}'
+        showIf: '{{ properties().externalIP != "None" }}'
       - label: Site address (internal IP)
         value: http://{{ outputs().vmInternalIP }}/
-        showIf: '{{ properties().externalIP == "NONE" }}'
+        showIf: '{{ properties().externalIP == "None" }}'
       - label: Admin URL
         value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/">http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/</a>
-        showIf: '{{ properties().externalIP != "NONE" }}'
+        showIf: '{{ properties().externalIP != "None" }}'
       - label: Admin URL (internal IP)
         value: http://{{ outputs().vmInternalIP }}/wp-admin/
-        showIf: '{{ properties().externalIP == "NONE" }}'
+        showIf: '{{ properties().externalIP == "None" }}'
       - label: Admin user
         value: user
       - label: Admin password (Temporary)
@@ -137,7 +138,7 @@ runtime:
   suggestedActions:
     - heading: No external IP configured
       description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
-      showIf: '{{ properties().externalIP == "NONE" }}'
+      showIf: '{{ properties().externalIP == "None" }}'
     - heading: Open HTTP traffic
       description: >-
         This firewall rule is not enabled.
@@ -174,7 +175,7 @@ runtime:
       description: For additional security, it is recommended that you change the password.
     - heading: Assign a static external IP address to your VM instance
       description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
-      showIf: '{{ properties().externalIP == "EPHEMERAL" }}'
+      showIf: '{{ properties().externalIP == "Ephemeral" }}'
 
 annotations:
   autogenSpecType: 'SINGLE_VM'
