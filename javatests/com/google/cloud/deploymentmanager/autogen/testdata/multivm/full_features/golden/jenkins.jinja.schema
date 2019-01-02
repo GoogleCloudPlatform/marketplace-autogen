@@ -73,12 +73,10 @@ properties:
         networkProperty: main_network
   main_externalIP:
     type: string
-    default: NONE
-    x-googleProperty:
-      type: GCE_EXTERNAL_IP
-      gceExternalIp:
-        networkProperty: main_network
-        notConfigurable: False
+    enum:
+      - Ephemeral
+      - None
+    default: None
   main_enableCloudReadonlyApi:
     type: boolean
     default: True
@@ -223,12 +221,9 @@ properties:
         networkProperty: tier2_network
   tier2_externalIP:
     type: string
-    default: EPHEMERAL
-    x-googleProperty:
-      type: GCE_EXTERNAL_IP
-      gceExternalIp:
-        networkProperty: tier2_network
-        notConfigurable: True
+    enum:
+      - Ephemeral
+    default: Ephemeral
   tier2_bootDiskType:
     type: string
     default: pd-standard
@@ -293,12 +288,10 @@ properties:
         networkProperty: tier3_network
   tier3_externalIP:
     type: string
-    default: EPHEMERAL
-    x-googleProperty:
-      type: GCE_EXTERNAL_IP
-      gceExternalIp:
-        networkProperty: tier3_network
-        notConfigurable: False
+    enum:
+      - Ephemeral
+      - None
+    default: Ephemeral
   tier3_bootDiskType:
     type: string
     default: pd-standard

@@ -1,12 +1,12 @@
 {% set allTiersCount = 3 %}
 {% set tiersWithNoExternalIPCount = 0 %}
-{% if properties["main_externalIP"] == "NONE" %}
+{% if properties["main_externalIP"] == "None" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier2_externalIP"] == "NONE" %}
+{% if properties["tier2_externalIP"] == "None" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier3_externalIP"] == "NONE" %}
+{% if properties["tier3_externalIP"] == "None" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 

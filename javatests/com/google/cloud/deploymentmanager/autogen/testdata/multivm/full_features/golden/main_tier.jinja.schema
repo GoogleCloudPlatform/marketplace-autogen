@@ -69,12 +69,10 @@ properties:
         networkProperty: network
   externalIP:
     type: string
-    default: NONE
-    x-googleProperty:
-      type: GCE_EXTERNAL_IP
-      gceExternalIp:
-        networkProperty: network
-        notConfigurable: False
+    enum:
+      - Ephemeral
+      - None
+    default: None
   enableCloudReadonlyApi:
     type: boolean
     default: True
