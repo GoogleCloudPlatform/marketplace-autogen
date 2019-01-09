@@ -452,7 +452,7 @@ public class SoyFunctionsTest {
         .build();
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
-        .isEqualTo("properties().externalIP == \"None\"");
+        .isEqualTo("properties().externalIP == \"NONE\"");
   }
 
   @Test
@@ -470,7 +470,7 @@ public class SoyFunctionsTest {
     );
     assertFunctionCall(booleanExpressionDisplayCondition, expression, tiersList)
         .hasResultThat()
-        .isEqualTo("properties().tier0_externalIP != \"None\"");
+        .isEqualTo("properties().tier0_externalIP != \"NONE\"");
   }
 
   @Test

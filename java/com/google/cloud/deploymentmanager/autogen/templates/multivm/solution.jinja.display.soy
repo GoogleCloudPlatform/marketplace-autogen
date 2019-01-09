@@ -288,7 +288,6 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: External IP
   tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
   {$section}
-  level: 1
 
 {for $firewallRule in $spec.firewallRulesList}
 {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
