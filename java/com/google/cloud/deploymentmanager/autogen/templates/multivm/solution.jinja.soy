@@ -99,6 +99,13 @@ resources:
       {diskTypePropertyName(index($disk), $tier)}: {{ properties["{diskTypePropertyName(index($disk), $tier)}"] }}
       {diskSizePropertyName(index($disk), $tier)}: {{ properties["{diskSizePropertyName(index($disk), $tier)}"] }}
       {/for}
+
+      {if $spec.stackdriver?.logging}
+      enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
+      {/if}
+      {if $spec.stackdriver?.monitoring}
+      enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
+      {/if}
   {/for}
 
   {for $password in $spec.passwordsList}

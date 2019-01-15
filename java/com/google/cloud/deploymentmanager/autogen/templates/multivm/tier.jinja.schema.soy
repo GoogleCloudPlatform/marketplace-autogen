@@ -192,4 +192,13 @@ properties:
     type: integer
   {/for}
 
+  {if $packageSpec.stackdriver}
+  {let $stackdriverPropertiesSchema kind="text"}
+    {call renders.stackdriverPropertiesSchema}
+      {param stackdriver: $packageSpec.stackdriver/}
+    {/call}
+  {/let}
+  {$stackdriverPropertiesSchema |indent: 2, true}{nil}
+  {/if}
+
 {/template}

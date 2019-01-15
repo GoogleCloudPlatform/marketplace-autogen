@@ -239,6 +239,14 @@ input:
       title: Zone
       level: 1
       section: LOAD_BALANCERS
+    - name: enableStackdriverLogging
+      title: Enable Stackdriver Logging
+      tooltip: 'Stackdriver Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+      section: STACKDRIVER
+    - name: enableStackdriverMonitoring
+      title: Enable Stackdriver Monitoring
+      tooltip: 'Stackdriver Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+      section: STACKDRIVER
   sections:
     - name: MAIN_TIER
       title: Main Tier
@@ -248,6 +256,9 @@ input:
       title: Third Tier
     - name: LOAD_BALANCERS
       title: Additional zones for load balancers
+    - name: STACKDRIVER
+      title: Stackdriver
+      subtext: Monitoring and management for services, containers, applications, and infrastructure
   boolean_groups:
     - name: MAIN_TIER_FIREWALL
       title: Firewall

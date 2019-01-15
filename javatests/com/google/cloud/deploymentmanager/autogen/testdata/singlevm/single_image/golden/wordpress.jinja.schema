@@ -90,6 +90,9 @@ properties:
     default: 0
     minimum: 0
     maximum: 3
+  enableStackdriverLogging:
+    type: boolean
+    default: False
 
 outputs:
   deployment:

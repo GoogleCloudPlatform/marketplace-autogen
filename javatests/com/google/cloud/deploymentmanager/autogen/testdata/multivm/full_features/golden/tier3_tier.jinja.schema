@@ -104,3 +104,9 @@ properties:
     type: string
   generatedPassword2:
     type: string
+  enableStackdriverLogging:
+    type: boolean
+    default: False
+  enableStackdriverMonitoring:
+    type: boolean
+    default: True

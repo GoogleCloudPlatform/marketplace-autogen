@@ -536,6 +536,12 @@ spec {
     zone {
       default_zone: "us-west1-b"
     }
+    stackdriver {
+      logging {
+        default_on: true
+      }
+      monitoring: {}
+    }
   }
 }
 logo {
