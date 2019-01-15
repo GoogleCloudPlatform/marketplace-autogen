@@ -37,6 +37,12 @@
 {% set canIpForward = properties["ipForward"] == "On" %}
 {/if}
 
+{if $spec.stackdriver}
+{call renders.stackdriverPropertiesJinja}
+  {param stackdriver: $spec.stackdriver/}
+{/call}
+{/if}
+
 {for $scope in $spec.gcpAuthScopesList}
 {let $propName kind="text"}{call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}{/let}
 {% set {$propName} = properties["{$propName}"] %}
@@ -158,18 +164,25 @@ resources:
           {param deployInput: $spec.deployInput/}
         {/call}
       {/let}
+      {let $stackdriverMetadataItems kind="text"}
+        {call renders.stackdriverMetadataItems}
+          {param stackdriver: $spec.stackdriver/}
+        {/call}
+      {/let}
 
       // Waiter's metadata are rendered conditionally - with other metadata items list empty,
       // the metadata attribute should be rendered conditionally too. b/69837703.
       {if strLen($passwordMetadataItems)
           + strLen($gceMetadataItems)
-          + strLen($startupScriptAndWaiterMetadataItemsUnconditional) > 0}
+          + strLen($startupScriptAndWaiterMetadataItemsUnconditional)
+          + strLen($stackdriverMetadataItems) > 0}
       metadata:
         items:
           {$passwordMetadataItems |indent: 10, true}{nil}
           {$startupScriptAndWaiterMetadataItemsUnconditional |indent: 10, true}{nil}
           {$startupScriptAndWaiterMetadataItemsConditional |indent: 10, true}{nil}
           {$gceMetadataItems |indent: 10, true}{nil}
+          {$stackdriverMetadataItems |indent: 10, true}{nil}
       {elseif strLen($startupScriptAndWaiterMetadataItemsStatusWaiterDisabled) == 0
               and strLen($startupScriptAndWaiterMetadataItemsStatusWaiterEnabled) > 0}
       {% if enableStatusWaiter %}

@@ -128,6 +128,15 @@ input:
     {/for}
     {/if}
 
+    {if $spec.stackdriver}
+    {let $stackdriverDisplay kind="text"}
+      {call display.stackdriverDisplay}
+        {param stackdriver: $spec.stackdriver/}
+      {/call}
+    {/let}
+    {$stackdriverDisplay |indent: 4, true}{nil}
+    {/if}
+
   sections:
     {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
 
@@ -153,6 +162,15 @@ input:
     {/if}
 
     {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+
+    {if $spec.stackdriver}
+    {let $stackdriverBottomSections kind="text"}
+      {call display.stackdriverBottomSections}
+        {param stackdriver: $spec.stackdriver/}
+      {/call}
+    {/let}
+    {$stackdriverBottomSections |indent: 4, true}{nil}
+    {/if}
 
   {let $firewallBooleanGroups kind="text"}
     {call display.firewallBooleanGroups}{param singleVmSpec: $spec/}{/call}

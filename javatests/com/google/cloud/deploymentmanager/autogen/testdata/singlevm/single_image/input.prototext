@@ -146,6 +146,11 @@ spec {
         }
       }
     }
+    stackdriver {
+      logging {
+        default_on: false
+      }
+    }
   }
 }
 logo {

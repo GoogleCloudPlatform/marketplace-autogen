@@ -229,6 +229,33 @@ enumLabels:
 {/template}
 
 
+{template .stackdriverDisplay kind="text"}
+{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{if $stackdriver?.logging}
+- name: enableStackdriverLogging
+  title: Enable Stackdriver Logging
+  tooltip: 'Stackdriver Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+  section: STACKDRIVER
+{/if}
+{if $stackdriver?.monitoring}
+- name: enableStackdriverMonitoring
+  title: Enable Stackdriver Monitoring
+  tooltip: 'Stackdriver Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+  section: STACKDRIVER
+{/if}
+{/template}
+
+
+{template .stackdriverBottomSections kind="text"}
+{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{if $stackdriver?.logging or $stackdriver?.monitoring}
+- name: STACKDRIVER
+  title: Stackdriver
+  subtext: Monitoring and management for services, containers, applications, and infrastructure
+{/if}
+{/template}
+
+
 {template .topSections kind="text"}
 {@param? spec: cloud.deploymentmanager.autogen.DeployInputSpec}
 {let $output kind="text"}
@@ -354,7 +381,6 @@ FIREWALL{nil}
 {/for}
 {/if}
 {/template}
-
 
 
 {template .siteUrlApplicationTableRow kind="text"}
@@ -489,6 +515,7 @@ type: TYPE_GCE_VM_SSH
 action: '{{ {$output} }}'
 {/template}
 
+
 {template .acceleratorProperty kind="text"}
 {@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
 - name: {'acceleratorType' |tierprefixed: $tier}
@@ -497,6 +524,7 @@ action: '{{ {$output} }}'
   section: {call .tierSectionName}{param spec: $tier/}{/call}
 {/if}
 {/template}
+
 
 {template .acceleratorZoneSubtext kind="text"}
 subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'

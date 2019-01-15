@@ -208,3 +208,9 @@ properties:
     type: string
   tier2_instanceCount:
     type: integer
+  enableStackdriverLogging:
+    type: boolean
+    default: False
+  enableStackdriverMonitoring:
+    type: boolean
+    default: True

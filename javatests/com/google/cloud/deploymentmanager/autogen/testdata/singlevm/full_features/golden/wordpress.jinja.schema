@@ -225,6 +225,12 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+  enableStackdriverLogging:
+    type: boolean
+    default: True
+  enableStackdriverMonitoring:
+    type: boolean
+    default: False
 
 outputs:
   deployment:

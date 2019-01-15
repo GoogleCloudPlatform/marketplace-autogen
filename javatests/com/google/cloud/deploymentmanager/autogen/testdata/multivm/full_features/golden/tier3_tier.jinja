@@ -12,6 +12,10 @@
 {% set hasExternalIP = properties["externalIP"] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
 {% if instanceCount <= 0 %}
 resources: []
 {% else %}
@@ -62,6 +66,10 @@ resources:
           - key: status-uptime-deadline
             value: 300
           {% endif %}
+          - key: google-logging-enable
+            value: {{ enableStackdriverLogging }}
+          - key: google-monitoring-enable
+            value: {{ enableStackdriverMonitoring }}
       tags:
         items:
           - {{ env["deployment"] }}-deployment
