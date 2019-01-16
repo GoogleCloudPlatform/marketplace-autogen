@@ -28,6 +28,7 @@ import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validat
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateSingleVmGceMetadataItems;
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateSingleVmPasswords;
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateSingleVmPostDeployInfo;
+import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateStackdriver;
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateStartupScript;
 
 import com.google.cloud.deploymentmanager.autogen.proto.AcceleratorSpec;
@@ -62,6 +63,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo.ConnectToInstanceSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.SingleVmDeploymentPackageSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.StackdriverSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.TierVmInstance;
 import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.common.collect.ImmutableList;
@@ -1521,6 +1523,12 @@ public class SpecValidationsTest {
     validateExternalIp(externalIp);
   }
 
+  @Test
+  public void stackdriverSpecConnotBeEmpty() {
+    expectIllegalArgumentException(
+        "Invalid Stackdriver spec. At least one of logging or monitoring must be specified");
+    validateStackdriver(StackdriverSpec.getDefaultInstance());
+  }
 
   private void expectIllegalArgumentException(String message) {
     thrown.expect(IllegalArgumentException.class);
@@ -1669,13 +1677,6 @@ public class SpecValidationsTest {
   private static FirewallRuleSpec firewallRuleWithoutProtocol() {
     return FirewallRuleSpec.newBuilder()
         .setPort("8080")
-        .setAllowedSource(TrafficSource.PUBLIC)
-        .build();
-  }
-
-  private static FirewallRuleSpec firewallRuleWithoutPort() {
-    return FirewallRuleSpec.newBuilder()
-        .setProtocol(FirewallRuleSpec.Protocol.TCP)
         .setAllowedSource(TrafficSource.PUBLIC)
         .build();
   }

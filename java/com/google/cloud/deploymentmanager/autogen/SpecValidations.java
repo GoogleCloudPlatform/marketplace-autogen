@@ -46,6 +46,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo.ConnectToInstanceSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.SingleVmDeploymentPackageSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.StackdriverSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -119,6 +120,9 @@ final class SpecValidations {
     if (input.hasDeployInput()) {
       validateDeployInput(input.getDeployInput());
     }
+    if (input.hasStackdriver()) {
+      validateStackdriver(input.getStackdriver());
+    }
     validateSingleVmGceMetadataItems(input.getGceMetadataItemsList());
     validateMetadataKeyUniqueness(input);
     validateAccelerators(input.getAcceleratorsList());
@@ -164,6 +168,9 @@ final class SpecValidations {
     }
     if (input.hasDeployInput()) {
       validateDeployInput(input.getDeployInput());
+    }
+    if (input.hasStackdriver()) {
+      validateStackdriver(input.getStackdriver());
     }
     validateMetadataKeyUniqueness(input);
   }
@@ -732,6 +739,13 @@ final class SpecValidations {
 
       isInBooleanGroup = field.getTypeCase() == TypeCase.GROUPED_BOOLEAN_CHECKBOX;
     }
+  }
+
+  @VisibleForTesting
+  static void validateStackdriver(StackdriverSpec stackdriver) {
+    checkArgument(
+        stackdriver.hasMonitoring() || stackdriver.hasLogging(),
+        "Invalid Stackdriver spec. At least one of logging or monitoring must be specified");
   }
 
   private SpecValidations() {}
