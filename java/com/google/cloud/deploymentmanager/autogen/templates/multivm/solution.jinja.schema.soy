@@ -63,6 +63,15 @@ properties:
   {$deployInputProps |indent: 2, true}{nil}
   {/if}
 
+  {if $spec.stackdriver}
+  {let $stackdriverPropertiesSchema kind="text"}
+    {call renders.stackdriverPropertiesSchema}
+      {param stackdriver: $spec.stackdriver/}
+    {/call}
+  {/let}
+  {$stackdriverPropertiesSchema |indent: 2, true}{nil}
+  {/if}
+
 {\n}
 outputs:
   deployment:

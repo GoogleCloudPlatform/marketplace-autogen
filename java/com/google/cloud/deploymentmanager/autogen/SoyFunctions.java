@@ -525,7 +525,7 @@ final class SoyFunctions {
           return propertyExpression;
         case HAS_EXTERNAL_IP:
           ExternalIpAvailability externalIp = spec.getHasExternalIp();
-          String noneType = ExternalIpTypeName.apply(Type.NONE);
+          String noneType = Type.NONE.name();
           SoyValue tierName = StringData.forValue(externalIp.getTier());
           SoyValue tierSpec = NullData.INSTANCE;
           if (!Strings.isNullOrEmpty(externalIp.getTier())) {
@@ -788,18 +788,7 @@ final class SoyFunctions {
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       ExternalIpSpec.Type type = ExternalIpSpec.Type.forNumber(args.get(0).integerValue());
-      return StringData.forValue(apply(type));
-    }
-
-    private static String apply(ExternalIpSpec.Type type) {
-      switch (type) {
-        case NONE:
-          return "None";
-        case EPHEMERAL:
-          return "Ephemeral";
-        default:
-          throw new IllegalArgumentException("Unexpected value for ExternalIpSpec.Type: " + type);
-      }
+      return StringData.forValue(type.name());
     }
   }
 

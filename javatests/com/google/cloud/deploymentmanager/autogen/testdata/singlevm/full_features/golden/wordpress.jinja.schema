@@ -84,10 +84,12 @@ properties:
         networkProperty: network
   externalIP:
     type: string
-    enum:
-      - Ephemeral
-      - None
-    default: Ephemeral
+    default: EPHEMERAL
+    x-googleProperty:
+      type: GCE_EXTERNAL_IP
+      gceExternalIp:
+        networkProperty: network
+        notConfigurable: False
   bootDiskType:
     type: string
     default: pd-standard
@@ -223,6 +225,12 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+  enableStackdriverLogging:
+    type: boolean
+    default: True
+  enableStackdriverMonitoring:
+    type: boolean
+    default: False
 
 outputs:
   deployment:

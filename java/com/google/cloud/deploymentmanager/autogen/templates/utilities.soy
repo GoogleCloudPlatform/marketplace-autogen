@@ -132,7 +132,6 @@
 {/template}
 
 
-
 /** Produces the property name for firewall rule source ranges. */
 {template .firewallRuleSourceRangesPropName kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
@@ -250,9 +249,11 @@ generated-password-{$passwordIndex}{nil}
 $(ref.{$resourceName}.password){nil}
 {/template}
 
+
 {template .deploymentTag kind="text"}
 {{ env["deployment"] }}-deployment{nil}
 {/template}
+
 
 {template .tierTag kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.VmTierSpec}

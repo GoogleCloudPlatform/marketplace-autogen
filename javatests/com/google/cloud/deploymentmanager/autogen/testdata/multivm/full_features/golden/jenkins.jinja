@@ -1,12 +1,12 @@
 {% set allTiersCount = 3 %}
 {% set tiersWithNoExternalIPCount = 0 %}
-{% if properties["main_externalIP"] == "None" %}
+{% if properties["main_externalIP"] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier2_externalIP"] == "None" %}
+{% if properties["tier2_externalIP"] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier3_externalIP"] == "None" %}
+{% if properties["tier3_externalIP"] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 
@@ -70,6 +70,8 @@ resources:
       main_disk2_sizeGb: {{ properties["main_disk2_sizeGb"] }}
       main_disk3_type: {{ properties["main_disk3_type"] }}
       main_disk3_sizeGb: {{ properties["main_disk3_sizeGb"] }}
+      enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
+      enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
   - name: tier2-tier
     type: tier2_tier.jinja
     properties:
@@ -106,6 +108,8 @@ resources:
       input_extraLbZone1: |-
         {{ properties["input_extraLbZone1"] }}
       main_instanceCount: {{ properties["main_instanceCount"] }}
+      enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
+      enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
   - name: tier3-tier
     type: tier3_tier.jinja
     properties:
@@ -128,6 +132,8 @@ resources:
       {% if properties["input_generateOptionalPassword"] %}
       generatedPassword2: $(ref.generated-password-2.password)
       {% endif %}
+      enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
+      enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
   - name: generated-password-0
     type: password.py
     properties:

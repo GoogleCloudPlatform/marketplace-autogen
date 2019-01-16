@@ -1,7 +1,6 @@
 {namespace renders}
 {alias cloud.deploymentmanager.autogen as proto}
 
-
 /** Constructs all firewall resources. */
 {template .firewallResources kind="text"}
 {@param specList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
@@ -170,6 +169,7 @@ sourceTags:
 {/call}
 {/template}
 
+
 /** Constructs password property metadata entry */
 {template .passwordMetadataFromProperty kind="text"}
 {@param password: cloud.deploymentmanager.autogen.PasswordSpec}
@@ -186,6 +186,7 @@ sourceTags:
 {/call}
 {/template}
 
+
 /** Constructs password property schema entry */
 {template .passwordRequiredSchema kind="text"}
 {@param password: cloud.deploymentmanager.autogen.PasswordSpec}
@@ -197,6 +198,7 @@ sourceTags:
 - {$propertyName}
 {/if}
 {/template}
+
 
 /** Constructs waiter resources. */
 {template .startupScriptAndWaiterResources kind="text"}
@@ -283,6 +285,7 @@ sourceTags:
     {$startupSpec.bashScriptContent |indent: 4, false}
 {/if}
 {/template}
+
 
 /**
  * Lists all metadata items for a startup script and waiter related configuration
@@ -381,6 +384,50 @@ sourceTags:
 
   {/if /* $metadata.value */}
 {/for}
+{/template}
+
+
+/** Converts Stackdriver's properties to integer. */
+{template .stackdriverPropertiesJinja kind="text"}
+{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{if $stackdriver?.logging}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
+{/if}
+{if $stackdriver?.monitoring}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
+{/if}
+{/template}
+
+
+/** Renders Stackdriver's properties in schema. */
+{template .stackdriverPropertiesSchema kind="text"}
+{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{if $stackdriver?.logging}
+enableStackdriverLogging:
+  type: boolean
+  default: {if $stackdriver?.logging.defaultOn}True{else}False{/if}
+{/if}
+{if $stackdriver?.monitoring}
+enableStackdriverMonitoring:
+  type: boolean
+  default: {if $stackdriver?.monitoring.defaultOn}True{else}False{/if}
+{/if}
+{/template}
+
+
+/** Renders Stackdriver's metadata items. */
+{template .stackdriverMetadataItems kind="text"}
+{@param? stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{if $stackdriver?.logging}
+- key: google-logging-enable
+  value: {{ enableStackdriverLogging }}
+{/if}
+{if $stackdriver?.monitoring}
+- key: google-monitoring-enable
+  value: {{ enableStackdriverMonitoring }}
+{/if}
 {/template}
 
 
@@ -517,14 +564,12 @@ serviceAccounts:
 {@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
-  enum:
-    {if $spec.notConfigurable}
-    - {externalIpTypeName($spec.defaultType)}
-    {else}
-    - {externalIpTypeName(proto.ExternalIpSpec.Type.EPHEMERAL)}
-    - {externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}
-    {/if}
   default: {externalIpTypeName($spec.defaultType)}
+  x-googleProperty:
+    type: GCE_EXTERNAL_IP
+    gceExternalIp:
+      networkProperty: {'network' |tierprefixed: $tier}
+      notConfigurable: {if $spec.notConfigurable}True{else}False{/if}
 {/template}
 
 
@@ -564,6 +609,7 @@ serviceAccounts:
       diskTypeProperty: {'bootDiskType' |tierprefixed: $tier}
 {/template}
 
+
 {template .additionalDiskPropertiesSchema kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.DiskSpec}
 {@param diskIndex: int}
@@ -587,6 +633,7 @@ serviceAccounts:
     gceDiskSize:
       diskTypeProperty: {diskTypePropertyName($diskIndex, $tier)}
 {/template}
+
 
 {template .tierInstanceAcountPropertySchema kind="text"}
 {@param name: string}

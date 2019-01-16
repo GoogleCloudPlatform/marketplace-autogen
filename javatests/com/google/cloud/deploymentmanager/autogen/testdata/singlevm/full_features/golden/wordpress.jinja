@@ -12,9 +12,13 @@
 {% set subnetwork = properties["subnetwork"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
-{% set hasExternalIP = properties["externalIP"] != "None" %}
+{% set hasExternalIP = properties["externalIP"] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
 
 {% set imageProjects = ["bitnami-launchpad", "bitnami-launchpad", "click-to-deploy-images"] %}
 {% set imageNames = ["bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64", "bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64", "wordpress-453-1607261609-debian-8-jessie-v20160718"] %}
@@ -124,6 +128,10 @@ resources:
           - key: extra-lb-zone1
             value: |-
                    {{ properties["input_extraLbZone1"] }}
+          - key: google-logging-enable
+            value: {{ enableStackdriverLogging }}
+          - key: google-monitoring-enable
+            value: {{ enableStackdriverMonitoring }}
       tags:
         items:
           - {{ env["deployment"] }}-tcp-80

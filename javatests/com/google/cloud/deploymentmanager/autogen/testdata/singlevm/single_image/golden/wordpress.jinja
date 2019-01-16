@@ -10,9 +10,11 @@
 {% set subnetwork = properties["subnetwork"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
-{% set hasExternalIP = properties["externalIP"] != "None" %}
+{% set hasExternalIP = properties["externalIP"] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
+{# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
+{% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
 
 resources:
   - name: {{ name }}
@@ -52,6 +54,8 @@ resources:
           - key: startup-script
             value: $(ref.software-status-script.startup-script)
           {% endif %}
+          - key: google-logging-enable
+            value: {{ enableStackdriverLogging }}
       tags:
         items:
           - {{ env["deployment"] }}-tcp-80
