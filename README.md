@@ -137,3 +137,11 @@ bazel-bin/java/com/google/cloud/deploymentmanager/autogen/cli/AutogenCli \
 ```shell
 bazel test javatests/com/google/cloud/deploymentmanager/autogen:all
 ```
+
+### Troubleshooting
+
+If you see errors when trying to build Autogen using bazel, try to run the following command and then try again:
+
+```shell
+bazel clean --expunge
+```
