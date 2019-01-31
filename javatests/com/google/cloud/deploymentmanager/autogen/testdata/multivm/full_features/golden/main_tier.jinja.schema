@@ -34,7 +34,7 @@ properties:
     maximum: 10
   zone:
     type: string
-    default: us-central1-f
+    default: us-east1-b
     x-googleProperty:
       type: GCE_ZONE
   image:
