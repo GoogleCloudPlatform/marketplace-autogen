@@ -121,4 +121,4 @@ properties:
   zone:
     description: Zone where the instance resides
     type: string
-    default: us-central1-f
+    default: us-east1-b
