@@ -151,14 +151,8 @@ properties:
   {/for}
 
   {for $firewallRule in $spec.firewallRulesList}
-  {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}:
-    type: boolean
-    default: {if $firewallRule.defaultOff}False{else}True{/if}
-  {/for}
-
-  {for $firewallRule in $spec.firewallRulesList}
-  {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}:
-    type: string
+  {let $firewallProp kind="text"}{call renders.firewallProps}{param spec: $firewallRule/}{/call}{/let}
+  {$firewallProp |indent: 2, true}{nil}
   {/for}
 
   {if $spec.deployInput}

@@ -93,36 +93,30 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: NETWORKING
+    - name: enableTcp80
+      title: Allow HTTP traffic
+      section: NETWORKING
     - name: tcp80SourceRanges
       title: Source IP ranges for HTTP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: NETWORKING
-      level: 1
+    - name: enableTcp443
+      title: Allow HTTPS traffic
+      section: NETWORKING
     - name: tcp443SourceRanges
       title: Source IP ranges for HTTPS traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: NETWORKING
-      level: 1
+    - name: enableIcmp
+      title: Allow ICMP traffic
+      section: NETWORKING
     - name: icmpSourceRanges
       title: Source IP ranges for ICMP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: NETWORKING
-      level: 1
-    - name: enableTcp80
-      title: Allow HTTP traffic
-      section: NETWORKING
-      boolean_group: FIREWALL
-    - name: enableTcp443
-      title: Allow HTTPS traffic
-      section: NETWORKING
-      boolean_group: FIREWALL
-    - name: enableIcmp
-      title: Allow ICMP traffic
-      section: NETWORKING
-      boolean_group: FIREWALL
     - name: input_domain
       title: Domain
       subtext: Your Wordpress blog domain
@@ -217,10 +211,6 @@ input:
       title: Stackdriver
       subtext: Monitoring and management for services, containers, applications, and infrastructure
   boolean_groups:
-    - name: FIREWALL
-      title: Firewall
-      tooltip: 'By default all incoming traffic from outside a network is blocked. Select the type of network traffic you want to allow. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
-      subtext: Add tags and firewall rules to allow specific network traffic from the Internet
     - name: IMAGE_CACHING_OPTIONS
       title: Image caching options
       tooltip: <a href='http://wordpress.com/help'>Learn more</a>

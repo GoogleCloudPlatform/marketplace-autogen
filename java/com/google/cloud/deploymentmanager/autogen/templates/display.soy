@@ -33,6 +33,57 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
+{template .firewallDisplayProperties kind="text"}
+{@param firewallsList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{let $section kind="text"}
+  {if $tierSpec}
+    {call .tierSectionName}{param spec: $tierSpec/}{/call}{nil}
+  {else}
+    NETWORKING{nil}
+  {/if}
+{/let}
+
+{for $firewallRule in $firewallsList}
+  {if ($tierSpec and $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC) or not $tierSpec}
+  {call .firewallDisplayProperty}
+    {param firewallSpec: $firewallRule/}
+    {param section: $section/}
+    {param tierSpec: $tierSpec/}
+  {/call}
+  {/if}
+{/for}
+{/template}
+
+
+{template .firewallDisplayProperty kind="text"}
+{@param firewallSpec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param section: string}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{let $propName kind="text"}
+  {call utilities.firewallRulePropName}
+    {param spec: $firewallSpec/}
+    {param tierSpec: $tierSpec/}
+  {/call}
+{/let}
+{let $rangePropName kind="text"}
+  {call utilities.firewallRuleSourceRangesPropName}
+    {param spec: $firewallSpec/}
+    {param tierSpec: $tierSpec/}
+  {/call}
+{/let}
+{let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallSpec/}{/call}{/let}
+- name: {$propName}
+  title: Allow {$firewallTitle} traffic
+  section: {$section}
+- name: {$rangePropName}
+  title: Source IP ranges for {$firewallTitle} traffic
+  tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+  placeholder: '0.0.0.0/0, 192.169.0.2/24'
+  section: {$section}
+{/template}
+
+
 {template .authScopeDescription kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
 {switch $spec.scope}
@@ -325,40 +376,6 @@ enumLabels:
 {template .tierSectionName kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
 {$spec.name |uppercased}_TIER{nil}
-{/template}
-
-
-{template .firewallBooleanGroups kind="text"}
-{@param? singleVmSpec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
-{@param? multiVmSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
-{if $singleVmSpec}
-{if length($singleVmSpec.firewallRulesList) > 0}
-- name: {call .firewallBooleanGroupName/}
-  title: Firewall
-  tooltip: 'By default all incoming traffic from outside a network is blocked. Select the type of network traffic you want to allow. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
-  subtext: Add tags and firewall rules to allow specific network traffic from the Internet
-{/if}
-
-{else}
-
-{for $tier in $multiVmSpec.tiersList}
-{if length($tier.firewallRulesList) > 0}
-- name: {call .firewallBooleanGroupName}{param tier: $tier/}{/call}
-  title: Firewall
-  tooltip: 'By default all incoming traffic from outside a network is blocked. Select the type of network traffic you want to allow. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
-  subtext: Add tags and firewall rules to allow specific network traffic from the Internet
-{/if}
-{/for}
-{/if}
-{/template}
-
-
-{template .firewallBooleanGroupName kind="text"}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
-{if $tier}
-{call .tierSectionName}{param spec: $tier/}{/call}_{nil}
-{/if}
-FIREWALL{nil}
 {/template}
 
 
