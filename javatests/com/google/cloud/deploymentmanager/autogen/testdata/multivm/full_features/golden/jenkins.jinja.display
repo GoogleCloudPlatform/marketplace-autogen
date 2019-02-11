@@ -86,36 +86,30 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: MAIN_TIER
+    - name: main_enableTcp80
+      title: Allow HTTP traffic
+      section: MAIN_TIER
     - name: main_tcp80SourceRanges
       title: Source IP ranges for HTTP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: MAIN_TIER
-      level: 1
+    - name: main_enableTcp443
+      title: Allow HTTPS traffic
+      section: MAIN_TIER
     - name: main_tcp443SourceRanges
       title: Source IP ranges for HTTPS traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: MAIN_TIER
-      level: 1
+    - name: main_enableUdp
+      title: Allow UDP traffic
+      section: MAIN_TIER
     - name: main_udpSourceRanges
       title: Source IP ranges for UDP traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: MAIN_TIER
-      level: 1
-    - name: main_enableTcp80
-      title: Allow HTTP traffic
-      section: MAIN_TIER
-      boolean_group: MAIN_TIER_FIREWALL
-    - name: main_enableTcp443
-      title: Allow HTTPS traffic
-      section: MAIN_TIER
-      boolean_group: MAIN_TIER_FIREWALL
-    - name: main_enableUdp
-      title: Allow UDP traffic
-      section: MAIN_TIER
-      boolean_group: MAIN_TIER_FIREWALL
     - name: main_enableCloudReadonlyApi
       title: Allow read only access to all of Google Cloud Platform APIs on the VM
       section: MAIN_TIER
@@ -260,10 +254,6 @@ input:
       title: Stackdriver
       subtext: Monitoring and management for services, containers, applications, and infrastructure
   boolean_groups:
-    - name: MAIN_TIER_FIREWALL
-      title: Firewall
-      tooltip: 'By default all incoming traffic from outside a network is blocked. Select the type of network traffic you want to allow. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
-      subtext: Add tags and firewall rules to allow specific network traffic from the Internet
     - name: MAIN_TIER_CLOUD_PLATFORM_READONLY_API_ACCESS
       title: Google Cloud Platform Readonly API
     - name: MAIN_TIER_CLOUD_PLATFORM_API_ACCESS

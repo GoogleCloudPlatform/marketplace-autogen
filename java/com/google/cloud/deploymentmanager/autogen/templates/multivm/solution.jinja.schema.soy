@@ -199,11 +199,7 @@ outputs:
 
 {for $firewallRule in $spec.firewallRulesList}
 {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
-{call utilities.firewallRulePropName}{param spec: $firewallRule/}{param tierSpec: $spec/}{/call}:
-  type: boolean
-  default: {if $firewallRule.defaultOff}False{else}True{/if}
-{call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{param tierSpec: $spec/}{/call}:
-  type: string
+{call renders.firewallProps}{param spec: $firewallRule/}{param tierSpec: $spec/}{/call}
 {/if}
 {/for}
 {/template}
