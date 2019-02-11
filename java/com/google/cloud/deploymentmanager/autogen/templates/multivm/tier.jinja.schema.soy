@@ -161,11 +161,8 @@ properties:
 
   {for $firewallRule in $spec.firewallRulesList}
   {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
-  {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}:
-    type: boolean
-    default: {if $firewallRule.defaultOff}False{else}True{/if}
-  {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}:
-    type: string
+  {let $firewallProp kind="text"}{call renders.firewallProps}{param spec: $firewallRule/}{/call}{/let}
+  {$firewallProp |indent: 2, true}{nil}
   {/if}
   {/for}
 

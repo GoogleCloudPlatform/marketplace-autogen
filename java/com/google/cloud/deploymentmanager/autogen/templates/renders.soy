@@ -97,6 +97,29 @@ sourceTags:
 {/template}
 
 
+/** Creates Firewall check box and range input field for a Firewall rule spec */
+{template .firewallProps kind="text"}
+{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{let $firewallPropName kind="text"}
+  {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+{/let}
+{$firewallPropName}:
+  type: boolean
+  default: {if $spec.defaultOff}False{else}True{/if}
+  x-googleProperty:
+    type: GCE_FIREWALL
+    gceFirewall:
+      networkProperty: {'network' |tierprefixed: $tierSpec}
+{call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}:
+  type: string
+  x-googleProperty:
+    type: GCE_FIREWALL_RANGE
+    gceFirewallRange:
+      firewallProperty: {$firewallPropName}
+{/template}
+
+
 /** Constructs password instance property */
 {template .passwordProperty kind="text"}
 {@param password: cloud.deploymentmanager.autogen.PasswordSpec}

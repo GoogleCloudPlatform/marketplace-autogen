@@ -160,18 +160,42 @@ properties:
   main_enableTcp80:
     type: boolean
     default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: main_network
   main_tcp80SourceRanges:
     type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: main_enableTcp80
   main_enableTcp443:
     type: boolean
     default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: main_network
   main_tcp443SourceRanges:
     type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: main_enableTcp443
   main_enableUdp:
     type: boolean
     default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: main_network
   main_udpSourceRanges:
     type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: main_enableUdp
   tier2_instanceCount:
     type: integer
     default: 2
