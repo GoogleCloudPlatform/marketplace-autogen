@@ -92,12 +92,18 @@ def RefGroup(name):
   return '$(ref.%s.instanceGroup)' % name
 
 
-def GlobalComputeLink(project, collection, name):
+def GlobalComputeLink(project, collection, value):
+  if IsComputeLink(value):
+    return value
+
   return ''.join([default.COMPUTE_URL_BASE, 'projects/', project, '/global/',
-                  collection, '/', name])
+                  collection, '/', value])
 
 
 def LocalComputeLink(project, zone, key, value):
+  if IsComputeLink(value):
+    return value
+
   return ''.join([default.COMPUTE_URL_BASE, 'projects/', project, '/zones/',
                   zone, '/', key, '/', value])
 
@@ -109,18 +115,12 @@ def ReadContext(context, prop_key):
 
 def MakeLocalComputeLink(context, key):
   project, zone, value = ReadContext(context, key)
-  if IsComputeLink(value):
-    return value
-  else:
-    return LocalComputeLink(project, zone, key + 's', value)
+  return LocalComputeLink(project, zone, key + 's', value)
 
 
 def MakeGlobalComputeLink(context, key):
   project, _, value = ReadContext(context, key)
-  if IsComputeLink(value):
-    return value
-  else:
-    return GlobalComputeLink(project, key + 's', value)
+  return GlobalComputeLink(project, key + 's', value)
 
 
 def MakeSubnetworkComputeLink(context, key):
