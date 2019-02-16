@@ -134,10 +134,11 @@ def GenerateComputeVM(context, create_disks_separately=True):
   if local_ssd:
     disks = AppendLocalSSDDisks(context, disks, local_ssd)
   machine_type = common.MakeLocalComputeLink(context, default.MACHINETYPE)
-  network = common.MakeGlobalComputeLink(context, default.NETWORK)
+  network = common.MakeNetworkComputeLink(context, prop[default.NETWORK])
   subnetwork = ''
   if default.SUBNETWORK in prop:
-    subnetwork = common.MakeSubnetworkComputeLink(context, default.SUBNETWORK)
+    subnetwork = common.MakeSubnetworkComputeLink(context,
+                                                  prop[default.SUBNETWORK])
 
   # To be consistent with Dev console and gcloud, service accounts need to be
   #  explicitly disabled
@@ -350,7 +351,7 @@ def AddServiceEndpointIfNeeded(context):
   prop = context.properties
   if ENDPOINT_NAME not in prop:
     return []
-  network = common.MakeGlobalComputeLink(context, default.NETWORK)
+  network = common.MakeNetworkComputeLink(context, prop[default.NETWORK])
   reference = '$(ref.' + MakeVMName(context) + '.name)'
   address = common.MakeFQHN(context, reference)
   name = prop[ENDPOINT_NAME]
