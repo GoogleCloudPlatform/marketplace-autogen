@@ -108,29 +108,25 @@ def LocalComputeLink(project, zone, key, value):
                   zone, '/', key, '/', value])
 
 
-def ReadContext(context, prop_key):
-  return (context.env['project'], context.properties.get('zone', None),
-          context.properties[prop_key])
-
-
 def MakeLocalComputeLink(context, key):
-  project, zone, value = ReadContext(context, key)
-  return LocalComputeLink(project, zone, key + 's', value)
+  return LocalComputeLink(context.env['project'],
+                          context.properties.get('zone', None), key + 's',
+                          context.properties[key])
 
 
-def MakeGlobalComputeLink(context, key):
-  project, _, value = ReadContext(context, key)
-  return GlobalComputeLink(project, key + 's', value)
+def MakeNetworkComputeLink(context, value):
+  return GlobalComputeLink(context.env['project'], 'networks', value)
 
 
-def MakeSubnetworkComputeLink(context, key):
-  project, zone, value = ReadContext(context, key)
-  region = ZoneToRegion(zone)
+def MakeSubnetworkComputeLink(context, value):
+  region = ZoneToRegion(context.properties.get('zone', None))
   if IsComputeLink(value):
     return value
 
-  return ''.join([default.COMPUTE_URL_BASE, 'projects/', project, '/regions/',
-                  region, '/subnetworks/', value])
+  return ''.join([
+      default.COMPUTE_URL_BASE, 'projects/', context.env['project'],
+      '/regions/', region, '/subnetworks/', value
+  ])
 
 
 def MakeAcceleratorTypeLink(context, accelerator_type):
