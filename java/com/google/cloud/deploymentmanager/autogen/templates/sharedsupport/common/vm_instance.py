@@ -40,8 +40,6 @@ SRCIMAGE = default.SRCIMAGE
 TAGS = default.TAGS
 ZONE = default.ZONE
 AUTODELETE_BOOTDISK = 'bootDiskAutodelete'
-STATIC_IP = 'staticIP'
-NAT_IP = 'natIP'
 HAS_EXTERNAL_IP = 'hasExternalIP'
 
 # Defaults used for modules that imports this one
@@ -52,7 +50,6 @@ DEFAULT_NETWORK = 'default'
 DEFAULT_PROVIDE_BOOT = True
 DEFAULT_BOOTDISKSIZE = 10
 DEFAULT_AUTODELETE_BOOTDISK = True
-DEFAULT_STATIC_IP = False
 DEFAULT_HAS_EXTERNAL_IP = True
 DEFAULT_DATADISKSIZE = 500
 DEFAULT_ZONE = 'us-east1-b'
@@ -124,8 +121,6 @@ def GenerateComputeVM(context, create_disks_separately=True):
   tags = prop.setdefault(TAGS, dict([('items', [])]))
   zone = prop.setdefault(ZONE, DEFAULT_ZONE)
   has_external_ip = prop.get(HAS_EXTERNAL_IP, DEFAULT_HAS_EXTERNAL_IP)
-  static_ip = prop.get(STATIC_IP, DEFAULT_STATIC_IP)
-  nat_ip = prop.get(NAT_IP, None)
 
   if provide_boot:
     dev_mode = DEVIMAGE in prop and prop[DEVIMAGE]
@@ -158,20 +153,6 @@ def GenerateComputeVM(context, create_disks_separately=True):
   if has_external_ip:
     access_config = {'name': default.EXTERNAL, 'type': default.ONE_NAT}
     access_configs.append(access_config)
-    if static_ip and nat_ip:
-      raise common.Error(
-          'staticIP=True and natIP cannot be specified at the same time')
-    if static_ip:
-      address_resource, nat_ip = MakeStaticAddress(vm_name, zone)
-      resource.append(address_resource)
-    if nat_ip:
-      access_config['natIP'] = nat_ip
-  else:
-    if static_ip:
-      raise common.Error('staticIP cannot be True when hasExternalIP is False')
-    if nat_ip:
-      raise common.Error(
-          'natIP must not be specified when hasExternalIP is False')
 
   network_interfaces = []
   if subnetwork:
@@ -228,20 +209,6 @@ def SetMetadataDefaults(metadata):
           if x.get('key', None) == 'google-logging-enable']:
     items.append({'key': 'google-logging-enable',
                   'value': '0'})
-
-
-def MakeStaticAddress(vm_name, zone):
-  """Creates a static IP address resource; returns it and the natIP."""
-  address_name = vm_name + '-address'
-  address_resource = {
-      'name': address_name,
-      'type': default.ADDRESS,
-      'properties': {
-          'name': address_name,
-          'region': common.ZoneToRegion(zone),
-      },
-  }
-  return (address_resource, '$(ref.%s.address)' % address_name)
 
 
 def PrependBootDisk(disk_list, name, disk_type, disk_size, src_image,
