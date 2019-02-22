@@ -37,7 +37,7 @@ properties:
       - 4
   zone:
     type: string
-    default: us-east1-b
+    default: us-central1-f
     x-googleProperty:
       type: GCE_ZONE
   machineType:
