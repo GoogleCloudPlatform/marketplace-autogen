@@ -6,11 +6,21 @@
 {% set instanceName = "%s-vm" % deployment %}
 {% set zone = properties["zone"] %}
 {% set machineType = properties["machineType"] %}
-{% set network = path_utils.networkPath(properties["network"]) %}
-{% set subnetwork = properties["subnetwork"] %}
+{% set networks = path_utils.networkPath(properties["network"]) %}
+{% if networks is string %}
+  {% set networks = [path_utils.networkPath(properties["network"])] %}
+{% endif %}
+{% set subnetworks = properties["subnetwork"] %}
+{% if subnetworks is string %}
+  {% set subnetworks = [properties["subnetwork"]] %}
+{% endif %}
+{% set externalIPs = properties["externalIP"] %}
+{% if externalIPs is string %}
+  {% set externalIPs = [properties["externalIP"]] %}
+{% endif %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
-{% set hasExternalIP = properties["externalIP"] != "NONE" %}
+{% set hasExternalIP = externalIPs is defined and externalIPs[0] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
@@ -24,14 +34,25 @@ resources:
       sourceImage: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
       zone: {{ zone }}
       machineType: {{ machineType }}
-      network: {{ network }}
-      {% if subnetwork %}
-      subnetwork: {{ subnetwork }}
+      networks:
+      {% for network in networks %}
+        - {{ network }}
+      {% endfor %}
+      {% if subnetworks is defined and subnetworks %}
+      subnetworks:
+      {% for subnetwork in subnetworks %}
+        - {{ subnetwork }}
+      {% endfor %}
+      {% endif %}
+      {% if externalIPs is defined and externalIPs %}
+      externalIPs:
+      {% for externalIP in externalIPs %}
+        - {{ externalIP }}
+      {% endfor %}
       {% endif %}
       bootDiskType: {{ bootDiskType }}
       bootDiskSizeGb: {{ bootDiskSizeGb }}
       localSSDs: {{ properties["input_localSsdsCount"] }}
-      hasExternalIP: {{ hasExternalIP }}
       serviceAccounts:
         - email: default
           scopes:
@@ -58,8 +79,10 @@ resources:
             value: {{ enableStackdriverLogging }}
       tags:
         items:
-          - {{ env["deployment"] }}-tcp-80
-          - {{ env["deployment"] }}-tcp-443
+          {% for network in networks %}
+          - {{ env["deployment"] }}-tcp-80-{{ loop.index0 }}
+          - {{ env["deployment"] }}-tcp-443-{{ loop.index0 }}
+          {% endfor %}
   - name: generated-password-0
     type: password.py
     properties:
@@ -83,11 +106,12 @@ resources:
           exit 1
         fi
   {% endif %}
+  {% for network in networks %}
   {% if properties["enableTcp80"] %}
-  - name: {{ env["deployment"] }}-tcp-80
+  - name: {{ env["deployment"] }}-tcp-80-{{ loop.index0 }}
     type: compute.v1.firewall
     properties:
-      network: {{ network }}
+      network: {{ networks[loop.index0] }}
       {% if properties.get("tcp80SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp80SourceRanges"].split(',') %}
@@ -96,16 +120,16 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-tcp-80"]
+      targetTags: ["{{ env["deployment"] }}-tcp-80-{{ loop.index0 }}"]
       allowed:
         - IPProtocol: TCP
           ports: ["80"]
   {% endif %}
   {% if properties["enableTcp443"] %}
-  - name: {{ env["deployment"] }}-tcp-443
+  - name: {{ env["deployment"] }}-tcp-443-{{ loop.index0 }}
     type: compute.v1.firewall
     properties:
-      network: {{ network }}
+      network: {{ networks[loop.index0] }}
       {% if properties.get("tcp443SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp443SourceRanges"].split(',') %}
@@ -114,11 +138,12 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-tcp-443"]
+      targetTags: ["{{ env["deployment"] }}-tcp-443-{{ loop.index0 }}"]
       allowed:
         - IPProtocol: TCP
           ports: ["443"]
   {% endif %}
+  {% endfor %}
 
 outputs:
   - name: deployment

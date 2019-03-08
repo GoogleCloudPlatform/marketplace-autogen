@@ -15,20 +15,20 @@ Open {$firewallTitle} traffic{nil}
     This firewall rule is not enabled.
     To allow specific network traffic from the Internet,
     create a firewall rule to open {$firewallTitle} traffic
-    for target tag "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}".
+    for target tag "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-[network_interface_index]".
     <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
     If you are using Google Cloud SDK, type the following command in
     the terminal:
   snippet: >-
     gcloud --project={{ outputs().project }} compute firewall-rules
-    create "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}"
+    create "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-0"
     --network {{ properties().network }}
     {if $spec.port and strLen($spec.port) > 0}
     --allow {$protocol |lowercased}:{$spec.port}
     {else}
     --allow {$protocol |lowercased}
     {/if}
-    --target-tags "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}"
+    --target-tags "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-0"
   showIf: '{{ !properties().{call utilities.firewallRulePropName data="all"/} }}'{plsp}
 {/template}
 

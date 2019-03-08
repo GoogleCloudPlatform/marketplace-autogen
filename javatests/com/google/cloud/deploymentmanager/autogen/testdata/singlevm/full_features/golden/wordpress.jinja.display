@@ -308,48 +308,48 @@ runtime:
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open HTTP traffic
-        for target tag "{{ outputs().deployment }}-tcp-80".
+        for target tag "{{ outputs().deployment }}-tcp-80-[network_interface_index]".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-tcp-80"
+        create "{{ outputs().deployment }}-tcp-80-0"
         --network {{ properties().network }}
         --allow tcp:80
-        --target-tags "{{ outputs().deployment }}-tcp-80"
+        --target-tags "{{ outputs().deployment }}-tcp-80-0"
       showIf: '{{ !properties().enableTcp80 }}'
     - heading: Open HTTPS traffic
       description: >-
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open HTTPS traffic
-        for target tag "{{ outputs().deployment }}-tcp-443".
+        for target tag "{{ outputs().deployment }}-tcp-443-[network_interface_index]".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-tcp-443"
+        create "{{ outputs().deployment }}-tcp-443-0"
         --network {{ properties().network }}
         --allow tcp:443
-        --target-tags "{{ outputs().deployment }}-tcp-443"
+        --target-tags "{{ outputs().deployment }}-tcp-443-0"
       showIf: '{{ !properties().enableTcp443 }}'
     - heading: Open ICMP traffic
       description: >-
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open ICMP traffic
-        for target tag "{{ outputs().deployment }}-icmp".
+        for target tag "{{ outputs().deployment }}-icmp-[network_interface_index]".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-icmp"
+        create "{{ outputs().deployment }}-icmp-0"
         --network {{ properties().network }}
         --allow icmp
-        --target-tags "{{ outputs().deployment }}-icmp"
+        --target-tags "{{ outputs().deployment }}-icmp-0"
       showIf: '{{ !properties().enableIcmp }}'
     - heading: Change the temporary passwords
       description: For additional security, it is recommended that you change the passwords.

@@ -5,11 +5,21 @@
 {% set machineType = properties["machineType"] %}
 {% set acceleratorType = properties["acceleratorType"] %}
 {% set acceleratorCount = properties["acceleratorCount"] %}
-{% set network = path_utils.networkPath(properties["network"]) %}
-{% set subnetwork = properties["subnetwork"] %}
+{% set networks = path_utils.networkPath(properties["network"]) %}
+{% if networks is string %}
+  {% set networks = [path_utils.networkPath(properties["network"])] %}
+{% endif %}
+{% set subnetworks = properties["subnetwork"] %}
+{% if subnetworks is string %}
+  {% set subnetworks = [properties["subnetwork"]] %}
+{% endif %}
+{% set externalIPs = properties["externalIP"] %}
+{% if externalIPs is string %}
+  {% set externalIPs = [properties["externalIP"]] %}
+{% endif %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
-{% set hasExternalIP = properties["externalIP"] != "NONE" %}
+{% set hasExternalIP = externalIPs is defined and externalIPs[0] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
@@ -28,14 +38,25 @@ resources:
       sourceImage: https://www.googleapis.com/compute/v1/projects/click-to-deploy-images/global/images/jenkins-v20180130
       zone: {{ zone }}
       machineType: {{ machineType }}
-      network: {{ network }}
-      {% if subnetwork %}
-      subnetwork: {{ subnetwork }}
+      networks:
+      {% for network in networks %}
+        - {{ network }}
+      {% endfor %}
+      {% if subnetworks is defined and subnetworks %}
+      subnetworks:
+      {% for subnetwork in subnetworks %}
+        - {{ subnetwork }}
+      {% endfor %}
+      {% endif %}
+      {% if externalIPs is defined and externalIPs %}
+      externalIPs:
+      {% for externalIP in externalIPs %}
+        - {{ externalIP }}
+      {% endfor %}
       {% endif %}
       bootDiskType: {{ bootDiskType }}
       bootDiskSizeGb: {{ bootDiskSizeGb }}
       localSSDs: {{ properties["input_tier2LocalSSDs"] }}
-      hasExternalIP: {{ hasExternalIP }}
       {% if acceleratorCount > 0 %}
       guestAccelerators:
         - acceleratorType: {{ acceleratorType }}
