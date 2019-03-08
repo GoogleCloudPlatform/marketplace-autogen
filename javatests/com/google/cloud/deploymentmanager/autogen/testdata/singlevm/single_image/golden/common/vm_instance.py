@@ -26,12 +26,13 @@ DISK = default.DISK
 DISKTYPE = default.DISKTYPE
 DISK_RESOURCES = default.DISK_RESOURCES
 ENDPOINT_NAME = default.ENDPOINT_NAME
+EXTERNAL_IPS = default.EXTERNAL_IPS
 GUEST_ACCELERATORS = default.GUEST_ACCELERATORS
 INSTANCE_NAME = default.INSTANCE_NAME
 MACHINETYPE = default.MACHINETYPE
 METADATA = default.METADATA
-NETWORK = default.NETWORK
-SUBNETWORK = default.SUBNETWORK
+NETWORKS = default.NETWORKS
+SUBNETWORKS = default.SUBNETWORKS
 NO_SCOPE = default.NO_SCOPE
 PROJECT = default.PROJECT
 PROVIDE_BOOT = default.PROVIDE_BOOT
@@ -40,17 +41,16 @@ SRCIMAGE = default.SRCIMAGE
 TAGS = default.TAGS
 ZONE = default.ZONE
 AUTODELETE_BOOTDISK = 'bootDiskAutodelete'
-HAS_EXTERNAL_IP = 'hasExternalIP'
 
 # Defaults used for modules that imports this one
 DEFAULT_DISKTYPE = 'pd-standard'
+DEFAULT_EXTERNAL_IPS = ['EPHEMERAL']
 DEFAULT_IP_FWD = False
 DEFAULT_MACHINETYPE = 'n1-standard-1'
-DEFAULT_NETWORK = 'default'
+DEFAULT_NETWORKS = ['default']
 DEFAULT_PROVIDE_BOOT = True
 DEFAULT_BOOTDISKSIZE = 10
 DEFAULT_AUTODELETE_BOOTDISK = True
-DEFAULT_HAS_EXTERNAL_IP = True
 DEFAULT_DATADISKSIZE = 500
 DEFAULT_ZONE = 'us-central1-f'
 DEFAULT_PERSISTENT = 'PERSISTENT'
@@ -115,12 +115,10 @@ def GenerateComputeVM(context, create_disks_separately=True):
   machine_type = prop.setdefault(MACHINETYPE, DEFAULT_MACHINETYPE)
   metadata = prop.setdefault(METADATA, dict())
   SetMetadataDefaults(metadata)
-  network = prop.setdefault(NETWORK, DEFAULT_NETWORK)
   vm_name = MakeVMName(context)
   provide_boot = prop.setdefault(PROVIDE_BOOT, DEFAULT_PROVIDE_BOOT)
   tags = prop.setdefault(TAGS, dict([('items', [])]))
   zone = prop.setdefault(ZONE, DEFAULT_ZONE)
-  has_external_ip = prop.get(HAS_EXTERNAL_IP, DEFAULT_HAS_EXTERNAL_IP)
 
   if provide_boot:
     dev_mode = DEVIMAGE in prop and prop[DEVIMAGE]
@@ -134,11 +132,6 @@ def GenerateComputeVM(context, create_disks_separately=True):
   if local_ssd:
     disks = AppendLocalSSDDisks(context, disks, local_ssd)
   machine_type = common.MakeLocalComputeLink(context, default.MACHINETYPE)
-  network = common.MakeNetworkComputeLink(context, prop[default.NETWORK])
-  subnetwork = ''
-  if default.SUBNETWORK in prop:
-    subnetwork = common.MakeSubnetworkComputeLink(context,
-                                                  prop[default.SUBNETWORK])
 
   # To be consistent with Dev console and gcloud, service accounts need to be
   #  explicitly disabled
@@ -149,38 +142,20 @@ def GenerateComputeVM(context, create_disks_separately=True):
     prop.setdefault(SERVICE_ACCOUNTS, copy.deepcopy(DEFAULT_SERVICE_ACCOUNT))
 
   resource = []
-
-  access_configs = []
-  if has_external_ip:
-    access_config = {'name': default.EXTERNAL, 'type': default.ONE_NAT}
-    access_configs.append(access_config)
-
-  network_interfaces = []
-  if subnetwork:
-    network_interfaces.insert(0, {
-        'network': network,
-        'subnetwork': subnetwork,
-        'accessConfigs': access_configs
-    })
-  else:
-    network_interfaces.insert(0, {
-        'network': network,
-        'accessConfigs': access_configs
-    })
-
-  resource.insert(0, {
-      'name': vm_name,
-      'type': default.INSTANCE,
-      'properties': {
-          'zone': zone,
-          'machineType': machine_type,
-          'canIpForward': can_ip_fwd,
-          'disks': disks,
-          'networkInterfaces': network_interfaces,
-          'tags': tags,
-          'metadata': metadata,
-      }
-  })
+  resource.insert(
+      0, {
+          'name': vm_name,
+          'type': default.INSTANCE,
+          'properties': {
+              'zone': zone,
+              'machineType': machine_type,
+              'canIpForward': can_ip_fwd,
+              'disks': disks,
+              'networkInterfaces': GetNetworkInterfaces(context),
+              'tags': tags,
+              'metadata': metadata,
+          }
+      })
 
   # Pass through any additional properties to the VM
   if SERVICE_ACCOUNTS in prop:
@@ -196,6 +171,37 @@ def GenerateComputeVM(context, create_disks_separately=True):
     resource[0]['properties'].update(
         {'scheduling': {'onHostMaintenance': 'terminate'}})
   return resource
+
+
+def GetNetworkInterfaces(context):
+  """Extracts the network interfaces to be used in the VM creation."""
+  props = context.properties
+
+  networks = props.setdefault(NETWORKS, DEFAULT_NETWORKS)
+  subnetworks = props.get(SUBNETWORKS, [])
+  external_ips = props.get(EXTERNAL_IPS, DEFAULT_EXTERNAL_IPS)
+
+  network_interfaces = []
+  for i in range(len(networks)):
+    name = 'Interface %d' % i
+    network_interface = {
+        'network': common.MakeNetworkComputeLink(context, networks[i]),
+        'name': name,
+    }
+
+    if i < len(subnetworks):
+      network_interface['subnetwork'] = common.MakeSubnetworkComputeLink(
+          context, subnetworks[i])
+
+    if i < len(external_ips) and external_ips[i] == 'EPHEMERAL':
+      network_interface['accessConfigs'] = [{
+          'name': '%s %s' % (name, default.EXTERNAL),
+          'type': default.ONE_NAT,
+      }]
+
+    network_interfaces.append(network_interface)
+
+  return network_interfaces
 
 
 def SetMetadataDefaults(metadata):
@@ -351,7 +357,7 @@ def AddServiceEndpointIfNeeded(context):
   prop = context.properties
   if ENDPOINT_NAME not in prop:
     return []
-  network = common.MakeNetworkComputeLink(context, prop[default.NETWORK])
+  network = common.MakeNetworkComputeLink(context, prop[default.NETWORKS][0])
   reference = '$(ref.' + MakeVMName(context) + '.name)'
   address = common.MakeFQHN(context, reference)
   name = prop[ENDPOINT_NAME]
@@ -387,9 +393,8 @@ def GenerateOutputList(context, resource_list):
       'name': 'internalIP',
       'value': '$(ref.%s.networkInterfaces[0].networkIP)' % vm_res['name'],
   }]
-  has_external_ip = context.properties.get(HAS_EXTERNAL_IP,
-                                           DEFAULT_HAS_EXTERNAL_IP)
-  if has_external_ip:
+  external_ips = context.properties.get(EXTERNAL_IPS, [])
+  if external_ips and external_ips[0] == 'EPHEMERAL':
     outputs.append({
         'name': 'ip',
         'value': ('$(ref.%s.networkInterfaces[0].accessConfigs[0].natIP)' %

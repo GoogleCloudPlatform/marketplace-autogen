@@ -38,20 +38,22 @@ properties:
     description: Data disk size (GB)
     type: integer
     default: 10
-  hasExternalIP:
-    description: Whether the VM is accessible from the Internet
-    type: boolean
-    default: True
+  externalIPs:
+    description: List of External IP configuration for each network interface
+    type: array
+    default:
+    - EPHEMERAL
   localSSDs:
     description: |
       Number of local SSD disks to add to instance. See
       https://cloud.google.com/compute/docs/disks/
       for information about SSDs specs. Defaults to using SCRATCH and SCSI
     type: integer
-  network:
-    description: Network in which this instance should be placed
-    type: string
-    default: default
+  networks:
+    description: List of Networks for each network interface of this VM
+    type: array
+    default:
+    - default
   noScope:
     description: Explicitly remove all default access scopes for instance
     type: boolean
@@ -59,9 +61,9 @@ properties:
   sourceImage:
     description: Imgage to be used for the bood disk of this instance
     type: string
-  subnetwork:
-    description: Subnetwork in which this instance should be placed
-    type: string
+  subnetworks:
+    description: List of Subnetworks for each network interface of this VM
+    type: array
   # Same properties as described in
   # https://cloud.google.com/compute/docs/reference/latest/instances
   canIpForward:

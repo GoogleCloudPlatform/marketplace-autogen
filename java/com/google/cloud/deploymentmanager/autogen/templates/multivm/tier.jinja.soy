@@ -20,12 +20,26 @@
 {% set acceleratorType = properties["acceleratorType"] %}
 {% set acceleratorCount = properties["acceleratorCount"] %}
 {/if}
-{% set network = path_utils.networkPath(properties["network"]) %}
-{% set subnetwork = properties["subnetwork"] %}
+
+{% set networks = path_utils.networkPath(properties["network"]) %}
+{% if networks is string %}
+  {% set networks = [path_utils.networkPath(properties["network"])] %}
+{% endif %}
+
+{% set subnetworks = properties["subnetwork"] %}
+{% if subnetworks is string %}
+  {% set subnetworks = [properties["subnetwork"]] %}
+{% endif %}
+
+{% set externalIPs = properties["externalIP"] %}
+{% if externalIPs is string %}
+  {% set externalIPs = [properties["externalIP"]] %}
+{% endif %}
+
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 
-{% set hasExternalIP = properties["externalIP"] != "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+{% set hasExternalIP = externalIPs is defined and externalIPs[0] != "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
 
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
@@ -79,9 +93,21 @@ resources:
       {/if}
       zone: {{ zone }}
       machineType: {{ machineType }}
-      network: {{ network }}
-      {% if subnetwork %}
-      subnetwork: {{ subnetwork }}
+      networks:
+      {% for network in networks %}
+        - {{ network }}
+      {% endfor %}
+      {% if subnetworks is defined and subnetworks %}
+      subnetworks:
+      {% for subnetwork in subnetworks %}
+        - {{ subnetwork }}
+      {% endfor %}
+      {% endif %}
+      {% if externalIPs is defined and externalIPs %}
+      externalIPs:
+      {% for externalIP in externalIPs %}
+        - {{ externalIP }}
+      {% endfor %}
       {% endif %}
       bootDiskType: {{ bootDiskType }}
       bootDiskSizeGb: {{ bootDiskSizeGb }}
@@ -106,7 +132,6 @@ resources:
       {/let}
       {$localSsdItem |indent: 6}
       {/if}
-      hasExternalIP: {{ hasExternalIP }}
       {if $spec.ipForwarding}
       canIpForward: {{ canIpForward }}
       {/if}
@@ -220,7 +245,9 @@ resources:
           - {call utilities.deploymentTag data="all"/}
           - {call utilities.tierTag data="all"/}
           {if strLen($firewallRuleTags) > 0}
+          {% for network in networks %}
           {$firewallRuleTags |indent: 10, true}{nil}
+          {% endfor %}
           {/if}
 
   {% endfor %}
@@ -242,7 +269,11 @@ resources:
       {param tierSpec: $spec/}
     {/call}
   {/let}
+  {if strLen($firewallResources) > 0}
+  {% for network in networks %}
   {$firewallResources |indent: 2, true}{nil}
+  {% endfor %}
+  {/if}
 
 {\n}
 outputs:

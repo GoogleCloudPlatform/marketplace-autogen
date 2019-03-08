@@ -28,7 +28,7 @@
 - name: {call utilities.firewallRuleName data="all"/}
   type: compute.v1.firewall
   properties:
-    network: {{ network }}
+    network: {{ networks[loop.index0] }}
     {$source |indent: 4}
     targetTags: ["{call utilities.firewallRuleTag data="all"/}"]
     allowed:
