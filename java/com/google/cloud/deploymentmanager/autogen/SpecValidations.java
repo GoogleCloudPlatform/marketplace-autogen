@@ -86,7 +86,8 @@ final class SpecValidations {
           "nvidia-tesla-v100",
           "nvidia-tesla-p100-vws",
           "nvidia-tesla-p4",
-          "nvidia-tesla-p4-vws");
+          "nvidia-tesla-p4-vws",
+          "nvidia-tesla-t4");
 
   /**
    * Validates that a spec is complete and reasonable.
