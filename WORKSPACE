@@ -71,7 +71,7 @@ maven_jar(
 
 maven_jar(
     name = "com_google_truth_truth",
-    artifact = "com.google.truth:truth:0.39",
+    artifact = "com.google.truth:truth:0.44",
 )
 
 maven_jar(
