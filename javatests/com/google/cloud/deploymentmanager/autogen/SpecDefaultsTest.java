@@ -347,12 +347,12 @@ public class SpecDefaultsTest {
     SingleVmDeploymentPackageSpec.Builder single =
         fillInMissingDefaults(newSingleSpec().addAllPasswords(passwords));
     assertThat(single.getPasswordsList()).hasSize(2);
-    assertThat(single.getPasswordsList()).containsAllIn(passwords).inOrder();
+    assertThat(single.getPasswordsList()).containsAtLeastElementsIn(passwords).inOrder();
 
     MultiVmDeploymentPackageSpec.Builder multi =
         fillInMissingDefaults(newMultiSpec().addAllPasswords(passwords));
     assertThat(multi.getPasswordsList()).hasSize(2);
-    assertThat(multi.getPasswordsList()).containsAllIn(passwords).inOrder();
+    assertThat(multi.getPasswordsList()).containsAtLeastElementsIn(passwords).inOrder();
   }
 
   @Test
