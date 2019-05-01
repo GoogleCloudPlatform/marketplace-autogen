@@ -51,7 +51,7 @@ public class SpecDefaultsTest {
   public void shouldUseDefaultsAndReturnTheSameBuilder_single() {
     SingleVmDeploymentPackageSpec.Builder builder = newSingleSpec();
     SingleVmDeploymentPackageSpec.Builder returned = fillInMissingDefaults(builder);
-    assertThat(returned).isSameAs(builder);
+    assertThat(returned).isSameInstanceAs(builder);
     assertThat(builder.hasMachineType()).isTrue();
     assertThat(builder.hasBootDisk()).isTrue();
     assertThat(builder.hasExternalIp()).isTrue();
@@ -61,7 +61,7 @@ public class SpecDefaultsTest {
   public void shouldUseDefaultsAndReturnTheSameBuilder_multi() {
     MultiVmDeploymentPackageSpec.Builder builder = newMultiSpec();
     MultiVmDeploymentPackageSpec.Builder returned = fillInMissingDefaults(builder);
-    assertThat(returned).isSameAs(builder);
+    assertThat(returned).isSameInstanceAs(builder);
     assertThat(builder.getTiersList()).hasSize(2);
     assertThat(builder.getTiers(0).hasMachineType()).isTrue();
     assertThat(builder.getTiers(0).hasBootDisk()).isTrue();
