@@ -53,7 +53,6 @@ import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.truth.DefaultSubject;
 import com.google.common.truth.IterableSubject;
 import com.google.common.truth.Subject;
 import com.google.common.truth.ThrowableSubject;
@@ -561,7 +560,7 @@ public class SoyFunctionsTest {
     }
 
     @CheckReturnValue
-    Subject<DefaultSubject, Object> hasResultThat() {
+    Subject hasResultThat() {
       try {
         return assertThat(callable.call());
       } catch (Exception e) {
