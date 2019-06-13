@@ -7,7 +7,12 @@
 {% set allTiersCount = {length($spec.tiersList)} %}
 {% set tiersWithNoExternalIPCount = 0 %}
 {for $tier in $spec.tiersList}
-{% if properties["{$tier.name}_externalIP"] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+{let $tierExternalIPs: tierPrefixed('externalIPs', $tier)/}
+{% set {$tierExternalIPs} = properties["{$tier.name}_externalIP"] %}
+{% if {$tierExternalIPs} and {$tierExternalIPs} is string %}
+  {% set {$tierExternalIPs} = [properties["{$tier.name}_externalIP"]] %}
+{% endif %}
+{% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 {/for}
@@ -149,6 +154,18 @@ outputs:
     value: $(ref.{$tier.name}-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
   {/for}
+  {if $spec.siteUrl}
+  {let $urlTier: findVmTier($spec.siteUrl.tierVm.tier, $spec.tiersList)/}
+  {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
+  - name: {$tierHasExternalIP}
+    value: $(ref.{$urlTier.name}-tier.hasExternalIP)
+  {/if}
+  {if $spec.adminUrl and (not $spec.siteUrl or $spec.siteUrl.tierVm.tier != $spec.adminUrl.tierVm.tier)}
+  {let $urlTier: findVmTier($spec.adminUrl.tierVm.tier, $spec.tiersList)/}
+  {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
+  - name: {$tierHasExternalIP}
+    value: $(ref.{$urlTier.name}-tier.hasExternalIP)
+  {/if}
 
   - name: tiersWithNoExternalIPStatus
     {% if tiersWithNoExternalIPCount == 0 %}

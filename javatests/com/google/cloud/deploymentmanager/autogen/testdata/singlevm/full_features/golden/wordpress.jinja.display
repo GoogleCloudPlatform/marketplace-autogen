@@ -222,16 +222,16 @@ runtime:
     rows:
       - label: Site address
         value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/">http://{{ externalIp(outputs().vmSelfLink) }}/</a>
-        showIf: '{{ properties().externalIP != "NONE" }}'
+        showIf: '{{ outputs().hasExternalIP }}'
       - label: Site address (internal IP)
         value: http://{{ outputs().vmInternalIP }}/
-        showIf: '{{ properties().externalIP == "NONE" }}'
+        showIf: '{{ !outputs().hasExternalIP }}'
       - label: Admin URL
         value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/">http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/</a>
-        showIf: '{{ properties().externalIP != "NONE" }}'
+        showIf: '{{ outputs().hasExternalIP }}'
       - label: Admin URL (internal IP)
         value: http://{{ outputs().vmInternalIP }}/wp-admin/
-        showIf: '{{ properties().externalIP == "NONE" }}'
+        showIf: '{{ !outputs().hasExternalIP }}'
       - label: Admin user
         value: '{{ properties().input_domain }}'
       - label: Admin password (Temporary)

@@ -434,19 +434,19 @@ enumLabels:
 {let $internalUrl kind="text"}
   {call .makeInternalUrl}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
-{let $externalIpProp kind="text"}
+{let $hasExternalIpProp kind="text"}
   {if $spec.tierVm}
-    {'externalIP' |tierprefixed: findVmTier($spec.tierVm.tier, $tiersList)}{nil}
+    {'hasExternalIP' |tierprefixed: findVmTier($spec.tierVm.tier, $tiersList)}{nil}
   {else}
-    externalIP{nil}
+    hasExternalIP{nil}
   {/if}
 {/let}
 - label: {$label |yamlprimitive: 2}
   value: {$externalUrl |yamlprimitive: 2}
-  showIf: '{{ properties().{$externalIpProp} != "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" }}'
+  showIf: '{{ outputs().{$hasExternalIpProp} }}'
 - label: {$label + ' (internal IP)' |yamlprimitive: 2}
   value: {$internalUrl |yamlprimitive: 2}
-  showIf: '{{ properties().{$externalIpProp} == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" }}'
+  showIf: '{{ !outputs().{$hasExternalIpProp} }}'
 {/template}
 
 

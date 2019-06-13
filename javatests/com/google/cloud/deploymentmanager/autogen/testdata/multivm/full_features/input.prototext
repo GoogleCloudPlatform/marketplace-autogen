@@ -358,6 +358,12 @@ spec {
         tier: "main"
       }
     }
+    admin_url {
+      scheme: HTTP
+      tier_vm {
+        tier: "tier2"
+      }
+    }
     passwords {
       metadata_key: "admin-password"
       length: 8
