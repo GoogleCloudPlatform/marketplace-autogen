@@ -293,6 +293,8 @@ outputs:
   - name: vmSelfLink{{ vmIndex }}
     value: $(ref.{call .instanceName data="all"/}.selfLink)
   {% endfor %}
+  - name: hasExternalIP
+    value: {{ hasExternalIP }}
 
 {% endif %}
 

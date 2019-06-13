@@ -1,12 +1,24 @@
 {% set allTiersCount = 3 %}
 {% set tiersWithNoExternalIPCount = 0 %}
-{% if properties["main_externalIP"] == "NONE" %}
+{% set main_externalIPs = properties["main_externalIP"] %}
+{% if main_externalIPs and main_externalIPs is string %}
+  {% set main_externalIPs = [properties["main_externalIP"]] %}
+{% endif %}
+{% if main_externalIPs and main_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier2_externalIP"] == "NONE" %}
+{% set tier2_externalIPs = properties["tier2_externalIP"] %}
+{% if tier2_externalIPs and tier2_externalIPs is string %}
+  {% set tier2_externalIPs = [properties["tier2_externalIP"]] %}
+{% endif %}
+{% if tier2_externalIPs and tier2_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% if properties["tier3_externalIP"] == "NONE" %}
+{% set tier3_externalIPs = properties["tier3_externalIP"] %}
+{% if tier3_externalIPs and tier3_externalIPs is string %}
+  {% set tier3_externalIPs = [properties["tier3_externalIP"]] %}
+{% endif %}
+{% if tier3_externalIPs and tier3_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 
@@ -201,6 +213,10 @@ outputs:
   - name: tier3_vmSelfLink{{ vmIndex }}
     value: $(ref.tier3-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
+  - name: main_hasExternalIP
+    value: $(ref.main-tier.hasExternalIP)
+  - name: tier2_hasExternalIP
+    value: $(ref.tier2-tier.hasExternalIP)
   - name: tiersWithNoExternalIPStatus
     {% if tiersWithNoExternalIPCount == 0 %}
     value: 'NONE'

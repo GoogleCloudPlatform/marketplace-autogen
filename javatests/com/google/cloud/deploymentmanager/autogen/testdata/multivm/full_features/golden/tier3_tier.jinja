@@ -130,4 +130,6 @@ outputs:
   - name: vmSelfLink{{ vmIndex }}
     value: $(ref.{{ env["deployment"] }}-tier3-vm-{{ vmIndex }}.selfLink)
   {% endfor %}
+  - name: hasExternalIP
+    value: {{ hasExternalIP }}
 {% endif %}

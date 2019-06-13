@@ -15,12 +15,12 @@
   {% set subnetworks = [properties["subnetwork"]] %}
 {% endif %}
 {% set externalIPs = properties["externalIP"] %}
-{% if externalIPs is string %}
+{% if externalIPs and externalIPs is string %}
   {% set externalIPs = [properties["externalIP"]] %}
 {% endif %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
-{% set hasExternalIP = externalIPs is defined and externalIPs[0] != "NONE" %}
+{% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
@@ -166,3 +166,5 @@ outputs:
     value: {{ instanceName }}
   - name: vmSelfLink
     value: $(ref.{{ instanceName }}.selfLink)
+  - name: hasExternalIP
+    value: {{ hasExternalIP }}

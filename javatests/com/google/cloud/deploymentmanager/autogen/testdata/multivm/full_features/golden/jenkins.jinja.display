@@ -277,10 +277,16 @@ runtime:
     rows:
       - label: Site address
         value: <a href="http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/">http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/</a>
-        showIf: '{{ properties().main_externalIP != "NONE" }}'
+        showIf: '{{ outputs().main_hasExternalIP }}'
       - label: Site address (internal IP)
         value: http://{{ outputs()["main_vmInternalIP" + 0] }}/
-        showIf: '{{ properties().main_externalIP == "NONE" }}'
+        showIf: '{{ !outputs().main_hasExternalIP }}'
+      - label: Admin URL
+        value: <a href="http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/">http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/</a>
+        showIf: '{{ outputs().tier2_hasExternalIP }}'
+      - label: Admin URL (internal IP)
+        value: http://{{ outputs()["tier2_vmInternalIP" + 0] }}/
+        showIf: '{{ !outputs().tier2_hasExternalIP }}'
       - label: Admin user
         value: '{{ properties().input_domain }}'
       - label: Admin password (Temporary)
@@ -312,13 +318,13 @@ runtime:
         value: Some value
         showIf: '{{ properties().tier2_externalIP == "NONE" }}'
   primaryButton:
+    label: Log into the admin panel
+    type: TYPE_URL
+    action: http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/
+  secondaryButton:
     label: Visit the site
     type: TYPE_URL
     action: http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/
-  secondaryButton:
-    label: My Own SSH Label
-    type: TYPE_GCE_VM_SSH
-    action: '{{ outputs()["main_vmSelfLink" + 0] }}'
   suggestedActions:
     - heading: No external IP configured on any tier
       description: 'All VM instances have been configured with no external IP or internet access. Connecting to them directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access these VMs.'
