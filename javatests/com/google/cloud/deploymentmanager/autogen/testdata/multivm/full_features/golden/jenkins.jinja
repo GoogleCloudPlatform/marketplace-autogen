@@ -1,3 +1,5 @@
+{% import "path_utils.jinja" as path_utils with context %}
+
 {% set allTiersCount = 3 %}
 {% set tiersWithNoExternalIPCount = 0 %}
 {% set main_externalIPs = properties["main_externalIP"] %}
@@ -7,6 +9,10 @@
 {% if main_externalIPs and main_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
+{% set main_mainNetwork = path_utils.networkPath(properties["main_network"]) %}
+{% if main_mainNetwork is iterable and main_mainNetwork is not string %}
+  {% set main_mainNetwork = main_mainNetwork[0] %}
+{% endif %}
 {% set tier2_externalIPs = properties["tier2_externalIP"] %}
 {% if tier2_externalIPs and tier2_externalIPs is string %}
   {% set tier2_externalIPs = [properties["tier2_externalIP"]] %}
@@ -14,12 +20,20 @@
 {% if tier2_externalIPs and tier2_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
+{% set tier2_mainNetwork = path_utils.networkPath(properties["tier2_network"]) %}
+{% if tier2_mainNetwork is iterable and tier2_mainNetwork is not string %}
+  {% set tier2_mainNetwork = tier2_mainNetwork[0] %}
+{% endif %}
 {% set tier3_externalIPs = properties["tier3_externalIP"] %}
 {% if tier3_externalIPs and tier3_externalIPs is string %}
   {% set tier3_externalIPs = [properties["tier3_externalIP"]] %}
 {% endif %}
 {% if tier3_externalIPs and tier3_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+{% set tier3_mainNetwork = path_utils.networkPath(properties["tier3_network"]) %}
+{% if tier3_mainNetwork is iterable and tier3_mainNetwork is not string %}
+  {% set tier3_mainNetwork = tier3_mainNetwork[0] %}
 {% endif %}
 
 resources:
@@ -189,6 +203,8 @@ outputs:
   - name: main_vmSelfLink{{ vmIndex }}
     value: $(ref.main-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
+  - name: main_mainNetwork
+    value: {{ main_mainNetwork }}
   {% for vmIndex in range(properties["tier2_instanceCount"]) %}
   - name: tier2_vmId{{ vmIndex }}
     value: $(ref.tier2-tier.vmId{{ vmIndex }})
@@ -201,6 +217,8 @@ outputs:
   - name: tier2_vmSelfLink{{ vmIndex }}
     value: $(ref.tier2-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
+  - name: tier2_mainNetwork
+    value: {{ tier2_mainNetwork }}
   {% for vmIndex in range(properties["tier3_instanceCount"]) %}
   - name: tier3_vmId{{ vmIndex }}
     value: $(ref.tier3-tier.vmId{{ vmIndex }})
@@ -213,6 +231,8 @@ outputs:
   - name: tier3_vmSelfLink{{ vmIndex }}
     value: $(ref.tier3-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
+  - name: tier3_mainNetwork
+    value: {{ tier3_mainNetwork }}
   - name: main_hasExternalIP
     value: $(ref.main-tier.hasExternalIP)
   - name: tier2_hasExternalIP
