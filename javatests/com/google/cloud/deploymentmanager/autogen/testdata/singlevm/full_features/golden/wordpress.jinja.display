@@ -315,7 +315,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-tcp-80-0"
-        --network {{ properties().network }}
+        --network {{ outputs().mainNetwork }}
         --allow tcp:80
         --target-tags "{{ outputs().deployment }}-tcp-80-0"
       showIf: '{{ !properties().enableTcp80 }}'
@@ -331,7 +331,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-tcp-443-0"
-        --network {{ properties().network }}
+        --network {{ outputs().mainNetwork }}
         --allow tcp:443
         --target-tags "{{ outputs().deployment }}-tcp-443-0"
       showIf: '{{ !properties().enableTcp443 }}'
@@ -347,7 +347,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-icmp-0"
-        --network {{ properties().network }}
+        --network {{ outputs().mainNetwork }}
         --allow icmp
         --target-tags "{{ outputs().deployment }}-icmp-0"
       showIf: '{{ !properties().enableIcmp }}'
