@@ -75,7 +75,7 @@ class OutputWriterFactory {
     @Override
     void writeOutput(Message message) throws IOException {
       try (OutputStream stream = newOutputStream()) {
-        new PrintStream(stream).print(TextFormat.printToString(message));
+        new PrintStream(stream).print(TextFormat.printer().printToString(message));
       }
     }
   }
