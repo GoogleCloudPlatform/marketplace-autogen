@@ -10,6 +10,13 @@
 Open {$firewallTitle} traffic{nil}
 {if $tierSpec}{sp}for {$tierSpec.title}{/if}
 {/let}
+{let $tierMainNetwork kind="text"}
+  {if $tierSpec}
+    {'mainNetwork' |tierprefixed: $tierSpec}{nil}
+  {else}
+    mainNetwork{nil}
+  {/if}
+{/let}
 - heading: {$heading |yamlprimitive: 2}
   description: >-
     This firewall rule is not enabled.
@@ -22,7 +29,7 @@ Open {$firewallTitle} traffic{nil}
   snippet: >-
     gcloud --project={{ outputs().project }} compute firewall-rules
     create "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-0"
-    --network {{ properties().network }}
+    --network {{ outputs().{$tierMainNetwork} }}
     {if $spec.port and strLen($spec.port) > 0}
     --allow {$protocol |lowercased}:{$spec.port}
     {else}

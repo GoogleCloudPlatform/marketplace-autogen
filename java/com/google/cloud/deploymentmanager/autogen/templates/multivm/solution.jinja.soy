@@ -4,6 +4,8 @@
 {template .jinja kind="text"}
 {@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
 
+{% import "path_utils.jinja" as path_utils with context %}
+{\n}
 {% set allTiersCount = {length($spec.tiersList)} %}
 {% set tiersWithNoExternalIPCount = 0 %}
 {for $tier in $spec.tiersList}
@@ -14,6 +16,12 @@
 {% endif %}
 {% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
+{% endif %}
+
+{let $tierMainNetwork: tierPrefixed('mainNetwork', $tier)/}
+{% set {$tierMainNetwork} = path_utils.networkPath(properties["{$tier.name}_network"]) %}
+{% if {$tierMainNetwork} is iterable and {$tierMainNetwork} is not string %}
+  {% set {$tierMainNetwork} = {$tierMainNetwork}[0] %}
 {% endif %}
 {/for}
 {\n}
@@ -153,6 +161,9 @@ outputs:
   - name: {'vmSelfLink{{ vmIndex }}' |tierprefixed: $tier}
     value: $(ref.{$tier.name}-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
+  {let $tierMainNetwork: tierPrefixed('mainNetwork', $tier)/}
+  - name: {$tierMainNetwork}
+    value: {{ {$tierMainNetwork} }}
   {/for}
   {if $spec.siteUrl}
   {let $urlTier: findVmTier($spec.siteUrl.tierVm.tier, $spec.tiersList)/}

@@ -358,7 +358,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-main-tcp-80-0"
-        --network {{ properties().network }}
+        --network {{ outputs().main_mainNetwork }}
         --allow tcp:80
         --target-tags "{{ outputs().deployment }}-main-tcp-80-0"
       showIf: '{{ !properties().main_enableTcp80 }}'
@@ -374,7 +374,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-main-tcp-443-0"
-        --network {{ properties().network }}
+        --network {{ outputs().main_mainNetwork }}
         --allow tcp:443
         --target-tags "{{ outputs().deployment }}-main-tcp-443-0"
       showIf: '{{ !properties().main_enableTcp443 }}'
@@ -390,7 +390,7 @@ runtime:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
         create "{{ outputs().deployment }}-main-udp-0"
-        --network {{ properties().network }}
+        --network {{ outputs().main_mainNetwork }}
         --allow udp
         --target-tags "{{ outputs().deployment }}-main-udp-0"
       showIf: '{{ !properties().main_enableUdp }}'
