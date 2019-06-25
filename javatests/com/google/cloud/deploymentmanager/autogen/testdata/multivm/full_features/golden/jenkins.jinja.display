@@ -87,7 +87,7 @@ input:
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: MAIN_TIER
     - name: main_enableTcp80
-      title: Allow HTTP traffic
+      title: Allow HTTP traffic from the Internet
       section: MAIN_TIER
     - name: main_tcp80SourceRanges
       title: Source IP ranges for HTTP traffic
@@ -95,15 +95,21 @@ input:
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: MAIN_TIER
     - name: main_enableTcp443
-      title: Allow HTTPS traffic
+      title: Allow HTTPS traffic from the Internet
       section: MAIN_TIER
     - name: main_tcp443SourceRanges
       title: Source IP ranges for HTTPS traffic
       tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
       placeholder: '0.0.0.0/0, 192.169.0.2/24'
       section: MAIN_TIER
+    - name: main_enableIcmp
+      title: Allow ICMP traffic from other VMs in this deployment
+      section: MAIN_TIER
+    - name: main_enableTcp7000-7001
+      title: Allow TCP port 7000-7001 traffic between VMs in this group
+      section: MAIN_TIER
     - name: main_enableUdp
-      title: Allow UDP traffic
+      title: Allow UDP traffic from the Internet
       section: MAIN_TIER
     - name: main_udpSourceRanges
       title: Source IP ranges for UDP traffic
@@ -159,6 +165,12 @@ input:
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
       section: TIER2_TIER
+    - name: tier2_enableTcp9878
+      title: Allow TCP port 9878 traffic between VMs in this group
+      section: TIER2_TIER
+    - name: tier2_enableUdp2555
+      title: Allow UDP port 2555 traffic from other VMs in this deployment
+      section: TIER2_TIER
     - name: tier3_instanceCount
       title: Instance Count
       tooltip: Specify a value between 1 and 10.
@@ -184,6 +196,12 @@ input:
     - name: tier3_externalIP
       title: External IP
       tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: TIER3_TIER
+    - name: tier3_enableTcp9000
+      title: Allow TCP port 9000 traffic between VMs in this group
+      section: TIER3_TIER
+    - name: tier3_enableUdp2333
+      title: Allow UDP port 2333 traffic from other VMs in this deployment
       section: TIER3_TIER
     - name: input_domain
       title: Domain
@@ -351,49 +369,151 @@ runtime:
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open HTTP traffic
-        for target tag "{{ outputs().deployment }}-main-tcp-80-[network_interface_index]".
+        for target tag "{{ outputs().deployment }}-main-tier".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-main-tcp-80-0"
+        create "{{ outputs().deployment }}-main-tcp-80"
         --network {{ outputs().main_mainNetwork }}
         --allow tcp:80
-        --target-tags "{{ outputs().deployment }}-main-tcp-80-0"
+        --target-tags "{{ outputs().deployment }}-main-tier"
       showIf: '{{ !properties().main_enableTcp80 }}'
     - heading: Open HTTPS traffic for Main Tier
       description: >-
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open HTTPS traffic
-        for target tag "{{ outputs().deployment }}-main-tcp-443-[network_interface_index]".
+        for target tag "{{ outputs().deployment }}-main-tier".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-main-tcp-443-0"
+        create "{{ outputs().deployment }}-main-tcp-443"
         --network {{ outputs().main_mainNetwork }}
         --allow tcp:443
-        --target-tags "{{ outputs().deployment }}-main-tcp-443-0"
+        --target-tags "{{ outputs().deployment }}-main-tier"
       showIf: '{{ !properties().main_enableTcp443 }}'
+    - heading: Open ICMP traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open ICMP traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-icmp"
+        --network {{ outputs().main_mainNetwork }}
+        --allow icmp
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableIcmp }}'
+    - heading: Open TCP port 7000-7001 traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 7000-7001 traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-main-tcp-7000-7001"
+        --network {{ outputs().main_mainNetwork }}
+        --allow tcp:7000-7001
+        --source-tags "{{ outputs().deployment }}-main-tier"
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableTcp7000-7001 }}'
     - heading: Open UDP traffic for Main Tier
       description: >-
         This firewall rule is not enabled.
         To allow specific network traffic from the Internet,
         create a firewall rule to open UDP traffic
-        for target tag "{{ outputs().deployment }}-main-udp-[network_interface_index]".
+        for target tag "{{ outputs().deployment }}-main-tier".
         <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
         If you are using Google Cloud SDK, type the following command in
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-main-udp-0"
+        create "{{ outputs().deployment }}-main-udp"
         --network {{ outputs().main_mainNetwork }}
         --allow udp
-        --target-tags "{{ outputs().deployment }}-main-udp-0"
+        --target-tags "{{ outputs().deployment }}-main-tier"
       showIf: '{{ !properties().main_enableUdp }}'
+    - heading: Open TCP port 9878 traffic for Secondary Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 9878 traffic
+        for target tag "{{ outputs().deployment }}-tier2-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier2-tcp-9878"
+        --network {{ outputs().tier2_mainNetwork }}
+        --allow tcp:9878
+        --source-tags "{{ outputs().deployment }}-tier2-tier"
+        --target-tags "{{ outputs().deployment }}-tier2-tier"
+      showIf: '{{ !properties().tier2_enableTcp9878 }}'
+    - heading: Open UDP port 2555 traffic for Secondary Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open UDP port 2555 traffic
+        for target tag "{{ outputs().deployment }}-tier2-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier2-udp-2555"
+        --network {{ outputs().tier2_mainNetwork }}
+        --allow udp:2555
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-tier2-tier"
+      showIf: '{{ !properties().tier2_enableUdp2555 }}'
+    - heading: Open TCP port 9000 traffic for Third Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 9000 traffic
+        for target tag "{{ outputs().deployment }}-tier3-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier3-tcp-9000"
+        --network {{ outputs().tier3_mainNetwork }}
+        --allow tcp:9000
+        --source-tags "{{ outputs().deployment }}-tier3-tier"
+        --target-tags "{{ outputs().deployment }}-tier3-tier"
+      showIf: '{{ !properties().tier3_enableTcp9000 }}'
+    - heading: Open UDP port 2333 traffic for Third Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open UDP port 2333 traffic
+        for target tag "{{ outputs().deployment }}-tier3-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier3-udp-2333"
+        --network {{ outputs().tier3_mainNetwork }}
+        --allow udp:2333
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-tier3-tier"
+      showIf: '{{ !properties().tier3_enableUdp2333 }}'
     - heading: Change the temporary passwords
       description: For additional security, it is recommended that you change the passwords.
 

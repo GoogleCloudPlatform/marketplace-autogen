@@ -362,10 +362,8 @@ message FirewallRuleSpec {
     // This rule can be enabled or disabled by end user.
     PUBLIC = 1;
     // Applies to traffic between instances within a tier.
-    // This rule is not configurable (enable/disable) by end user.
     TIER = 2;
     // Applies to traffic between all instances in the deployment.
-    // This rule is not configurable (enable/disable) by end user.
     DEPLOYMENT = 3;
   }
   // The IP Protocol that the firewall rule allows. Required.

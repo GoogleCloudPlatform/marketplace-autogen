@@ -1,5 +1,4 @@
 {namespace vm.multi}
-{alias cloud.deploymentmanager.autogen as proto}
 
 /** Generates solution.jinja.display file. */
 {template .display kind="text"}
@@ -212,12 +211,10 @@ runtime:
 
     {for $tier in $spec.tiersList}
     {for $firewallRule in $tier.firewallRulesList}
-    {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
     {let $item kind="text"}
       {call display.openPortAction}{param spec: $firewallRule/}{param tierSpec: $tier/}{/call}
     {/let}
     {$item |indent: 4}
-    {/if}
     {/for}
     {/for}
 

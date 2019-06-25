@@ -70,11 +70,11 @@ resources:
       {/for}
 
       {for $firewallRule in $tier.firewallRulesList}
-      {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
       {let $propName kind="text"}
         {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}
       {/let}
       {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
+      {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
       {let $sourcesPropName kind="text"}
         {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}
       {/let}
