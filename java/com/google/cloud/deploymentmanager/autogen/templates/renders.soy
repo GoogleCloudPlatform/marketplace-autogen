@@ -22,41 +22,19 @@
 {let $source kind="text"}
   {call utilities.firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/let}
-{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {% if properties["{$propName}"] %}
-{/if}
 - name: {call utilities.firewallRuleName data="all"/}
   type: compute.v1.firewall
   properties:
-    network: {{ networks[loop.index0] }}
+    network: {{ networks[0] }}
     {$source |indent: 4}
-    targetTags: ["{call utilities.firewallRuleTag data="all"/}"]
+    targetTags: ["{call utilities.firewallRuleTargetTag data="all"/}"]
     allowed:
       - IPProtocol: {call utilities.firewallRuleProtocol}{param spec: $spec/}{/call}
         {if strLen($spec.port) > 0}
         ports: ["{$spec.port}"]
         {/if}
-{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {% endif %}
-{/if}
-{/template}
-
-
-/** Lists all the firewall rule tags for a VM. */
-{template .firewallRuleTags kind="text"}
-{@param specList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
-{for $firewallRule in $specList}
-{if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
-{let $item kind="text"}
-  {call utilities.firewallRuleTag}
-    {param spec: $firewallRule/}
-    {param tierSpec: $tierSpec/}
-  {/call}
-{/let}
-- {$item}
-{/if}
-{/for}
 {/template}
 
 
@@ -111,12 +89,14 @@ sourceTags:
     type: GCE_FIREWALL
     gceFirewall:
       networkProperty: {'network' |tierprefixed: $tierSpec}
+{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}:
   type: string
   x-googleProperty:
     type: GCE_FIREWALL_RANGE
     gceFirewallRange:
       firewallProperty: {$firewallPropName}
+{/if}
 {/template}
 
 

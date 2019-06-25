@@ -57,6 +57,8 @@ resources:
       {% if properties.get("main_tcp443SourceRanges") %}
       tcp443SourceRanges: {{ properties["main_tcp443SourceRanges"] }}
       {% endif %}
+      enableIcmp: {{ properties["main_enableIcmp"] }}
+      enableTcp7000-7001: {{ properties["main_enableTcp7000-7001"] }}
       enableUdp: {{ properties["main_enableUdp"] }}
       {% if properties.get("main_udpSourceRanges") %}
       udpSourceRanges: {{ properties["main_udpSourceRanges"] }}
@@ -105,6 +107,8 @@ resources:
       {% if properties["input_generateOptionalPassword"] %}
       generatedPassword2: $(ref.generated-password-2.password)
       {% endif %}
+      enableTcp9878: {{ properties["tier2_enableTcp9878"] }}
+      enableUdp2555: {{ properties["tier2_enableUdp2555"] }}
       input_domain: |-
         {{ properties["input_domain"] }}
       input_showConditionals: {{ properties["input_showConditionals"] }}
@@ -143,6 +147,8 @@ resources:
       {% if properties["input_generateOptionalPassword"] %}
       generatedPassword2: $(ref.generated-password-2.password)
       {% endif %}
+      enableTcp9000: {{ properties["tier3_enableTcp9000"] }}
+      enableUdp2333: {{ properties["tier3_enableUdp2333"] }}
       enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
       enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
   - name: generated-password-0

@@ -183,6 +183,20 @@ properties:
       type: GCE_FIREWALL_RANGE
       gceFirewallRange:
         firewallProperty: main_enableTcp443
+  main_enableIcmp:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: main_network
+  main_enableTcp7000-7001:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: main_network
   main_enableUdp:
     type: boolean
     default: True
@@ -268,6 +282,20 @@ properties:
       type: GCE_DISK_SIZE
       gceDiskSize:
         diskTypeProperty: tier2_bootDiskType
+  tier2_enableTcp9878:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: tier2_network
+  tier2_enableUdp2555:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: tier2_network
   tier3_instanceCount:
     type: integer
     default: 1
@@ -338,6 +366,20 @@ properties:
       type: GCE_DISK_SIZE
       gceDiskSize:
         diskTypeProperty: tier3_bootDiskType
+  tier3_enableTcp9000:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: tier3_network
+  tier3_enableUdp2333:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: tier3_network
   input_domain:
     type: string
     default: google.com

@@ -227,18 +227,9 @@ resources:
           {% endif %}
       {/if}
 
-      // Always apply firewall tags. This makes it easier to add firewall rules in
-      // post-deploy should the user select not to add the rules when deploying.
-      {let $firewallRuleTags kind="text"}
-        {call renders.firewallRuleTags}{param specList: $spec.firewallRulesList/}{/call}
-      {/let}
-      {if strLen($firewallRuleTags) > 0}
       tags:
         items:
-          {% for network in networks %}
-          {$firewallRuleTags |indent: 10, true}{nil}
-          {% endfor %}
-      {/if}
+          - {call utilities.deploymentTag data="all"/}
 
   {for $password in $spec.passwordsList}
   {let $passwordResource kind="text"}
@@ -264,9 +255,7 @@ resources:
     {call renders.firewallResources}{param specList: $spec.firewallRulesList/}{/call}
   {/let}
   {if strLen($firewallResources) > 0}
-  {% for network in networks %}
   {$firewallResources |indent: 2, true}{nil}
-  {% endfor %}
   {/if}
 
 {\n}

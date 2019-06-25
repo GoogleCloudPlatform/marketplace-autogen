@@ -17,26 +17,56 @@ Open {$firewallTitle} traffic{nil}
     mainNetwork{nil}
   {/if}
 {/let}
+{let $targetTagSuffix kind="text"}
+  {if not $tierSpec}
+    -deployment{nil}
+  {else}
+    -{$tierSpec.name}-tier{nil}
+  {/if}
+{/let}
 - heading: {$heading |yamlprimitive: 2}
   description: >-
     This firewall rule is not enabled.
-    To allow specific network traffic from the Internet,
+    To allow specific network traffic {call .firewallRuleTrafficLabel}{param firewallSpec: $spec/}{/call},
     create a firewall rule to open {$firewallTitle} traffic
-    for target tag "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-[network_interface_index]".
+    for target tag "{{ outputs().deployment }}{$targetTagSuffix}".
     <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
     If you are using Google Cloud SDK, type the following command in
     the terminal:
   snippet: >-
     gcloud --project={{ outputs().project }} compute firewall-rules
-    create "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-0"
+    create "{{ outputs().deployment }}{call utilities.firewallRuleNameSuffix}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}"
     --network {{ outputs().{$tierMainNetwork} }}
     {if $spec.port and strLen($spec.port) > 0}
     --allow {$protocol |lowercased}:{$spec.port}
     {else}
     --allow {$protocol |lowercased}
     {/if}
-    --target-tags "{{ outputs().deployment }}{call utilities.firewallRuleTagSuffix data="all"/}-0"
+    {if $tierSpec and $spec.allowedSource != proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+    {let $sourceTag kind="text"}
+      {if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.TIER}
+        "{{ outputs().deployment }}-{$tierSpec.name}-tier"{nil}
+      {else}
+        "{{ outputs().deployment }}-deployment"{nil}
+      {/if}
+    {/let}
+    --source-tags {$sourceTag}
+    {/if}
+    --target-tags "{{ outputs().deployment }}{$targetTagSuffix}"
   showIf: '{{ !properties().{call utilities.firewallRulePropName data="all"/} }}'{plsp}
+{/template}
+
+
+{template .firewallRuleTrafficLabel kind="text"}
+{@param firewallSpec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{switch $firewallSpec.allowedSource}
+{case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+  from the Internet{nil}
+{case proto.FirewallRuleSpec.TrafficSource.TIER}
+  between VMs in this group{nil}
+{case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+  from other VMs in this deployment{nil}
+{/switch}
 {/template}
 
 
@@ -52,13 +82,11 @@ Open {$firewallTitle} traffic{nil}
 {/let}
 
 {for $firewallRule in $firewallsList}
-  {if ($tierSpec and $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC) or not $tierSpec}
   {call .firewallDisplayProperty}
     {param firewallSpec: $firewallRule/}
     {param section: $section/}
     {param tierSpec: $tierSpec/}
   {/call}
-  {/if}
 {/for}
 {/template}
 
@@ -73,21 +101,23 @@ Open {$firewallTitle} traffic{nil}
     {param tierSpec: $tierSpec/}
   {/call}
 {/let}
+{let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallSpec/}{/call}{/let}
+- name: {$propName}
+  title: Allow {$firewallTitle} traffic {call .firewallRuleTrafficLabel}{param firewallSpec: $firewallSpec/}{/call}
+  section: {$section}
+{if $firewallSpec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $rangePropName kind="text"}
   {call utilities.firewallRuleSourceRangesPropName}
     {param spec: $firewallSpec/}
     {param tierSpec: $tierSpec/}
   {/call}
 {/let}
-{let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallSpec/}{/call}{/let}
-- name: {$propName}
-  title: Allow {$firewallTitle} traffic
-  section: {$section}
 - name: {$rangePropName}
   title: Source IP ranges for {$firewallTitle} traffic
   tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
   placeholder: '0.0.0.0/0, 192.169.0.2/24'
   section: {$section}
+{/if}
 {/template}
 
 

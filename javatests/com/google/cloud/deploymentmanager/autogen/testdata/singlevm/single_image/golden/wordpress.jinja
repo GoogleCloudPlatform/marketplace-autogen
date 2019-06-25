@@ -73,10 +73,7 @@ resources:
             value: {{ enableStackdriverLogging }}
       tags:
         items:
-          {% for network in networks %}
-          - {{ env["deployment"] }}-tcp-80-{{ loop.index0 }}
-          - {{ env["deployment"] }}-tcp-443-{{ loop.index0 }}
-          {% endfor %}
+          - {{ env["deployment"] }}-deployment
   - name: generated-password-0
     type: password.py
     properties:
@@ -100,12 +97,11 @@ resources:
           exit 1
         fi
   {% endif %}
-  {% for network in networks %}
   {% if properties["enableTcp80"] %}
-  - name: {{ env["deployment"] }}-tcp-80-{{ loop.index0 }}
+  - name: {{ env["deployment"] }}-tcp-80
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       {% if properties.get("tcp80SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp80SourceRanges"].split(',') %}
@@ -114,16 +110,16 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-tcp-80-{{ loop.index0 }}"]
+      targetTags: ["{{ env["deployment"] }}-deployment"]
       allowed:
         - IPProtocol: TCP
           ports: ["80"]
   {% endif %}
   {% if properties["enableTcp443"] %}
-  - name: {{ env["deployment"] }}-tcp-443-{{ loop.index0 }}
+  - name: {{ env["deployment"] }}-tcp-443
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       {% if properties.get("tcp443SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp443SourceRanges"].split(',') %}
@@ -132,12 +128,11 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-tcp-443-{{ loop.index0 }}"]
+      targetTags: ["{{ env["deployment"] }}-deployment"]
       allowed:
         - IPProtocol: TCP
           ports: ["443"]
   {% endif %}
-  {% endfor %}
 
 outputs:
   - name: deployment

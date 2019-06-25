@@ -164,11 +164,6 @@ resources:
         items:
           - {{ env["deployment"] }}-deployment
           - {{ env["deployment"] }}-main-tier
-          {% for network in networks %}
-          - {{ env["deployment"] }}-main-tcp-80-{{ loop.index0 }}
-          - {{ env["deployment"] }}-main-tcp-443-{{ loop.index0 }}
-          - {{ env["deployment"] }}-main-udp-{{ loop.index0 }}
-          {% endfor %}
   {% endfor %}
   {% if enableStatusWaiter %}
   {% if instanceCount > 0 %}
@@ -186,12 +181,11 @@ resources:
       {% endif %}
   {% endif %}
   {% endif %}
-  {% for network in networks %}
   {% if properties["enableTcp80"] %}
-  - name: {{ env["deployment"] }}-main-tcp-80-{{ loop.index0 }}
+  - name: {{ env["deployment"] }}-main-tcp-80
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       {% if properties.get("tcp80SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp80SourceRanges"].split(',') %}
@@ -200,16 +194,16 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-main-tcp-80-{{ loop.index0 }}"]
+      targetTags: ["{{ env["deployment"] }}-main-tier"]
       allowed:
         - IPProtocol: TCP
           ports: ["80"]
   {% endif %}
   {% if properties["enableTcp443"] %}
-  - name: {{ env["deployment"] }}-main-tcp-443-{{ loop.index0 }}
+  - name: {{ env["deployment"] }}-main-tcp-443
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       {% if properties.get("tcp443SourceRanges") %}
       sourceRanges:
         {% for source in properties["tcp443SourceRanges"].split(',') %}
@@ -218,35 +212,39 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-main-tcp-443-{{ loop.index0 }}"]
+      targetTags: ["{{ env["deployment"] }}-main-tier"]
       allowed:
         - IPProtocol: TCP
           ports: ["443"]
   {% endif %}
-  - name: {{ env["deployment"] }}-icmp-{{ loop.index0 }}
+  {% if properties["enableIcmp"] %}
+  - name: {{ env["deployment"] }}-icmp
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       sourceTags:
       - {{ env["deployment"] }}-deployment
-      targetTags: ["{{ env["deployment"] }}-deployment"]
+      targetTags: ["{{ env["deployment"] }}-main-tier"]
       allowed:
         - IPProtocol: ICMP
-  - name: {{ env["deployment"] }}-main-tcp-7000-7001-{{ loop.index0 }}
+  {% endif %}
+  {% if properties["enableTcp7000-7001"] %}
+  - name: {{ env["deployment"] }}-main-tcp-7000-7001
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       sourceTags:
       - {{ env["deployment"] }}-main-tier
       targetTags: ["{{ env["deployment"] }}-main-tier"]
       allowed:
         - IPProtocol: TCP
           ports: ["7000-7001"]
+  {% endif %}
   {% if properties["enableUdp"] %}
-  - name: {{ env["deployment"] }}-main-udp-{{ loop.index0 }}
+  - name: {{ env["deployment"] }}-main-udp
     type: compute.v1.firewall
     properties:
-      network: {{ networks[loop.index0] }}
+      network: {{ networks[0] }}
       {% if properties.get("udpSourceRanges") %}
       sourceRanges:
         {% for source in properties["udpSourceRanges"].split(',') %}
@@ -255,11 +253,10 @@ resources:
       {% else %}
       sourceRanges: ["0.0.0.0/0"]
       {% endif %}
-      targetTags: ["{{ env["deployment"] }}-main-udp-{{ loop.index0 }}"]
+      targetTags: ["{{ env["deployment"] }}-main-tier"]
       allowed:
         - IPProtocol: UDP
   {% endif %}
-  {% endfor %}
 
 outputs:
   {% for vmIndex in range(instanceCount) %}
