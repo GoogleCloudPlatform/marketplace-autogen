@@ -24,20 +24,14 @@
 {% set acceleratorCount = properties["acceleratorCount"] %}
 {/if}
 
-{% set networks = path_utils.networkPath(properties["network"]) %}
-{% if networks is string %}
-  {% set networks = [path_utils.networkPath(properties["network"])] %}
-{% endif %}
+{% set networks = [] %}
+{% for network in ([properties["network"]] if properties["network"] is string else properties["network"]) %}
+{% set _ = networks.append(path_utils.networkPath(network)) %}
+{% endfor %}
 
-{% set subnetworks = properties["subnetwork"] %}
-{% if subnetworks is string %}
-  {% set subnetworks = [properties["subnetwork"]] %}
-{% endif %}
+{% set subnetworks = [properties["subnetwork"]] if properties["subnetwork"] is string else properties["subnetwork"] %}
 
-{% set externalIPs = properties["externalIP"] %}
-{% if externalIPs and externalIPs is string %}
-  {% set externalIPs = [properties["externalIP"]] %}
-{% endif %}
+{% set externalIPs = [properties["externalIP"]] if properties["externalIP"] is string else properties["externalIP"] %}
 
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}

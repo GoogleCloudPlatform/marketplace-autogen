@@ -2,39 +2,24 @@
 
 {% set allTiersCount = 3 %}
 {% set tiersWithNoExternalIPCount = 0 %}
-{% set main_externalIPs = properties["main_externalIP"] %}
-{% if main_externalIPs and main_externalIPs is string %}
-  {% set main_externalIPs = [properties["main_externalIP"]] %}
-{% endif %}
+{% set main_externalIPs = [properties["main_externalIP"]] if properties["main_externalIP"] is string else properties["main_externalIP"] %}
 {% if main_externalIPs and main_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% set main_mainNetwork = path_utils.networkPath(properties["main_network"]) %}
-{% if main_mainNetwork is iterable and main_mainNetwork is not string %}
-  {% set main_mainNetwork = main_mainNetwork[0] %}
-{% endif %}
-{% set tier2_externalIPs = properties["tier2_externalIP"] %}
-{% if tier2_externalIPs and tier2_externalIPs is string %}
-  {% set tier2_externalIPs = [properties["tier2_externalIP"]] %}
-{% endif %}
+{% set main_mainNetwork = [properties["main_network"]] if properties["main_network"] is string else properties["main_network"] %}
+{% set main_mainNetwork = path_utils.networkPath(main_mainNetwork[0]) %}
+{% set tier2_externalIPs = [properties["tier2_externalIP"]] if properties["tier2_externalIP"] is string else properties["tier2_externalIP"] %}
 {% if tier2_externalIPs and tier2_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% set tier2_mainNetwork = path_utils.networkPath(properties["tier2_network"]) %}
-{% if tier2_mainNetwork is iterable and tier2_mainNetwork is not string %}
-  {% set tier2_mainNetwork = tier2_mainNetwork[0] %}
-{% endif %}
-{% set tier3_externalIPs = properties["tier3_externalIP"] %}
-{% if tier3_externalIPs and tier3_externalIPs is string %}
-  {% set tier3_externalIPs = [properties["tier3_externalIP"]] %}
-{% endif %}
+{% set tier2_mainNetwork = [properties["tier2_network"]] if properties["tier2_network"] is string else properties["tier2_network"] %}
+{% set tier2_mainNetwork = path_utils.networkPath(tier2_mainNetwork[0]) %}
+{% set tier3_externalIPs = [properties["tier3_externalIP"]] if properties["tier3_externalIP"] is string else properties["tier3_externalIP"] %}
 {% if tier3_externalIPs and tier3_externalIPs[0] == "NONE" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
-{% set tier3_mainNetwork = path_utils.networkPath(properties["tier3_network"]) %}
-{% if tier3_mainNetwork is iterable and tier3_mainNetwork is not string %}
-  {% set tier3_mainNetwork = tier3_mainNetwork[0] %}
-{% endif %}
+{% set tier3_mainNetwork = [properties["tier3_network"]] if properties["tier3_network"] is string else properties["tier3_network"] %}
+{% set tier3_mainNetwork = path_utils.networkPath(tier3_mainNetwork[0]) %}
 
 resources:
   - name: main-tier
