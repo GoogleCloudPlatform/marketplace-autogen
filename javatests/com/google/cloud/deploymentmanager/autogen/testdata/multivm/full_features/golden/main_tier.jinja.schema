@@ -179,6 +179,20 @@ properties:
       type: GCE_FIREWALL_RANGE
       gceFirewallRange:
         firewallProperty: enableTcp443
+  enableIcmp:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  enableTcp7000-7001:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
   enableUdp:
     type: boolean
     default: True

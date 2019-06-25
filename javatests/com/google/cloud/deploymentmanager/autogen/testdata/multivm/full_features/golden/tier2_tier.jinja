@@ -149,6 +149,30 @@ resources:
         return 0
   {% endif %}
   {% endif %}
+  {% if properties["enableTcp9878"] %}
+  - name: {{ env["deployment"] }}-tier2-tcp-9878
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      sourceTags:
+      - {{ env["deployment"] }}-tier2-tier
+      targetTags: ["{{ env["deployment"] }}-tier2-tier"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["9878"]
+  {% endif %}
+  {% if properties["enableUdp2555"] %}
+  - name: {{ env["deployment"] }}-tier2-udp-2555
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      sourceTags:
+      - {{ env["deployment"] }}-deployment
+      targetTags: ["{{ env["deployment"] }}-tier2-tier"]
+      allowed:
+        - IPProtocol: UDP
+          ports: ["2555"]
+  {% endif %}
 
 outputs:
   {% for vmIndex in range(instanceCount) %}

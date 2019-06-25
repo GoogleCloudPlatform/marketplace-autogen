@@ -160,10 +160,8 @@ properties:
   {/for}
 
   {for $firewallRule in $spec.firewallRulesList}
-  {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
   {let $firewallProp kind="text"}{call renders.firewallProps}{param spec: $firewallRule/}{/call}{/let}
   {$firewallProp |indent: 2, true}{nil}
-  {/if}
   {/for}
 
   {if $packageSpec.deployInput}
