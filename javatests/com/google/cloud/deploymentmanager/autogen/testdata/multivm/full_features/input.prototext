@@ -254,6 +254,16 @@ spec {
           }
         }
       }
+      firewall_rules {
+        protocol: TCP
+        port: "9878"
+        allowed_source: TIER
+      }
+      firewall_rules {
+        protocol: UDP
+        port: "2555"
+        allowed_source: DEPLOYMENT
+      }
       external_ip {
         not_configurable: true
       }
@@ -322,6 +332,16 @@ spec {
       images {
         project: "click-to-deploy-images"
         name: "jenkins-v20180130"
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "9000"
+        allowed_source: TIER
+      }
+      firewall_rules {
+        protocol: UDP
+        port: "2333"
+        allowed_source: DEPLOYMENT
       }
       machine_type {
         default_machine_type {

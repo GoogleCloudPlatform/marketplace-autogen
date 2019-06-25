@@ -106,6 +106,30 @@ resources:
       {% endif %}
   {% endif %}
   {% endif %}
+  {% if properties["enableTcp9000"] %}
+  - name: {{ env["deployment"] }}-tier3-tcp-9000
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      sourceTags:
+      - {{ env["deployment"] }}-tier3-tier
+      targetTags: ["{{ env["deployment"] }}-tier3-tier"]
+      allowed:
+        - IPProtocol: TCP
+          ports: ["9000"]
+  {% endif %}
+  {% if properties["enableUdp2333"] %}
+  - name: {{ env["deployment"] }}-tier3-udp-2333
+    type: compute.v1.firewall
+    properties:
+      network: {{ networks[0] }}
+      sourceTags:
+      - {{ env["deployment"] }}-deployment
+      targetTags: ["{{ env["deployment"] }}-tier3-tier"]
+      allowed:
+        - IPProtocol: UDP
+          ports: ["2333"]
+  {% endif %}
 
 outputs:
   {% for vmIndex in range(instanceCount) %}

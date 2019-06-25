@@ -1,5 +1,4 @@
 {namespace vm.multi}
-{alias cloud.deploymentmanager.autogen as proto}
 
 {template .schema kind="text"}
 {@param solutionId: string}
@@ -198,8 +197,6 @@ outputs:
 {/for}
 
 {for $firewallRule in $spec.firewallRulesList}
-{if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {call renders.firewallProps}{param spec: $firewallRule/}{param tierSpec: $spec/}{/call}
-{/if}
 {/for}
 {/template}
