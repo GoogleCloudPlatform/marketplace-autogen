@@ -24,7 +24,6 @@ import com.google.inject.Injector;
 import com.google.protobuf.Descriptors.GenericDescriptor;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
-import com.google.template.soy.data.SanitizedContent.ContentKind;
 import com.google.template.soy.jbcsrc.api.SoySauce;
 import com.google.template.soy.jbcsrc.api.SoySauce.Renderer;
 import java.io.IOException;
@@ -140,7 +139,7 @@ public final class TemplateRenderer {
 
   /** Use {@link TemplateRenderer.FileSet#builder} to construct an instance. */
   private TemplateRenderer(Renderer delegate) {
-    this.delegate = delegate.setExpectedContentKind(ContentKind.TEXT);
+    this.delegate = delegate;
   }
 
   /** Sets data to call the template with. */
@@ -157,6 +156,6 @@ public final class TemplateRenderer {
 
   /** Renders the template. */
   public String render() {
-    return delegate.renderStrict().get().coerceToString();
+    return delegate.renderText().get();
   }
 }
