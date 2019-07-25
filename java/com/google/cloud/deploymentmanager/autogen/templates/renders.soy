@@ -336,8 +336,8 @@ sourceTags:
 {if $startupSpec?.bashScriptContent and $waiterSpec?.script}
 - key: startup-script
   value: |-
-         #!/bin/bash
-         {$startupSpec.bashScriptContent}
+    #!/bin/bash
+    {$startupSpec.bashScriptContent |indent: 4, false}
 {/if}
 
 {/if} // $statusWaiterEnabled

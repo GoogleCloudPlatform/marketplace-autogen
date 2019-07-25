@@ -73,6 +73,12 @@ resources:
           - key: optional-password
             value: {{ properties["generatedPassword2"] }}
           {% endif %}
+          - key: startup-script
+            value: |-
+              #!/bin/bash
+              cd /tmp
+              echo STARTED >> /tmp/startup_log
+              cd -
           {% if enableStatusWaiter %}
           - key: status-config-url
             value: $(ref.software-status.config-url)
