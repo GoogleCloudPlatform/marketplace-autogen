@@ -240,7 +240,7 @@ spec {
         }
       }
       gce_startup_script {
-        bash_script_content: "echo STARTED >> /opt/startup_log"
+        bash_script_content: "cd /tmp\necho STARTED >> /tmp/startup_log\ncd -"
       }
       local_ssds {
         count_from_deploy_input_field: "tier2LocalSSDs"
@@ -360,6 +360,9 @@ spec {
         disk_type {
           default_type: "pd-standard"
         }
+      }
+      gce_startup_script {
+        bash_script_content: "cd /tmp\necho STARTED >> /tmp/startup_log\ncd -"
       }
       application_status {
         type: WAITER
