@@ -144,19 +144,11 @@ outputs:
   {call renders.networkPropertiesSchema}
     {param nameSuffix: 'network'/}
     {param zonePropertyName: 'zone'/}
+    {param spec: $spec.networkInterfaces/}
     {param tier: $spec/}
   {/call}
 {/let}
 {$networkProps}{nil}
-
-{let $externalIpProp kind="text"}
-  {call renders.externalIpPropertySchema}
-    {param name: 'externalIP'/}
-    {param spec: $spec.externalIp/}
-    {param tier: $spec/}
-  {/call}
-{/let}
-{$externalIpProp}{nil}
 
 {if $spec.ipForwarding}
 {let $ipForwardingProp kind="text"}

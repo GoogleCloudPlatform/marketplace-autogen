@@ -1,0 +1,7 @@
+{
+  "defaultDeploymentType": "MULTI_VM",
+  "imageName": "jenkins-v20180130",
+  "projectId": "click-to-deploy-images",
+  "templateName": "nonexistent_template",
+  "useSolutionPackage": true
+}

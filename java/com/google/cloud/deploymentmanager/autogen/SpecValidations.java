@@ -42,6 +42,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.ImageSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.InstanceUrlSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.NetworkInterfacesSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo.ConnectToInstanceSpec;
@@ -89,6 +90,8 @@ final class SpecValidations {
           "nvidia-tesla-p4-vws",
           "nvidia-tesla-t4");
 
+  private static final int MAX_NICS = 8;
+
   /**
    * Validates that a spec is complete and reasonable.
    *
@@ -99,7 +102,7 @@ final class SpecValidations {
     validateBootDisk(input.getBootDisk());
     validateAdditionalDisks(input.getAdditionalDisksList());
     validateMachineType(input.getMachineType());
-    validateExternalIp(input.getExternalIp());
+    validateNetworkInterfaces(input.getNetworkInterfaces());
     validateSingleVmFirewallRules(input.getFirewallRulesList());
     validateSingleVmPasswords(input.getPasswordsList());
     if (input.hasAdminUrl()) {
@@ -145,7 +148,7 @@ final class SpecValidations {
       validateBootDisk(tier.getBootDisk());
       validateAdditionalDisks(tier.getAdditionalDisksList());
       validateMachineType(tier.getMachineType());
-      validateExternalIp(tier.getExternalIp());
+      validateNetworkInterfaces(tier.getNetworkInterfaces());
       validateMultiVmFirewallRules(tier.getFirewallRulesList());
       validateGcpAuthScopes(tier.getGcpAuthScopesList());
       if (tier.hasGceStartupScript()) {
@@ -318,6 +321,18 @@ final class SpecValidations {
       checkArgument(machineType.getMinimum().getCpu() >= 0, "Minimum CPUs must be nonnegative");
       checkArgument(machineType.getMinimum().getRamGb() >= 0, "Minimum RAM must be nonnegative");
     }
+  }
+
+  private static void validateNetworkInterfaces(NetworkInterfacesSpec spec) {
+    int min = spec.getMinCount();
+    int max = spec.getMaxCount();
+    checkArgument(min > 0, "Minimum number of Network interfaces must be greater than 0.");
+    checkArgument(
+        max >= min && max <= MAX_NICS,
+        String.format(
+            "Maxmium number of Network interfaces must be greater than minimum and at most %d.",
+            MAX_NICS));
+    validateExternalIp(spec.getExternalIp());
   }
 
   @VisibleForTesting

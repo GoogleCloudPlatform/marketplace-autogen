@@ -21,6 +21,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
+import java.io.File;
 import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +47,7 @@ public class VerifySolutionFileSetTest {
     final ImmutableSet<String> expectedFiles =
         FluentIterable.from(Files.fileTraverser().depthFirstPreOrder(solution.goldenFolder))
             .filter(Files.isFile())
-            .transform(AutogenMediumTestsSuite.relativePathFunction(solution.goldenFolder))
+            .transform(relativePathFunction(solution.goldenFolder))
             .toSet();
 
     final ImmutableSet<String> actualFilePaths =
@@ -60,5 +61,14 @@ public class VerifySolutionFileSetTest {
                 })
             .toSet();
     assertThat(actualFilePaths).containsExactlyElementsIn(expectedFiles);
+  }
+
+  static Function<File, String> relativePathFunction(final File parent) {
+    return new Function<File, String>() {
+      @Override
+      public String apply(File f) {
+        return AutogenMediumTestsSuite.relativePathFunction(parent, f);
+      }
+    };
   }
 }

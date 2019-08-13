@@ -117,9 +117,11 @@ spec {
         }
       }
     }
-    external_ip {
-      default_type: EPHEMERAL
-      not_configurable: true
+    network_interfaces {
+      external_ip {
+        default_type: EPHEMERAL
+        not_configurable: true
+      }
     }
     post_deploy {
       connect_button_label: "Fancy SSH label"
