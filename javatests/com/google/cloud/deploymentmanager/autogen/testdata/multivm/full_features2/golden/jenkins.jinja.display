@@ -1,0 +1,523 @@
+description:
+  author:
+    title: Google Click to Deploy
+    descriptionHtml: Popular open stacks on Google Compute Engine packaged by Google.
+    shortDescription: Popular open stacks on Google Compute Engine packaged by Google.
+    url: https://cloud.google.com/solutions/#click-to-deploy
+  descriptionHtml: Jenkins is an open-source continuous integration software tool that provides real-time feedback for isolated changes that are part of a larger project. It supports multiple SCM tools including CVS, Subversion and Git. It can execute Apache Ant and Apache Maven-based projects as well as arbitrary scripts.
+  logo: '@media/jenkins_store.png'
+  tagline: A continuous integration and delivery tool
+  title: Jenkins
+  url: https://jenkins.io/
+  version: 2.46.3
+  eulaUrl: https://jenkins.io/license/
+  softwareGroups:
+  - type: SOFTWARE_GROUP_OS
+    software:
+    - title: Debian
+      version: '9'
+  - software:
+    - title: Apache
+      version: 2.4.10
+    - title: Jenkins
+      version: 2.46.3
+    - title: OpenJDK
+      version: 1.8.0
+  documentations:
+  - title: Jenkins Documentation
+    url: https://jenkins.io/doc/book/getting-started/
+    destinations:
+    - DESTINATION_SOLUTION_DETAILS
+    - DESTINATION_POST_DEPLOY
+  support:
+  - title: Support
+    descriptionHtml: Google does not offer support for this solution. However, community support is available on <a href="http://stackoverflow.com/questions/tagged/jenkins">Stack Overflow</a> . Additional support is available on <a href="https://wiki.jenkins-ci.org/display/JENKINS/Asking+for+Help">community forums</a>.
+
+input:
+  properties:
+    - name: zone
+      title: Zone
+      subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+    - name: main_instanceCount
+      title: Instance Count
+      tooltip: Specify a value between 1 and 10.
+      subtext: A custom description for instance count.
+      section: MAIN_TIER
+    - name: main_image
+      title: Image version
+      section: MAIN_TIER
+      enumLabels:
+        '0': 'jenkins-v20180130'
+        '1': 'jenkins-v20180123'
+    - name: main_machineType
+      title: Machine type
+      section: MAIN_TIER
+    - name: main_bootDiskType
+      title: Boot disk type
+      section: MAIN_TIER
+    - name: main_bootDiskSizeGb
+      title: Boot disk size in GB
+      section: MAIN_TIER
+    - name: main_disk1_type
+      title: Very-extra disk type
+      section: MAIN_TIER
+    - name: main_disk1_sizeGb
+      title: Very-extra disk size in GB
+      section: MAIN_TIER
+    - name: main_disk2_type
+      title: Extra disk type
+      section: MAIN_TIER
+    - name: main_disk2_sizeGb
+      title: Extra disk size in GB
+      section: MAIN_TIER
+    - name: main_disk3_type
+      title: Super Extra disk type
+      section: MAIN_TIER
+    - name: main_disk3_sizeGb
+      title: Super Extra disk size in GB
+      section: MAIN_TIER
+    - name: main_network
+      title: Network name
+      section: MAIN_TIER
+    - name: main_subnetwork
+      title: Subnetwork name
+      section: MAIN_TIER
+    - name: main_externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: MAIN_TIER
+    - name: main_enableTcp80
+      title: Allow HTTP traffic from the Internet
+      section: MAIN_TIER
+    - name: main_tcp80SourceRanges
+      title: Source IP ranges for HTTP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: MAIN_TIER
+    - name: main_enableTcp443
+      title: Allow HTTPS traffic from the Internet
+      section: MAIN_TIER
+    - name: main_tcp443SourceRanges
+      title: Source IP ranges for HTTPS traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: MAIN_TIER
+    - name: main_enableIcmp
+      title: Allow ICMP traffic from other VMs in this deployment
+      section: MAIN_TIER
+    - name: main_enableTcp7000-7001
+      title: Allow TCP port 7000-7001 traffic between VMs in this group
+      section: MAIN_TIER
+    - name: main_enableUdp
+      title: Allow UDP traffic from the Internet
+      section: MAIN_TIER
+    - name: main_udpSourceRanges
+      title: Source IP ranges for UDP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: MAIN_TIER
+    - name: main_enableCloudReadonlyApi
+      title: Allow read only access to all of Google Cloud Platform APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_CLOUD_PLATFORM_READONLY_API_ACCESS
+    - name: main_enableCloudApi
+      title: Allow full access to all of Google Cloud Platform APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_CLOUD_PLATFORM_API_ACCESS
+    - name: main_enableComputeReadonlyApi
+      title: Allow read access to Google Compute Engine APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_COMPUTE_READONLY_API_ACCESS
+    - name: main_enableComputeApi
+      title: Allow read write access to Google Compute Engine APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_COMPUTE_API_ACCESS
+    - name: main_enableSourceReadWriteApi
+      title: Allow read write access to Google Cloud Source Repositories APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_SOURCE_READ_WRITE_API_ACCESS
+    - name: main_enableProjecthostingApi
+      title: Allow project hosting access to (Deprecated) Google Code Project Hosting APIs on the VM
+      section: MAIN_TIER
+      boolean_group: MAIN_TIER_PROJECT_HOSTING_API_ACCESS
+    - name: tier2_instanceCount
+      title: Instance Count
+      section: TIER2_TIER
+    - name: tier2_machineType
+      title: Machine type
+      section: TIER2_TIER
+    - name: tier2_acceleratorType
+      title: GPUs
+      section: TIER2_TIER
+    - name: tier2_bootDiskType
+      title: Boot disk type
+      section: TIER2_TIER
+    - name: tier2_bootDiskSizeGb
+      title: Boot disk size in GB
+      section: TIER2_TIER
+    - name: tier2_network
+      title: Network name
+      section: TIER2_TIER
+    - name: tier2_subnetwork
+      title: Subnetwork name
+      section: TIER2_TIER
+    - name: tier2_externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: TIER2_TIER
+    - name: tier2_enableTcp9878
+      title: Allow TCP port 9878 traffic between VMs in this group
+      section: TIER2_TIER
+    - name: tier2_enableUdp2555
+      title: Allow UDP port 2555 traffic from other VMs in this deployment
+      section: TIER2_TIER
+    - name: tier3_instanceCount
+      title: Instance Count
+      tooltip: Specify a value between 1 and 10.
+      section: TIER3_TIER
+    - name: tier3_machineType
+      title: Machine type
+      section: TIER3_TIER
+    - name: tier3_acceleratorType
+      title: GPUs
+      section: TIER3_TIER
+    - name: tier3_bootDiskType
+      title: Boot disk type
+      section: TIER3_TIER
+    - name: tier3_bootDiskSizeGb
+      title: Boot disk size in GB
+      section: TIER3_TIER
+    - name: tier3_network
+      title: Network name
+      section: TIER3_TIER
+    - name: tier3_subnetwork
+      title: Subnetwork name
+      section: TIER3_TIER
+    - name: tier3_externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: TIER3_TIER
+    - name: tier3_enableTcp9000
+      title: Allow TCP port 9000 traffic between VMs in this group
+      section: TIER3_TIER
+    - name: tier3_enableUdp2333
+      title: Allow UDP port 2333 traffic from other VMs in this deployment
+      section: TIER3_TIER
+    - name: input_domain
+      title: Domain
+      subtext: Your domain
+      validation: A valid domain has to be entered
+      placeholder: mydomain.com
+    - name: input_adminEmailAddress
+      title: Administrator e-mail address
+      tooltip: The e-mail address used to create the administrator account for WordPress.
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_optionalEmailAddress
+      title: Optional e-mail address
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_showConditionals
+      title: Show conditional values
+    - name: input_generateOptionalPassword
+      title: Generate optional password
+    - name: input_tier2LocalSSDs
+      title: Tier 2 - local SSDs
+    - name: input_superExtraDiskName
+      title: Super-extra disk name
+    - name: input_imageCaching
+      title: Image caching
+      level: 1
+      section: MAIN_TIER
+      enumLabels:
+        'redis': Cached with redis
+        'memcached': Cached with memcached
+        'none': Not cached
+    - name: input_imageCompression
+      title: Enable compression
+      level: 1
+      section: MAIN_TIER
+      boolean_group: IMAGE_CACHING_OPTIONS
+    - name: input_imageSizing
+      title: Dynamic sizing
+      level: 1
+      section: MAIN_TIER
+      boolean_group: IMAGE_CACHING_OPTIONS
+    - name: input_extraLbZone0
+      title: Zone
+      level: 1
+      section: LOAD_BALANCERS
+    - name: input_extraLbZone1
+      title: Zone
+      level: 1
+      section: LOAD_BALANCERS
+    - name: enableStackdriverLogging
+      title: Enable Stackdriver Logging
+      tooltip: 'Stackdriver Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+      section: STACKDRIVER
+    - name: enableStackdriverMonitoring
+      title: Enable Stackdriver Monitoring
+      tooltip: 'Stackdriver Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+      section: STACKDRIVER
+  sections:
+    - name: MAIN_TIER
+      title: Main Tier
+    - name: TIER2_TIER
+      title: Secondary Tier
+    - name: TIER3_TIER
+      title: Third Tier
+    - name: LOAD_BALANCERS
+      title: Additional zones for load balancers
+    - name: STACKDRIVER
+      title: Stackdriver
+      subtext: Monitoring and management for services, containers, applications, and infrastructure
+  boolean_groups:
+    - name: MAIN_TIER_CLOUD_PLATFORM_READONLY_API_ACCESS
+      title: Google Cloud Platform Readonly API
+    - name: MAIN_TIER_CLOUD_PLATFORM_API_ACCESS
+      title: Google Cloud Platform API
+    - name: MAIN_TIER_COMPUTE_READONLY_API_ACCESS
+      title: Compute Readonly API
+    - name: MAIN_TIER_COMPUTE_API_ACCESS
+      title: Compute API
+    - name: MAIN_TIER_SOURCE_READ_WRITE_API_ACCESS
+      title: Cloud Source Repositories Readwrite API
+    - name: MAIN_TIER_PROJECT_HOSTING_API_ACCESS
+      title: (Deprecated) Code Project Hosting APIs
+    - name: IMAGE_CACHING_OPTIONS
+      title: Image caching options
+      tooltip: <a href='http://wordpress.com/help'>Learn more</a>
+      subtext: Advanced image caching options. Don't touch unless you know.
+
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      - label: Site address
+        value: <a href="http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/">http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/</a>
+        showIf: '{{ outputs().main_hasExternalIP }}'
+      - label: Site address (internal IP)
+        value: http://{{ outputs()["main_vmInternalIP" + 0] }}/
+        showIf: '{{ !outputs().main_hasExternalIP }}'
+      - label: Admin URL
+        value: <a href="http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/">http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/</a>
+        showIf: '{{ outputs().tier2_hasExternalIP }}'
+      - label: Admin URL (internal IP)
+        value: http://{{ outputs()["tier2_vmInternalIP" + 0] }}/
+        showIf: '{{ !outputs().tier2_hasExternalIP }}'
+      - label: Admin user
+        value: '{{ properties().input_domain }}'
+      - label: Admin password (Temporary)
+        value: '{{ outputs().password0 }}'
+      - label: Ghost MySQL user
+        value: ghost
+      - label: Ghost MySQL password (Temporary)
+        value: '{{ outputs().password1 }}'
+      - label: This is optional user
+        value: some-user
+        showIf: '{{ properties().input_generateOptionalPassword }}'
+      - label: This is optional password (Temporary)
+        value: '{{ outputs().password2 }}'
+        showIf: '{{ properties().input_generateOptionalPassword }}'
+      - label: Zone
+        value: '{{ properties().zone }}'
+      - label: Conditional Row
+        value: This row is presented conditionally. Unselect the checkbox to hide it.
+        showIf: '{{ properties().input_showConditionals }}'
+      - label: Conditional Row - negation
+        value: This row is presented conditionally. Select the checkbox to hide it.
+        showIf: '{{ !properties().input_showConditionals }}'
+      - label: Value from boolean deploy input field
+        value: '{{ properties().input_showConditionals }}'
+      - label: External IP row
+        value: Some value
+        showIf: '{{ properties().tier2_externalIP != "NONE" }}'
+      - label: Internal IP row
+        value: Some value
+        showIf: '{{ properties().tier2_externalIP == "NONE" }}'
+  primaryButton:
+    label: Log into the admin panel
+    type: TYPE_URL
+    action: http://{{ externalIp(outputs()["tier2_vmSelfLink" + 0]) }}/
+  secondaryButton:
+    label: Visit the site
+    type: TYPE_URL
+    action: http://{{ externalIp(outputs()["main_vmSelfLink" + 0]) }}/
+  suggestedActions:
+    - heading: No external IP configured on any tier
+      description: 'All VM instances have been configured with no external IP or internet access. Connecting to them directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access these VMs.'
+      showIf: "{{ outputs().tiersWithNoExternalIPStatus == 'ALL' }}"
+    - heading: No external IP configured on some tiers
+      description: 'Some VM instances have been configured with no external IP or internet access. Connecting to them directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access these VMs.'
+      showIf: "{{ outputs().tiersWithNoExternalIPStatus == 'SOME' }}"
+    - heading: Conditional step
+      description: This step is displayed conditionally. Unselect the checkbox to hide it.
+      snippet: e^(i * pi) + 1 = 0
+      showIf: '{{ properties().input_showConditionals }}'
+    - heading: Conditional step - negation
+      description: This step is displayed conditionally. Select the checkbox to hide it.
+      snippet: a^2 + b^2 = c^2
+      showIf: '{{ !properties().input_showConditionals }}'
+    - heading: External IP action
+      description: Some action
+      showIf: '{{ properties().main_externalIP != "NONE" }}'
+    - heading: Internal IP action
+      description: Some action
+      showIf: '{{ properties().main_externalIP == "NONE" }}'
+    - heading: Open HTTP traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTP traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-main-tcp-80"
+        --network {{ outputs().main_mainNetwork }}
+        --allow tcp:80
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableTcp80 }}'
+    - heading: Open HTTPS traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTPS traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-main-tcp-443"
+        --network {{ outputs().main_mainNetwork }}
+        --allow tcp:443
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableTcp443 }}'
+    - heading: Open ICMP traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open ICMP traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-icmp"
+        --network {{ outputs().main_mainNetwork }}
+        --allow icmp
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableIcmp }}'
+    - heading: Open TCP port 7000-7001 traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 7000-7001 traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-main-tcp-7000-7001"
+        --network {{ outputs().main_mainNetwork }}
+        --allow tcp:7000-7001
+        --source-tags "{{ outputs().deployment }}-main-tier"
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableTcp7000-7001 }}'
+    - heading: Open UDP traffic for Main Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open UDP traffic
+        for target tag "{{ outputs().deployment }}-main-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-main-udp"
+        --network {{ outputs().main_mainNetwork }}
+        --allow udp
+        --target-tags "{{ outputs().deployment }}-main-tier"
+      showIf: '{{ !properties().main_enableUdp }}'
+    - heading: Open TCP port 9878 traffic for Secondary Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 9878 traffic
+        for target tag "{{ outputs().deployment }}-tier2-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier2-tcp-9878"
+        --network {{ outputs().tier2_mainNetwork }}
+        --allow tcp:9878
+        --source-tags "{{ outputs().deployment }}-tier2-tier"
+        --target-tags "{{ outputs().deployment }}-tier2-tier"
+      showIf: '{{ !properties().tier2_enableTcp9878 }}'
+    - heading: Open UDP port 2555 traffic for Secondary Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open UDP port 2555 traffic
+        for target tag "{{ outputs().deployment }}-tier2-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier2-udp-2555"
+        --network {{ outputs().tier2_mainNetwork }}
+        --allow udp:2555
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-tier2-tier"
+      showIf: '{{ !properties().tier2_enableUdp2555 }}'
+    - heading: Open TCP port 9000 traffic for Third Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic between VMs in this group,
+        create a firewall rule to open TCP port 9000 traffic
+        for target tag "{{ outputs().deployment }}-tier3-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier3-tcp-9000"
+        --network {{ outputs().tier3_mainNetwork }}
+        --allow tcp:9000
+        --source-tags "{{ outputs().deployment }}-tier3-tier"
+        --target-tags "{{ outputs().deployment }}-tier3-tier"
+      showIf: '{{ !properties().tier3_enableTcp9000 }}'
+    - heading: Open UDP port 2333 traffic for Third Tier
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from other VMs in this deployment,
+        create a firewall rule to open UDP port 2333 traffic
+        for target tag "{{ outputs().deployment }}-tier3-tier".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tier3-udp-2333"
+        --network {{ outputs().tier3_mainNetwork }}
+        --allow udp:2333
+        --source-tags "{{ outputs().deployment }}-deployment"
+        --target-tags "{{ outputs().deployment }}-tier3-tier"
+      showIf: '{{ !properties().tier3_enableUdp2333 }}'
+    - heading: Change the temporary passwords
+      description: For additional security, it is recommended that you change the passwords.
+
+annotations:
+  autogenSpecType: 'MULTI_VM'
+
+metadata_version: v1

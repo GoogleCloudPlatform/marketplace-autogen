@@ -1,0 +1,366 @@
+description:
+  author:
+    title: Bitnami
+    descriptionHtml: Bitnami is a library of popular server applications and development environments that can be installed in a single click, either on your laptop, in a virtual machine, or hosted in the cloud. With over a million deployments each month, Bitnami.com has become a leading source of many of today's most popular applications. Bitnami-packaged apps provide a consistent, secure and up-to-date, optimized end user experience on any platform. We take care of compiling and configuring the application and all of its dependencies (third party libraries, language run times, databases) so it works out of the box. The company is also the largest source of applications for the leading cloud marketplaces. Bitnami is headquartered in San Francisco, CA and has a major development center in Seville, Spain. For more information, visit www.bitnami.com, or follow us on Twitter (@bitnami) and Facebook
+    shortDescription: Bitnami provides a catalog of over 120 curated server applications and development environments that can be installed with one click, either locally, in a VM, or in the cloud.  Bitnami apps work out of the box, with no dependency or compiling worries, and regularly updated images.
+    url: http://bitnami.com
+  descriptionHtml: WordPress is one of the world's most popular web publishing platforms for building blogs and websites. It can be customized via a wide selection of themes, extensions and plug-ins.
+  logo: '@media/wordpress_store.png'
+  tagline: The most popular and ready-to-go CMS
+  title: 'WordPress: Apache & PHP'
+  url: https://bitnami.com/stack/wordpress
+  version: 4.5.3-1
+  eulaUrl: https://bitnami.com/agreement
+  softwareGroups:
+  - type: SOFTWARE_GROUP_OS
+    software:
+    - title: Debian
+      version: '8'
+  - software:
+    - title: Apache
+      version: 2.4.23
+    - title: MySQL
+      version: 5.7.13
+    - title: OpenSSL
+      version: 1.0.2h
+    - title: PHP
+      version: 7.0.9
+    - title: phpMyAdmin
+      version: 4.6.3
+    - title: SQLite
+      version: 3.7.15.1
+    - title: Varnish
+      version: 4.1.0
+    - title: WordPress
+      version: 4.5.3
+  documentations:
+  - title: Getting Started
+    url: https://docs.bitnami.com/google/apps/wordpress
+    description: Get started with Bitnami WordPress Stack.
+    destinations:
+    - DESTINATION_POST_DEPLOY
+  support:
+  - title: Support
+    descriptionHtml: Bitnami provides technical support for installation and setup issues through <a href="https://bitnami.com/support/google">our support center</a>.
+    url: https://bitnami.com/support/google
+
+input:
+  properties:
+    - name: image
+      title: Image version
+      enumLabels:
+        '0': 'Wordpress 4.5'
+        '1': 'Wordpress 4.6'
+        '2': 'wordpress-453-1607261609-debian-8-jessie-v20160718'
+    - name: zone
+      title: Zone
+      subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+    - name: machineType
+      title: Machine type
+    - name: acceleratorType
+      title: GPUs
+    - name: bootDiskType
+      title: Boot disk type
+      section: BOOT_DISK
+    - name: bootDiskSizeGb
+      title: Boot disk size in GB
+      section: BOOT_DISK
+    - name: disk1_type
+      title: The super-extra-great disk type
+      section: ADDITIONAL_DISKS
+    - name: disk1_sizeGb
+      title: The super-extra-great disk size in GB
+      section: ADDITIONAL_DISKS
+    - name: disk2_type
+      title: The less great disk type
+      section: ADDITIONAL_DISKS
+    - name: disk2_sizeGb
+      title: The less great disk size in GB
+      section: ADDITIONAL_DISKS
+    - name: disk3_type
+      title: The third disk type
+      section: ADDITIONAL_DISKS
+    - name: disk3_sizeGb
+      title: The third disk size in GB
+      section: ADDITIONAL_DISKS
+    - name: network
+      title: Network name
+      section: NETWORKING
+    - name: subnetwork
+      title: Subnetwork name
+      section: NETWORKING
+    - name: externalIP
+      title: External IP
+      tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+      section: NETWORKING
+    - name: enableTcp80
+      title: Allow HTTP traffic from the Internet
+      section: NETWORKING
+    - name: tcp80SourceRanges
+      title: Source IP ranges for HTTP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+    - name: enableTcp443
+      title: Allow HTTPS traffic from the Internet
+      section: NETWORKING
+    - name: tcp443SourceRanges
+      title: Source IP ranges for HTTPS traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+    - name: enableIcmp
+      title: Allow ICMP traffic from the Internet
+      section: NETWORKING
+    - name: icmpSourceRanges
+      title: Source IP ranges for ICMP traffic
+      tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+      placeholder: '0.0.0.0/0, 192.169.0.2/24'
+      section: NETWORKING
+    - name: input_domain
+      title: Domain
+      subtext: Your Wordpress blog domain
+      tooltip: Register your own domain with <a href='http://domains.google'>Google</a>
+      validation: A valid domain has to be entered
+      placeholder: mydomain.com
+    - name: input_adminEmailAddress
+      title: Administrator e-mail address
+      tooltip: The e-mail address used to create the administrator account for WordPress.
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_optionalEmailAddress
+      title: Optional e-mail address
+      validation: Please enter a valid email address
+      placeholder: user@example.com
+    - name: input_showConditionalRowAndAction
+      title: Show conditional row
+    - name: input_generateOptionalPassword
+      title: Generate optional password
+    - name: input_installPhpMyAdmin
+      title: Install phpMyAdmin
+      section: PHPMYADMIN
+    - name: input_imageCaching
+      title: Image caching
+      level: 1
+      section: CONTENT_SETTINGS
+      enumLabels:
+        'none': Not cached
+        'redis': Cached with redis
+        'memcached': Cached with memcached
+    - name: input_imageCompression
+      title: Enable compression
+      level: 1
+      section: CONTENT_SETTINGS
+      boolean_group: IMAGE_CACHING_OPTIONS
+    - name: input_imageSizing
+      title: Dynamic sizing
+      level: 1
+      section: CONTENT_SETTINGS
+      boolean_group: IMAGE_CACHING_OPTIONS
+    - name: input_imageCacheSize
+      title: Image cache size
+      validation: Enter a number between 100 and 99999
+      level: 1
+      section: CONTENT_SETTINGS
+    - name: input_cacheExpiration
+      title: Cache expiration
+      level: 1
+      section: CONTENT_SETTINGS
+      enumLabels:
+        '60': 1 hour
+        '120': 2 hours
+        '240': 4 hours
+        '480': 8 hours
+    - name: input_thirdDiskName
+      title: The third disk's device name
+      section: CONTENT_SETTINGS
+    - name: input_extraLbZone0
+      title: Zone
+      level: 1
+      section: LOAD_BALANCERS
+    - name: input_extraLbZone1
+      title: Zone
+      level: 1
+      section: LOAD_BALANCERS
+    - name: enableStackdriverLogging
+      title: Enable Stackdriver Logging
+      tooltip: 'Stackdriver Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+      section: STACKDRIVER
+    - name: enableStackdriverMonitoring
+      title: Enable Stackdriver Monitoring
+      tooltip: 'Stackdriver Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+      section: STACKDRIVER
+  sections:
+    - name: PHPMYADMIN
+      title: phpMyAdmin
+      tooltip: phpMyAdmin makes administer your Wordpress installation much easier.
+    - name: BOOT_DISK
+      title: Boot Disk
+      tooltip: Each instance requires a disk to boot from.
+    - name: ADDITIONAL_DISKS
+      title: Additional Disks
+      tooltip: The additional disks will be attached to the instance.
+    - name: NETWORKING
+      title: Networking
+    - name: CONTENT_SETTINGS
+      title: Advanced content settings
+      subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
+    - name: LOAD_BALANCERS
+      title: Additional zones for load balancers
+    - name: STACKDRIVER
+      title: Stackdriver
+      subtext: Monitoring and management for services, containers, applications, and infrastructure
+  boolean_groups:
+    - name: IMAGE_CACHING_OPTIONS
+      title: Image caching options
+      tooltip: <a href='http://wordpress.com/help'>Learn more</a>
+      subtext: Advanced image caching options. Don't touch unless you know.
+
+runtime:
+  deployingMessage: Deployment can take several minutes to complete.
+  applicationTable:
+    rows:
+      - label: Site address
+        value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/">http://{{ externalIp(outputs().vmSelfLink) }}/</a>
+        showIf: '{{ outputs().hasExternalIP }}'
+      - label: Site address (internal IP)
+        value: http://{{ outputs().vmInternalIP }}/
+        showIf: '{{ !outputs().hasExternalIP }}'
+      - label: Admin URL
+        value: <a href="http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/">http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/</a>
+        showIf: '{{ outputs().hasExternalIP }}'
+      - label: Admin URL (internal IP)
+        value: http://{{ outputs().vmInternalIP }}/wp-admin/
+        showIf: '{{ !outputs().hasExternalIP }}'
+      - label: Admin user
+        value: '{{ properties().input_domain }}'
+      - label: Admin password (Temporary)
+        value: '{{ outputs().password0 }}'
+      - label: MySQL root user
+        value: root
+      - label: MySQL root password (Temporary)
+        value: '{{ outputs().password1 }}'
+      - label: This is optional user
+        value: root2
+        showIf: '{{ properties().input_generateOptionalPassword }}'
+      - label: This is optional password (Temporary)
+        value: '{{ outputs().password2 }}'
+        showIf: '{{ properties().input_generateOptionalPassword }}'
+      - label: Instance
+        value: '<a href="{{ consoleUrl(outputs().vmSelfLink) }}">{{ outputs().vmName }}</a>'
+      - label: Instance zone
+        value: '{{ properties().zone }}'
+      - label: Instance machine type
+        value: '{{ properties().machineType }}'
+      - label: PHP Admin user
+        value: admin
+      - label: PHP Admin password
+        value: (Same as MySQL root)
+      - label: Custom conditional field
+        value: Some trivial value
+        showIf: '{{ properties().input_showConditionalRowAndAction }}'
+      - label: Custom conditional field - displayed on negation
+        value: Some other trivial value
+        showIf: '{{ !properties().input_showConditionalRowAndAction }}'
+      - label: Row with deploy input field value
+        value: '{{ properties().input_domain }}'
+      - label: External IP row
+        value: Some value
+        showIf: '{{ properties().externalIP != "NONE" }}'
+      - label: Internal IP row
+        value: Some value
+        showIf: '{{ properties().externalIP == "NONE" }}'
+  primaryButton:
+    label: Log into the admin panel
+    type: TYPE_URL
+    action: http://{{ externalIp(outputs().vmSelfLink) }}/wp-admin/
+  secondaryButton:
+    label: The best SSH connection ever
+    type: TYPE_GCE_VM_SSH
+    action: '{{ outputs().vmSelfLink }}'
+  suggestedActions:
+    - heading: No external IP configured
+      description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
+      showIf: '{{ !outputs().hasExternalIP }}'
+    - heading: Log on now
+      description: Use the Admin URL above. <a href='http://wordpress.com'>Learn more</a>
+    - heading: Change your password
+      description: |
+        First, SSH into your VM.
+        Second, run the following command
+      snippet: |-
+        $ which wordpress-admin
+        $ wordpress-admin change-password
+    - heading: Custom conditional action item
+      description: This action is displayed only when the checkbox for displaying conditional row and action was selected
+      showIf: '{{ properties().input_showConditionalRowAndAction }}'
+    - heading: Custom conditional action item - displayed on negation
+      description: This action is displayed only when the checkbox for displaying conditional row and action wasn't selected
+      showIf: '{{ !properties().input_showConditionalRowAndAction }}'
+    - heading: External IP action
+      description: Some action
+      showIf: '{{ properties().externalIP != "NONE" }}'
+    - heading: Internal IP action
+      description: Some action
+      showIf: '{{ properties().externalIP == "NONE" }}'
+    - heading: Open HTTP traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTP traffic
+        for target tag "{{ outputs().deployment }}-deployment".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tcp-80"
+        --network {{ outputs().mainNetwork }}
+        --allow tcp:80
+        --target-tags "{{ outputs().deployment }}-deployment"
+      showIf: '{{ !properties().enableTcp80 }}'
+    - heading: Open HTTPS traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open HTTPS traffic
+        for target tag "{{ outputs().deployment }}-deployment".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-tcp-443"
+        --network {{ outputs().mainNetwork }}
+        --allow tcp:443
+        --target-tags "{{ outputs().deployment }}-deployment"
+      showIf: '{{ !properties().enableTcp443 }}'
+    - heading: Open ICMP traffic
+      description: >-
+        This firewall rule is not enabled.
+        To allow specific network traffic from the Internet,
+        create a firewall rule to open ICMP traffic
+        for target tag "{{ outputs().deployment }}-deployment".
+        <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
+        If you are using Google Cloud SDK, type the following command in
+        the terminal:
+      snippet: >-
+        gcloud --project={{ outputs().project }} compute firewall-rules
+        create "{{ outputs().deployment }}-icmp"
+        --network {{ outputs().mainNetwork }}
+        --allow icmp
+        --target-tags "{{ outputs().deployment }}-deployment"
+      showIf: '{{ !properties().enableIcmp }}'
+    - heading: Change the temporary passwords
+      description: For additional security, it is recommended that you change the passwords.
+    - heading: Assign a static external IP address to your VM instance
+      description: 'An ephemeral external IP address has been assigned to the VM instance. If you require a static external IP address, you may promote the address to static. <a href="https://cloud.google.com/compute/docs/instances-and-network#promote_ephemeral_ip">Learn more</a>'
+      showIf: '{{ outputs().hasExternalIP }}'
+
+annotations:
+  autogenSpecType: 'SINGLE_VM'
+  vmImage0: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
+  vmImage1: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64
+  vmImage2: https://www.googleapis.com/compute/v1/projects/click-to-deploy-images/global/images/wordpress-453-1607261609-debian-8-jessie-v20160718
+
+metadata_version: v1

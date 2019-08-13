@@ -1,0 +1,285 @@
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
+  - name: software_status_script.py
+    path: common/software_status_script.py
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+info:
+  version: '1.00'
+  title: 'WordPress: Apache & PHP Template'
+
+required:
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+  - input_domain
+  - input_adminEmailAddress
+  - input_imageCacheSize
+  - input_cacheExpiration
+  - input_thirdDiskName
+
+properties:
+  zone:
+    type: string
+    default: us-west1-b
+    x-googleProperty:
+      type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - '0'
+      - '1'
+      - '2'
+    default: '0'
+  machineType:
+    type: string
+    default: f1-micro
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minRamGb: 0.5
+  acceleratorType:
+    type: string
+    default: nvidia-tesla-k80
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: machineType
+        gpuType:
+          - nvidia-tesla-k80
+  acceleratorCount:
+    type: integer
+    default: 1
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: machineType
+  network:
+    type: array
+    default: [default]
+    minItems: 2
+    maxItems: 7
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+        machineTypeProperty: machineType
+  subnetwork:
+    type: array
+    minItems: 2
+    maxItems: 7
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  externalIP:
+    type: array
+    default: [EPHEMERAL]
+    minItems: 2
+    maxItems: 7
+    x-googleProperty:
+      type: GCE_EXTERNAL_IP
+      gceExternalIp:
+        networkProperty: network
+        notConfigurable: False
+  bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: bootDiskType
+  disk1_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  disk1_sizeGb:
+    type: integer
+    default: 1000
+    minimum: 20
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: disk1_type
+  disk2_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  disk2_sizeGb:
+    type: integer
+    default: 500
+    minimum: 15
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: disk2_type
+  disk3_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  disk3_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: disk3_type
+  enableTcp80:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  tcp80SourceRanges:
+    type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: enableTcp80
+  enableTcp443:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  tcp443SourceRanges:
+    type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: enableTcp443
+  enableIcmp:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  icmpSourceRanges:
+    type: string
+    x-googleProperty:
+      type: GCE_FIREWALL_RANGE
+      gceFirewallRange:
+        firewallProperty: enableIcmp
+  input_domain:
+    type: string
+    pattern: '[a-zA-Z0-9-]+.[a-z]{2,}'
+  input_adminEmailAddress:
+    type: string
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_optionalEmailAddress:
+    type: string
+    default: default_value@example.com
+    x-googleProperty:
+      type: EMAIL_ADDRESS
+  input_showConditionalRowAndAction:
+    type: boolean
+    default: True
+  input_generateOptionalPassword:
+    type: boolean
+    default: True
+  input_installPhpMyAdmin:
+    type: boolean
+    default: True
+  input_imageCaching:
+    type: string
+    default: none
+    enum:
+    - none
+    - redis
+    - memcached
+  input_imageCompression:
+    type: boolean
+    default: False
+  input_imageSizing:
+    type: boolean
+    default: True
+  input_imageCacheSize:
+    type: integer
+    default: 50000
+    minimum: 100
+    maximum: 99999
+  input_cacheExpiration:
+    type: integer
+    default: 120
+    enum:
+    - 60
+    - 120
+    - 240
+    - 480
+  input_thirdDiskName:
+    type: string
+    default: third-disk
+    pattern: '[A-Za-z][A-Za-z0-9\-_]+'
+  input_extraLbZone0:
+    type: string
+    default: us-west1-a
+    x-googleProperty:
+      type: GCE_ZONE
+  input_extraLbZone1:
+    type: string
+    x-googleProperty:
+      type: GCE_ZONE
+  enableStackdriverLogging:
+    type: boolean
+    default: True
+  enableStackdriverMonitoring:
+    type: boolean
+    default: False
+
+outputs:
+  deployment:
+    type: string
+  password0:
+    type: string
+  password1:
+    type: string
+  password2:
+    type: string
+  project:
+    type: string
+  vmId:
+    type: string
+  vmExternalIP:
+    type: string
+  vmInternalIP:
+    type: string
+  vmName:
+    type: string
+  vmSelfLink:
+    type: string

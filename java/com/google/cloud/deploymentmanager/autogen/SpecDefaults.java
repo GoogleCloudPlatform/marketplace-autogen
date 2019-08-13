@@ -29,6 +29,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec.MachineType;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpecOrBuilder;
+import com.google.cloud.deploymentmanager.autogen.proto.NetworkInterfacesSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo.ConnectToInstanceSpec;
@@ -77,7 +78,12 @@ final class SpecDefaults {
     setBootDiskDefaults(input.getBootDiskBuilder());
     setAdditionalDisksDefaults(input.getAdditionalDisksBuilderList());
     setPasswordDefaults(input.getPasswordsBuilderList());
-    setExternalIpDefaults(input.getExternalIpBuilder());
+
+    // We keep the external IP spec to be backwards compatible to old solutions. If present, we will
+    // set it as the default external IP spec of the NetworkInterfacesSpec
+    ExternalIpSpec deprecatedExternalIp = input.hasExternalIp() ? input.getExternalIp() : null;
+    setNetworkInterfacesDefault(input.getNetworkInterfacesBuilder(), deprecatedExternalIp);
+
     if (input.hasApplicationStatus()) {
       // Fill in defaults only when the application status is actually desired (i.e. set by user).
       // Note that .get*Builder() will blindly set the field, so we need the if.
@@ -97,7 +103,12 @@ final class SpecDefaults {
       setAceleratorsDefaults(tier.getAcceleratorsBuilderList());
       setBootDiskDefaults(tier.getBootDiskBuilder());
       setAdditionalDisksDefaults(tier.getAdditionalDisksBuilderList());
-      setExternalIpDefaults(tier.getExternalIpBuilder());
+
+      // We keep the external IP spec to be backwards compatible to old solutions. If present, we
+      // will set it as the default external IP spec of the NetworkInterfacesSpec
+      ExternalIpSpec deprecatedExternalIp = tier.hasExternalIp() ? tier.getExternalIp() : null;
+      setNetworkInterfacesDefault(tier.getNetworkInterfacesBuilder(), deprecatedExternalIp);
+
       if (tier.hasApplicationStatus()) {
         // Fill in defaults only when the application status is actually desired (i.e. set by user).
         // Note that .get*Builder() will blindly set the field, so we need the if.
@@ -159,6 +170,23 @@ final class SpecDefaults {
           input.getRange().getEndValue());
       input.setTooltip(tooltip);
     }
+  }
+
+  private static void setNetworkInterfacesDefault(
+      NetworkInterfacesSpec.Builder input, ExternalIpSpec deprecatedExternalIp) {
+    if (input.getMinCount() < 1) {
+      input.setMinCount(1);
+    }
+
+    if (input.getMaxCount() < 1) {
+      input.setMaxCount(input.getMinCount());
+    }
+
+    if (!input.hasExternalIp() && deprecatedExternalIp != null) {
+      input.setExternalIp(deprecatedExternalIp);
+    }
+
+    setExternalIpDefaults(input.getExternalIpBuilder());
   }
 
   private static void setMachineTypeDefaults(MachineTypeSpec.Builder input) {

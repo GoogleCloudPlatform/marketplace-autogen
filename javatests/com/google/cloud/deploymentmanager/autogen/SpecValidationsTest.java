@@ -59,6 +59,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec.MachineType;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec.MachineTypeConstraint;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.NetworkInterfacesSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo;
 import com.google.cloud.deploymentmanager.autogen.proto.PostDeployInfo.ConnectToInstanceSpec;
@@ -1530,6 +1531,98 @@ public class SpecValidationsTest {
     validateStackdriver(StackdriverSpec.getDefaultInstance());
   }
 
+  @Test
+  public void networkInterfacesMustHaveMinCountGreaterThan0_singleVm() {
+    expectIllegalArgumentException("Minimum number of Network interfaces must be greater than 0.");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(0);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveNegativeMinCount_singleVm() {
+    expectIllegalArgumentException("Minimum number of Network interfaces must be greater than 0.");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(-1);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveMaxCountLowerThanMinCount_singleVm() {
+    expectIllegalArgumentException(
+        "Maxmium number of Network interfaces must be greater than minimum and at most 8.");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(2).setMaxCount(1);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveMaxCountGreaterThan8_singleVm() {
+    expectIllegalArgumentException(
+        "Maxmium number of Network interfaces must be greater than minimum and at most 8.");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(2).setMaxCount(9);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesDoNotFailWithCorrectMinAndMaxCount_singleVm() {
+    validate(newSingleSpecWithDefaults().build());
+  }
+
+  @Test
+  public void networkInterfacesDoNotFailWithCorrectMinAndMaxCountEqual_singleVm() {
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(3).setMaxCount(3);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustHaveMinCountGreaterThan0_multiVm() {
+    expectIllegalArgumentException("Minimum number of Network interfaces must be greater than 0.");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(0);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveNegativeMinCount_multiVm() {
+    expectIllegalArgumentException("Minimum number of Network interfaces must be greater than 0.");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(-1);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveMaxCountLowerThanMinCount_multiVm() {
+    expectIllegalArgumentException(
+        "Maxmium number of Network interfaces must be greater than minimum and at most 8.");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(4).setMaxCount(1);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesMustNotHaveMaxCountGreaterThan8_multiVm() {
+    expectIllegalArgumentException(
+        "Maxmium number of Network interfaces must be greater than minimum and at most 8.");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(4).setMaxCount(10);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesDoNotFailWithCorrectMinAndMaxCount_multiVm() {
+    validate(newMultiSpecWithDefaults().build());
+  }
+
+  @Test
+  public void networkInterfacesDoNotFailWithCorrectMinAndMaxCountEqual_multiVm() {
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(1).setMaxCount(1);
+    validate(builder.build());
+  }
+
   private void expectIllegalArgumentException(String message) {
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage(message);
@@ -1547,7 +1640,11 @@ public class SpecValidationsTest {
 
   private SingleVmDeploymentPackageSpec.Builder newSingleSpecWithDefaults() {
     return newSingleSpec()
-        .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL).build())
+        .setNetworkInterfaces(
+            NetworkInterfacesSpec.newBuilder()
+                .setMinCount(2)
+                .setMaxCount(6)
+                .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL)))
         .setMachineType(
             MachineTypeSpec.newBuilder()
                 .setDefaultMachineType(MachineType.newBuilder().setGceMachineType("n1-standard-1")))
@@ -1568,13 +1665,19 @@ public class SpecValidationsTest {
     MultiVmDeploymentPackageSpec.Builder builder = MultiVmDeploymentPackageSpec.newBuilder();
     builder
         .addTiersBuilder()
-        .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL).build())
+        .setNetworkInterfaces(
+            NetworkInterfacesSpec.newBuilder()
+                .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL)))
         .setName("tier0")
         .setTitle("Tier 0")
         .addImages(ImageSpec.newBuilder().setProject("image-project").setName("image-name-0"));
     builder
         .addTiersBuilder()
-        .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.NONE).build())
+        .setNetworkInterfaces(
+            NetworkInterfacesSpec.newBuilder()
+                .setMinCount(2)
+                .setMaxCount(2)
+                .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.NONE)))
         .setName("tier1")
         .setTitle("Tier 1")
         .addImages(ImageSpec.newBuilder().setProject("image-project").setName("image-name-1"));
@@ -1599,7 +1702,11 @@ public class SpecValidationsTest {
                   .setDiskType(DiskType.newBuilder().setDefaultType("pd-ssd"))
                   .setDiskSize(DiskSize.newBuilder().setDefaultSizeGb(5))
                   .setDisplayLabel("Data Disk"))
-          .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL).build());
+          .setNetworkInterfaces(
+              NetworkInterfacesSpec.newBuilder()
+                  .setMinCount(2)
+                  .setMaxCount(6)
+                  .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL)));
     }
     return builder;
   }

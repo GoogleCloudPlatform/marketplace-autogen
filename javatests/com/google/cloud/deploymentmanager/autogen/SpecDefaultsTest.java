@@ -16,6 +16,7 @@ package com.google.cloud.deploymentmanager.autogen;
 
 import static com.google.cloud.deploymentmanager.autogen.SpecDefaults.fillInMissingDefaults;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
 
 import com.google.cloud.deploymentmanager.autogen.proto.AcceleratorSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.ApplicationStatusSpec;
@@ -34,6 +35,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.ImageSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.MachineTypeSpec.MachineType;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.NetworkInterfacesSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.PasswordSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.SingleVmDeploymentPackageSpec;
 import com.google.common.collect.ImmutableList;
@@ -54,7 +56,7 @@ public class SpecDefaultsTest {
     assertThat(returned).isSameInstanceAs(builder);
     assertThat(builder.hasMachineType()).isTrue();
     assertThat(builder.hasBootDisk()).isTrue();
-    assertThat(builder.hasExternalIp()).isTrue();
+    assertThat(builder.hasNetworkInterfaces()).isTrue();
   }
 
   @Test
@@ -65,10 +67,10 @@ public class SpecDefaultsTest {
     assertThat(builder.getTiersList()).hasSize(2);
     assertThat(builder.getTiers(0).hasMachineType()).isTrue();
     assertThat(builder.getTiers(0).hasBootDisk()).isTrue();
-    assertThat(builder.getTiers(0).hasExternalIp()).isTrue();
+    assertThat(builder.getTiers(0).hasNetworkInterfaces()).isTrue();
     assertThat(builder.getTiers(1).hasMachineType()).isTrue();
     assertThat(builder.getTiers(1).hasBootDisk()).isTrue();
-    assertThat(builder.getTiers(1).hasExternalIp()).isTrue();
+    assertThat(builder.getTiers(1).hasNetworkInterfaces()).isTrue();
   }
 
   @Test
@@ -235,16 +237,19 @@ public class SpecDefaultsTest {
   @Test
   public void shouldDefaultToEphemeralExternalIp() {
     SingleVmDeploymentPackageSpec.Builder single = fillInMissingDefaults(newSingleSpec());
-    assertThat(single.hasExternalIp()).isTrue();
-    assertThat(single.getExternalIp().getDefaultType())
-        .isEqualTo(ExternalIpSpec.Type.EPHEMERAL);
+    NetworkInterfacesSpec nicSpec = single.getNetworkInterfaces();
+    assertThat(nicSpec.hasExternalIp()).isTrue();
+    assertThat(nicSpec.getExternalIp().getDefaultType()).isEqualTo(ExternalIpSpec.Type.EPHEMERAL);
 
     MultiVmDeploymentPackageSpec.Builder multi = fillInMissingDefaults(newMultiSpec());
-    assertThat(multi.getTiers(0).hasExternalIp()).isTrue();
-    assertThat(multi.getTiers(0).getExternalIp().getDefaultType())
+    NetworkInterfacesSpec tier0NicSpec = multi.getTiers(0).getNetworkInterfaces();
+    assertThat(tier0NicSpec.hasExternalIp()).isTrue();
+    assertThat(tier0NicSpec.getExternalIp().getDefaultType())
         .isEqualTo(ExternalIpSpec.Type.EPHEMERAL);
-    assertThat(multi.getTiers(1).hasExternalIp()).isTrue();
-    assertThat(multi.getTiers(1).getExternalIp().getDefaultType())
+
+    NetworkInterfacesSpec tier1NicSpec = multi.getTiers(1).getNetworkInterfaces();
+    assertThat(tier1NicSpec.hasExternalIp()).isTrue();
+    assertThat(tier1NicSpec.getExternalIp().getDefaultType())
         .isEqualTo(ExternalIpSpec.Type.EPHEMERAL);
   }
 
@@ -254,13 +259,150 @@ public class SpecDefaultsTest {
         ExternalIpSpec.newBuilder().setDefaultType(ExternalIpSpec.Type.NONE).build();
 
     SingleVmDeploymentPackageSpec.Builder single =
-        fillInMissingDefaults(newSingleSpec().setExternalIp(externalIpSpec));
-    assertThat(single.getExternalIp()).isEqualTo(externalIpSpec);
+        fillInMissingDefaults(
+            newSingleSpec()
+                .setNetworkInterfaces(
+                    NetworkInterfacesSpec.newBuilder().setExternalIp(externalIpSpec)));
+    NetworkInterfacesSpec nicSpec = single.getNetworkInterfaces();
+    assertThat(nicSpec.getExternalIp()).isEqualTo(externalIpSpec);
 
     MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
-    multi.getTiersBuilder(0).setExternalIp(externalIpSpec);
+    NetworkInterfacesSpec.Builder tier0NicSpecBuilder =
+        multi.getTiersBuilder(0).getNetworkInterfacesBuilder();
+    tier0NicSpecBuilder.setExternalIp(externalIpSpec);
     fillInMissingDefaults(multi);
-    assertThat(multi.getTiers(0).getExternalIp()).isEqualTo(externalIpSpec);
+    assertThat(multi.getTiers(0).getNetworkInterfaces().getExternalIp()).isEqualTo(externalIpSpec);
+  }
+
+  @Test
+  public void shouldSetDeprecatedExternalIpSpecInNetworkInterfaceSpec() {
+    ExternalIpSpec deprecatedExternalIpSpec =
+        ExternalIpSpec.newBuilder().setDefaultType(ExternalIpSpec.Type.NONE).build();
+
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(newSingleSpec().setExternalIp(deprecatedExternalIpSpec));
+    assertThat(single.getNetworkInterfaces().getExternalIp()).isEqualTo(deprecatedExternalIpSpec);
+  }
+
+  @Test
+  public void shouldNotOverrideExternalIpSpecInNetworkInterfaceSpec() {
+    ExternalIpSpec deprecatedExternalIpSpec =
+        ExternalIpSpec.newBuilder().setNotConfigurable(true).build();
+    ExternalIpSpec expected =
+        ExternalIpSpec.newBuilder().setDefaultType(ExternalIpSpec.Type.NONE).build();
+
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(
+            newSingleSpec()
+                .setExternalIp(deprecatedExternalIpSpec)
+                .setNetworkInterfaces(NetworkInterfacesSpec.newBuilder().setExternalIp(expected)));
+
+    assertThat(single.getNetworkInterfaces().getExternalIp()).isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldSetDeprecatedExternalIpSpecInNetworkInterfaceSpecMultiVm() {
+    ExternalIpSpec deprecatedExternalIpSpec =
+        ExternalIpSpec.newBuilder().setDefaultType(ExternalIpSpec.Type.NONE).build();
+
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi.getTiersBuilder(0).setExternalIp(deprecatedExternalIpSpec);
+    fillInMissingDefaults(multi);
+
+    assertThat(multi.getTiers(0).getNetworkInterfaces().getExternalIp())
+        .isEqualTo(deprecatedExternalIpSpec);
+  }
+
+  @Test
+  public void shouldNotOverrideExternalIpSpecInNetworkInterfaceSpecMultiVm() {
+    ExternalIpSpec deprecatedExternalIpSpec =
+        ExternalIpSpec.newBuilder()
+            .setDefaultType(ExternalIpSpec.Type.EPHEMERAL)
+            .setNotConfigurable(true)
+            .build();
+    ExternalIpSpec expected =
+        ExternalIpSpec.newBuilder().setDefaultType(ExternalIpSpec.Type.NONE).build();
+
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi.getTiersBuilder(0).setExternalIp(deprecatedExternalIpSpec);
+    multi.getTiersBuilder(1).setExternalIp(deprecatedExternalIpSpec);
+    multi.getTiersBuilder(1).getNetworkInterfacesBuilder().setExternalIp(expected);
+    fillInMissingDefaults(multi);
+
+    assertThat(multi.getTiers(0).getNetworkInterfaces().getExternalIp())
+        .isEqualTo(deprecatedExternalIpSpec);
+    assertThat(multi.getTiers(1).getNetworkInterfaces().getExternalIp()).isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldFillMinCount_networkInterfacesSingleVm() {
+    SingleVmDeploymentPackageSpec.Builder single = fillInMissingDefaults(newSingleSpec());
+
+    NetworkInterfacesSpec nicSpec = single.getNetworkInterfaces();
+    assertThat(nicSpec.getMinCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldFillMaxCount_networkInterfacesSingleVm() {
+    int min = 3;
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(
+            newSingleSpec()
+                .setNetworkInterfaces(NetworkInterfacesSpec.newBuilder().setMinCount(min)));
+
+    NetworkInterfacesSpec nicSpec = single.getNetworkInterfaces();
+    assertThat(nicSpec.getMaxCount()).isEqualTo(min);
+  }
+
+  @Test
+  public void shouldNotOverwriteMinAndMaxCount_networkInterfacesSingleVm() {
+    int min = 2;
+    int max = 4;
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(
+            newSingleSpec()
+                .setNetworkInterfaces(
+                    NetworkInterfacesSpec.newBuilder().setMinCount(min).setMaxCount(max)));
+
+    NetworkInterfacesSpec expected =
+        NetworkInterfacesSpec.newBuilder().setMinCount(min).setMaxCount(max).build();
+    assertThat(single.getNetworkInterfaces()).comparingExpectedFieldsOnly().isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldNotOverwriteMinAndMaxCount_networkInterfacesMultiVm() {
+    int min = 3;
+    int max = 3;
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi.getTiersBuilder(0).getNetworkInterfacesBuilder().setMinCount(min).setMaxCount(max);
+    fillInMissingDefaults(multi);
+
+    NetworkInterfacesSpec expected =
+        NetworkInterfacesSpec.newBuilder().setMinCount(min).setMaxCount(max).build();
+    assertThat(multi.getTiers(0).getNetworkInterfaces())
+        .comparingExpectedFieldsOnly()
+        .isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldFillMinCount_networkInterfacesMultiVm() {
+    MultiVmDeploymentPackageSpec.Builder multi = fillInMissingDefaults(newMultiSpec());
+
+    NetworkInterfacesSpec nicSpec = multi.getTiers(0).getNetworkInterfaces();
+    assertThat(nicSpec.getMinCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldFillMaxCount_networkInterfacesMultiVm() {
+    int min = 4;
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi
+        .getTiersBuilder(0)
+        .setNetworkInterfaces(NetworkInterfacesSpec.newBuilder().setMinCount(min));
+    fillInMissingDefaults(multi);
+
+    NetworkInterfacesSpec nicSpec = multi.getTiers(0).getNetworkInterfaces();
+    assertThat(nicSpec.getMaxCount()).isEqualTo(min);
   }
 
   @Test
