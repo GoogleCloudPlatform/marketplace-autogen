@@ -10,14 +10,13 @@
 {% set tiersWithNoExternalIPCount = 0 %}
 {for $tier in $spec.tiersList}
 {let $tierExternalIPs: tierPrefixed('externalIPs', $tier)/}
-{% set {$tierExternalIPs} = [properties["{$tier.name}_externalIP"]] if properties["{$tier.name}_externalIP"] is string else properties["{$tier.name}_externalIP"] %}
+{% set {$tierExternalIPs} = properties["{$tier.name}_externalIP"] %}
 {% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 
 {let $tierMainNetwork: tierPrefixed('mainNetwork', $tier)/}
-{% set {$tierMainNetwork} = [properties["{$tier.name}_network"]] if properties["{$tier.name}_network"] is string else properties["{$tier.name}_network"] %}
-{% set {$tierMainNetwork} = path_utils.networkPath({$tierMainNetwork}[0]) %}
+{% set {$tierMainNetwork} = path_utils.networkPath(properties["{$tier.name}_network"][0]) %}
 {/for}
 {\n}
 

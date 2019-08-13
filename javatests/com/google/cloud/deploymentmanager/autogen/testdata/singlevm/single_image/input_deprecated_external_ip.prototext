@@ -1,0 +1,161 @@
+# proto-file: java/com/google/cloud/deploymentmanager/autogen/autogen.proto
+# proto-message: DeploymentPackageInput
+
+partner_id: "bitnami-launchpad"
+solution_id: "wordpress"
+partner_info {
+  name: "Bitnami"
+  description: "Bitnami is a library of popular server applications and development environments that can be installed in a single click, either on your laptop, in a virtual machine, or hosted in the cloud. With over a million deployments each month, Bitnami.com has become a leading source of many of today\'s most popular applications. Bitnami-packaged apps provide a consistent, secure and up-to-date, optimized end user experience on any platform. We take care of compiling and configuring the application and all of its dependencies (third party libraries, language run times, databases) so it works out of the box. The company is also the largest source of applications for the leading cloud marketplaces. Bitnami is headquartered in San Francisco, CA and has a major development center in Seville, Spain. For more information, visit www.bitnami.com, or follow us on Twitter (@bitnami) and Facebook"
+  url: "http://bitnami.com"
+  short_description: "Bitnami provides a catalog of over 120 curated server applications and development environments that can be installed with one click, either locally, in a VM, or in the cloud.  Bitnami apps work out of the box, with no dependency or compiling worries, and regularly updated images."
+}
+solution_info {
+  name: "WordPress"
+  version: "4.5.3-1"
+  description: "WordPress is one of the world\'s most popular web publishing platforms for building blogs and websites. It can be customized via a wide selection of themes, extensions and plug-ins."
+  url: "https://bitnami.com/stack/wordpress"
+  tagline: "The most popular and ready-to-go CMS"
+  support_url: "https://bitnami.com/support/google"
+  support_info: "Bitnami provides technical support for installation and setup issues through <a href=\"https://bitnami.com/support/google\">our support center</a>."
+  eula_url: "https://bitnami.com/agreement"
+  documentations {
+    url: "https://docs.bitnami.com/google/apps/wordpress"
+    title: "Getting Started"
+    description: "Get started with Bitnami WordPress Stack."
+    destinations: DESTINATION_POST_DEPLOY
+  }
+  packaged_software_groups {
+    type: SOFTWARE_GROUP_OS
+    components {
+      name: "Debian"
+      version: "8"
+    }
+  }
+  packaged_software_groups {
+    components {
+      name: "Apache"
+      version: "2.4.23"
+    }
+    components {
+      name: "MySQL"
+      version: "5.7.13"
+    }
+    components {
+      name: "OpenSSL"
+      version: "1.0.2h"
+    }
+    components {
+      name: "PHP"
+      version: "7.0.9"
+    }
+    components {
+      name: "phpMyAdmin"
+      version: "4.6.3"
+    }
+    components {
+      name: "SQLite"
+      version: "3.7.15.1"
+    }
+    components {
+      name: "Varnish"
+      version: "4.1.0"
+    }
+    components {
+      name: "WordPress"
+      version: "4.5.3"
+    }
+  }
+}
+spec {
+  single_vm {
+    images {
+      project: "bitnami-launchpad"
+      name: "bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"
+      label: "Wordpress 4.5"
+    }
+    machine_type {
+      default_machine_type {
+        gce_machine_type: "f1-micro"
+      }
+    }
+    boot_disk {
+      disk_size {
+        default_size_gb: 10
+        min_size_gb: 10
+      }
+    }
+    local_ssds {
+      count_from_deploy_input_field: "localSsdsCount"
+    }
+    firewall_rules {
+      protocol: TCP
+      port: "80"
+    }
+    firewall_rules {
+      protocol: TCP
+      port: "443"
+    }
+    site_url {
+      scheme: HTTP
+    }
+    admin_url {
+      scheme: HTTP
+      path: "wp-admin/"
+    }
+    passwords {
+      metadata_key: "bitnami-base-password"
+      length: 8
+      username: "user"
+    }
+    application_status {
+      type: WAITER
+      waiter {
+        waiter_timeout_secs: 480
+        script {
+          check_timeout_secs: 420
+          check_script_content: "failed=$(/etc/init.d/bitnami status \\\n    | grep \"not running\" | cut -d\" \" -f1 | tr \"\\n\" \" \")\nif [ ! -z \"$failed\" ]; then\n  echo \"Processes failed to start: $failed\"\n  exit 1\nfi"
+        }
+      }
+    }
+    external_ip {
+      default_type: EPHEMERAL
+      not_configurable: true
+    }
+    post_deploy {
+      connect_button_label: "Fancy SSH label"
+    }
+    deploy_input {
+      sections {
+        placement: MAIN
+        fields {
+          name: "localSsdsCount"
+          title: "Local SSDs"
+          integer_box {
+            default_value {
+              value: 0
+            }
+            validation {
+              min {
+                value: 0
+              }
+              max {
+                value: 3
+              }
+            }
+          }
+        }
+      }
+    }
+    stackdriver {
+      logging {
+        default_on: false
+      }
+    }
+  }
+}
+logo {
+  raw {
+    content_type: PNG
+    content: "\211PNG\r"
+  }
+}

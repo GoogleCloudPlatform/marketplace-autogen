@@ -140,8 +140,10 @@ spec {
           waiter_timeout_secs: 300
         }
       }
-      external_ip {
-        default_type: NONE
+      network_interfaces {
+        external_ip {
+          default_type: NONE
+        }
       }
       gce_metadata_items {
         key: "fixed-key"
@@ -264,8 +266,10 @@ spec {
         port: "2555"
         allowed_source: DEPLOYMENT
       }
-      external_ip {
-        not_configurable: true
+      network_interfaces {
+        external_ip {
+          not_configurable: true
+        }
       }
       gce_metadata_items {
         key: "main-0"

@@ -1,0 +1,552 @@
+# proto-file: java/com/google/cloud/deploymentmanager/autogen/autogen.proto
+# proto-message: DeploymentPackageInput
+
+partner_id: "bitnami-launchpad"
+solution_id: "wordpress"
+partner_info {
+  name: "Bitnami"
+  description: "Bitnami is a library of popular server applications and development environments that can be installed in a single click, either on your laptop, in a virtual machine, or hosted in the cloud. With over a million deployments each month, Bitnami.com has become a leading source of many of today\'s most popular applications. Bitnami-packaged apps provide a consistent, secure and up-to-date, optimized end user experience on any platform. We take care of compiling and configuring the application and all of its dependencies (third party libraries, language run times, databases) so it works out of the box. The company is also the largest source of applications for the leading cloud marketplaces. Bitnami is headquartered in San Francisco, CA and has a major development center in Seville, Spain. For more information, visit www.bitnami.com, or follow us on Twitter (@bitnami) and Facebook"
+  url: "http://bitnami.com"
+  short_description: "Bitnami provides a catalog of over 120 curated server applications and development environments that can be installed with one click, either locally, in a VM, or in the cloud.  Bitnami apps work out of the box, with no dependency or compiling worries, and regularly updated images."
+}
+solution_info {
+  name: "WordPress: Apache & PHP"
+  version: "4.5.3-1"
+  description: "WordPress is one of the world's most popular web publishing platforms for building blogs and websites. It can be customized via a wide selection of themes, extensions and plug-ins."
+  url: "https://bitnami.com/stack/wordpress"
+  tagline: "The most popular and ready-to-go CMS"
+  support_url: "https://bitnami.com/support/google"
+  support_info: "Bitnami provides technical support for installation and setup issues through <a href=\"https://bitnami.com/support/google\">our support center</a>."
+  eula_url: "https://bitnami.com/agreement"
+  documentations {
+    url: "https://docs.bitnami.com/google/apps/wordpress"
+    title: "Getting Started"
+    description: "Get started with Bitnami WordPress Stack."
+    destinations: DESTINATION_POST_DEPLOY
+  }
+  packaged_software_groups {
+    type: SOFTWARE_GROUP_OS
+    components {
+      name: "Debian"
+      version: "8"
+    }
+  }
+  packaged_software_groups {
+    components {
+      name: "Apache"
+      version: "2.4.23"
+    }
+    components {
+      name: "MySQL"
+      version: "5.7.13"
+    }
+    components {
+      name: "OpenSSL"
+      version: "1.0.2h"
+    }
+    components {
+      name: "PHP"
+      version: "7.0.9"
+    }
+    components {
+      name: "phpMyAdmin"
+      version: "4.6.3"
+    }
+    components {
+      name: "SQLite"
+      version: "3.7.15.1"
+    }
+    components {
+      name: "Varnish"
+      version: "4.1.0"
+    }
+    components {
+      name: "WordPress"
+      version: "4.5.3"
+    }
+  }
+}
+spec {
+  version: "1.00"
+  single_vm {
+    images {
+      project: "bitnami-launchpad"
+      name: "bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"
+      label: "Wordpress 4.5"
+    }
+    images {
+      project: "bitnami-launchpad"
+      name: "bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64"
+      label: "Wordpress 4.6"
+    }
+    images {
+      project: "click-to-deploy-images"
+      name: "wordpress-453-1607261609-debian-8-jessie-v20160718"
+    }
+    machine_type {
+      default_machine_type {
+        gce_machine_type: "f1-micro"
+      }
+      minimum {
+        ram_gb: 0.5
+      }
+    }
+    accelerators {
+      types: "nvidia-tesla-k80"
+      default_count: 1
+    }
+    boot_disk {
+      disk_size {
+        default_size_gb: 10
+        min_size_gb: 10
+      }
+    }
+    additional_disks: [
+      {
+        device_name_suffix {
+          name: "disk-one"
+        }
+        disk_size {
+          default_size_gb: 1000
+          min_size_gb: 20
+        }
+        display_label: "The super-extra-great disk"
+      },
+      {
+        device_name_suffix {
+          name: "disk-xyz"
+        }
+        disk_size {
+          default_size_gb: 500
+          min_size_gb: 15
+        }
+        display_label: "The less great disk"
+        prevent_auto_deletion: true
+      },
+      {
+        display_label: "The third disk"
+        device_name_suffix {
+          name_from_deploy_input_field: "thirdDiskName"
+        }
+      }
+    ]
+    local_ssds {
+      count: 3
+    }
+    firewall_rules {
+      protocol: TCP
+      port: "80"
+    }
+    firewall_rules {
+      protocol: TCP
+      port: "443"
+    }
+    firewall_rules {
+      protocol: ICMP
+    }
+    site_url {
+      scheme: HTTP
+    }
+    admin_url {
+      scheme: HTTP
+      path: "wp-admin/"
+    }
+    passwords {
+      metadata_key: "bitnami-base-password"
+      length: 8
+      username_from_deploy_input_field: "domain"
+      display_label: "Admin"
+    }
+    passwords {
+      metadata_key: "bitnami-db-password"
+      length: 8
+      username: "root"
+      display_label: "MySQL root"
+    }
+    passwords {
+      metadata_key: "optional-password"
+      length: 8
+      username: "root2"
+      display_label: "This is optional"
+      generate_if {
+        boolean_deploy_input_field {
+          name: "generateOptionalPassword"
+        }
+      }
+    }
+    application_status {
+      type: WAITER
+      waiter {
+        waiter_timeout_secs: 480
+        script {
+          check_timeout_secs: 420
+          check_script_content: "failed=$(/etc/init.d/bitnami status \\\n    | grep \"not running\" | cut -d\" \" -f1 | tr \"\\n\" \" \")\nif [ ! -z \"$failed\" ]; then\n  echo \"Processes failed to start: $failed\"\n  exit 1\nfi"
+        }
+      }
+    }
+    external_ip {
+      not_configurable: false
+    }
+    gce_startup_script {
+      bash_script_content: "echo SUCCESS > /var/log/startup-log.txt"
+    }
+    post_deploy {
+      action_items {
+        heading: "Log on now"
+        description: "Use the Admin URL above. <a href='http://wordpress.com'>Learn more</a>"
+      }
+      action_items {
+        heading: "Change your password"
+        description: "First, SSH into your VM.\nSecond, run the following command\n"
+        snippet: "$ which wordpress-admin\n$ wordpress-admin change-password"
+      }
+      action_items {
+        heading: "Custom conditional action item"
+        description: "This action is displayed only when the checkbox for displaying conditional row and action was selected"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction"
+          }
+        }
+      }
+      action_items {
+        heading: "Custom conditional action item - displayed on negation"
+        description: "This action is displayed only when the checkbox for displaying conditional row and action wasn't selected"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction",
+            negated: true
+          }
+        }
+      }
+      action_items {
+        heading: "External IP action"
+        description: "Some action"
+        show_if {
+          has_external_ip {}
+        }
+      }
+      action_items {
+        heading: "Internal IP action"
+        description: "Some action"
+        show_if {
+          has_external_ip {
+            negated: true
+          }
+        }
+      }
+      info_rows {
+        label: "PHP Admin user"
+        value: "admin"
+      }
+      info_rows {
+        label: "PHP Admin password"
+        value: "(Same as MySQL root)"
+      }
+      info_rows {
+        label: "Custom conditional field"
+        value: "Some trivial value"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction"
+          }
+        }
+      }
+      info_rows {
+        label: "Custom conditional field - displayed on negation"
+        value: "Some other trivial value"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction",
+            negated: true
+          }
+        }
+      }
+      info_rows {
+        label: "Row with deploy input field value"
+        value_from_deploy_input_field: "domain"
+      }
+      info_rows {
+        label: "External IP row"
+        value: "Some value"
+        show_if {
+          has_external_ip {}
+        }
+      }
+      info_rows {
+        label: "Internal IP row"
+        value: "Some value"
+        show_if {
+          has_external_ip {
+            negated: true
+          }
+        }
+      }
+      connect_button {
+        display_label: "The best SSH connection ever"
+      }
+    }
+    gce_metadata_items {
+      key: "admin-username"
+      value: "admin@local"
+    }
+    gce_metadata_items {
+      key: "user-username"
+      value: "user@local"
+    }
+    gce_metadata_items {
+      key: "some-other-domain-metadata"
+      value_from_deploy_input_field: "domain"
+    }
+    gce_metadata_items {
+      key: "install-phpmyadmin"
+      value_from_deploy_input_field: "installPhpMyAdmin"
+    }
+    gce_metadata_items {
+      key: "image-caching"
+      value_from_deploy_input_field: "imageCaching"
+    }
+    gce_metadata_items {
+      key: "image-compression"
+      value_from_deploy_input_field: "imageCompression"
+    }
+    gce_metadata_items {
+      key: "image-sizing"
+      value_from_deploy_input_field: "imageSizing"
+    }
+    gce_metadata_items {
+      key: "image-cache-size"
+      value_from_deploy_input_field: "imageCacheSize"
+    }
+    gce_metadata_items {
+      key: "cache-expiration-minutes"
+      value_from_deploy_input_field: "cacheExpiration"
+    }
+    gce_metadata_items {
+      key: "extra-lb-zone0"
+      value_from_deploy_input_field: "extraLbZone0"
+    }
+    gce_metadata_items {
+      key: "extra-lb-zone1"
+      value_from_deploy_input_field: "extraLbZone1"
+    }
+    deploy_input {
+      sections {
+        placement: MAIN
+        fields {
+          name: "domain"
+          title: "Domain"
+          description: "Your Wordpress blog domain"
+          tooltip: "Register your own domain with <a href='http://domains.google'>Google</a>"
+          required: true
+          string_box {
+            validation {
+              description: "A valid domain has to be entered"
+              regex: "[a-zA-Z0-9-]+.[a-z]{2,}"
+            }
+            placeholder: "mydomain.com"
+            test_default_value: "mydomain.test.com"
+          }
+        }
+        fields {
+          name: "adminEmailAddress"
+          title: "Administrator e-mail address"
+          tooltip: "The e-mail address used to create the administrator account for WordPress."
+          required: true
+          email_box {
+            validation {
+              description: "Please enter a valid email address"
+            }
+            placeholder: "user@example.com"
+          }
+        }
+        fields {
+          name: "optionalEmailAddress"
+          title: "Optional e-mail address"
+          required: false
+          email_box {
+            default_value: "default_value@example.com"
+            test_default_value: "test_default_value@example.com"
+          }
+        }
+        fields {
+          name: "showConditionalRowAndAction"
+          title: "Show conditional row"
+          boolean_checkbox {
+            default_value: true
+          }
+        }
+        fields {
+          name: "generateOptionalPassword"
+          title: "Generate optional password"
+          boolean_checkbox {
+            default_value: true
+          }
+        }
+      }
+      sections {
+        placement: CUSTOM_TOP
+        name: "PHPMYADMIN"
+        title: "phpMyAdmin"
+        tooltip: "phpMyAdmin makes administer your Wordpress installation much easier."
+        fields {
+          name: "installPhpMyAdmin"
+          title: "Install phpMyAdmin"
+          boolean_checkbox {
+            default_value: true
+          }
+        }
+      }
+      sections {
+        placement: CUSTOM_BOTTOM
+        name: "CONTENT_SETTINGS"
+        title: "Advanced content settings"
+        description: "Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>"
+        fields {
+          name: "imageCaching"
+          title: "Image caching"
+          level: 1
+          string_dropdown {
+            values: "none"
+            values: "redis"
+            values: "memcached"
+            default_value_index {
+              value: 0
+            }
+            value_labels {
+              key: "none"
+              value: "Not cached"
+            }
+            value_labels {
+              key: "redis"
+              value: "Cached with redis"
+            }
+            value_labels {
+              key: "memcached"
+              value: "Cached with memcached"
+            }
+          }
+        }
+        fields {
+          name: "imageCompression"
+          title: "Enable compression"
+          level: 1
+          grouped_boolean_checkbox {
+            display_group {
+              name: "IMAGE_CACHING_OPTIONS"
+              title: "Image caching options"
+              description: "Advanced image caching options. Don't touch unless you know."
+              tooltip: "<a href='http://wordpress.com/help'>Learn more</a>"
+            }
+          }
+        }
+        fields {
+          name: "imageSizing"
+          title: "Dynamic sizing"
+          level: 1
+          grouped_boolean_checkbox {
+            default_value: true
+          }
+        }
+        fields {
+          name: "imageCacheSize"
+          title: "Image cache size"
+          level: 1
+          required: true
+          integer_box {
+            default_value {
+              value: 50000
+            }
+            validation {
+              description: "Enter a number between 100 and 99999"
+              min {
+                value: 100
+              }
+              max {
+                value: 99999
+              }
+            }
+          }
+        }
+        fields {
+          name: "cacheExpiration"
+          title: "Cache expiration"
+          level: 1
+          required: true
+          integer_dropdown {
+            values: 60
+            values: 120
+            values: 240
+            values: 480
+            default_value_index {
+              value: 1
+            }
+            value_labels {
+              key: 60
+              value: "1 hour"
+            }
+            value_labels {
+              key: 120
+              value: "2 hours"
+            }
+            value_labels {
+              key: 240
+              value: "4 hours"
+            }
+            value_labels {
+              key: 480
+              value: "8 hours"
+            }
+          }
+        }
+        fields {
+          name: "thirdDiskName"
+          title: "The third disk's device name"
+          required: true
+          string_box {
+            default_value: "third-disk"
+            validation {
+              regex: "[A-Za-z][A-Za-z0-9\\-_]+"
+            }
+          }
+        }
+      }
+      sections {
+        placement: CUSTOM_BOTTOM
+        name: "LOAD_BALANCERS"
+        title: "Additional zones for load balancers"
+        fields {
+          name: "extraLbZone0"
+          title: "Zone"
+          level: 1
+          zone_dropdown {
+            default_value {
+              value: "us-west1-a"
+            }
+          }
+        }
+        fields {
+          name: "extraLbZone1"
+          title: "Zone"
+          level: 1
+          zone_dropdown {}
+        }
+      }
+    }
+    zone {
+      default_zone: "us-west1-b"
+    }
+    stackdriver {
+      logging {
+        default_on: true
+      }
+      monitoring: {}
+    }
+  }
+}
+logo {
+  raw {
+    content_type: PNG
+    content: "\211PNG\r"
+  }
+}

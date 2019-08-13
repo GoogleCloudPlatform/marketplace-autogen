@@ -184,8 +184,10 @@ spec {
         }
       }
     }
-    external_ip {
-      not_configurable: false
+    network_interfaces {
+      external_ip {
+        not_configurable: false
+      }
     }
     gce_startup_script {
       bash_script_content: "echo SUCCESS > /var/log/startup-log.txt"

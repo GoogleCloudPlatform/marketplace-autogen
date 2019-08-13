@@ -46,6 +46,7 @@ public class AutogenMediumTestsSuite {
       System.getenv("JAVA_RUNFILES")
           + "/__main__/"
           + RELATIVE_TESTDATA_PATH;
+  static final File ROOT = new File(TESTDATA_PATH);
 
   static class Solution {
     final String name;
@@ -54,7 +55,7 @@ public class AutogenMediumTestsSuite {
     final Supplier<SolutionPackage> solutionPackage;
 
     static Collection<String[]> allSolutionsActualFilesDesc() {
-      List<String[]> files = new ArrayList();
+      List<String[]> files = new ArrayList<>();
       for (Solution solution : findAllSolutions()) {
         for (SolutionPackage.File f : solution.solutionPackage.get().getFilesList()) {
           files.add(
@@ -68,37 +69,29 @@ public class AutogenMediumTestsSuite {
 
     /** Finds all solutions under testdata folder. */
     static Collection<Solution> findAllSolutions() {
-      File root = new File(TESTDATA_PATH);
-      return FluentIterable.from(Files.fileTraverser().depthFirstPreOrder(root))
+      return FluentIterable.from(Files.fileTraverser().depthFirstPreOrder(ROOT))
           .filter(Files.isFile())
           .filter(
               new Predicate<File>() {
                 @Override
                 public boolean apply(File f) {
-                  return "input.prototext".equals(f.getName());
+                  return f.getName().matches("input.*\\.prototext");
                 }
               })
           .transform(
-              new Function<File, File>() {
+              new Function<File, Solution>() {
                 @Override
-                public File apply(File f) {
-                  return f.getParentFile();
-                }
-              })
-          .transform(relativePathFunction(root))
-          .transform(
-              new Function<String, Solution>() {
-                @Override
-                public Solution apply(String name) {
-                  return new Solution(name);
+                public Solution apply(File f) {
+                  return new Solution(f);
                 }
               })
           .toList();
     }
 
-    Solution(String folder) {
-      name = folder;
-      solutionFolder = new File(TESTDATA_PATH + folder);
+    Solution(File inputSpecFile) {
+      name = relativePathFunction(ROOT, inputSpecFile);
+      solutionFolder =
+          new File(TESTDATA_PATH + relativePathFunction(ROOT, inputSpecFile.getParentFile()));
       goldenFolder = new File(solutionFolder, "golden");
       solutionPackage =
           Suppliers.memoize(
@@ -107,11 +100,13 @@ public class AutogenMediumTestsSuite {
                 public SolutionPackage get() {
                   try {
                     DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
-                    TextFormat.getParser().merge(Files.asCharSource(
-                        new File(solutionFolder, "input.prototext"), StandardCharsets.UTF_8)
-                            .read(), input);
-                    return Autogen.getInstance().generateDeploymentPackage(input.build(),
-                        SharedSupportFilesStrategy.INCLUDED);
+                    TextFormat.getParser()
+                        .merge(
+                            Files.asCharSource(inputSpecFile, StandardCharsets.UTF_8).read(),
+                            input);
+                    return Autogen.getInstance()
+                        .generateDeploymentPackage(
+                            input.build(), SharedSupportFilesStrategy.INCLUDED);
                   } catch (IOException e) {
                     throw new RuntimeException(e);
                   }
@@ -121,18 +116,14 @@ public class AutogenMediumTestsSuite {
 
     @Override
     public String toString() {
-      return this.name;
+      return String.format(
+          "Input spec: %s, golden: %s", this.name, relativePathFunction(ROOT, goldenFolder));
     }
   }
 
-  static Function<File, String> relativePathFunction(final File parent) {
-    return new Function<File, String>() {
-      @Override
-      public String apply(File f) {
-        Path parentPath = Paths.get(parent.getAbsolutePath()).normalize();
-        Path filePath = Paths.get(f.getAbsolutePath()).normalize();
-        return parentPath.relativize(filePath).toString();
-      }
-    };
+  public static String relativePathFunction(File parent, File f) {
+    Path parentPath = Paths.get(parent.getAbsolutePath()).normalize();
+    Path filePath = Paths.get(f.getAbsolutePath()).normalize();
+    return parentPath.relativize(filePath).toString();
   }
 }
