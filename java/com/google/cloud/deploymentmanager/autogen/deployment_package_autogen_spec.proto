@@ -41,7 +41,7 @@ message DeploymentPackageAutogenSpec {
 }
 
 // Specifies a solution that deploys a single VM.
-// Next ID: 21
+// Next ID: 22
 message SingleVmDeploymentPackageSpec {
   // Defines the disk images. If there are more than one, the user can select
   // which image to deploy with. The 1st image is the default.
@@ -65,6 +65,9 @@ message SingleVmDeploymentPackageSpec {
 
   // If not specified, IP forwarding is forced off and not user-configurable.
   IpForwardingSpec ip_forwarding = 4;
+
+  // Spec to define Multi/Single NIC(s) usage for this solution.
+  NetworkInterfacesSpec network_interfaces = 21;
 
   // Specifies the default firewall rules to access the deployed application.
   // They could be off by default, but should still be listed so that the user
@@ -91,7 +94,8 @@ message SingleVmDeploymentPackageSpec {
 
   // Defines how the VM is accessible from the Internet.
   // Will use defaults if not specified.
-  ExternalIpSpec external_ip = 11;
+  // DEPRECATED! Use NetworkInterfacesSpec instead.
+  ExternalIpSpec external_ip = 11 [deprecated = true];
 
   // Customizes post-deploy information displayed to the user.
   // This helps get the user started with using the deployed solution.
@@ -149,7 +153,7 @@ message MultiVmDeploymentPackageSpec {
 
 // A tier consists of one or more VMs of the same type. Each VM is
 // uniquely identified by its index.
-// Next ID: 17
+// Next ID: 18
 message VmTierSpec {
   // Unique name for this tier. Only lowercases. Required.
   string name = 1;
@@ -183,6 +187,9 @@ message VmTierSpec {
   // If not specified, IP forwarding is forced off and not user-configurable.
   IpForwardingSpec ip_forwarding = 7;
 
+  // Spec to define Multi/Single NIC(s) usage for this solution.
+  NetworkInterfacesSpec network_interfaces = 17;
+
   // Declares what GCP APIs should be available to the VM.
   repeated GcpAuthScopeSpec gcp_auth_scopes = 8;
 
@@ -195,7 +202,8 @@ message VmTierSpec {
 
   // Defines how the VMs are accessible from the Internet.
   // Will use defaults if not specified.
-  ExternalIpSpec external_ip = 10;
+  // DEPRECATED! Use NetworkInterfacesSpec instead.
+  ExternalIpSpec external_ip = 10 [deprecated = true];
 
   // Customizes metadata items on each GCE VM instance.
   repeated GceMetadataItem gce_metadata_items = 11;
@@ -332,6 +340,16 @@ message DiskSpec {
   // Whether to leave the disk when the instance is deleted.
   // Ignored for boot disk.
   bool prevent_auto_deletion = 6;
+}
+
+// Network interfaces configuration for this solution.
+message NetworkInterfacesSpec {
+  // Minimum number of Network Interfaces (defaults to 1).
+  int32 min_count = 2;
+  // Maximum number of Network Interfaces (can't exceed 8 and if not specified,
+  // will take the value of min_count).
+  int32 max_count = 3;
+  ExternalIpSpec external_ip = 5;
 }
 
 // Specifies if the VM can route IP packets.

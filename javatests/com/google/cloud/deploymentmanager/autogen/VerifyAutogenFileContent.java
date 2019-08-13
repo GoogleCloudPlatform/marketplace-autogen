@@ -49,18 +49,15 @@ public class VerifyAutogenFileContent {
 
   @Test
   public void goldenVerifyFile() throws Exception {
-    File root = new File(AutogenMediumTestsSuite.TESTDATA_PATH);
     File tempDir = Files.createTempDir();
-    File tempSolutionDir = new File(tempDir, solutionName);
+    File tempSolutionDir = new File(tempDir, goldenFolder.replace("golden", ""));
     File actualFile = new File(tempSolutionDir, fileRelativePath);
     Files.createParentDirs(actualFile);
     File goldenFile = new File(goldenFolder, fileRelativePath);
     if (actualFile.getPath().endsWith(".png") || actualFile.getPath().endsWith(".jpg")) {
       Files.write(BaseEncoding.base64().decode(fileContent), actualFile);
       String expected = BaseEncoding.base64().encode(Files.toByteArray(goldenFile));
-      assertWithMessage(generateDiffMessage(solutionName, fileRelativePath, tempSolutionDir))
-          .that(fileContent)
-          .isEqualTo(expected);
+      assertWithMessage(generateDiffMessage(tempSolutionDir)).that(fileContent).isEqualTo(expected);
     } else {
       Files.asCharSink(actualFile, StandardCharsets.UTF_8).write(fileContent);
       String expected = Files.asCharSource(goldenFile, StandardCharsets.UTF_8).read();
@@ -69,17 +66,17 @@ public class VerifyAutogenFileContent {
       // first. This means that the difference between "abc" and "ab" is the empty String and not
       // "c".
       // Because of that we need to compare actual vs expected as well
-      String diffMessage = generateDiffMessage(solutionName, fileRelativePath, tempSolutionDir);
+      String diffMessage = generateDiffMessage(tempSolutionDir);
       assertWithMessage(diffMessage).that(StringUtils.difference(expected, fileContent)).isEmpty();
       assertWithMessage(diffMessage).that(StringUtils.difference(fileContent, expected)).isEmpty();
     }
   }
 
-  private static String generateDiffMessage(String solutionName, String filePath, File tempDir) {
+  private String generateDiffMessage(File tempDir) {
     return String.format(
         "Diff found in %s.\nRun this test locally with --test_strategy=local. "
             + "The diff command is: \ndiff -ur %s/%s/golden %s\n",
-        filePath,
+        fileRelativePath,
         AutogenMediumTestsSuite.RELATIVE_TESTDATA_PATH,
         solutionName,
         new File(tempDir, solutionName).getAbsolutePath());

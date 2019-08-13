@@ -542,37 +542,38 @@ serviceAccounts:
 {template .networkPropertiesSchema kind="text"}
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
+{@param spec: cloud.deploymentmanager.autogen.NetworkInterfacesSpec}
 {@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
-{$nameSuffix |tierprefixed: $tier}:
-  type: string
-  default: default
+{let $networkPropName: tierPrefixed($nameSuffix, $tier)/}
+{$networkPropName}:
+  type: array
+  default: [default]
+  minItems: {$spec.minCount}
+  maxItems: {$spec.maxCount}
   x-googleProperty:
     type: GCE_NETWORK
     gceNetwork:
       allowSharedVpcs: True
       machineTypeProperty: {'machineType' |tierprefixed: $tier}
 {'sub' + $nameSuffix |tierprefixed: $tier}:
-  type: string
+  type: array
+  minItems: {$spec.minCount}
+  maxItems: {$spec.maxCount}
   x-googleProperty:
     type: GCE_SUBNETWORK
     zoneProperty: {$zonePropertyName}
     gceSubnetwork:
-      networkProperty: {$nameSuffix |tierprefixed: $tier}
-{/template}
-
-
-{template .externalIpPropertySchema kind="text"}
-{@param name: string}
-{@param spec: cloud.deploymentmanager.autogen.ExternalIpSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
-{$name |tierprefixed: $tier}:
-  type: string
-  default: {externalIpTypeName($spec.defaultType)}
+      networkProperty: {$networkPropName}
+{'externalIP' |tierprefixed: $tier}:
+  type: array
+  default: [{externalIpTypeName($spec.externalIp.defaultType)}]
+  minItems: {$spec.minCount}
+  maxItems: {$spec.maxCount}
   x-googleProperty:
     type: GCE_EXTERNAL_IP
     gceExternalIp:
-      networkProperty: {'network' |tierprefixed: $tier}
-      notConfigurable: {if $spec.notConfigurable}True{else}False{/if}
+      networkProperty: {$networkPropName}
+      notConfigurable: {if $spec.externalIp.notConfigurable}True{else}False{/if}
 {/template}
 
 

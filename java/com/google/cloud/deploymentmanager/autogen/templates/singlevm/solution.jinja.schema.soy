@@ -103,17 +103,10 @@ properties:
     {call renders.networkPropertiesSchema}
       {param nameSuffix: 'network'/}
       {param zonePropertyName: 'zone'/}
+      {param spec: $spec.networkInterfaces/}
     {/call}
   {/let}
   {$networkProps |indent: 2, true}{nil}
-
-  {let $externalIpProp kind="text"}
-    {call renders.externalIpPropertySchema}
-      {param name: 'externalIP'/}
-      {param spec: $spec.externalIp/}
-    {/call}
-  {/let}
-  {$externalIpProp |indent: 2, true}{nil}
 
   {if $spec.ipForwarding}
   {let $ipForwardingProp kind="text"}
