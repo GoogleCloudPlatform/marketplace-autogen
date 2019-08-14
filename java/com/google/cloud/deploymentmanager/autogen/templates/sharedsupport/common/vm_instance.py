@@ -189,7 +189,7 @@ def GetNetworkInterfaces(context):
         'name': name,
     }
 
-    if i < len(subnetworks):
+    if subnetworks and i < len(subnetworks) and subnetworks[i]:
       network_interface['subnetwork'] = common.MakeSubnetworkComputeLink(
           context, subnetworks[i])
 
