@@ -35,7 +35,7 @@ resources:
       {% if subnetworks is defined and subnetworks %}
       subnetworks:
       {% for subnetwork in subnetworks %}
-        - {{ subnetwork }}
+        - {{ subnetwork or '' }}
       {% endfor %}
       {% endif %}
       {% if externalIPs is defined and externalIPs %}
