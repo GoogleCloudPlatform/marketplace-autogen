@@ -86,8 +86,10 @@ resources:
           {% else %}
           - key: startup-script
             value: |-
-                   #!/bin/bash
-                   echo STARTED >> /opt/startup_log
+              #!/bin/bash
+              cd /tmp
+              echo STARTED >> /tmp/startup_log
+              cd -
           {% endif %}
           - key: main-0
             value: {{ env["deployment"] }}-main-vm-0
@@ -144,7 +146,9 @@ resources:
     type: software_status_script.py
     properties:
       initScript: |-
-        echo STARTED >> /opt/startup_log
+        cd /tmp
+        echo STARTED >> /tmp/startup_log
+        cd -
       checkScript: |-
         return 0
   {% endif %}
