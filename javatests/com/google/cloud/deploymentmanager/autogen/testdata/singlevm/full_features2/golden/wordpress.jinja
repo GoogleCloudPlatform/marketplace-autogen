@@ -109,8 +109,8 @@ resources:
           {% else %}
           - key: startup-script
             value: |-
-                   #!/bin/bash
-                   echo SUCCESS > /var/log/startup-log.txt
+              #!/bin/bash
+              echo SUCCESS > /var/log/startup-log.txt
           {% endif %}
           - key: admin-username
             value: admin@local
