@@ -12,6 +12,8 @@ java_library(
         "@com_google_guava_guava//jar",
         "@com_google_inject_guice//jar",
         "@com_google_template_soy//jar",
+        "@com_google_truth_extensions_proto_extension//jar",
+        "@com_google_truth_extensions_liteproto_extension//jar",
         "@com_google_truth_truth//jar",
         "@com_ibm_icu_icu4j//jar",
         "@junit_junit//jar",
