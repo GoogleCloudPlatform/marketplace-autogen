@@ -8,7 +8,7 @@ addons:
     - wget
     - pkg-config
 env:
-- BAZEL_VERSION=0.16.0
+- BAZEL_VERSION=0.28.1
 
 before_install:
 - wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb
