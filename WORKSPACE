@@ -26,6 +26,11 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 protobuf_deps()
 
 maven_jar(
+    name = "org_ow2_asm",
+    artifact = "org.ow2.asm:asm:7.0",
+)
+
+maven_jar(
     name = "javax_inject",
     artifact = "javax.inject:javax.inject:1",
 )
