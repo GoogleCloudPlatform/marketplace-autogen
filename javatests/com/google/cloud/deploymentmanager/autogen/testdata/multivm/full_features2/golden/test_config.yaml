@@ -8,3 +8,4 @@ resources:
     input_domain: test.google.com
     input_adminEmailAddress: aX9-YD_8W.3@example.com
     input_optionalEmailAddress: test_default_value@example.com
+    zone: us-central1-f

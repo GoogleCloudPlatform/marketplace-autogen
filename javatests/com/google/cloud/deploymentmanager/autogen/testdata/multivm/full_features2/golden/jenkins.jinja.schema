@@ -33,7 +33,6 @@ required:
 properties:
   zone:
     type: string
-    default: us-west1-b
     x-googleProperty:
       type: GCE_ZONE
   main_instanceCount:
