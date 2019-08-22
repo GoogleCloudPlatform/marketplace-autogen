@@ -14,6 +14,7 @@
 """Creates an Instance VM with common defaults."""
 # pylint: disable=g-import-not-at-top
 import copy
+import re
 import common
 import default
 
@@ -72,6 +73,10 @@ SCRATCH = 'SCRATCH'
 
 # Blank image used when sourceImage property is not provided.
 BLANK_IMAGE = 'empty10gb'
+
+VALID_IP_RE = re.compile(
+    r'((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))'
+)
 
 
 def MakeVMName(context):
@@ -193,11 +198,23 @@ def GetNetworkInterfaces(context):
       network_interface['subnetwork'] = common.MakeSubnetworkComputeLink(
           context, subnetworks[i])
 
-    if i < len(external_ips) and external_ips[i] == 'EPHEMERAL':
-      network_interface['accessConfigs'] = [{
+    ip_value = external_ips[i] if i < len(external_ips) else 'NONE'
+    is_static_ip = VALID_IP_RE.match(ip_value) is not None
+    if ip_value != 'EPHEMERAL' and ip_value != 'NONE' and not is_static_ip:
+      raise common.Error(
+          ('External IP value "%s" is invalid. Valid values '
+           'are: a valid IP Address, EPHEMERAL or NONE.') % ip_value)
+
+    if ip_value == 'EPHEMERAL' or is_static_ip:
+      access_config = {
           'name': '%s %s' % (name, default.EXTERNAL),
           'type': default.ONE_NAT,
-      }]
+      }
+
+      if is_static_ip:
+        access_config[default.NAT_IP] = ip_value
+
+      network_interface['accessConfigs'] = [access_config]
 
     network_interfaces.append(network_interface)
 
@@ -394,7 +411,7 @@ def GenerateOutputList(context, resource_list):
       'value': '$(ref.%s.networkInterfaces[0].networkIP)' % vm_res['name'],
   }]
   external_ips = context.properties.get(EXTERNAL_IPS, [])
-  if external_ips and external_ips[0] == 'EPHEMERAL':
+  if external_ips and external_ips[0] != 'NONE':
     outputs.append({
         'name': 'ip',
         'value': ('$(ref.%s.networkInterfaces[0].accessConfigs[0].natIP)' %
