@@ -16,6 +16,7 @@ package com.google.cloud.deploymentmanager.autogen;
 
 import static com.google.cloud.deploymentmanager.autogen.proto.GceMetadataItem.ValueSpecCase.VALUE_FROM_DEPLOY_INPUT_FIELD;
 import static com.google.cloud.deploymentmanager.autogen.proto.LocalSsdSpec.CountSpecCase.COUNT_FROM_DEPLOY_INPUT_FIELD;
+import static com.google.template.soy.data.SoyValueConverter.markAsSoyMap;
 
 import com.google.cloud.deploymentmanager.autogen.proto.BooleanExpression;
 import com.google.cloud.deploymentmanager.autogen.proto.BooleanExpression.BooleanDeployInputField;
@@ -31,6 +32,7 @@ import com.google.cloud.deploymentmanager.autogen.proto.GceMetadataItem;
 import com.google.cloud.deploymentmanager.autogen.proto.MultiVmDeploymentPackageSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.SingleVmDeploymentPackageSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.ZoneSpec;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -89,6 +91,7 @@ final class SoyFunctions {
       soyFunctionSetBinder.addBinding().to(ListDeployInputFields.class);
       soyFunctionSetBinder.addBinding().to(ExternalIpTypeName.class);
       soyFunctionSetBinder.addBinding().to(SolutionHasGpus.class);
+      soyFunctionSetBinder.addBinding().to(GetTestConfigDefaultValues.class);
     }
   }
 
@@ -313,6 +316,50 @@ final class SoyFunctions {
                   field.getName()));
       }
       return converter.convert(value).resolve();
+    }
+  }
+
+  @VisibleForTesting
+  @Singleton
+  @SoyFunctionSignature(
+      name = "getTestConfigDefaultValues",
+      value = {
+        @Signature(
+            parameterTypes = {
+              "cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec|cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec"
+            },
+            returnType = "map<string, string>")
+      })
+  static final class GetTestConfigDefaultValues extends TypedSoyFunction
+      implements SoyJavaFunction {
+    @Inject SoyValueConverter converter;
+
+    private static final String DEFAULT_ZONE_PROP_NAME = "zone";
+    private static final String DEFAULT_ZONE = "us-central1-f";
+
+    private static Map<String, String> getZoneDefaultValue(ZoneSpec zoneSpec) {
+      ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
+      if (zoneSpec.getDefaultZone().isEmpty()) {
+        result.put(DEFAULT_ZONE_PROP_NAME, DEFAULT_ZONE);
+      }
+      return result.build();
+    }
+
+    @Override
+    public SoyValue computeForJava(List<SoyValue> args) {
+      Message message = ((SoyProtoValue) args.get(0)).getProto();
+      if (message instanceof SingleVmDeploymentPackageSpec) {
+        return converter
+            .convert(
+                markAsSoyMap(
+                    getZoneDefaultValue(((SingleVmDeploymentPackageSpec) message).getZone())))
+            .resolve();
+      }
+
+      return converter
+          .convert(
+              markAsSoyMap(getZoneDefaultValue(((MultiVmDeploymentPackageSpec) message).getZone())))
+          .resolve();
     }
   }
 

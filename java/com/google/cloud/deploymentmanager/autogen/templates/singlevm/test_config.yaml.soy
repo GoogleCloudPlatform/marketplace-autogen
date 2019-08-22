@@ -14,10 +14,14 @@ resources:
 - name: {$solutionId}
   type: {$template}
   {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
-  {if length($testDefaultedFields) > 0}
+  {let $defaultMap: getTestConfigDefaultValues($spec)/}
+  {if length($testDefaultedFields) > 0 or length(mapKeys($defaultMap)) > 0}
   properties:
   {/if}
     {for $field in $testDefaultedFields}
     {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
+    {/for}
+    {for $key in mapKeys($defaultMap)}
+    {$key |yamlprimitive: 4}: {$defaultMap[$key] |yamlprimitive: 4}
     {/for}
 {/template}

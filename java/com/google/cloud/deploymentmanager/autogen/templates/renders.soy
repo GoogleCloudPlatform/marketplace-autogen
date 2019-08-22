@@ -466,8 +466,6 @@ serviceAccounts:
   type: string
   {if $zoneSpec and $zoneSpec.defaultZone}
   default: {$zoneSpec.defaultZone}
-  {else}
-  default: us-central1-f
   {/if}
   x-googleProperty:
     type: GCE_ZONE

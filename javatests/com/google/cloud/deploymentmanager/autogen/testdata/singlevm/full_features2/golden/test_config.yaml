@@ -8,3 +8,4 @@ resources:
     input_domain: mydomain.test.com
     input_adminEmailAddress: default-user@example.com
     input_optionalEmailAddress: test_default_value@example.com
+    zone: us-central1-f
