@@ -76,6 +76,10 @@ properties:
       gceNetwork:
         allowSharedVpcs: True
         machineTypeProperty: machineType
+        labels:
+        - Main
+        - Management
+        - Extra
   subnetwork:
     type: array
     minItems: 2

@@ -1532,6 +1532,23 @@ public class SpecValidationsTest {
   }
 
   @Test
+  public void networkInterfacesLabelsDoNotFailIfNotExceedMinCountPlus1_singleVm() {
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(2);
+    builder.getNetworkInterfacesBuilder().addAllLabels(ImmutableList.of("1", "2", "3"));
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesLabelsMustNotExceedMinCountPlus1_singleVm() {
+    expectIllegalArgumentException("The number of labels must not exceed min_count + 1.");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.getNetworkInterfacesBuilder().setMinCount(2);
+    builder.getNetworkInterfacesBuilder().addAllLabels(ImmutableList.of("1", "2", "3", "4"));
+    validate(builder.build());
+  }
+
+  @Test
   public void networkInterfacesMustHaveMinCountGreaterThan0_singleVm() {
     expectIllegalArgumentException("Minimum number of Network interfaces must be greater than 0.");
     SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
@@ -1574,6 +1591,29 @@ public class SpecValidationsTest {
   public void networkInterfacesDoNotFailWithCorrectMinAndMaxCountEqual_singleVm() {
     SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
     builder.getNetworkInterfacesBuilder().setMinCount(3).setMaxCount(3);
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesLabelsMustNotExceedMinCountPlus1_multiVm() {
+    expectIllegalArgumentException("The number of labels must not exceed min_count + 1.");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(2);
+    builder
+        .getTiersBuilder(1)
+        .getNetworkInterfacesBuilder()
+        .addAllLabels(ImmutableList.of("1", "2", "3", "4"));
+    validate(builder.build());
+  }
+
+  @Test
+  public void networkInterfacesLabelsDoNotFailIfNotExceedMinCountPlus1_multiVm() {
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(1).getNetworkInterfacesBuilder().setMinCount(2);
+    builder
+        .getTiersBuilder(1)
+        .getNetworkInterfacesBuilder()
+        .addAllLabels(ImmutableList.of("1", "2", "3"));
     validate(builder.build());
   }
 

@@ -553,6 +553,12 @@ serviceAccounts:
     gceNetwork:
       allowSharedVpcs: True
       machineTypeProperty: {'machineType' |tierprefixed: $tier}
+      {if length($spec.labelsList) > 0}
+      labels:
+      {for $label in $spec.labelsList}
+      - {$label}
+      {/for}
+      {/if}
 {'sub' + $nameSuffix |tierprefixed: $tier}:
   type: array
   minItems: {$spec.minCount}

@@ -332,6 +332,9 @@ final class SpecValidations {
         String.format(
             "Maxmium number of Network interfaces must be greater than minimum and at most %d.",
             MAX_NICS));
+    checkArgument(
+        spec.getLabelsCount() <= spec.getMinCount() + 1,
+        "The number of labels must not exceed min_count + 1.");
     validateExternalIp(spec.getExternalIp());
   }
 

@@ -350,6 +350,12 @@ message NetworkInterfacesSpec {
   // will take the value of min_count).
   int32 max_count = 3;
   ExternalIpSpec external_ip = 5;
+
+  // Label that will be in front of each Network Interface (according to the
+  // index in this list).
+  // If the list is greater than min_count, the last label will be used to name
+  // all networks added beyond min_count.
+  repeated string labels = 6;
 }
 
 // Specifies if the VM can route IP packets.

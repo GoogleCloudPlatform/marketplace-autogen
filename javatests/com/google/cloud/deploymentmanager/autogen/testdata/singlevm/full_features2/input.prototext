@@ -190,6 +190,7 @@ spec {
       external_ip {
         not_configurable: false
       }
+      labels: ["Main", "Management", "Extra"]
     }
     gce_startup_script {
       bash_script_content: "echo SUCCESS > /var/log/startup-log.txt"
