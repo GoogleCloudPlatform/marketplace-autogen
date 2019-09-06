@@ -84,6 +84,7 @@ properties:
       gceExternalIp:
         networkProperty: main_network
         notConfigurable: False
+        allowStaticIps: True
   main_enableCloudReadonlyApi:
     type: boolean
     default: True
@@ -278,6 +279,7 @@ properties:
       gceExternalIp:
         networkProperty: tier2_network
         notConfigurable: True
+        allowStaticIps: True
   tier2_bootDiskType:
     type: string
     default: pd-standard
@@ -368,6 +370,7 @@ properties:
       gceExternalIp:
         networkProperty: tier3_network
         notConfigurable: False
+        allowStaticIps: True
   tier3_bootDiskType:
     type: string
     default: pd-standard

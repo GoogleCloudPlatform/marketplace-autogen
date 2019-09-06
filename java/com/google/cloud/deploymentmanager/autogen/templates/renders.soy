@@ -578,6 +578,7 @@ serviceAccounts:
     gceExternalIp:
       networkProperty: {$networkPropName}
       notConfigurable: {if $spec.externalIp.notConfigurable}True{else}False{/if}
+      allowStaticIps: True
 {/template}
 
 

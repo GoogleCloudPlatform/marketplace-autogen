@@ -65,6 +65,7 @@ properties:
       gceExternalIp:
         networkProperty: network
         notConfigurable: True
+        allowStaticIps: True
   bootDiskType:
     type: string
     default: pd-standard
