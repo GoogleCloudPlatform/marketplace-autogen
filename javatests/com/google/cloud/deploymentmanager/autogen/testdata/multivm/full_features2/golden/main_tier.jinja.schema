@@ -80,6 +80,7 @@ properties:
       gceExternalIp:
         networkProperty: network
         notConfigurable: False
+        allowStaticIps: True
   enableCloudReadonlyApi:
     type: boolean
     default: True
