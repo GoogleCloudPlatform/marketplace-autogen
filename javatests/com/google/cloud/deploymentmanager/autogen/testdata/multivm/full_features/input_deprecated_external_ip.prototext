@@ -657,6 +657,8 @@ spec {
     }
     zone {
       default_zone: "us-west1-b"
+      whitelisted_zones: ["us-east4-a"]
+      whitelisted_regions: ["europe-west1"]
     }
     stackdriver {
       logging {

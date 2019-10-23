@@ -69,6 +69,10 @@ solution_info {
 spec {
   version: "1.00"
   single_vm {
+    zone {
+      whitelisted_zones: ["us-central1-a", "europe-west1-a", "asia-northeast1-b"]
+      whitelisted_regions: ["us-east4", "southamerica-east1"]
+    }
     images {
       project: "bitnami-launchpad"
       name: "bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"

@@ -36,6 +36,11 @@ properties:
     default: us-west1-b
     x-googleProperty:
       type: GCE_ZONE
+      gceZone:
+        whitelistedZones:
+        - us-east4-a
+        whitelistedRegions:
+        - europe-west1
   main_instanceCount:
     type: integer
     default: 3

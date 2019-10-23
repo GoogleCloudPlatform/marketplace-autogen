@@ -35,6 +35,14 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+      gceZone:
+        whitelistedZones:
+        - us-central1-a
+        - europe-west1-a
+        - asia-northeast1-b
+        whitelistedRegions:
+        - us-east4
+        - southamerica-east1
   image:
     type: string
     enum:
