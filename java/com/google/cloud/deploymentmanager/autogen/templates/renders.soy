@@ -469,6 +469,22 @@ serviceAccounts:
   {/if}
   x-googleProperty:
     type: GCE_ZONE
+    {if $zoneSpec and (length($zoneSpec.whitelistedZonesList) > 0 or
+      length($zoneSpec.whitelistedRegionsList) > 0)}
+    gceZone:
+      {if length($zoneSpec.whitelistedZonesList) > 0}
+      whitelistedZones:
+      {for $zone in $zoneSpec.whitelistedZonesList}
+      - {$zone}
+      {/for}
+      {/if}
+      {if length($zoneSpec.whitelistedRegionsList) > 0}
+      whitelistedRegions:
+      {for $region in $zoneSpec.whitelistedRegionsList}
+      - {$region}
+      {/for}
+      {/if}
+    {/if}
 {/template}
 
 

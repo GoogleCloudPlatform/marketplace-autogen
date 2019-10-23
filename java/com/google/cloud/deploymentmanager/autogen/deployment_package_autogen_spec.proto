@@ -709,6 +709,14 @@ message AcceleratorSpec {
 message ZoneSpec {
   // Sets the default zone.
   string default_zone = 1;
+
+  // Lists the zones that are allowed to be used in this DM package. If list is
+  // empty, all zones are allowed.
+  repeated string whitelisted_zones = 2;
+
+  // Lists the regions that are allowed to be used in this DM package. Only the
+  // zones that belong to the specified regions will be allowed to be used.
+  repeated string whitelisted_regions = 3;
 }
 
 message StackdriverSpec {
