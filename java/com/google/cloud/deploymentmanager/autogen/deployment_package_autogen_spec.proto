@@ -514,7 +514,7 @@ message ApplicationStatusSpec {
     // Deprecated.
     LEGACY_DETECTOR = 1;
     // Uses runtime config waiter to block the deployment until the
-    // the application finishes installing. Accompanied by WaiterSpec.
+    // application finishes installing. Accompanied by WaiterSpec.
     WAITER = 2;
   }
   // Defines how to monitor application installation status. Required.
