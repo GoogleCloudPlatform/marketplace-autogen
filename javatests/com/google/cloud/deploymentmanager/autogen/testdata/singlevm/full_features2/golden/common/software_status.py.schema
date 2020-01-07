@@ -1,5 +1,4 @@
-imports:
-  - path: software_status.py
+imports: []
 
 properties:
   timeout:
