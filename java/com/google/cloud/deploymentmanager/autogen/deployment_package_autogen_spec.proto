@@ -42,6 +42,29 @@ message DeploymentPackageAutogenSpec {
 
 // Specifies a solution that deploys a single VM.
 // Next ID: 22
+//
+// (== yamlExample
+// partnerId: my-partner-id
+// solutionId: example-autogen-solution
+// spec:
+//   singleVm:
+//     siteUrl:
+//       scheme: HTTP
+//     firewallRules:
+//     - port: "80"
+//       protocol: TCP
+//     images:
+//     - name: debian-10-buster-v20191210
+//       project: debian-cloud
+//     gceStartupScript:
+//       bashScriptContent: |-
+//         apt-get update
+//         apt-get install -y apache2
+//         cat <<EOF > /var/www/html/index.html
+//         <html><body><h1>Hello World</h1>
+//         <p>This page was created from a simple startup script!</p>
+//         </body></html>
+// ==)
 message SingleVmDeploymentPackageSpec {
   // Defines the disk images. If there are more than one, the user can select
   // which image to deploy with. The 1st image is the default.
@@ -122,6 +145,40 @@ message SingleVmDeploymentPackageSpec {
 
 // Specifies a solution that deploys Multiple VMs.
 // Next ID: 9
+//
+// (== yamlExample
+// partnerId: my-partner-id
+// solutionId: example-autogen-solution
+// spec:
+//   multiVm:
+//     siteUrl:
+//      scheme: HTTP
+//      tierVm:
+//        tier: debian
+//     tiers:
+//     - name: debian
+//       title: Debian 10
+//       firewallRules:
+//       - port: "80"
+//         protocol: TCP
+//         allowedSource: PUBLIC
+//       images:
+//       - name: debian-10-buster-v20191210
+//         project: debian-cloud
+//       instanceCount:
+//         defaultValue: 3
+//         range:
+//           startValue: 1
+//           endValue: 12
+//       gceStartupScript:
+//         bashScriptContent: |-
+//           apt-get update
+//           apt-get install -y apache2
+//           cat <<EOF > /var/www/html/index.html
+//           <html><body><h1>Hello World</h1>
+//           <p>This page was created from a simple startup script!</p>
+//           </body></html>
+// ==)
 message MultiVmDeploymentPackageSpec {
   // One or more tiers.
   repeated VmTierSpec tiers = 1;
@@ -396,14 +453,14 @@ message FirewallRuleSpec {
   // or a port range like "32768-40000".
   string port = 2;
   // Specifies that by default it should be off.
-  // Applicable to TrafficSource.PUBLIC only.
+  // Applicable to `TrafficSource.PUBLIC` only.
   bool default_off = 3;
   // Whether to restrict the user from changing away from the default settings.
   // Not supported yet (always false).
-  // Applicable to TrafficSource.PUBLIC only.
+  // Applicable to `TrafficSource.PUBLIC` only.
   bool not_configurable = 4;
   // Source of traffic, wrapping range/tags with friendly enum.
-  // Defaults to TrafficSource.PUBLIC.
+  // Defaults to `TrafficSource.PUBLIC`.
   TrafficSource allowed_source = 5;
 }
 
@@ -554,7 +611,7 @@ message ApplicationStatusSpec {
     // directly signal the waiter.
     ScriptSpec script = 2;
   }
-  // Required if type is WAITER.
+  // Required if type is `WAITER`.
   WaiterSpec waiter = 2;
 }
 
@@ -643,7 +700,7 @@ message PostDeployInfo {
   repeated InfoRow info_rows = 2;
 
   // Optional label to use for the button that connects to the VM.
-  // Deprecated in favor of connect_button.display_label.
+  // Deprecated in favor of `ConnectToInstanceSpec.displayLabel`.
   string connect_button_label = 3 [deprecated = true];
 
   ConnectToInstanceSpec connect_button = 4;
@@ -770,7 +827,7 @@ message DeployInputSection {
   // Convention is to use an UPPERCASE_UNDERSCORE name.
   string name = 2;
 
-  // For Placement.TIER, this specifies the required tier name.
+  // For `Placement.TIER`, this specifies the required tier name.
   string tier = 7;
 
   // Section title, required if this section is a custom one.
@@ -866,8 +923,8 @@ message DeployInputField {
     Validation validation = 2;
     string placeholder = 3;
     // This attribute is used as field's value in automated tests.
-    // If present, it overrides the default_value. For required fields without
-    // default_value, it is required to set test_default_value.
+    // If present, it overrides the `default_value`. For required fields without
+    // `default_value`, it is required to set `test_default_value`.
     OptionalInt32 test_default_value = 4;
   }
 
@@ -893,8 +950,8 @@ message DeployInputField {
     Validation validation = 2;
     string placeholder = 3;
     // This attribute is used as field's value in automated tests.
-    // If present, it overrides the default_value. For required fields without
-    // default_value, it is required to set test_default_value.
+    // If present, it overrides the `default_value`. For required fields without
+    // `default_value`, it is required to set `test_default_value`.
     string test_default_value = 4;
   }
 
@@ -916,7 +973,7 @@ message DeployInputField {
     // This attribute is used as field's value in automated tests.
     // Defaults to default-user@example.com if this field is required unless
     // the default_value or this field is explicitly present.
-    // If present, it overrides the default_value.
+    // If present, it overrides the `default_value`.
     string test_default_value = 4;
   }
 
