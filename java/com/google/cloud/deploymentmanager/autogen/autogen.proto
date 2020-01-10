@@ -32,158 +32,158 @@ import "java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto";
 // partnerId: my-partner-id
 // solutionId: example-autogen-solution
 // partnerInfo:
-// name: Autogen Example Co.
-// description: |
-//   This is a long description that should be at most 2048 characters and can contain line breaks
-//   The pipe operation above denotest that this is a multi-line sentence
-// url: https://www.google.com
-// shortDescription: This is a short partner description, with at most 300 characters
+//   name: Autogen Example Co.
+//   description: |
+//     This is a long description that should be at most 2048 characters and can contain line breaks
+//     The pipe operation above denotest that this is a multi-line sentence
+//   url: https://www.google.com
+//   shortDescription: This is a short partner description, with at most 300 characters
 // solutionInfo:
-// name: Autogen Solution Example
-// version: 1.0
-// description: This is a long description of the solution. Follows the same size constraints of the
-//   partnerInfo description and can contain HTML tags
-// url: https://www.google.com
-// tagline: Short solution description displayed right below the solution title (100 chars max)
-// supportInfo: Some description of the support provided for this solution
-// supportUrl: https://www.google.com
-// eulaUrl: https://www.google.com
-// documentations:
-//   - url: https://www.google.com
-//     title: Getting Started
-//     description: Get started docs for this example solution
-//     # List of places where this support info should be displayed
-//     # check marketing_info.proto for options
-//     destinations:
-//       - DESTINATION_POST_DEPLOY
-//   - url: https://www.google.com
-//     title: Some more docs
-//     description: Additional docs for this solution
-//     destinations:
-//       - DESTINATION_POST_DEPLOY
-//       - DESTINATION_CONFIGURATION
-// packagedSoftwareGroups:
-//   - type: SOFTWARE_GROUP_OS
-//     components:
-//       - name: Ubuntu
-//         version: 16.04 LTS
-//   - components:
-//       - name: Apache
-//         version: 2.4.23
+//   name: Autogen Solution Example
+//   version: 1.0
+//   description: This is a long description of the solution. Follows the same size constraints of the
+//     partnerInfo description and can contain HTML tags
+//   url: https://www.google.com
+//   tagline: Short solution description displayed right below the solution title (100 chars max)
+//   supportInfo: Some description of the support provided for this solution
+//   supportUrl: https://www.google.com
+//   eulaUrl: https://www.google.com
+//   documentations:
+//     - url: https://www.google.com
+//       title: Getting Started
+//       description: Get started docs for this example solution
+//       # List of places where this support info should be displayed
+//       # check marketing_info.proto for options
+//       destinations:
+//         - DESTINATION_POST_DEPLOY
+//     - url: https://www.google.com
+//       title: Some more docs
+//       description: Additional docs for this solution
+//       destinations:
+//         - DESTINATION_POST_DEPLOY
+//         - DESTINATION_CONFIGURATION
+//   packagedSoftwareGroups:
+//     - type: SOFTWARE_GROUP_OS
+//       components:
+//         - name: Ubuntu
+//           version: 16.04 LTS
+//     - components:
+//         - name: Apache
+//           version: 2.4.23
 // logo:
-// raw:
-//   contentType: PNG
-//   # Base 64 encoded image
-//   content: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
-// description: Solution Logo
+//   raw:
+//     contentType: PNG
+//     # Base 64 encoded image
+//     content: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
+//   description: Solution Logo
 // spec:
-// version: 1.0
-// # multiVm option is also available
-// singleVm:
-//   images:
-//     # if more than one image is provided, the user will be able to select which one they want
-//     - project: your-project-id-that-the-image-belongs-to
-//       name: name-of-your-image
-//      label: Label to show in the selection dropdown
-//   machineType:
-//     # Check http://cloud.google.com/compute/docs/machine-types for all available types
-//     defaultMachineType:
-//       gceMachineType: n1-standard-4
-//     # Minimum CPU and memory constraints for the machine type to run your solution properly
-//     minimum:
-//       cpu: 2
-//       ramGb: 4
-//   bootDisk:
-//     # Describes the default and minimum disk size (GB) that user should have to run your solution properly
-//     diskSize:
-//       defaultSizeGb: 30
-//       minSizeGb: 20
-//     diskType:
-//       # For more information about disk types: http://cloud.google.com/compute/docs/reference/latest/diskTypes
-//       # Some types: pd-standard, local-ssd, pd-ssd
-//       defaultType: pd-standard
-//     # Defaults to Boot Disk
-//     displayLabel: My Boot Disk
-//     # Additional SSDs to be attached to you VM
-//   localSsds:
-//     count: 2
-//   # Adds the option for the use to set IP forwarding when deploying this solution
-//   # More info: http://cloud.google.com/compute/docs/networking#eventualconsistency
-//   ipForwarding:
-//     defaultOff: true
-//   # List of firewall rules for this solution. If not specified, allowedSource will be set to PUBLIC by default
-//   # More details in deployment_package_autogen_spec.proto
-//   firewallRules:
-//     - protocol: TCP
-//       # Can be a range of ports, in the format 32768-40000
-//       port: 80
-//   # Rules to specify how to generate passwords
-//   passwords:
-//     # This password identifier that
-//     - metadataKey: my-password-1
-//       length: 8
-//       allowSpecialChars: true
-//       username: solutionuser
-//       # Label to describe the purpose of this password (will default to Admin in case only one password is provided)
-//       displayLabel: Admin
-//   gceStartupScript:
-//     bashScriptContent: echo SUCCESS > /var/log/startup-log.txt
-//   # Post deployment information that will be displayed to the user to actions upon
-//   postDeploy:
-//     # List of suggested action items for users, after deployment is successful
-//     actionItems:
-//       - heading: Log on now
-//         description: "Start using your application by accessing the following URL: https://www.google.com"
-//         snippet: $ some code snippets can go here, to show some examples
-//       - heading: Another label
-//         description: Another description
-//         showIf:
-//           # We make this action only show in the post deployment page if a boolean expression is satisfied
-//           # In this example, only if an input field (see deployInput sections below) in the DM config UI is selected
-//           booleanDeployInputField:
-//             name: booleanField1
-//     # In the post deployment page we can show a table to expose some more details about the deployed solution
-//     infoRows:
-//       - label: Property 1
-//         value: Value for property 1
-//       - label: Property 2
-//         # We can specify values from custom deploy input fields present in this spec
-//         valueFromDeployInputField: additionalEmail
-//   # Field describing the accelerators that can be attached to this VM. For now, only one acceleratorSpec is allowed
-//   accelerators:
-//     # List of available GPUs (user can only pick one type). This list is required. Types: https://cloud.google.com/compute/docs/gpus/
-//     # Check the ids of the GPUs through GCP API: https://cloud.google.com/compute/docs/reference/latest/acceleratorTypes
-//     - types:
-//         - nvidia-tesla-k80
-//         - nvidia-tesla-p100
-//       defaultType: nvidia-tesla-p100
-//       # Only values of 0, 1, 2, 4, and 8 are supported.
-//       defaultCount: 2
-//   # Here we can specify extra input fields to be passed to the deployment manager
-//   deployInput:
-//     sections:
-//       # The place int he Deployment Manager config that this section will appear. More details in deployment_package_autogen_spec.proto
-//       - placement: MAIN
-//         name: idOfThisSection
-//         title: Title that will appear on top of this section
-//         description: This will appear below the title
-//         tooltip: Tooltip for this section
-//         # List of input fields that this section has
-//         fields:
-//           - required: true
-//             name: adminEmail
-//             title: Enter your e-mail here
-//             description: Some description to go below the title
-//             tooltip: Tooltipe for this input field
-//             emailBox: {}
-//           - required: false
-//             name: additionalEmail
-//             title: Additional email address
-//             emailBox: {}
-//           - required:
-//             name: booleanField1
-//             title: Boolean checkbox used to tell whether our actionItem above should be displayed or not
-//             booleanCheckbox: {}
+//   version: 1.0
+//   # multiVm option is also available
+//   singleVm:
+//     images:
+//       # if more than one image is provided, the user will be able to select which one they want
+//       - project: your-project-id-that-the-image-belongs-to
+//         name: name-of-your-image
+//         label: Label to show in the selection dropdown
+//     machineType:
+//       # Check http://cloud.google.com/compute/docs/machine-types for all available types
+//       defaultMachineType:
+//         gceMachineType: n1-standard-4
+//       # Minimum CPU and memory constraints for the machine type to run your solution properly
+//       minimum:
+//         cpu: 2
+//         ramGb: 4
+//     bootDisk:
+//       # Describes the default and minimum disk size (GB) that user should have to run your solution properly
+//       diskSize:
+//         defaultSizeGb: 30
+//         minSizeGb: 20
+//       diskType:
+//         # For more information about disk types: http://cloud.google.com/compute/docs/reference/latest/diskTypes
+//         # Some types: pd-standard, local-ssd, pd-ssd
+//         defaultType: pd-standard
+//       # Defaults to Boot Disk
+//       displayLabel: My Boot Disk
+//       # Additional SSDs to be attached to you VM
+//     localSsds:
+//       count: 2
+//     # Adds the option for the use to set IP forwarding when deploying this solution
+//     # More info: http://cloud.google.com/compute/docs/networking#eventualconsistency
+//     ipForwarding:
+//       defaultOff: true
+//     # List of firewall rules for this solution. If not specified, allowedSource will be set to PUBLIC by default
+//     # More details in deployment_package_autogen_spec.proto
+//     firewallRules:
+//       - protocol: TCP
+//         # Can be a range of ports, in the format 32768-40000
+//         port: 80
+//     # Rules to specify how to generate passwords
+//     passwords:
+//       # This password identifier that
+//       - metadataKey: my-password-1
+//         length: 8
+//         allowSpecialChars: true
+//         username: solutionuser
+//         # Label to describe the purpose of this password (will default to Admin in case only one password is provided)
+//         displayLabel: Admin
+//     gceStartupScript:
+//       bashScriptContent: echo SUCCESS > /var/log/startup-log.txt
+//     # Post deployment information that will be displayed to the user to actions upon
+//     postDeploy:
+//       # List of suggested action items for users, after deployment is successful
+//       actionItems:
+//         - heading: Log on now
+//           description: "Start using your application by accessing the following URL: https://www.google.com"
+//           snippet: $ some code snippets can go here, to show some examples
+//         - heading: Another label
+//           description: Another description
+//           showIf:
+//             # We make this action only show in the post deployment page if a boolean expression is satisfied
+//             # In this example, only if an input field (see deployInput sections below) in the DM config UI is selected
+//             booleanDeployInputField:
+//               name: booleanField1
+//       # In the post deployment page we can show a table to expose some more details about the deployed solution
+//       infoRows:
+//         - label: Property 1
+//           value: Value for property 1
+//         - label: Property 2
+//           # We can specify values from custom deploy input fields present in this spec
+//           valueFromDeployInputField: additionalEmail
+//     # Field describing the accelerators that can be attached to this VM. For now, only one acceleratorSpec is allowed
+//     accelerators:
+//       # List of available GPUs (user can only pick one type). This list is required. Types: https://cloud.google.com/compute/docs/gpus/
+//       # Check the ids of the GPUs through GCP API: https://cloud.google.com/compute/docs/reference/latest/acceleratorTypes
+//       - types:
+//           - nvidia-tesla-k80
+//           - nvidia-tesla-p100
+//         defaultType: nvidia-tesla-p100
+//         # Only values of 0, 1, 2, 4, and 8 are supported.
+//         defaultCount: 2
+//     # Here we can specify extra input fields to be passed to the deployment manager
+//     deployInput:
+//       sections:
+//         # The place int he Deployment Manager config that this section will appear. More details in deployment_package_autogen_spec.proto
+//         - placement: MAIN
+//           name: idOfThisSection
+//           title: Title that will appear on top of this section
+//           description: This will appear below the title
+//           tooltip: Tooltip for this section
+//           # List of input fields that this section has
+//           fields:
+//             - required: true
+//               name: adminEmail
+//               title: Enter your e-mail here
+//               description: Some description to go below the title
+//               tooltip: Tooltipe for this input field
+//               emailBox: {}
+//             - required: false
+//               name: additionalEmail
+//               title: Additional email address
+//               emailBox: {}
+//             - required:
+//               name: booleanField1
+//               title: Boolean checkbox used to tell whether our actionItem above should be displayed or not
+//               booleanCheckbox: {}
 // ==)
 message DeploymentPackageInput {
   // The partner ID. Required.
