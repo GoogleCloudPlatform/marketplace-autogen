@@ -49,7 +49,8 @@ import java.util.List;
  */
 final class SpecDefaults {
 
-  private static final String DEFAULT_MACHINE_TYPE = "f1-micro";
+  private static final String DEFAULT_MACHINE_TYPE = "e2-small";
+  private static final String DEFAULT_MACHINE_TYPE_GPU_SUPPORT = "n1-standard-1";
 
   private static final int DEFAULT_BOOT_DISK_SIZE_GB = 10;
   private static final String DEFAULT_BOOT_DISK_TYPE = "pd-standard";
@@ -73,7 +74,8 @@ final class SpecDefaults {
    */
   public static SingleVmDeploymentPackageSpec.Builder fillInMissingDefaults(
       SingleVmDeploymentPackageSpec.Builder input) {
-    setMachineTypeDefaults(input.getMachineTypeBuilder());
+    setMachineTypeDefaults(
+        input.getMachineTypeBuilder(), !input.getAcceleratorsBuilderList().isEmpty());
     setAceleratorsDefaults(input.getAcceleratorsBuilderList());
     setBootDiskDefaults(input.getBootDiskBuilder());
     setAdditionalDisksDefaults(input.getAdditionalDisksBuilderList());
@@ -99,7 +101,8 @@ final class SpecDefaults {
       MultiVmDeploymentPackageSpec.Builder input) {
     for (VmTierSpec.Builder tier : input.getTiersBuilderList()) {
       setInstanceCountDefaults(tier.getInstanceCountBuilder());
-      setMachineTypeDefaults(tier.getMachineTypeBuilder());
+      setMachineTypeDefaults(
+          tier.getMachineTypeBuilder(), !tier.getAcceleratorsBuilderList().isEmpty());
       setAceleratorsDefaults(tier.getAcceleratorsBuilderList());
       setBootDiskDefaults(tier.getBootDiskBuilder());
       setAdditionalDisksDefaults(tier.getAdditionalDisksBuilderList());
@@ -189,10 +192,12 @@ final class SpecDefaults {
     setExternalIpDefaults(input.getExternalIpBuilder());
   }
 
-  private static void setMachineTypeDefaults(MachineTypeSpec.Builder input) {
-    if (!input.hasDefaultMachineType()) {
+  private static void setMachineTypeDefaults(MachineTypeSpec.Builder input, boolean supportGpu) {
+    if (input.getDefaultMachineTypeOrBuilder().getGceMachineType().isEmpty()) {
       input.setDefaultMachineType(
-          MachineType.newBuilder().setGceMachineType(DEFAULT_MACHINE_TYPE));
+          MachineType.newBuilder()
+              .setGceMachineType(
+                  supportGpu ? DEFAULT_MACHINE_TYPE_GPU_SUPPORT : DEFAULT_MACHINE_TYPE));
     }
   }
 
