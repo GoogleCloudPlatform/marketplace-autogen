@@ -91,6 +91,46 @@ public class SpecDefaultsTest {
   }
 
   @Test
+  public void shouldSetMachineTypeForGpuSupport() {
+    MachineTypeSpec machineTypeSpec =
+        MachineTypeSpec.newBuilder()
+            .setDefaultMachineType(MachineType.getDefaultInstance())
+            .build();
+    AcceleratorSpec gpuSpec = AcceleratorSpec.newBuilder().addTypes("nvidia-gpu").build();
+
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(
+            newSingleSpec().setMachineType(machineTypeSpec).addAccelerators(gpuSpec));
+    assertThat(single.getMachineType().getDefaultMachineType().getGceMachineType())
+        .startsWith("n1");
+
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi.getTiersBuilder(0).setMachineType(machineTypeSpec).addAccelerators(gpuSpec);
+    fillInMissingDefaults(multi);
+    assertThat(multi.getTiers(0).getMachineType().getDefaultMachineType().getGceMachineType())
+        .startsWith("n1");
+  }
+
+  @Test
+  public void shouldSetE2AsDefaultMachineType() {
+    MachineTypeSpec machineTypeSpec =
+        MachineTypeSpec.newBuilder()
+            .setDefaultMachineType(MachineType.getDefaultInstance())
+            .build();
+
+    SingleVmDeploymentPackageSpec.Builder single =
+        fillInMissingDefaults(newSingleSpec().setMachineType(machineTypeSpec));
+    assertThat(single.getMachineType().getDefaultMachineType().getGceMachineType())
+        .startsWith("e2");
+
+    MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
+    multi.getTiersBuilder(0).setMachineType(machineTypeSpec);
+    fillInMissingDefaults(multi);
+    assertThat(multi.getTiers(0).getMachineType().getDefaultMachineType().getGceMachineType())
+        .startsWith("e2");
+  }
+
+  @Test
   public void shouldNotOverwriteBootDisk() {
     DiskSpec diskSpec =
         DiskSpec.newBuilder()
