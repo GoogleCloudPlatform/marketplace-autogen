@@ -76,7 +76,7 @@ final class SoyDirectives {
       if (args.size() == 2) {
         joiner = args.get(1).coerceToString();
       }
-      VmTierSpec tier = (VmTierSpec) (((SoyProtoValue) args.get(0)).getProto());
+      VmTierSpec tier = (VmTierSpec) ((SoyProtoValue) args.get(0)).getProto();
       return StringData.forValue(
           String.format("%s%s%s", tier.getName(), joiner, value.coerceToString()));
     }
