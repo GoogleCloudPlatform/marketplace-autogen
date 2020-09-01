@@ -1,8 +1,9 @@
 {namespace vm.multi}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template .jinja kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param spec: proto.MultiVmDeploymentPackageSpec}
 
 {% import "path_utils.jinja" as path_utils with context %}
 {\n}

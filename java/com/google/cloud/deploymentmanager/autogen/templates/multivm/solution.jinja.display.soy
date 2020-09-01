@@ -1,10 +1,13 @@
 {namespace vm.multi}
 
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {PartnerMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+
 /** Generates solution.jinja.display file. */
 {template .display kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param spec: proto.MultiVmDeploymentPackageSpec}
 {@param? partnerId: string}
-{@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
+{@param? partnerInfo: PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
 {let $partnerName kind="text"}
@@ -236,7 +239,7 @@ metadata_version: v1
 
 
 {template .displayTierProperties kind="text" /*visibility="private"*/}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {let $section kind="text"}
 section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
 {/let}

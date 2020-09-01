@@ -87,7 +87,7 @@ maven_jar(
 
 maven_jar(
     name = "com_google_template_soy",
-    artifact = "com.google.template:soy:2019-07-14",
+    artifact = "com.google.template:soy:2020-08-24",
 )
 
 maven_jar(
