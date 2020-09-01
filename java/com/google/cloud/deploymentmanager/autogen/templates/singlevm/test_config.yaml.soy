@@ -1,9 +1,11 @@
 {namespace vm.single}
 
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
 /** Generates top level template solution.jinja file. */
 {template .test_config kind="text"}
 {@param solutionId: string}
-{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
+{@param spec: proto.SingleVmDeploymentPackageSpec}
 
 {let $template: $solutionId + '.jinja'/}
 

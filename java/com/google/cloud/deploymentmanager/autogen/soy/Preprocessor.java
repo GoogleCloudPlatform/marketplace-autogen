@@ -32,20 +32,21 @@ import java.util.regex.Pattern;
  * Preprocesses a soy template content by inserting special characters to preserve line breaks and
  * indentations, as well as auto-escaping special Jinja delimiters. This helps preserving YAML
  * structure, as well as easing the crafting of Jinja templates.
- * 
+ *
  * <p>The preprocessor strips off all comments.
  *
  * <p>The following Jinja delimiters are automatically escaped: <code>{%</code>, <code>%}</code>,
  * <code>{{</code>, and <code>}}</code>.
  *
  * <p>"Left as-is" means that the line is unmodified and will follow the soy's line joining.
- * Otherwise, a <code>{nil}</code> is inserted at the beginning of the line, and a
- * <code>{\n}</code> is inserted at the end of the line. A line is left as-is if:
+ * Otherwise, a <code>{nil}</code> is inserted at the beginning of the line, and a <code>{\n}</code>
+ * is inserted at the end of the line. A line is left as-is if:
+ *
  * <ul>
- * <li>It is empty or contains only spaces
- * <li>It has only soy commands other than {@code print}
- * <li>It contains any special character in the following list: <code>{sp}</code>,
- * <code>{nil}</code>, <code>{\r}</code>, <code>{\n}</code>, and <code>{\t}</code>
+ *   <li>It is empty or contains only spaces
+ *   <li>It has only soy commands other than {@code print}
+ *   <li>It contains any special character in the following list: <code>{sp}</code>, <code>{nil}
+ *       </code>, <code>{\r}</code>, <code>{\n}</code>, and <code>{\t}</code>
  * </ul>
  */
 final class Preprocessor {
@@ -53,17 +54,16 @@ final class Preprocessor {
   // Soy double slash single line comment only counts if it's preceded by an empty space.
   // This is because soy wants to support "http://" without the needs for escaping.
   // Also counts leading spaces as part of the comment.
-  private static final Pattern SOY_SINGLE_LINE_COMMENT_REGEX = Pattern.compile(
-      "(?:^| +)//.*?$", Pattern.MULTILINE);
-  
+  private static final Pattern SOY_SINGLE_LINE_COMMENT_REGEX =
+      Pattern.compile("(?:^| +)//.*?$", Pattern.MULTILINE);
+
   // Also counts leading spaces as part of the comment.
-  private static final Pattern SOY_BLOCK_COMMENT_REGEX = Pattern.compile(
-      "(?: *)/[*].*?[*]/", Pattern.MULTILINE | Pattern.DOTALL);
+  private static final Pattern SOY_BLOCK_COMMENT_REGEX =
+      Pattern.compile("(?: *)/[*].*?[*]/", Pattern.MULTILINE | Pattern.DOTALL);
 
   // If this regex is found, don't insert line breaks or preserve leading spaces.
   @VisibleForTesting
-  static final Pattern ESCAPE_REGEX = Pattern.compile(
-      "\\{((sp)|(nil)|(\\\\r)|(\\\\n)|(\\\\t))\\}");
+  static final Pattern ESCAPE_REGEX = Pattern.compile("\\{((sp)|(nil)|(\\\\r)|(\\\\n)|(\\\\t))\\}");
 
   // If this regex is found, preserve the leading spaces.
   private static final Pattern PRESERVE_LEADING_REGEX = Pattern.compile("\\{plsp\\}");
@@ -71,21 +71,23 @@ final class Preprocessor {
   // Substrings found by this regex should be removed as they serve only as directives.
   // For now we have only one directive.
   private static final Pattern DIRECTIVE_REGEX = PRESERVE_LEADING_REGEX;
-  
+
   // This regex should be used as an inner regex to capture the content inside a soy command,
   // which is single-quote-sensitive. It specifically consumes all non-closed-curly-brace
   // characters, except the ones inside a pair of single quotes.
   private static final String SOY_COMMAND_CONTENT = "(?:(?:[^}']+)|(?:'(?:[^']|\\\\')*'))+";
-  
+
   // Captures a single-lined soy command. This does not include the short version of the print
   // command (something like "{$variable}") and special characters.
   // This consumes leading and trailing spaces.
   @VisibleForTesting
-  static final Pattern SOY_COMMAND_REGEX = Pattern.compile(
-      String.format("\\s*(\\{[/@]?([a-z?]+)(\\s+%s)?\\})\\s*", SOY_COMMAND_CONTENT));
+  static final Pattern SOY_COMMAND_REGEX =
+      Pattern.compile(
+          String.format("\\s*(\\{[/@]?([a-z?]+)(\\s+%s)?\\})\\s*", SOY_COMMAND_CONTENT));
+
   @VisibleForTesting
-  static final Pattern SOY_COMMAND_BLACKLIST_REGEX = Pattern.compile(
-      "\\{((sp)|(nil)|(\\\\r)|(\\\\n)|(\\\\t)|(lb)|(rb)|(print\\s+.*))\\}");
+  static final Pattern SOY_COMMAND_BLACKLIST_REGEX =
+      Pattern.compile("\\{((sp)|(nil)|(\\\\r)|(\\\\n)|(\\\\t)|(lb)|(rb)|(print\\s+.*))\\}");
 
   private static final Pattern JINJA_STATEMENT_BEGIN_REGEX = Pattern.compile("\\{%(-)?");
   private static final Pattern JINJA_STATEMENT_END_REGEX = Pattern.compile("(-)?%\\}");
@@ -155,14 +157,28 @@ final class Preprocessor {
         }
       };
 
+  static final Predicate<String> IS_IMPORT =
+      new Predicate<String>() {
+        @Override
+        public boolean apply(String trimmedLine) {
+          return trimmedLine.startsWith("import ") && trimmedLine.endsWith(";");
+        }
+      };
+
   // Predicates that a trimmed line should not have line breaks inserted.
-  private static final Predicate<String> SHOULD_SKIP_LINE_BREAKS = Predicates.or(ImmutableList.of(
-      IS_EMPTY_OR_HAS_ONLY_SPACES, HAS_ONLY_SOY_COMMANDS, HAS_ESCAPES, SHOULD_PRESERVE_LEADING));
+  private static final Predicate<String> SHOULD_SKIP_LINE_BREAKS =
+      Predicates.or(
+          ImmutableList.of(
+              IS_EMPTY_OR_HAS_ONLY_SPACES,
+              HAS_ONLY_SOY_COMMANDS,
+              HAS_ESCAPES,
+              SHOULD_PRESERVE_LEADING,
+              IS_IMPORT));
 
   private static final Joiner LINE_JOINER = Joiner.on('\n');
 
   // Captures all soy commands, including multi-lined ones and short versions of print command.
-  // This regex is sensitive to jinja delimiters. It's crafted to especially avoid matching 
+  // This regex is sensitive to jinja delimiters. It's crafted to especially avoid matching
   // something like "{{ abc }}", since such construct could have been potentially recognized as a
   // "{ abc }" soy command, with leading { and trailing }. Note that a Jinja delimiter is always
   // separated by at least one space, hence the space requirement in the lookbehind expression.
@@ -170,6 +186,7 @@ final class Preprocessor {
   static final Pattern SOY_COMMAND_TO_COLLAPSE_REGEX =
       Pattern.compile(
           String.format("(?<![{])\\{(?![%%#{]-?\\s)%s\\}", SOY_COMMAND_CONTENT), Pattern.MULTILINE);
+
   private static final Pattern LINE_COLLAPSING_REGEX =
       Pattern.compile("\\s*\\n\\s*", Pattern.MULTILINE);
 
@@ -182,7 +199,7 @@ final class Preprocessor {
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine();
         String trimmed = line.trim();
-        
+
         if (!SHOULD_SKIP_LINE_BREAKS.apply(trimmed)) {
           line = "{nil}" + line + "{\\n}";
         } else if (SHOULD_PRESERVE_LEADING.apply(trimmed)) {
@@ -194,14 +211,14 @@ final class Preprocessor {
       return LINE_JOINER.join(lines);
     }
   }
-  
+
   @VisibleForTesting
   static String stripComments(String content) {
     content = SOY_SINGLE_LINE_COMMENT_REGEX.matcher(content).replaceAll("");
     content = SOY_BLOCK_COMMENT_REGEX.matcher(content).replaceAll("");
     return content;
   }
-  
+
   // Collapsing multiline commands is necessary so that we don't insert line breaks on command
   // continuation lines.
   @VisibleForTesting
@@ -222,7 +239,7 @@ final class Preprocessor {
   static String removeDirectives(String line) {
     return DIRECTIVE_REGEX.matcher(line).replaceAll("");
   }
-  
+
   private static String doEscapeJinjaDelimiters(String toEscape) {
     for (Map.Entry<String, Pattern> entry : JINJA_DELIMITER_REPLACEMENTS.entrySet()) {
       toEscape = entry.getValue().matcher(toEscape).replaceAll(entry.getKey());

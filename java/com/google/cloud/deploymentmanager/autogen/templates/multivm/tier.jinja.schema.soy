@@ -1,9 +1,10 @@
 {namespace vm.multi}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template .tierJinjaSchema kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
-{@param packageSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param spec: proto.VmTierSpec}
+{@param packageSpec: proto.MultiVmDeploymentPackageSpec}
 
 {let $waiterSpec:
     ($spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER)

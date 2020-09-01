@@ -1,11 +1,13 @@
 {namespace vm.single}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 
 /** Generates solution.jinja.schema file. */
 {template .schema kind="text"}
 {@param solutionId: string}
-{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
-{@param? solutionInfo: cloud.deploymentmanager.autogen.SolutionMarketingInfo}
+{@param spec: proto.SingleVmDeploymentPackageSpec}
+{@param? solutionInfo: SolutionMarketingInfo}
 {@param? templateVersion: string}
 
 {let $waiterSpec:

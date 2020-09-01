@@ -1,10 +1,11 @@
 {namespace utilities}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Produces the property name for a firewall rule. */
 {template .firewallRulePropName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
     {'enableTcp' + $spec.port |tierprefixed: $tierSpec}{nil}
@@ -18,7 +19,7 @@
 
 /** Produces the targetTag for a firewall rule. */
 {template .firewallRuleTargetTag kind="text"}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {if not $tierSpec}
 {call utilities.deploymentTag data="all"/}{nil}
 {else}
@@ -29,8 +30,8 @@
 
 /** Produces the name for a firewall rule. */
 {template .firewallRuleName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {{ env["deployment"] }}{call .firewallRuleNameSuffix data="all"/}{nil}
 {/template}
 
@@ -40,8 +41,8 @@
  * The suffix includes only the "-TCP-80" part.
  */
 {template .firewallRuleNameSuffix kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
   {let $portSuffix kind="text"}
     {call .firewallRulePortSuffix}
       {param spec: $spec /}
@@ -63,7 +64,7 @@
  * tier spec).
  */
 {template .firewallRuleTargetTagSuffix kind="text"}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {if not $tierSpec}
   -deployment{nil}
 {else}
@@ -77,7 +78,7 @@
  * In other case it returns "", empty string.
  */
 {template .firewallRulePortSuffix kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param spec: proto.FirewallRuleSpec}
 {if strLen($spec.port) > 0}
 -{$spec.port}{nil}
 {/if}
@@ -88,8 +89,8 @@
  * Produces source information for firewall rule according Traffic enum in allowedSource.
  */
 {template .firewallRuleSource kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {switch $spec.allowedSource}
   {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
     {call renders.firewallRuleSpecPublicSource data="all"/}
@@ -103,7 +104,7 @@
 
 /** Produces the protocol as an uppercased string. */
 {template .firewallRuleProtocol kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param spec: proto.FirewallRuleSpec}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
     TCP{nil}
@@ -120,7 +121,7 @@
  * "TCP 123" or "HTTPS".
  */
 {template .firewallRuleTitle kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param spec: proto.FirewallRuleSpec}
 {if strLen($spec.port) > 0}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
@@ -142,8 +143,8 @@
 
 /** Produces the property name for firewall rule source ranges. */
 {template .firewallRuleSourceRangesPropName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
     {'tcp' + $spec.port + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
@@ -157,8 +158,8 @@
 
 /** Produces the property name for an API scope. */
 {template .gcpAuthScopePropertyName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.GcpAuthScopeSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     {'enableCloudReadonlyApi' |tierprefixed: $tierSpec}{nil}
@@ -178,7 +179,7 @@
 
 /** Produces the URL for an API scope. */
 {template .gcpAuthScopeUrl kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
+{@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     https://www.googleapis.com/auth/cloud-platform.read-only{nil}
@@ -198,7 +199,7 @@
 
 /** Produces the URL for an InstanceUrlSpec. */
 {template .makeUrl kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
+{@param spec: proto.InstanceUrlSpec}
 {@param ip: string}
 {let $scheme kind="text"}
   {switch $spec.scheme}
@@ -217,7 +218,7 @@
 
 
 {template .tierVmPrefix kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {{ env["deployment"] }}-{$spec.name}-vm{nil}
 {/template}
 
@@ -225,7 +226,7 @@
 /** Constructs an optionally conditional expression to print text
  * related to password generation condition */
 {template .passwordConditional kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param conditionalContent: string}
 {if $password.generateIf}
 {% if {booleanExpressionJinjaExpression($password.generateIf)} %}
@@ -264,6 +265,6 @@ $(ref.{$resourceName}.password){nil}
 
 
 {template .tierTag kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {{ env["deployment"] }}-{$spec.name}-tier{nil}
 {/template}

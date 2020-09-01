@@ -1,10 +1,11 @@
 {namespace vm.multi}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Generates a tier .jinja template, used for creating all VMs in a tier. */
 {template .tierJinja kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
-{@param packageSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param spec: proto.VmTierSpec}
+{@param packageSpec: proto.MultiVmDeploymentPackageSpec}
 
 {let $waiterSpec:
     $spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER
@@ -283,7 +284,7 @@ outputs:
 
 
 {template .passwordMetadataItems kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param spec: proto.MultiVmDeploymentPackageSpec}
 {for $password in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
 {call renders.passwordMetadataFromProperty}
@@ -297,12 +298,12 @@ outputs:
 
 
 {template .instanceName kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {call utilities.tierVmPrefix data="all"/}-{{ vmIndex }}{nil}
 {/template}
 
 
 {template .instanceTmplResourceName kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {call utilities.tierVmPrefix data="all"/}-tmpl-{{ vmIndex }}{nil}
 {/template}

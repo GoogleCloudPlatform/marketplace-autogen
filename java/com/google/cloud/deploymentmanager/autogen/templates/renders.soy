@@ -1,10 +1,11 @@
 {namespace renders}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Constructs all firewall resources. */
 {template .firewallResources kind="text"}
-{@param specList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param specList: list<proto.FirewallRuleSpec>}
+{@param? tierSpec: proto.VmTierSpec}
 {for $spec in $specList}
 {call .firewallResource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/for}
@@ -13,8 +14,8 @@
 
 /** Constructs a firewall resource. */
 {template .firewallResource kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 /* Note that prop names don't take into account the tier. */
 {let $propName kind="text"}
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: null/}{/call}
@@ -40,7 +41,7 @@
 
 /** Source for firewall rule with source Traffic.Public */
 {template .firewallRuleSpecPublicSource kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param spec: proto.FirewallRuleSpec}
 {let $sourcesPropName kind="text"}
   {call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: null/}{/call}
 {/let}
@@ -57,7 +58,7 @@ sourceRanges: ["0.0.0.0/0"]
 
 /** Source for firewall rule with source Traffic.Tier */
 {template .firewallRuleSpecTierSource kind="text"}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {if $tierSpec}
 sourceTags:
   - {call utilities.tierTag data="all"} {param spec: $tierSpec /}{/call}{nil}
@@ -67,7 +68,7 @@ sourceTags:
 
 /** Source for firewall rule with source Traffic.Deployment */
 {template .firewallRuleSpecDeploymentSource kind="text"}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {if $tierSpec}
 sourceTags:
   - {{ env["deployment"] }}-deployment{nil}
@@ -77,8 +78,8 @@ sourceTags:
 
 /** Creates Firewall check box and range input field for a Firewall rule spec */
 {template .firewallProps kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {let $firewallPropName kind="text"}
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/let}
@@ -102,7 +103,7 @@ sourceTags:
 
 /** Constructs password instance property */
 {template .passwordProperty kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
   {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
@@ -121,7 +122,7 @@ sourceTags:
 
 /** Constructs password resource */
 {template .passwordResource kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $resourceName kind="text"}
   {call utilities.passwordResourceName}{param passwordIndex: $passwordIndex/}{/call}
@@ -141,7 +142,7 @@ sourceTags:
 
 /** Constructs password output */
 {template .passwordOutput kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $outputReference kind="text"}
   {call utilities.passwordResourceOutputReference}{param passwordIndex: $passwordIndex/}{/call}
@@ -158,7 +159,7 @@ sourceTags:
 
 /** Constructs password metadata entry */
 {template .passwordMetadataFromOutput kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $outputReference kind="text"}
   {call utilities.passwordResourceOutputReference}{param passwordIndex: $passwordIndex/}{/call}
@@ -175,7 +176,7 @@ sourceTags:
 
 /** Constructs password property metadata entry */
 {template .passwordMetadataFromProperty kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
   {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
@@ -192,7 +193,7 @@ sourceTags:
 
 /** Constructs password property schema entry */
 {template .passwordRequiredSchema kind="text"}
-{@param password: cloud.deploymentmanager.autogen.PasswordSpec}
+{@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
   {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
@@ -205,8 +206,8 @@ sourceTags:
 
 /** Constructs waiter resources. */
 {template .startupScriptAndWaiterResources kind="text"}
-{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
-{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
+{@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: proto.GceStartupScriptSpec}
 {@param? enableJinjaVarName: string}
 /*
  * Only one of the following should be specified:
@@ -215,7 +216,7 @@ sourceTags:
  * - Both dependsOnTierSpec and dependsOnTierInstanceCountJinjaVarName
  */
 {@param? dependsOnList: list<string>}
-{@param? dependsOnTierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? dependsOnTierSpec: proto.VmTierSpec}
 {@param? dependsOnTierInstanceCountJinjaVarName: string}
 {if $waiterSpec}
 
@@ -279,8 +280,8 @@ sourceTags:
 
 
 {template .startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
-{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
-{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: proto.GceStartupScriptSpec}
+{@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 {if $startupSpec?.bashScriptContent and not $waiterSpec?.script}
 - key: startup-script
   value: |-
@@ -295,8 +296,8 @@ sourceTags:
  * that are included conditionally (depending on waiter being enabled or not).
  */
 {template .startupScriptAndWaiterMetadataItemsConditional kind="text"}
-{@param? startupSpec: cloud.deploymentmanager.autogen.GceStartupScriptSpec}
-{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: proto.GceStartupScriptSpec}
+{@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 {@param statusWaiterEnabled: bool}
 
 {if $statusWaiterEnabled}
@@ -347,9 +348,9 @@ sourceTags:
 
 /** List all metadata items for GceMetadataItem specs. */
 {template .gceMetadataItems kind="text"}
-{@param specList: list<cloud.deploymentmanager.autogen.GceMetadataItem>}
-{@param? tierSpecList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
-{@param? deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param specList: list<proto.GceMetadataItem>}
+{@param? tierSpecList: list<proto.VmTierSpec>}
+{@param? deployInput: proto.DeployInputSpec}
 {for $metadata in $specList}
 - key: {$metadata.key |yamlprimitive: 2}
 
@@ -392,7 +393,7 @@ sourceTags:
 
 /** Converts Stackdriver's properties to integer. */
 {template .stackdriverPropertiesJinja kind="text"}
-{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
@@ -406,7 +407,7 @@ sourceTags:
 
 /** Renders Stackdriver's properties in schema. */
 {template .stackdriverPropertiesSchema kind="text"}
-{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 enableStackdriverLogging:
   type: boolean
@@ -422,7 +423,7 @@ enableStackdriverMonitoring:
 
 /** Renders Stackdriver's metadata items. */
 {template .stackdriverMetadataItems kind="text"}
-{@param? stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{@param? stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 - key: google-logging-enable
   value: {{ enableStackdriverLogging }}
@@ -436,8 +437,8 @@ enableStackdriverMonitoring:
 
 /** Defines serviceAccounts section of a VM. */
 {template .serviceAccountsSection kind="text"}
-{@param gcpAuthScopesList: list<cloud.deploymentmanager.autogen.GcpAuthScopeSpec>}
-{@param? waiterSpec: cloud.deploymentmanager.autogen.ApplicationStatusSpec.WaiterSpec}
+{@param gcpAuthScopesList: list<proto.GcpAuthScopeSpec>}
+{@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 serviceAccounts:
   - email: default
     scopes:
@@ -461,7 +462,7 @@ serviceAccounts:
 
 {template .zonePropertySchema kind="text"}
 {@param name: string}
-{@param? zoneSpec: cloud.deploymentmanager.autogen.ZoneSpec}
+{@param? zoneSpec: proto.ZoneSpec}
 {$name}:
   type: string
   {if $zoneSpec and $zoneSpec.defaultZone}
@@ -490,8 +491,8 @@ serviceAccounts:
 
 {template .imagePropertySchema kind="text"}
 {@param name: string}
-{@param imagesList: list<cloud.deploymentmanager.autogen.ImageSpec>}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param imagesList: list<proto.ImageSpec>}
+{@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
   enum:
@@ -504,8 +505,8 @@ serviceAccounts:
 
 {template .machineTypePropertySchema kind="text"}
 {@param name: string}
-{@param spec: cloud.deploymentmanager.autogen.MachineTypeSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.MachineTypeSpec}
+{@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
   default: {$spec.defaultMachineType.gceMachineType}
@@ -526,8 +527,8 @@ serviceAccounts:
 
 {template .acceleratorPropertiesSchema kind="text"}
 {@param namePrefix: string}
-{@param spec: cloud.deploymentmanager.autogen.AcceleratorSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.AcceleratorSpec}
+{@param? tier: proto.VmTierSpec}
 {$namePrefix + 'Type' |tierprefixed: $tier}:
   type: string
   default: {$spec.defaultType}
@@ -556,8 +557,8 @@ serviceAccounts:
 {template .networkPropertiesSchema kind="text"}
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
-{@param spec: cloud.deploymentmanager.autogen.NetworkInterfacesSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.NetworkInterfacesSpec}
+{@param? tier: proto.VmTierSpec}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier)/}
 {$networkPropName}:
   type: array
@@ -600,8 +601,8 @@ serviceAccounts:
 
 {template .ipForwardingPropertySchema kind="text"}
 {@param name: string}
-{@param spec: cloud.deploymentmanager.autogen.IpForwardingSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.IpForwardingSpec}
+{@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
   enum:
@@ -612,9 +613,9 @@ serviceAccounts:
 
 
 {template .bootDiskPropertiesSchema kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.DiskSpec}
+{@param spec: proto.DiskSpec}
 {@param zonePropertyName: string}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tier: proto.VmTierSpec}
 {'bootDiskType' |tierprefixed: $tier}:
   type: string
   default: {$spec.diskType.defaultType}
@@ -636,10 +637,10 @@ serviceAccounts:
 
 
 {template .additionalDiskPropertiesSchema kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.DiskSpec}
+{@param spec: proto.DiskSpec}
 {@param diskIndex: int}
 {@param zonePropertyName: string}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tier: proto.VmTierSpec}
 {diskTypePropertyName($diskIndex, $tier)}:
   type: string
   default: {$spec.diskType.defaultType}
@@ -662,8 +663,8 @@ serviceAccounts:
 
 {template .tierInstanceAcountPropertySchema kind="text"}
 {@param name: string}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec.TierInstanceCount}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec.TierInstanceCount}
+{@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: integer
   default: {$spec.defaultValue}
@@ -680,8 +681,8 @@ serviceAccounts:
 
 
 {template .deployInputPropertiesSchema kind="text"}
-{@param inputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param inputSpec: proto.DeployInputSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {let $fields: $tierSpec ?
   listDeployInputFields($inputSpec, $tierSpec)
   : listDeployInputFields($inputSpec)/}
@@ -695,7 +696,7 @@ serviceAccounts:
 
 
 {template .deployInputFieldSchema /* visibility = "private" */ kind="text"}
-{@param field: cloud.deploymentmanager.autogen.DeployInputField}
+{@param field: proto.DeployInputField}
 {deployInputFieldName($field) |yamlprimitive: 0}:
 {if $field.booleanCheckbox}
   type: boolean
@@ -770,8 +771,8 @@ serviceAccounts:
 
 
 {template .deployInputRequiredSchema kind="text"}
-{@param? inputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? inputSpec: proto.DeployInputSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {if $inputSpec}
 {let $fields: $tierSpec ?
   listDeployInputFields($inputSpec, $tierSpec)
@@ -806,8 +807,8 @@ serviceAccounts:
 
 
 {template .localSsdPropertyItem kind="text"}
-{@param localSsdSpec: cloud.deploymentmanager.autogen.LocalSsdSpec}
-{@param deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param localSsdSpec: proto.LocalSsdSpec}
+{@param deployInput: proto.DeployInputSpec}
 {if $localSsdSpec.count and $localSsdSpec.count > 0}
 localSSDs: {$localSsdSpec.count}{nil}
 {elseif $localSsdSpec.countFromDeployInputField}
@@ -818,9 +819,9 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 
 
 {template .additionalDiskSection kind="text"}
-{@param additionalDisksList: list<cloud.deploymentmanager.autogen.DiskSpec>}
-{@param deployInputSpec: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param additionalDisksList: list<proto.DiskSpec>}
+{@param deployInputSpec: proto.DeployInputSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {@param instanceName: string}
 {for $disk in $additionalDisksList}
 {let $deviceNameSuffix kind="text"}

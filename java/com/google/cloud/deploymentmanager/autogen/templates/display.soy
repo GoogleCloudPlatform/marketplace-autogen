@@ -1,9 +1,10 @@
 {namespace display}
-{alias cloud.deploymentmanager.autogen as proto}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template .openPortAction kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.FirewallRuleSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle data="all"/}{/let}
 {let $protocol kind="text"}{call utilities.firewallRuleProtocol data="all"/}{/let}
 {let $heading kind="text"}
@@ -58,7 +59,7 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .firewallRuleTrafficLabel kind="text"}
-{@param firewallSpec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param firewallSpec: proto.FirewallRuleSpec}
 {switch $firewallSpec.allowedSource}
 {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
   from the Internet{nil}
@@ -71,8 +72,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .firewallDisplayProperties kind="text"}
-{@param firewallsList: list<cloud.deploymentmanager.autogen.FirewallRuleSpec>}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param firewallsList: list<proto.FirewallRuleSpec>}
+{@param? tierSpec: proto.VmTierSpec}
 {let $section kind="text"}
   {if $tierSpec}
     {call .tierSectionName}{param spec: $tierSpec/}{/call}{nil}
@@ -92,9 +93,9 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .firewallDisplayProperty kind="text"}
-{@param firewallSpec: cloud.deploymentmanager.autogen.FirewallRuleSpec}
+{@param firewallSpec: proto.FirewallRuleSpec}
 {@param section: string}
-{@param? tierSpec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tierSpec: proto.VmTierSpec}
 {let $propName kind="text"}
   {call utilities.firewallRulePropName}
     {param spec: $firewallSpec/}
@@ -122,7 +123,7 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .authScopeDescription kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
+{@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     read only access to all of Google Cloud Platform APIs{nil}
@@ -141,8 +142,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .authScopeBoolGroupName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.GcpAuthScopeSpec}
+{@param? tier: proto.VmTierSpec}
 {if $tier}
 {call .tierSectionName}{param spec: $tier/}{/call}_{nil}
 {/if}
@@ -164,7 +165,7 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .authScopeBoolGroupTitle kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.GcpAuthScopeSpec}
+{@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     Google Cloud Platform Readonly API{nil}
@@ -183,8 +184,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .makeExternalUrlLink kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 // Specifies the right kinds so that HTML escapes are done correctly.
 // Note that we do not put the IP expression into the original URL to
 // prevent it from being incorrectly escaped.
@@ -202,8 +203,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .makeInternalUrl kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call .vmOutputExpression}
@@ -217,8 +218,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .makeExternalUrl kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call .vmOutputExpression}
@@ -233,8 +234,8 @@ Open {$firewallTitle} traffic{nil}
 
 {template .vmOutputExpression kind="text"}
 {@param baseOutputName: string}
-{@param? spec: cloud.deploymentmanager.autogen.TierVmInstance}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param? spec: proto.TierVmInstance}
+{@param? tiersList: list<proto.VmTierSpec>}
 {if $spec}
   {let $tier: findVmTier($spec.tier, $tiersList)/}
   {let $prefix kind="text"}{$baseOutputName |tierprefixed: $tier}{nil}{/let}
@@ -254,9 +255,9 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template .deployInputFieldDisplay kind="text"}
-{@param section: cloud.deploymentmanager.autogen.DeployInputSection}
-{@param field: cloud.deploymentmanager.autogen.DeployInputField}
-{@param? tierList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param section: proto.DeployInputSection}
+{@param field: proto.DeployInputField}
+{@param? tierList: list<proto.VmTierSpec>}
 name: {deployInputFieldName($field) |yamlprimitive: 0}
 {if $field.title}
 title: {$field.title |yamlprimitive: 0}
@@ -318,7 +319,7 @@ enumLabels:
 
 
 {template .stackdriverDisplay kind="text"}
-{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 - name: enableStackdriverLogging
   title: Enable Stackdriver Logging
@@ -335,7 +336,7 @@ enumLabels:
 
 
 {template .stackdriverBottomSections kind="text"}
-{@param stackdriver: cloud.deploymentmanager.autogen.StackdriverSpec}
+{@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging or $stackdriver?.monitoring}
 - name: STACKDRIVER
   title: Stackdriver
@@ -345,7 +346,7 @@ enumLabels:
 
 
 {template .topSections kind="text"}
-{@param? spec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? spec: proto.DeployInputSpec}
 {let $output kind="text"}
   {call .customSectionsHelper}
     {param spec: $spec/}
@@ -357,7 +358,7 @@ enumLabels:
 
 
 {template .bottomSections kind="text"}
-{@param? spec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? spec: proto.DeployInputSpec}
 {let $output kind="text"}
   {call .customSectionsHelper}
     {param spec: $spec/}
@@ -369,8 +370,8 @@ enumLabels:
 
 
 {template .customSectionsHelper kind="text"}
-{@param? spec: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param placement: cloud.deploymentmanager.autogen.DeployInputSection.Placement}
+{@param? spec: proto.DeployInputSpec}
+{@param placement: proto.DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.sectionsList}
 {if $section.placement == $placement}
@@ -389,7 +390,7 @@ enumLabels:
 
 
 {template .customBooleanGroups kind="text"}
-{@param? spec: cloud.deploymentmanager.autogen.DeployInputSpec}
+{@param? spec: proto.DeployInputSpec}
 {if $spec}
 {for $section in $spec.sectionsList}
 {for $field in $section.fieldsList}
@@ -411,14 +412,14 @@ enumLabels:
 
 
 {template .tierSectionName kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {$spec.name |uppercased}_TIER{nil}
 {/template}
 
 
 {template .authScopeBooleanGroups kind="text"}
-{@param? singleVmSpec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
-{@param? multiVmSpec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{@param? singleVmSpec: proto.SingleVmDeploymentPackageSpec}
+{@param? multiVmSpec: proto.MultiVmDeploymentPackageSpec}
 {if $singleVmSpec}
 {for $scope in $singleVmSpec.gcpAuthScopesList}
 - name: {call .authScopeBoolGroupName}{param spec: $scope/}{/call}
@@ -438,8 +439,8 @@ enumLabels:
 
 
 {template .siteUrlApplicationTableRow kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $content kind="text"}
   {call .instanceUrlApplicationTableRow data="all"}
     {param label: 'Site address'/}
@@ -450,8 +451,8 @@ enumLabels:
 
 
 {template .adminUrlApplicationTableRow kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $content kind="text"}
   {call .instanceUrlApplicationTableRow data="all"}
     {param label: 'Admin URL'/}
@@ -463,8 +464,8 @@ enumLabels:
 
 {template .instanceUrlApplicationTableRow kind="text"}
 {@param label: string}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $externalUrl kind="text"}
   {call .makeExternalUrlLink}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
@@ -488,9 +489,9 @@ enumLabels:
 
 
 {template .passwordApplicationTableRows kind="text"}
-{@param passwordsList: list<cloud.deploymentmanager.autogen.PasswordSpec>}
-{@param? deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param passwordsList: list<proto.PasswordSpec>}
+{@param? deployInput: proto.DeployInputSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {for $password in $passwordsList}
 {if $password.username}
 - label: {($password.displayLabel + ' user') |yamlprimitive: 2}
@@ -516,9 +517,9 @@ enumLabels:
 
 
 {template .infoRowApplicationTableRow kind="text"}
-{@param infoRow: cloud.deploymentmanager.autogen.PostDeployInfo.InfoRow}
-{@param? deployInput: cloud.deploymentmanager.autogen.DeployInputSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param infoRow: proto.PostDeployInfo.InfoRow}
+{@param? deployInput: proto.DeployInputSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 - label: {$infoRow.label |yamlprimitive: 8}
 {if $infoRow.value}
   value: {$infoRow.value |yamlprimitive: 8}
@@ -533,8 +534,8 @@ enumLabels:
 
 
 {template .adminActionButton kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $actionUrl kind="text"}{call .makeExternalUrl data="all"/}{/let}
 label: Log into the admin panel
 type: TYPE_URL
@@ -543,8 +544,8 @@ action: {$actionUrl |yamlprimitive: 0}
 
 
 {template .siteActionButton kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.InstanceUrlSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param spec: proto.InstanceUrlSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $actionUrl kind="text"}{call .makeExternalUrl data="all"/}{/let}
 label: Visit the site
 type: TYPE_URL
@@ -553,8 +554,8 @@ action: {$actionUrl |yamlprimitive: 0}
 
 
 {template .connectActionButton kind="text"}
-{@param? button: cloud.deploymentmanager.autogen.PostDeployInfo.ConnectToInstanceSpec}
-{@param? tiersList: list<cloud.deploymentmanager.autogen.VmTierSpec>}
+{@param? button: proto.PostDeployInfo.ConnectToInstanceSpec}
+{@param? tiersList: list<proto.VmTierSpec>}
 {let $output kind="text"}
   {call .vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
@@ -571,7 +572,7 @@ action: '{{ {$output} }}'
 
 
 {template .acceleratorProperty kind="text"}
-{@param? tier: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param? tier: proto.VmTierSpec}
 - name: {'acceleratorType' |tierprefixed: $tier}
   title: GPUs
 {if $tier}

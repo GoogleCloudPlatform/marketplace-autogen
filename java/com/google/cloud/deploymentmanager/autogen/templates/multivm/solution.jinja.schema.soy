@@ -1,9 +1,12 @@
 {namespace vm.multi}
 
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+
 {template .schema kind="text"}
 {@param solutionId: string}
-{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
-{@param? solutionInfo: cloud.deploymentmanager.autogen.SolutionMarketingInfo}
+{@param spec: proto.MultiVmDeploymentPackageSpec}
+{@param? solutionInfo: SolutionMarketingInfo}
 {@param? templateVersion: string}
 
 imports:
@@ -86,7 +89,7 @@ outputs:
 
 
 {template .tierRequiredList kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 - {'instanceCount' |tierprefixed: $spec}
 - {'machineType' |tierprefixed: $spec}
 - {'bootDiskType' |tierprefixed: $spec}
@@ -99,7 +102,7 @@ outputs:
 
 
 {template .tierProperties kind="text" /* visibility="private" */}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {let $instanceCountProp kind="text"}
   {call renders.tierInstanceAcountPropertySchema}
     {param name: 'instanceCount'/}
