@@ -3,13 +3,13 @@ package(default_visibility = ["//visibility:public"])
 java_plugin(
     name = "auto_value_plugin",
     processor_class = "com.google.auto.value.processor.AutoValueProcessor",
-    deps = ["@com_google_auto_value_auto_value//jar"],
+    deps = ["@maven//:com_google_auto_value_auto_value"],
 )
 
 java_library(
     name = "auto_value",
     exported_plugins = [":auto_value_plugin"],
-    exports = ["@com_google_auto_value_auto_value//jar"],
+    exports = ["@maven//:com_google_auto_value_auto_value"],
 )
 
 proto_library(
@@ -59,16 +59,15 @@ java_library(
         ":deployment_package_autogen_spec_java_proto",
         ":marketing_info_java_proto",
         "//java/com/google/cloud/deploymentmanager/autogen/soy",
-        "@com_google_auto_value_auto_value//jar",
-        "@com_google_code_findbugs_jsr305//jar",
-        "@com_google_code_gson//jar",
-        "@com_google_guava_guava//jar",
-        "@com_google_inject_guice//jar",
-        "@com_google_protobuf_protobuf_java//jar",
-        "@com_google_protobuf_protobuf_java_util//jar",
-        "@com_google_template_soy//jar",
-        "@commons_cli_commons_cli//jar",
-        "@org_yaml_snakeyaml//jar",
+        "@maven//:com_google_auto_value_auto_value",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_google_protobuf_protobuf_java",
+        "@maven//:com_google_protobuf_protobuf_java_util",
+        "@maven//:com_google_template_soy",
+        "@maven//:commons_cli_commons_cli",
+        "@maven//:org_yaml_snakeyaml",
     ],
 )
-
