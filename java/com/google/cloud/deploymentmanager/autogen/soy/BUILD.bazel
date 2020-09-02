@@ -3,11 +3,11 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@com_google_guava_guava//jar",
-        "@com_google_inject_guice//jar",
-        "@com_google_protobuf_protobuf_java//jar",
-        "@com_google_template_soy//jar",
-        "@org_ow2_asm//jar",
-        "@org_yaml_snakeyaml//jar",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_google_protobuf_protobuf_java",
+        "@maven//:com_google_template_soy",
+        "@maven//:org_ow2_asm_asm",
+        "@maven//:org_yaml_snakeyaml",
     ],
 )
