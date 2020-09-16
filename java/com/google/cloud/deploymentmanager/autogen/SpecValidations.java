@@ -81,6 +81,7 @@ final class SpecValidations {
   private static final Pattern TIER_NAME_REGEX = Pattern.compile("[a-z0-9]+");
 
   private static final ImmutableSet<String> SUPPORTED_ACCELERATOR_TYPES =
+      // LINT.IfChange(gpuTypes)
       ImmutableSet.of(
           "nvidia-tesla-k80",
           "nvidia-tesla-p100",
@@ -88,7 +89,9 @@ final class SpecValidations {
           "nvidia-tesla-p100-vws",
           "nvidia-tesla-p4",
           "nvidia-tesla-p4-vws",
-          "nvidia-tesla-t4");
+          "nvidia-tesla-t4",
+          "nvidia-tesla-a100");
+  // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
 
