@@ -741,11 +741,22 @@ message GceMetadataItem {
 }
 
 message AcceleratorSpec {
+  // LINT.IfChange(gpuTypes)
+
   // One or more accelerator types. If the list contains exactly one item, the
   // type will not be selectable by the user.
-  // Currently avaiable types: "nvidia-tesla-k80", "nvidia-tesla-p100",
-  // "nvidia-tesla-v100".
+  // Currently avaiable types:
+  // nvidia-tesla-k80
+  // nvidia-tesla-p100
+  // nvidia-tesla-v100
+  // nvidia-tesla-p100-vws
+  // nvidia-tesla-p4
+  // nvidia-tesla-p4-vws
+  // nvidia-tesla-t4
+  // nvidia-tesla-a100
   repeated string types = 1;
+
+  // LINT.ThenChange()
 
   // Default accelerator type, which should be one of those listed above
   string default_type = 2;
