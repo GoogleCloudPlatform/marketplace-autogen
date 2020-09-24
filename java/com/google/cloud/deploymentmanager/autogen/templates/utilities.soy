@@ -54,7 +54,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
   {case proto.FirewallRuleSpec.Protocol.UDP}
     -{'udp' + $portSuffix |tierprefixed: $tierSpec, '-'}{nil}
   {case proto.FirewallRuleSpec.Protocol.ICMP}
-    -{'icmp'}{nil}
+    -{'icmp' |tierprefixed: $tierSpec, '-'}{nil}
 {/switch}
 {/template}
 
