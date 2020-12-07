@@ -1,6 +1,7 @@
 {namespace utilities}
 
 import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 
 /** Produces the property name for a firewall rule. */
 {template .firewallRulePropName kind="text"}
@@ -21,9 +22,9 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 {template .firewallRuleTargetTag kind="text"}
 {@param? tierSpec: proto.VmTierSpec}
 {if not $tierSpec}
-{call utilities.deploymentTag data="all"/}{nil}
+{call .deploymentTag data="all"/}{nil}
 {else}
-{call utilities.tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
+{call .tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
 {/if}
 {/template}
 
