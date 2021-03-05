@@ -83,7 +83,7 @@ properties:
   machineType:
     description: No zones or url needed. Just write the machine type
     type: string
-    default: n1-standard-1
+    default: e2-standard-2
   metadata:
     type: object
   name:
