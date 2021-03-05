@@ -50,7 +50,7 @@ import java.util.List;
 final class SpecDefaults {
 
   private static final String DEFAULT_MACHINE_TYPE = "e2-small";
-  private static final String DEFAULT_MACHINE_TYPE_GPU_SUPPORT = "n1-standard-1";
+  private static final String DEFAULT_MACHINE_TYPE_GPU_SUPPORT = "e2-standard-2";
 
   private static final int DEFAULT_BOOT_DISK_SIZE_GB = 10;
   private static final String DEFAULT_BOOT_DISK_TYPE = "pd-standard";

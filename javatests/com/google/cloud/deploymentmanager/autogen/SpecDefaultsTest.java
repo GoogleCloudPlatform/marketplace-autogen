@@ -102,13 +102,13 @@ public class SpecDefaultsTest {
         fillInMissingDefaults(
             newSingleSpec().setMachineType(machineTypeSpec).addAccelerators(gpuSpec));
     assertThat(single.getMachineType().getDefaultMachineType().getGceMachineType())
-        .startsWith("n1");
+        .startsWith("e2");
 
     MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
     multi.getTiersBuilder(0).setMachineType(machineTypeSpec).addAccelerators(gpuSpec);
     fillInMissingDefaults(multi);
     assertThat(multi.getTiers(0).getMachineType().getDefaultMachineType().getGceMachineType())
-        .startsWith("n1");
+        .startsWith("e2");
   }
 
   @Test

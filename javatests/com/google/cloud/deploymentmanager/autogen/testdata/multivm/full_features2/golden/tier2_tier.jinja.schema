@@ -41,7 +41,7 @@ properties:
       type: GCE_ZONE
   machineType:
     type: string
-    default: n1-standard-1
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone

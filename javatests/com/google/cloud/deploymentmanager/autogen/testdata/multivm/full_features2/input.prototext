@@ -69,7 +69,7 @@ spec {
       }
       machine_type {
         default_machine_type {
-          gce_machine_type: "n1-standard-1"
+          gce_machine_type: "e2-standard-2"
         }
         minimum {
           cpu: 1
@@ -225,7 +225,7 @@ spec {
       }
       machine_type {
         default_machine_type {
-          gce_machine_type: "n1-standard-1"
+          gce_machine_type: "e2-standard-2"
         }
         minimum {
           cpu: 1
@@ -350,7 +350,7 @@ spec {
       }
       machine_type {
         default_machine_type {
-          gce_machine_type: "n1-standard-1"
+          gce_machine_type: "e2-standard-2"
         }
         minimum {
           cpu: 1
