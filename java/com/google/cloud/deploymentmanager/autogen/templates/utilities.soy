@@ -1,7 +1,6 @@
 {namespace utilities}
 
 import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
-import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 
 /** Produces the property name for a firewall rule. */
 {template .firewallRulePropName kind="text"}
@@ -83,23 +82,6 @@ import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/r
 {if strLen($spec.port) > 0}
 -{$spec.port}{nil}
 {/if}
-{/template}
-
-
-/*
- * Produces source information for firewall rule according Traffic enum in allowedSource.
- */
-{template .firewallRuleSource kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
-{switch $spec.allowedSource}
-  {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
-    {call renders.firewallRuleSpecPublicSource data="all"/}
-  {case proto.FirewallRuleSpec.TrafficSource.TIER}
-    {call renders.firewallRuleSpecTierSource data="all"/}
-  {case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
-    {call renders.firewallRuleSpecDeploymentSource data="all"/}
-{/switch}
 {/template}
 
 
