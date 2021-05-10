@@ -22,7 +22,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: null/}{/call}
 {/let}
 {let $source kind="text"}
-  {call utilities.firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+  {call .firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/let}
 {% if properties["{$propName}"] %}
 - name: {call utilities.firewallRuleName data="all"/}
@@ -54,6 +54,23 @@ sourceRanges:
 {% else %}
 sourceRanges: ["0.0.0.0/0"]
 {% endif %}{nil}
+{/template}
+
+
+/*
+ * Produces source information for firewall rule according Traffic enum in allowedSource.
+ */
+{template .firewallRuleSource kind="text"}
+  {@param spec: proto.FirewallRuleSpec}
+  {@param? tierSpec: proto.VmTierSpec}
+  {switch $spec.allowedSource}
+    {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+      {call .firewallRuleSpecPublicSource data="all"/}
+    {case proto.FirewallRuleSpec.TrafficSource.TIER}
+      {call .firewallRuleSpecTierSource data="all"/}
+    {case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+      {call .firewallRuleSpecDeploymentSource data="all"/}
+  {/switch}
 {/template}
 
 

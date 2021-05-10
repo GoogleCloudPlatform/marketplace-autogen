@@ -226,25 +226,28 @@ public class Autogen {
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja")
-                .setContent(fileSet.newRenderer("vm.single.jinja").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.jinja.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.schema")
-                .setContent(fileSet.newRenderer("vm.single.schema").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.schema.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.display")
-                .setContent(fileSet.newRenderer("vm.single.display").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.display.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("test_config.yaml")
-                .setContent(fileSet.newRenderer("vm.single.test_config").setData(params).render()))
+                .setContent(
+                    fileSet.newRenderer("vm.single.test_config.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("c2d_deployment_configuration.json")
-                .setContent(fileSet.newRenderer("vm.single.c2d_deployment_configuration")
-                    .setData(params)
-                    .render()));
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.single.c2d_deployment_configuration.main")
+                        .setData(params)
+                        .render()));
 
     if (sharedSupportFilesStrategy == SharedSupportFilesStrategy.INCLUDED) {
       for (String filename : SINGLE_VM_SHARED_SUPPORT_FILES) {
@@ -278,13 +281,13 @@ public class Autogen {
               SolutionPackage.File.newBuilder()
                   .setPath(TierTemplateName.apply(tierSpec))
                   .setContent(
-                      fileSet.newRenderer("vm.multi.tierJinja").setData(tierParams).render()))
+                      fileSet.newRenderer("vm.multi.tierJinja.main").setData(tierParams).render()))
           .addFiles(
               SolutionPackage.File.newBuilder()
                   .setPath(TierTemplateName.apply(tierSpec) + ".schema")
                   .setContent(
                       fileSet
-                          .newRenderer("vm.multi.tierJinjaSchema")
+                          .newRenderer("vm.multi.tierSchema.main")
                           .setData(tierParams)
                           .render()));
     }
@@ -292,25 +295,28 @@ public class Autogen {
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja")
-                .setContent(fileSet.newRenderer("vm.multi.jinja").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.jinja.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.schema")
-                .setContent(fileSet.newRenderer("vm.multi.schema").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.schema.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.display")
-                .setContent(fileSet.newRenderer("vm.multi.display").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.display.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("test_config.yaml")
-                .setContent(fileSet.newRenderer("vm.multi.test_config").setData(params).render()))
+                .setContent(
+                    fileSet.newRenderer("vm.multi.test_config.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("c2d_deployment_configuration.json")
-                .setContent(fileSet.newRenderer("vm.multi.c2d_deployment_configuration")
-                    .setData(params)
-                    .render()));
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.multi.c2d_deployment_configuration.main")
+                        .setData(params)
+                        .render()));
 
     if (sharedSupportFilesStrategy == SharedSupportFilesStrategy.INCLUDED) {
       for (String filename : SINGLE_VM_SHARED_SUPPORT_FILES) {
