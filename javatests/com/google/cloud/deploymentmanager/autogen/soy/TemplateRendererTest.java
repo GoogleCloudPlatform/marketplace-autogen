@@ -16,9 +16,11 @@ package com.google.cloud.deploymentmanager.autogen.soy;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer;
+import com.google.cloud.deploymentmanager.autogen.Autogen;
+import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer.FileSet;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import com.google.inject.Guice;
 import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +39,10 @@ public class TemplateRendererTest {
    */
   @Test
   public void test() throws Exception {
+    FileSet.Builder fileSet =
+        Guice.createInjector(Autogen.getAutogenModule()).getInstance(FileSet.Builder.class);
     TemplateRenderer renderer =
-        TemplateRenderer.FileSet.builder()
+        fileSet
             .addContentFromResource(testDataResource("sanity_check.jinja.soy"))
             .build()
             .newRenderer("test.sanityCheck");

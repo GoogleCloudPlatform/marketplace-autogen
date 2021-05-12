@@ -14,21 +14,24 @@
 
 package com.google.cloud.deploymentmanager.autogen.soy;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
+import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer.Module.SoyFiles;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.google.protobuf.Descriptors.GenericDescriptor;
 import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.SoyModule;
 import com.google.template.soy.jbcsrc.api.SoySauce;
 import com.google.template.soy.jbcsrc.api.SoySauce.Renderer;
+import com.google.template.soy.shared.restricted.SoyFunction;
+import com.google.template.soy.shared.restricted.SoyPrintDirective;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
+import javax.inject.Qualifier;
 
 /**
  * Supports rendering of yaml jinja soy templates, which are jinja templates that generate yaml
@@ -59,7 +62,7 @@ public final class TemplateRenderer {
 
       /** Use {@link FileSet#builder} to create an instance. */
       @Inject
-      private Builder(SoyFileSet.Builder soyFileSetBuilder) {
+      Builder(@SoyFiles SoyFileSet.Builder soyFileSetBuilder) {
         this.soyFileSetBuilder = soyFileSetBuilder;
       }
 
@@ -102,15 +105,6 @@ public final class TemplateRenderer {
       return new TemplateRenderer(soySauce.renderTemplate(templateName));
     }
 
-    /**
-     * Creates a builder using the default Guice injector.
-     * 
-     * <p>If you want create your own Guice injector, for example because you want to add custom
-     * types, use {@link TemplateRenderer.Module}. 
-     */
-    public static Builder builder() {
-      return injector.get().getInstance(FileSet.Builder.class);
-    }
   }
   
   /**
@@ -118,22 +112,25 @@ public final class TemplateRenderer {
    * {@code SoyModule} is already installed as part of this.
    */
   public static final class Module extends AbstractModule {
+
+    @Qualifier
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface SoyFiles {}
+
     @Override
     protected void configure() {
-      install(new SoyModule());
       install(new SoyDirectives.Module());
     }
-  }
 
-  // Guice injector for creating soy objects.
-  private static final Supplier<Injector> injector =
-      Suppliers.memoize(
-          new Supplier<Injector>() {
-            @Override
-            public Injector get() {
-              return Guice.createInjector(new Module());
-            }
-          });
+    @SoyFiles
+    @Provides
+    SoyFileSet.Builder provideBuilder(
+        Set<SoyFunction> pluginFunctions, Set<SoyPrintDirective> pluginDirectives) {
+      return SoyFileSet.builder()
+          .addSoyFunctions(pluginFunctions)
+          .addSoyPrintDirectives(pluginDirectives);
+    }
+  }
 
   private final Renderer delegate;
 

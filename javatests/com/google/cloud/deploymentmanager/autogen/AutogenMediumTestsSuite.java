@@ -14,19 +14,20 @@
 
 package com.google.cloud.deploymentmanager.autogen;
 
+import static com.google.common.collect.Streams.stream;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
+
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.FluentIterable;
 import com.google.common.io.Files;
+import com.google.inject.Guice;
 import com.google.protobuf.TextFormat;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -47,6 +48,9 @@ public class AutogenMediumTestsSuite {
           + "/__main__/"
           + RELATIVE_TESTDATA_PATH;
   static final File ROOT = new File(TESTDATA_PATH);
+
+  static final Autogen AUTOGEN =
+      Guice.createInjector(Autogen.getAutogenModule()).getInstance(Autogen.class);
 
   static class Solution {
     final String name;
@@ -69,23 +73,11 @@ public class AutogenMediumTestsSuite {
 
     /** Finds all solutions under testdata folder. */
     static Collection<Solution> findAllSolutions() {
-      return FluentIterable.from(Files.fileTraverser().depthFirstPreOrder(ROOT))
+      return stream(Files.fileTraverser().depthFirstPreOrder(ROOT))
           .filter(Files.isFile())
-          .filter(
-              new Predicate<File>() {
-                @Override
-                public boolean apply(File f) {
-                  return f.getName().matches("input.*\\.prototext");
-                }
-              })
-          .transform(
-              new Function<File, Solution>() {
-                @Override
-                public Solution apply(File f) {
-                  return new Solution(f);
-                }
-              })
-          .toList();
+          .filter(f -> f.getName().matches("input.*\\.prototext"))
+          .map(Solution::new)
+          .collect(toList());
     }
 
     Solution(File inputSpecFile) {
@@ -95,21 +87,15 @@ public class AutogenMediumTestsSuite {
       goldenFolder = new File(solutionFolder, "golden");
       solutionPackage =
           Suppliers.memoize(
-              new Supplier<SolutionPackage>() {
-                @Override
-                public SolutionPackage get() {
-                  try {
-                    DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
-                    TextFormat.getParser()
-                        .merge(
-                            Files.asCharSource(inputSpecFile, StandardCharsets.UTF_8).read(),
-                            input);
-                    return Autogen.getInstance()
-                        .generateDeploymentPackage(
-                            input.build(), SharedSupportFilesStrategy.INCLUDED);
-                  } catch (IOException e) {
-                    throw new RuntimeException(e);
-                  }
+              () -> {
+                try {
+                  DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
+                  TextFormat.getParser()
+                      .merge(Files.asCharSource(inputSpecFile, UTF_8).read(), input);
+                  return AUTOGEN.generateDeploymentPackage(
+                      input.build(), SharedSupportFilesStrategy.INCLUDED);
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
                 }
               });
     }
