@@ -34,7 +34,6 @@ import com.google.cloud.deploymentmanager.autogen.proto.SingleVmDeploymentPackag
 import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.ZoneSpec;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -62,6 +61,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Additional soy functions to support our templating.
@@ -111,6 +111,8 @@ final class SoyFunctions {
             returnType = "list<cloud.deploymentmanager.autogen.VmTierSpec>")
       })
   static final class DependentTiers extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    DependentTiers() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -159,6 +161,8 @@ final class SoyFunctions {
       })
   private static final class DeployInputFieldIsString extends TypedSoyFunction
       implements SoyJavaFunction {
+    @Inject
+    DeployInputFieldIsString() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -192,6 +196,9 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class DeployInputFieldName extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    DeployInputFieldName() {}
+
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       DeployInputField field = (DeployInputField) ((SoyProtoValue) args.get(0)).getProto();
@@ -216,6 +223,8 @@ final class SoyFunctions {
             returnType = "cloud.deploymentmanager.autogen.DeployInputField")
       })
   static final class FindDeployInputField extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    FindDeployInputField() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> list) {
@@ -246,6 +255,8 @@ final class SoyFunctions {
       })
   static final class FindInputsWithTestDefaultValues extends TypedSoyFunction
       implements SoyJavaFunction {
+    @Inject
+    FindInputsWithTestDefaultValues() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -288,6 +299,8 @@ final class SoyFunctions {
             returnType = "string|int")
       })
   static final class FindInputTestDefaultValue extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    FindInputTestDefaultValue() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -327,6 +340,8 @@ final class SoyFunctions {
       })
   static final class GetTestConfigDefaultValues extends TypedSoyFunction
       implements SoyJavaFunction {
+    @Inject
+    GetTestConfigDefaultValues() {}
 
     private static final String DEFAULT_ZONE_PROP_NAME = "zone";
     private static final String DEFAULT_ZONE = "us-central1-f";
@@ -372,6 +387,8 @@ final class SoyFunctions {
                 "cloud.deploymentmanager.autogen.DeployInputField.GroupedBooleanCheckbox.DisplayGroup")
       })
   static final class FindDisplayGroup extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    FindDisplayGroup() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -413,6 +430,9 @@ final class SoyFunctions {
             returnType = "cloud.deploymentmanager.autogen.VmTierSpec")
       })
   static final class FindVmTier extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    FindVmTier() {}
+
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       String tierName = args.get(0).stringValue();
@@ -442,6 +462,8 @@ final class SoyFunctions {
       })
   private static final class FieldValueLabelMap extends TypedSoyFunction
       implements SoyJavaFunction {
+    @Inject
+    FieldValueLabelMap() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -489,6 +511,9 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class TierPrefixed extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    TierPrefixed() {}
+
     @Inject SoyDirectives.TierPrefixed directive;
 
     @Override
@@ -506,6 +531,9 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class TierTemplateName extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    TierTemplateName() {}
+
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       VmTierSpec spec = (VmTierSpec) ((SoyProtoValue) args.get(0)).getProto();
@@ -533,11 +561,15 @@ final class SoyFunctions {
       })
   static final class BooleanExpressionDisplayCondition extends TypedSoyFunction
       implements SoyJavaFunction {
-    @Inject
-    protected SoyFunctions.TierPrefixed tierPrefixedFunction;
+    private final SoyFunctions.TierPrefixed tierPrefixedFunction;
+    private final SoyFunctions.FindVmTier findVmTierFunction;
 
     @Inject
-    protected SoyFunctions.FindVmTier findVmTierFunction;
+    BooleanExpressionDisplayCondition(SoyFunctions.TierPrefixed tierPrefixedFunction,
+        SoyFunctions.FindVmTier findVmTierFunction) {
+      this.tierPrefixedFunction = tierPrefixedFunction;
+      this.findVmTierFunction = findVmTierFunction;
+    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -595,6 +627,9 @@ final class SoyFunctions {
       })
   static final class BooleanExpressionJinjaExpression extends TypedSoyFunction
       implements SoyJavaFunction {
+    @Inject
+    BooleanExpressionJinjaExpression() {}
+
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       BooleanExpression spec = (BooleanExpression) ((SoyProtoValue) args.get(0)).getProto();
@@ -633,6 +668,8 @@ final class SoyFunctions {
             returnType = "bool")
       })
   static final class SolutionHasGpus extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    SolutionHasGpus() {}
 
     /**
      * Argument can be either a {@code SingleVmDeploymentPackageSpec} or a {@code
@@ -684,6 +721,8 @@ final class SoyFunctions {
             returnType = "list<cloud.deploymentmanager.autogen.DeployInputField>")
       })
   static final class ListDeployInputFields extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    ListDeployInputFields() {}
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -744,12 +783,9 @@ final class SoyFunctions {
   private static List<VmTierSpec> extractTierList(SoyValue tiersArg) {
     if (tiersArg instanceof SoyList) {
       List<? extends SoyValue> list = ((SoyList) tiersArg).asResolvedJavaList();
-      return Lists.transform(list, new Function<SoyValue, VmTierSpec>() {
-        @Override
-        public VmTierSpec apply(SoyValue soyValue) {
-          return (VmTierSpec) ((SoyProtoValue) soyValue).getProto();
-        }
-      });
+      return list.stream()
+          .map(soyValue -> (VmTierSpec) ((SoyProtoValue) soyValue).getProto())
+          .collect(Collectors.toList());
     } else if (tiersArg instanceof SoyProtoValue) {
       return ((MultiVmDeploymentPackageSpec) ((SoyProtoValue) tiersArg).getProto()).getTiersList();
     } else {
@@ -759,8 +795,11 @@ final class SoyFunctions {
 
   abstract static class AbstractDiskPropertyName extends TypedSoyFunction
       implements SoyJavaFunction {
-    @Inject
-    protected SoyFunctions.TierPrefixed tierPrefixedFunction;
+    private final SoyFunctions.TierPrefixed tierPrefixedFunction;
+
+    AbstractDiskPropertyName(SoyFunctions.TierPrefixed tierPrefixedFunction) {
+      this.tierPrefixedFunction = tierPrefixedFunction;
+    }
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -789,6 +828,11 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class AdditionalDiskTypePropertyName extends AbstractDiskPropertyName {
+    @Inject
+    AdditionalDiskTypePropertyName(TierPrefixed tierPrefixedFunction) {
+      super(tierPrefixedFunction);
+    }
+
     @Override
     protected String getPropertyBaseName(int diskPosition) {
       return String.format("%s_type", additionalDiskPropertyName(diskPosition));
@@ -807,6 +851,11 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class AdditionalDiskSizePropertyName extends AbstractDiskPropertyName {
+    @Inject
+    AdditionalDiskSizePropertyName(TierPrefixed tierPrefixedFunction) {
+      super(tierPrefixedFunction);
+    }
+
     @Override
     protected String getPropertyBaseName(int diskPosition) {
       return String.format("%s_sizeGb", additionalDiskPropertyName(diskPosition));
@@ -822,6 +871,9 @@ final class SoyFunctions {
             returnType = "string")
       })
   static final class ExternalIpTypeName extends TypedSoyFunction implements SoyJavaFunction {
+    @Inject
+    ExternalIpTypeName() {}
+
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
       ExternalIpSpec.Type type = ExternalIpSpec.Type.forNumber(args.get(0).integerValue());
