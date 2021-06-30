@@ -57,7 +57,7 @@ final class DisplayDescriptionGenerator {
         convertSoftwareGroups(solutionInfo.getPackagedSoftwareGroupsList()));
     putIfNotEmpty(description, "documentations",
         convertDocumentations(solutionInfo.getDocumentationsList()));
-    putIfNotEmpty(description, "support", ImmutableList.of(buildSupport(solutionInfo)));
+    putIfNotEmpty(description, "support", buildSupport(solutionInfo));
     putIfNotEmpty(description, "icon", imageInfo.iconPath());
     putIfNotEmpty(description, "architectureDiagram", imageInfo.architectureDiagramPath());
     putIfNotEmpty(description,
@@ -150,14 +150,20 @@ final class DisplayDescriptionGenerator {
     });
   }
 
-  private static Map<String, Object> buildSupport(SolutionMarketingInfo solutionInfo) {
+  private static ImmutableList<Map<String, Object>> buildSupport(
+      SolutionMarketingInfo solutionInfo) {
     Map<String, Object> support = new LinkedHashMap<>();
-    putIfNotEmpty(support, "title", "Support");
+    if (solutionInfo.getSupportInfo().isEmpty() && solutionInfo.getSupportUrl().isEmpty()) {
+      return ImmutableList.of();
+    }
+
+    support.put("title", "Support");
     putIfNotEmpty(support, "descriptionHtml", solutionInfo.getSupportInfo());
     putIfNotEmpty(support, "url", solutionInfo.getSupportUrl());
+
     if (solutionInfo.getShowSupportId()) {
       support.put("showSupportId", solutionInfo.getShowSupportId());
     }
-    return support;
+    return ImmutableList.of(support);
   }
 }
