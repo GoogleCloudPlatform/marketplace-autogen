@@ -5,8 +5,10 @@ java_library(
     resources = glob(["testdata/*"]),
     deps = [
         "//java/com/google/cloud/deploymentmanager/autogen/soy",
+        "//java/com/google/cloud/deploymentmanager/autogen",
         "@maven//:aopalliance_aopalliance",
         "@maven//:com_google_common_html_types_types",
+        "@maven//:com_google_inject_guice",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_template_soy",
         "@maven//:com_google_truth_truth",
