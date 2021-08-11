@@ -27,6 +27,7 @@ import com.google.template.soy.shared.restricted.SoyJavaPrintDirective;
 import com.google.template.soy.shared.restricted.SoyPrintDirective;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 
 /**
  * Adds additional soy print directives to support our templating.
@@ -57,6 +58,9 @@ final class SoyDirectives {
   /** Prefix with the specified tier's name. */
   @Singleton
   static class TierPrefixed extends BaseDirective {
+    @Inject
+    TierPrefixed() {}
+
     @Override
     public String getName() {
       return "|tierprefixed";
@@ -76,7 +80,7 @@ final class SoyDirectives {
       if (args.size() == 2) {
         joiner = args.get(1).coerceToString();
       }
-      VmTierSpec tier = (VmTierSpec) (((SoyProtoValue) args.get(0)).getProto());
+      VmTierSpec tier = (VmTierSpec) ((SoyProtoValue) args.get(0)).getProto();
       return StringData.forValue(
           String.format("%s%s%s", tier.getName(), joiner, value.coerceToString()));
     }

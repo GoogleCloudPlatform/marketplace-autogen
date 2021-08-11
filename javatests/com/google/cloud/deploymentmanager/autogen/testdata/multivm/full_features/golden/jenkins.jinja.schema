@@ -54,7 +54,7 @@ properties:
     default: '0'
   main_machineType:
     type: string
-    default: n1-standard-1
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone
@@ -231,7 +231,7 @@ properties:
       - 4
   tier2_machineType:
     type: string
-    default: n1-standard-1
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone
@@ -322,7 +322,7 @@ properties:
     maximum: 10
   tier3_machineType:
     type: string
-    default: n1-standard-1
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone

@@ -1,10 +1,15 @@
-{namespace vm.single}
+{namespace vm.single.display}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {PartnerMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+import * as displayLib from 'com/google/cloud/deploymentmanager/autogen/templates/display.soy';
+import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 /** Generates solution.jinja.display file. */
-{template .display kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
+{template .main kind="text"}
+{@param spec: proto.SingleVmDeploymentPackageSpec}
 {@param? partnerId: string}
-{@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
+{@param? partnerInfo: PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
 {let $solutionHasGpus: solutionHasGpus($spec)/}
@@ -42,13 +47,13 @@ input:
     - name: zone
       title: Zone
       {if $solutionHasGpus}
-      {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
+      {let $acceleratorZoneSubtext kind="text"}{call displayLib.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
     - name: machineType
       title: Machine type
     {if $solutionHasGpus}
-    {let $acceleratorProperty kind="text"}{call display.acceleratorProperty/}{/let}
+    {let $acceleratorProperty kind="text"}{call displayLib.acceleratorProperty/}{/let}
     {$acceleratorProperty |indent: 4, true}{nil}
     {/if}
     - name: bootDiskType
@@ -79,7 +84,7 @@ input:
       section: NETWORKING
 
     {let $firewallDisplayProperties kind="text"}
-      {call display.firewallDisplayProperties}{param firewallsList: $spec.firewallRulesList/}{/call}
+      {call displayLib.firewallDisplayProperties}{param firewallsList: $spec.firewallRulesList/}{/call}
     {/let}
     {$firewallDisplayProperties |indent: 4, true}{nil}
 
@@ -93,16 +98,16 @@ input:
 
     {for $scope in $spec.gcpAuthScopesList}
     - name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}
-      title: Allow {call display.authScopeDescription}{param spec: $scope/}{/call} on the VM
+      title: Allow {call displayLib.authScopeDescription}{param spec: $scope/}{/call} on the VM
       section: API_ACCESS
-      boolean_group: {call display.authScopeBoolGroupName}{param spec: $scope/}{/call}
+      boolean_group: {call displayLib.authScopeBoolGroupName}{param spec: $scope/}{/call}
     {/for}
 
     {if $spec.deployInput}
     {for $section in $spec.deployInput.sectionsList}
     {for $field in $section.fieldsList}
     {let $fieldDisplay kind="text"}
-      {call display.deployInputFieldDisplay}
+      {call displayLib.deployInputFieldDisplay}
         {param section: $section/}
         {param field: $field/}
       {/call}
@@ -114,7 +119,7 @@ input:
 
     {if $spec.stackdriver}
     {let $stackdriverDisplay kind="text"}
-      {call display.stackdriverDisplay}
+      {call displayLib.stackdriverDisplay}
         {param stackdriver: $spec.stackdriver/}
       {/call}
     {/let}
@@ -122,7 +127,7 @@ input:
     {/if}
 
   sections:
-    {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.topSections}{param spec: $spec.deployInput/}{/call}{nil}
 
     - name: BOOT_DISK
       title: Boot Disk
@@ -145,11 +150,11 @@ input:
       tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
     {/if}
 
-    {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
 
     {if $spec.stackdriver}
     {let $stackdriverBottomSections kind="text"}
-      {call display.stackdriverBottomSections}
+      {call displayLib.stackdriverBottomSections}
         {param stackdriver: $spec.stackdriver/}
       {/call}
     {/let}
@@ -157,10 +162,10 @@ input:
     {/if}
 
   {let $authScopeBooleanGroups kind="text"}
-    {call display.authScopeBooleanGroups}{param singleVmSpec: $spec/}{/call}
+    {call displayLib.authScopeBooleanGroups}{param singleVmSpec: $spec/}{/call}
   {/let}
   {let $customBooleanGroups kind="text"}
-    {call display.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
+    {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
   {if (strLen($authScopeBooleanGroups) + strLen($customBooleanGroups)) > 0}
   boolean_groups:
@@ -175,20 +180,20 @@ runtime:
     rows:
       {if $spec.siteUrl}
       {let $row kind="text"}
-        {call display.siteUrlApplicationTableRow}{param spec: $spec.siteUrl/}{/call}
+        {call displayLib.siteUrlApplicationTableRow}{param spec: $spec.siteUrl/}{/call}
       {/let}
       {$row |indent: 6, true}{nil}
       {/if}
 
       {if $spec.adminUrl}
       {let $row kind="text"}
-        {call display.adminUrlApplicationTableRow}{param spec: $spec.adminUrl/}{/call}
+        {call displayLib.adminUrlApplicationTableRow}{param spec: $spec.adminUrl/}{/call}
       {/let}
       {$row |indent: 6, true}{nil}
       {/if}
 
       {let $passwordRows kind="text"}
-        {call display.passwordApplicationTableRows}
+        {call displayLib.passwordApplicationTableRows}
           {param passwordsList: $spec.passwordsList/}
           {param deployInput: $spec.deployInput/}
         {/call}
@@ -205,7 +210,7 @@ runtime:
       {if $spec.postDeploy}
       {for $row in $spec.postDeploy.infoRowsList}
       {let $rowDisplay kind="text"}
-        {call display.infoRowApplicationTableRow}
+        {call displayLib.infoRowApplicationTableRow}
           {param infoRow: $row/}
           {param deployInput: $spec.deployInput/}
         {/call}
@@ -216,16 +221,16 @@ runtime:
 
   {let $adminButton kind="text"}
     {if $spec.adminUrl}
-      {call display.adminActionButton}{param spec: $spec.adminUrl/}{/call}
+      {call displayLib.adminActionButton}{param spec: $spec.adminUrl/}{/call}
     {/if}
   {/let}
   {let $siteButton kind="text"}
     {if $spec.siteUrl}
-      {call display.siteActionButton}{param spec: $spec.siteUrl/}{/call}
+      {call displayLib.siteActionButton}{param spec: $spec.siteUrl/}{/call}
     {/if}
   {/let}
   {let $connectButton kind="text"} // The connect button spec is always present for single vm.
-    {call display.connectActionButton}{param button: $spec.postDeploy.connectButton/}{/call}
+    {call displayLib.connectActionButton}{param button: $spec.postDeploy.connectButton/}{/call}
   {/let}
 
 
@@ -267,7 +272,7 @@ runtime:
     {/if}
 
     {for $firewallRule in $spec.firewallRulesList}
-    {let $item kind="text"}{call display.openPortAction}{param spec: $firewallRule/}{/call}{/let}
+    {let $item kind="text"}{call displayLib.openPortAction}{param spec: $firewallRule/}{/call}{/let}
     {$item |indent: 4}
     {/for}
 

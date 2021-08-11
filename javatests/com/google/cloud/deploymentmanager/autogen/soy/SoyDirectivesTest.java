@@ -138,15 +138,15 @@ public class SoyDirectivesTest {
       Object expected, SoyValue value, SoyJavaPrintDirective directive, Object... args) {
     ImmutableList.Builder<SoyValue> argsData = ImmutableList.builder();
     for (Object arg : args) {
-      argsData.add(SoyValueConverter.UNCUSTOMIZED_INSTANCE.convert(arg).resolve());
+      argsData.add(SoyValueConverter.INSTANCE.convert(arg).resolve());
     }
     assertThat(directive.applyForJava(value, argsData.build()))
-        .isEqualTo(SoyValueConverter.UNCUSTOMIZED_INSTANCE.convert(expected).resolve());
+        .isEqualTo(SoyValueConverter.INSTANCE.convert(expected).resolve());
   }
 
   private static void assertOutput(
       Object expected, Object value, SoyJavaPrintDirective directive, Object... args) {
-    assertOutput(expected, SoyValueConverter.UNCUSTOMIZED_INSTANCE.convert(value).resolve(),
+    assertOutput(expected, SoyValueConverter.INSTANCE.convert(value).resolve(),
         directive, args);
   }
 }

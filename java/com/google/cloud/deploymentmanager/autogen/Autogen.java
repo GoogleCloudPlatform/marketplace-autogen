@@ -15,6 +15,7 @@
 package com.google.cloud.deploymentmanager.autogen;
 
 import com.google.auto.value.AutoValue;
+import com.google.cloud.deploymentmanager.autogen.Autogen.Module.TemplateFileSet;
 import com.google.cloud.deploymentmanager.autogen.SoyFunctions.TierTemplateName;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpecProtos;
@@ -28,8 +29,6 @@ import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -39,15 +38,16 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
+import javax.inject.Qualifier;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
@@ -106,7 +106,7 @@ public class Autogen {
     EXCLUDED,
   }
 
-  private static final class Module extends AbstractModule {
+  static final class Module extends AbstractModule {
     @Override
     protected void configure() {
       install(new TemplateRenderer.Module());
@@ -114,9 +114,14 @@ public class Autogen {
       install(new SoyDirectives.Module());
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Qualifier
+    @interface TemplateFileSet {}
+
     // Lists the soy template files to compile.
     @Provides
     @Singleton
+    @TemplateFileSet
     TemplateRenderer.FileSet provideFileSet(TemplateRenderer.FileSet.Builder builder) {
       return builder
           .addContentFromResource(resource("singlevm/c2d_deployment_configuration.json.soy"))
@@ -141,24 +146,14 @@ public class Autogen {
     }
   }
 
-  private static final Supplier<Injector> injector =
-      Suppliers.memoize(
-          new Supplier<Injector>() {
-            @Override
-            public Injector get() {
-              return Guice.createInjector(new Module());
-            }
-          });
-
-  /** Returns a preconfigured instance. */
-  public static Autogen getInstance() {
-    return injector.get().getInstance(Autogen.class);
+  public static AbstractModule getAutogenModule() {
+    return new Module();
   }
 
   private final TemplateRenderer.FileSet fileSet;
 
   @Inject
-  Autogen(TemplateRenderer.FileSet fileSet) {
+  Autogen(@TemplateFileSet TemplateRenderer.FileSet fileSet) {
     this.fileSet = fileSet;
   }
 
@@ -226,25 +221,28 @@ public class Autogen {
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja")
-                .setContent(fileSet.newRenderer("vm.single.jinja").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.jinja.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.schema")
-                .setContent(fileSet.newRenderer("vm.single.schema").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.schema.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.display")
-                .setContent(fileSet.newRenderer("vm.single.display").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.single.display.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("test_config.yaml")
-                .setContent(fileSet.newRenderer("vm.single.test_config").setData(params).render()))
+                .setContent(
+                    fileSet.newRenderer("vm.single.test_config.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("c2d_deployment_configuration.json")
-                .setContent(fileSet.newRenderer("vm.single.c2d_deployment_configuration")
-                    .setData(params)
-                    .render()));
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.single.c2d_deployment_configuration.main")
+                        .setData(params)
+                        .render()));
 
     if (sharedSupportFilesStrategy == SharedSupportFilesStrategy.INCLUDED) {
       for (String filename : SINGLE_VM_SHARED_SUPPORT_FILES) {
@@ -278,13 +276,13 @@ public class Autogen {
               SolutionPackage.File.newBuilder()
                   .setPath(TierTemplateName.apply(tierSpec))
                   .setContent(
-                      fileSet.newRenderer("vm.multi.tierJinja").setData(tierParams).render()))
+                      fileSet.newRenderer("vm.multi.tierJinja.main").setData(tierParams).render()))
           .addFiles(
               SolutionPackage.File.newBuilder()
                   .setPath(TierTemplateName.apply(tierSpec) + ".schema")
                   .setContent(
                       fileSet
-                          .newRenderer("vm.multi.tierJinjaSchema")
+                          .newRenderer("vm.multi.tierSchema.main")
                           .setData(tierParams)
                           .render()));
     }
@@ -292,25 +290,28 @@ public class Autogen {
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja")
-                .setContent(fileSet.newRenderer("vm.multi.jinja").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.jinja.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.schema")
-                .setContent(fileSet.newRenderer("vm.multi.schema").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.schema.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath(solutionId + ".jinja.display")
-                .setContent(fileSet.newRenderer("vm.multi.display").setData(params).render()))
+                .setContent(fileSet.newRenderer("vm.multi.display.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("test_config.yaml")
-                .setContent(fileSet.newRenderer("vm.multi.test_config").setData(params).render()))
+                .setContent(
+                    fileSet.newRenderer("vm.multi.test_config.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("c2d_deployment_configuration.json")
-                .setContent(fileSet.newRenderer("vm.multi.c2d_deployment_configuration")
-                    .setData(params)
-                    .render()));
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.multi.c2d_deployment_configuration.main")
+                        .setData(params)
+                        .render()));
 
     if (sharedSupportFilesStrategy == SharedSupportFilesStrategy.INCLUDED) {
       for (String filename : SINGLE_VM_SHARED_SUPPORT_FILES) {

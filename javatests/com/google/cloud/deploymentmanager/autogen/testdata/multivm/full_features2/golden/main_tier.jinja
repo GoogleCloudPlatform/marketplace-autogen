@@ -218,7 +218,7 @@ resources:
           ports: ["443"]
   {% endif %}
   {% if properties["enableIcmp"] %}
-  - name: {{ env["deployment"] }}-icmp
+  - name: {{ env["deployment"] }}-main-icmp
     type: compute.v1.firewall
     properties:
       network: {{ networks[0] }}

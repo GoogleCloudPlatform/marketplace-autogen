@@ -20,6 +20,10 @@ import com.google.cloud.deploymentmanager.autogen.proto.BatchInput;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.protobuf.Message;
 import java.io.IOException;
 import org.apache.commons.cli.ParseException;
@@ -29,11 +33,15 @@ import org.apache.commons.cli.ParseException;
  * specs
  */
 public final class AutogenCli {
+
+  private static final Supplier<Injector> injector =
+      Suppliers.memoize(() -> Guice.createInjector(Autogen.getAutogenModule()));
+
   private static SolutionPackage getSolutionPackage(
       DeploymentPackageInput solution, AutogenSettings settings) {
     SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
             ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
-    return Autogen.getInstance().generateDeploymentPackage(solution, strategy);
+    return injector.get().getInstance(Autogen.class).generateDeploymentPackage(solution, strategy);
   }
 
   static void runAutogen(String[] args) throws IOException, ParseException {

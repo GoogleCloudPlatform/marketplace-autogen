@@ -1687,7 +1687,7 @@ public class SpecValidationsTest {
                 .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL)))
         .setMachineType(
             MachineTypeSpec.newBuilder()
-                .setDefaultMachineType(MachineType.newBuilder().setGceMachineType("n1-standard-1")))
+                .setDefaultMachineType(MachineType.newBuilder().setGceMachineType("e2-standard-2")))
         .setBootDisk(
             DiskSpec.newBuilder()
                 .setDiskType(DiskType.newBuilder().setDefaultType("pd-ssd"))
@@ -1730,7 +1730,7 @@ public class SpecValidationsTest {
       tier.setMachineType(
               MachineTypeSpec.newBuilder()
                   .setDefaultMachineType(
-                      MachineType.newBuilder().setGceMachineType("n1-standard-1")))
+                      MachineType.newBuilder().setGceMachineType("e2-standard-2")))
           .setBootDisk(
               DiskSpec.newBuilder()
                   .setDiskType(DiskSpec.DiskType.newBuilder().setDefaultType("pd-ssd"))

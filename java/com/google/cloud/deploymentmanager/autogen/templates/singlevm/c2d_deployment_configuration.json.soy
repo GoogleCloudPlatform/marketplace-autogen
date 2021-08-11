@@ -1,7 +1,9 @@
-{namespace vm.single}
+{namespace vm.single.c2d_deployment_configuration}
 
-{template .c2d_deployment_configuration kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.SingleVmDeploymentPackageSpec}
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template .main kind="text"}
+{@param spec: proto.SingleVmDeploymentPackageSpec}
 
 {lb}
   "defaultDeploymentType": "SINGLE_VM",

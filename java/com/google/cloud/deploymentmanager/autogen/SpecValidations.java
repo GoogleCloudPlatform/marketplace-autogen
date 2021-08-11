@@ -81,6 +81,7 @@ final class SpecValidations {
   private static final Pattern TIER_NAME_REGEX = Pattern.compile("[a-z0-9]+");
 
   private static final ImmutableSet<String> SUPPORTED_ACCELERATOR_TYPES =
+      // LINT.IfChange(gpuTypes)
       ImmutableSet.of(
           "nvidia-tesla-k80",
           "nvidia-tesla-p100",
@@ -88,15 +89,13 @@ final class SpecValidations {
           "nvidia-tesla-p100-vws",
           "nvidia-tesla-p4",
           "nvidia-tesla-p4-vws",
-          "nvidia-tesla-t4");
+          "nvidia-tesla-t4",
+          "nvidia-tesla-a100");
+  // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
 
-  /**
-   * Validates that a spec is complete and reasonable.
-   *
-   * @throws IllegalArgumentException
-   */
+  /** Validates that a spec is complete and reasonable. */
   public static void validate(SingleVmDeploymentPackageSpec input) {
     validateImages(input.getImagesList());
     validateBootDisk(input.getBootDisk());
@@ -132,11 +131,7 @@ final class SpecValidations {
     validateAccelerators(input.getAcceleratorsList());
   }
 
-  /**
-   * Validates that a spec is complete and reasonable.
-   *
-   * @throws IllegalArgumentException
-   */
+  /** Validates that a spec is complete and reasonable. */
   public static void validate(MultiVmDeploymentPackageSpec input) {
     checkArgument(input.getTiersCount() > 0, "At least one tier must be specified");
     for (VmTierSpec tier : input.getTiersList()) {

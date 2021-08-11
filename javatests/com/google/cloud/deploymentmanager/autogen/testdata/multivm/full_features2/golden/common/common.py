@@ -17,7 +17,6 @@ import re
 import sys
 import traceback
 import default
-
 import yaml
 
 RFC1035_RE = re.compile(r'^[a-z][-a-z0-9]{1,61}[a-z0-9]{1}$')
@@ -52,8 +51,7 @@ def AutoRef(base, resource, *args):
 
 def OrderedItems(dict_obj):
   """Convenient method to yield sorted iteritems of a dictionary."""
-  keys = dict_obj.keys()
-  keys.sort()
+  keys = sorted(dict_obj)
   for k in keys:
     yield (k, dict_obj[k])
 
@@ -80,7 +78,8 @@ def FormatException(message):
   """Adds more information to the exception."""
   message = ('Exception Type: %s\n'
              'Details: %s\n'
-             'Message: %s\n') % (sys.exc_type, traceback.format_exc(), message)
+             'Message: %s\n') % (sys.exc_info()[0], traceback.format_exc(),
+                                 message)
   return message
 
 

@@ -1,10 +1,16 @@
-{namespace vm.multi}
+{namespace vm.multi.display}
+
+import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {PartnerMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+import * as displayLib from 'com/google/cloud/deploymentmanager/autogen/templates/display.soy';
+import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
+
 
 /** Generates solution.jinja.display file. */
-{template .display kind="text"}
-{@param spec: cloud.deploymentmanager.autogen.MultiVmDeploymentPackageSpec}
+{template .main kind="text"}
+{@param spec: proto.MultiVmDeploymentPackageSpec}
 {@param? partnerId: string}
-{@param? partnerInfo: cloud.deploymentmanager.autogen.PartnerMarketingInfo}
+{@param? partnerInfo: PartnerMarketingInfo}
 {@param? descriptionYaml: string}
 
 {let $partnerName kind="text"}
@@ -28,7 +34,7 @@ input:
     - name: zone
       title: Zone
       {if solutionHasGpus($spec)}
-      {let $acceleratorZoneSubtext kind="text"}{call display.acceleratorZoneSubtext/}{/let}
+      {let $acceleratorZoneSubtext kind="text"}{call displayLib.acceleratorZoneSubtext/}{/let}
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
 
@@ -41,7 +47,7 @@ input:
     {for $section in $spec.deployInput.sectionsList}
     {for $field in $section.fieldsList}
     {let $fieldDisplay kind="text"}
-      {call display.deployInputFieldDisplay}
+      {call displayLib.deployInputFieldDisplay}
         {param section: $section/}
         {param field: $field/}
         {param tierList: $spec.tiersList/}
@@ -54,7 +60,7 @@ input:
 
     {if $spec.stackdriver}
     {let $stackdriverDisplay kind="text"}
-      {call display.stackdriverDisplay}
+      {call displayLib.stackdriverDisplay}
         {param stackdriver: $spec.stackdriver/}
       {/call}
     {/let}
@@ -62,18 +68,18 @@ input:
     {/if}
 
   sections:
-    {call display.topSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.topSections}{param spec: $spec.deployInput/}{/call}{nil}
 
     {for $tier in $spec.tiersList}
-    - name: {call display.tierSectionName}{param spec: $tier/}{/call}
+    - name: {call displayLib.tierSectionName}{param spec: $tier/}{/call}
       title: {$tier.title |yamlprimitive: 6}
     {/for}
 
-    {call display.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
 
     {if $spec.stackdriver}
     {let $stackdriverBottomSections kind="text"}
-      {call display.stackdriverBottomSections}
+      {call displayLib.stackdriverBottomSections}
         {param stackdriver: $spec.stackdriver/}
       {/call}
     {/let}
@@ -81,10 +87,10 @@ input:
     {/if}
 
   {let $authScopeBooleanGroups kind="text"}
-    {call display.authScopeBooleanGroups}{param multiVmSpec: $spec/}{/call}
+    {call displayLib.authScopeBooleanGroups}{param multiVmSpec: $spec/}{/call}
   {/let}
   {let $customBooleanGroups kind="text"}
-    {call display.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
+    {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
   {if (strLen($authScopeBooleanGroups) + strLen($customBooleanGroups)) > 0}
   boolean_groups:
@@ -99,7 +105,7 @@ runtime:
     rows:
       {if $spec.siteUrl}
       {let $row kind="text"}
-        {call display.siteUrlApplicationTableRow}
+        {call displayLib.siteUrlApplicationTableRow}
           {param spec: $spec.siteUrl/}
           {param tiersList: $spec.tiersList/}
         {/call}
@@ -109,7 +115,7 @@ runtime:
 
       {if $spec.adminUrl}
       {let $row kind="text"}
-        {call display.adminUrlApplicationTableRow}
+        {call displayLib.adminUrlApplicationTableRow}
           {param spec: $spec.adminUrl/}
           {param tiersList: $spec.tiersList/}
         {/call}
@@ -118,7 +124,7 @@ runtime:
       {/if}
 
       {let $passwordRows kind="text"}
-        {call display.passwordApplicationTableRows}
+        {call displayLib.passwordApplicationTableRows}
           {param passwordsList: $spec.passwordsList/}
           {param deployInput: $spec.deployInput/}
           {param tiersList: $spec.tiersList/}
@@ -132,7 +138,7 @@ runtime:
       {if $spec.postDeploy}
       {for $row in $spec.postDeploy.infoRowsList}
       {let $rowDisplay kind="text"}
-        {call display.infoRowApplicationTableRow}
+        {call displayLib.infoRowApplicationTableRow}
           {param infoRow: $row/}
           {param deployInput: $spec.deployInput/}
           {param tiersList: $spec.tiersList/}
@@ -144,17 +150,17 @@ runtime:
 
   {let $adminButton kind="text"}
     {if $spec.adminUrl}
-      {call display.adminActionButton}{param spec: $spec.adminUrl/}{param tiersList: $spec.tiersList/}{/call}
+      {call displayLib.adminActionButton}{param spec: $spec.adminUrl/}{param tiersList: $spec.tiersList/}{/call}
     {/if}
   {/let}
   {let $siteButton kind="text"}
     {if $spec.siteUrl}
-      {call display.siteActionButton}{param spec: $spec.siteUrl/}{param tiersList: $spec.tiersList/}{/call}
+      {call displayLib.siteActionButton}{param spec: $spec.siteUrl/}{param tiersList: $spec.tiersList/}{/call}
     {/if}
   {/let}
   {let $connectButton kind="text"}
     {if $spec.postDeploy.connectButton}
-      {call display.connectActionButton}
+      {call displayLib.connectActionButton}
         {param button: $spec.postDeploy.connectButton/}
         {param tiersList: $spec.tiersList/}
       {/call}
@@ -212,7 +218,7 @@ runtime:
     {for $tier in $spec.tiersList}
     {for $firewallRule in $tier.firewallRulesList}
     {let $item kind="text"}
-      {call display.openPortAction}{param spec: $firewallRule/}{param tierSpec: $tier/}{/call}
+      {call displayLib.openPortAction}{param spec: $firewallRule/}{param tierSpec: $tier/}{/call}
     {/let}
     {$item |indent: 4}
     {/for}
@@ -236,9 +242,9 @@ metadata_version: v1
 
 
 {template .displayTierProperties kind="text" /*visibility="private"*/}
-{@param spec: cloud.deploymentmanager.autogen.VmTierSpec}
+{@param spec: proto.VmTierSpec}
 {let $section kind="text"}
-section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
+section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 {/let}
 
 - name: {'instanceCount' |tierprefixed: $spec}
@@ -269,7 +275,7 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: Machine type
   {$section}
 {if length($spec.acceleratorsList) > 0}
-{call display.acceleratorProperty}{param tier: $spec/}{/call}
+{call displayLib.acceleratorProperty}{param tier: $spec/}{/call}
 {/if}
 - name: {'bootDiskType' |tierprefixed: $spec}
   title: {$spec.bootDisk.displayLabel + ' type' |yamlprimitive: 2}
@@ -300,7 +306,7 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
   {$section}
 
 {let $firewallDisplayProperties kind="text"}
-  {call display.firewallDisplayProperties}
+  {call displayLib.firewallDisplayProperties}
     {param firewallsList: $spec.firewallRulesList/}
     {param tierSpec: $spec/}
   {/call}
@@ -317,9 +323,9 @@ section: {call display.tierSectionName}{param spec: $spec/}{/call}{nil}
 
 {for $scope in $spec.gcpAuthScopesList}
 - name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{param tierSpec: $spec/}{/call}
-  title: Allow {call display.authScopeDescription}{param spec: $scope/}{/call} on the VM
+  title: Allow {call displayLib.authScopeDescription}{param spec: $scope/}{/call} on the VM
   {$section}
-  boolean_group: {call display.authScopeBoolGroupName}{param spec: $scope/}{param tier: $spec/}{/call}
+  boolean_group: {call displayLib.authScopeBoolGroupName}{param spec: $scope/}{param tier: $spec/}{/call}
 {/for}
 
 {/template}

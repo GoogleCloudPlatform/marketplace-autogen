@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Creates an Instance VM with common defaults."""
-# pylint: disable=g-import-not-at-top
 import copy
 import re
 import common
@@ -47,7 +46,7 @@ AUTODELETE_BOOTDISK = 'bootDiskAutodelete'
 DEFAULT_DISKTYPE = 'pd-standard'
 DEFAULT_EXTERNAL_IPS = ['EPHEMERAL']
 DEFAULT_IP_FWD = False
-DEFAULT_MACHINETYPE = 'n1-standard-1'
+DEFAULT_MACHINETYPE = 'e2-standard-2'
 DEFAULT_NETWORKS = ['default']
 DEFAULT_PROVIDE_BOOT = True
 DEFAULT_BOOTDISKSIZE = 10

@@ -16,6 +16,7 @@ package com.google.cloud.deploymentmanager.autogen;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.cloud.deploymentmanager.autogen.AutogenMediumTestsSuite.Solution;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -35,11 +36,11 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(Parameterized.class)
 public class VerifySolutionFileSetTest {
-  @Parameter public AutogenMediumTestsSuite.Solution solution;
+  @Parameter public Solution solution;
 
   @Parameters(name = "Solution {0}")
-  public static Collection<AutogenMediumTestsSuite.Solution> data() {
-    return AutogenMediumTestsSuite.Solution.findAllSolutions();
+  public static Collection<Solution> data() {
+    return Solution.findAllSolutions();
   }
 
   @Test

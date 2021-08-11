@@ -93,6 +93,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Doublequoted extends BaseDirective {
+    @Inject
+    Doublequoted() {}
+
     private static final Escaper ESCAPER =
         new CharEscaperBuilder()
             .addEscape('\\', "\\\\")
@@ -119,6 +122,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Indent extends BaseDirective {
+    @Inject
+    Indent() {}
+
     private static final Splitter SPLITTER = Splitter.on('\n');
     private static final Joiner JOINER = Joiner.on('\n');
 
@@ -172,6 +178,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Lowercased extends BaseDirective {
+    @Inject
+    Lowercased() {}
+
     @Override
     public String getName() {
       return "|lowercased";
@@ -193,6 +202,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Quoted extends BaseDirective {
+    @Inject
+    Quoted() {}
+
     private static final Escaper ESCAPER =
         new CharEscaperBuilder().addEscape('\'', "''").toEscaper();
 
@@ -217,6 +229,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class ReplaceAll extends BaseDirective {
+    @Inject
+    ReplaceAll() {}
+
     @Override
     public Set<Integer> getValidArgsSizes() {
      return ImmutableSet.of(2);
@@ -250,6 +265,8 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Trim extends BaseDirective {
+    @Inject
+    Trim() {}
 
     enum Flag {
       LEADING,
@@ -331,6 +348,9 @@ final class SoyDirectives {
   @VisibleForTesting
   @Singleton
   static class Uppercased extends BaseDirective {
+    @Inject
+    Uppercased() {}
+
     @Override
     public String getName() {
       return "|uppercased";

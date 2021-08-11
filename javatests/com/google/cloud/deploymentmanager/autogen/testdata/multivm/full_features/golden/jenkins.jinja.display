@@ -407,7 +407,7 @@ runtime:
         the terminal:
       snippet: >-
         gcloud --project={{ outputs().project }} compute firewall-rules
-        create "{{ outputs().deployment }}-icmp"
+        create "{{ outputs().deployment }}-main-icmp"
         --network {{ outputs().main_mainNetwork }}
         --allow icmp
         --source-tags "{{ outputs().deployment }}-deployment"

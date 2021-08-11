@@ -35,7 +35,7 @@ metadata_value() {
 
 access_token() {
   metadata_value "instance/service-accounts/default/token" \
-  | python -c "import sys, json; print json.load(sys.stdin)['access_token']"
+  | python3 -c "import sys, json; print(json.load(sys.stdin)['access_token'])"
 }
 
 uptime_seconds() {
@@ -53,10 +53,10 @@ uptime_deadline() {
 }
 
 config_name() {
-  python - $(config_url) <<EOF
-import sys, urlparse
-parsed = urlparse.urlparse(sys.argv[1])
-print '/'.join(parsed.path.rstrip('/').split('/')[-4:])
+  python3 - $(config_url) <<EOF
+import sys, urllib.parse
+parsed = urllib.parse.urlparse(sys.argv[1])
+print('/'.join(parsed.path.rstrip('/').split('/')[-4:]))
 EOF
 }
 
