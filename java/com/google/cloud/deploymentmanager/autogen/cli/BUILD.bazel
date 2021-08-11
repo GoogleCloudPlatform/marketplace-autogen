@@ -12,7 +12,6 @@ java_library(
         "@maven//:com_google_code_gson_gson",
         "@maven//:com_google_common_html_types_types",
         "@maven//:com_google_guava_guava",
-        "@maven//:com_google_inject_guice",
         "@maven//:com_google_protobuf_protobuf_java",
         "@maven//:com_google_protobuf_protobuf_java_util",
         "@maven//:com_ibm_icu_icu4j",

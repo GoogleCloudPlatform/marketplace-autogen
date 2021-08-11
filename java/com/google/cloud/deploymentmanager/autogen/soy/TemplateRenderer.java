@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.protobuf.Descriptors.GenericDescriptor;
 import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.jbcsrc.api.LegacySoyJavaStringCaller;
 import com.google.template.soy.jbcsrc.api.SoySauce;
 import com.google.template.soy.jbcsrc.api.SoySauce.Renderer;
 import com.google.template.soy.shared.restricted.SoyFunction;
@@ -101,6 +102,7 @@ public final class TemplateRenderer {
       this.soySauce = soySauce;
     }
 
+    @LegacySoyJavaStringCaller
     public TemplateRenderer newRenderer(String templateName) {
       return new TemplateRenderer(soySauce.renderTemplate(templateName));
     }

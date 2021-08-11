@@ -113,7 +113,7 @@ autogen \
 
 ### Prerequisites
 
-* **bazel (version 4.1.0 or up)**: Install [here](https://docs.bazel.build/versions/master/install.html).
+* **bazel (version 0.28.1 or up)**: Install [here](https://docs.bazel.build/versions/master/install.html).
 * **Java**: Check the [bazel docs](https://docs.bazel.build/versions/master/tutorial/java.html) on how to install and setup a Java environment.
 
 ### Build
