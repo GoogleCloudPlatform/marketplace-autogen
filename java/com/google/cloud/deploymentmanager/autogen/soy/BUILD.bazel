@@ -7,6 +7,7 @@ java_library(
         "@maven//:com_google_inject_guice",
         "@maven//:com_google_protobuf_protobuf_java",
         "@maven//:com_google_template_soy",
+        "@maven//:javax_inject_javax_inject",
         "@maven//:org_ow2_asm_asm",
         "@maven//:org_yaml_snakeyaml",
     ],

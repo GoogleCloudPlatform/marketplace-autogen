@@ -67,6 +67,7 @@ java_library(
         "@maven//:com_google_protobuf_protobuf_java",
         "@maven//:com_google_protobuf_protobuf_java_util",
         "@maven//:com_google_template_soy",
+        "@maven//:javax_inject_javax_inject",
         "@maven//:commons_cli_commons_cli",
         "@maven//:org_yaml_snakeyaml",
     ],
