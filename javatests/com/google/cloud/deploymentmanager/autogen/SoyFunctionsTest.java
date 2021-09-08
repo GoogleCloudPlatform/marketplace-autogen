@@ -227,18 +227,18 @@ public class SoyFunctionsTest {
   @Test
   public void testFindDeployInputField() {
     DeployInputField[] fields = {
-        DeployInputField.newBuilder()
-            .setName("field0")
-            .setIntegerBox(IntegerBox.newBuilder())
-            .build(),
-        DeployInputField.newBuilder()
-            .setName("field1")
-            .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.newBuilder())
-            .build(),
-        DeployInputField.newBuilder()
-            .setName("field2")
-            .setStringBox(StringBox.newBuilder())
-            .build(),
+      DeployInputField.newBuilder()
+          .setName("field0")
+          .setIntegerBox(IntegerBox.getDefaultInstance())
+          .build(),
+      DeployInputField.newBuilder()
+          .setName("field1")
+          .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.getDefaultInstance())
+          .build(),
+      DeployInputField.newBuilder()
+          .setName("field2")
+          .setStringBox(StringBox.getDefaultInstance())
+          .build(),
     };
     DeployInputSpec deployInputSpec =
         DeployInputSpec.newBuilder()
@@ -265,14 +265,18 @@ public class SoyFunctionsTest {
     DisplayGroup displayGroup0 = DisplayGroup.newBuilder().setName("DISPLAY_GROUP0").build();
     DisplayGroup displayGroup1 = DisplayGroup.newBuilder().setName("DISPLAY_GROUP1").build();
     DeployInputSection.Builder sectionBuilder = DeployInputSection.newBuilder();
-    sectionBuilder.addFieldsBuilder()
-        .setName("nonGroupedBooleanCheckboxField").setIntegerBox(IntegerBox.newBuilder());
+    sectionBuilder
+        .addFieldsBuilder()
+        .setName("nonGroupedBooleanCheckboxField")
+        .setIntegerBox(IntegerBox.getDefaultInstance());
     sectionBuilder.addFieldsBuilder()
         .setName("group0LeadingField")
         .setGroupedBooleanCheckbox(
             GroupedBooleanCheckbox.newBuilder().setDisplayGroup(displayGroup0));
-    sectionBuilder.addFieldsBuilder().setName("group0SecondField")
-        .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.newBuilder());
+    sectionBuilder
+        .addFieldsBuilder()
+        .setName("group0SecondField")
+        .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.getDefaultInstance());
     sectionBuilder.addFieldsBuilder()
         .setName("group1LeadingField")
         .setGroupedBooleanCheckbox(
@@ -289,14 +293,17 @@ public class SoyFunctionsTest {
 
   @Test
   public void testFindDisplayGroup_noDisplayGroup() {
-    DeployInputSection section = DeployInputSection.newBuilder()
-        .addFields(
-            DeployInputField.newBuilder().setName("field0")
-                .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.newBuilder()))
-        .addFields(
-            DeployInputField.newBuilder().setName("field1")
-                .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.newBuilder()))
-        .build();
+    DeployInputSection section =
+        DeployInputSection.newBuilder()
+            .addFields(
+                DeployInputField.newBuilder()
+                    .setName("field0")
+                    .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.getDefaultInstance()))
+            .addFields(
+                DeployInputField.newBuilder()
+                    .setName("field1")
+                    .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.getDefaultInstance()))
+            .build();
     assertFunctionCall(findDisplayGroup, section.getFields(0), section)
         .throwsExceptionThat(RuntimeException.class)
         .hasMessageThat().startsWith("Unable to locate display group");
@@ -307,14 +314,17 @@ public class SoyFunctionsTest {
 
   @Test
   public void testFindDisplayGroup_precededByAnotherFieldType() {
-    DeployInputSection section = DeployInputSection.newBuilder()
-        .addFields(
-            DeployInputField.newBuilder().setName("field0")
-                .setIntegerBox(IntegerBox.newBuilder()))
-        .addFields(
-            DeployInputField.newBuilder().setName("field1")
-                .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.newBuilder()))
-        .build();
+    DeployInputSection section =
+        DeployInputSection.newBuilder()
+            .addFields(
+                DeployInputField.newBuilder()
+                    .setName("field0")
+                    .setIntegerBox(IntegerBox.getDefaultInstance()))
+            .addFields(
+                DeployInputField.newBuilder()
+                    .setName("field1")
+                    .setGroupedBooleanCheckbox(GroupedBooleanCheckbox.getDefaultInstance()))
+            .build();
     assertFunctionCall(findDisplayGroup, section.getFields(1), section)
         .throwsExceptionThat(RuntimeException.class)
         .hasMessageThat().startsWith("No preceding grouped boolean checkbox field");
@@ -518,12 +528,16 @@ public class SoyFunctionsTest {
 
   private DeployInputField buildStringBoxInput(String fieldName) {
     return DeployInputField.newBuilder()
-        .setName(fieldName).setStringBox(StringBox.newBuilder()).build();
+        .setName(fieldName)
+        .setStringBox(StringBox.getDefaultInstance())
+        .build();
   }
 
   private DeployInputField buildIntegerBoxInput(String fieldName) {
     return DeployInputField.newBuilder()
-        .setName(fieldName).setIntegerBox(IntegerBox.newBuilder()).build();
+        .setName(fieldName)
+        .setIntegerBox(IntegerBox.getDefaultInstance())
+        .build();
   }
 
   private DeployInputSection buildInputSection(

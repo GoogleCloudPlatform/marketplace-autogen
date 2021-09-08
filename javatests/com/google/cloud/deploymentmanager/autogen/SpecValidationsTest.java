@@ -911,7 +911,9 @@ public class SpecValidationsTest {
   public void postDeployActionItem_mustHaveHeading_single() {
     expectIllegalArgumentException("Post deploy action item must have a valid heading");
     PostDeployInfo postDeployInfo =
-        PostDeployInfo.newBuilder().addActionItems(PostDeployInfo.ActionItem.newBuilder()).build();
+        PostDeployInfo.newBuilder()
+            .addActionItems(PostDeployInfo.ActionItem.getDefaultInstance())
+            .build();
     validateSingleVmPostDeployInfo(postDeployInfo);
   }
 
@@ -919,7 +921,9 @@ public class SpecValidationsTest {
   public void postDeployActionItem_mustHaveHeading_multi() {
     expectIllegalArgumentException("Post deploy action item must have a valid heading");
     PostDeployInfo postDeployInfo =
-        PostDeployInfo.newBuilder().addActionItems(PostDeployInfo.ActionItem.newBuilder()).build();
+        PostDeployInfo.newBuilder()
+            .addActionItems(PostDeployInfo.ActionItem.getDefaultInstance())
+            .build();
     validateMultiVmPostDeployInfo(postDeployInfo);
   }
 
@@ -1778,7 +1782,7 @@ public class SpecValidationsTest {
   private static MachineTypeSpec machineTypeSpecWithEmptyConstraint() {
     return MachineTypeSpec.newBuilder()
         .setDefaultMachineType(MachineType.newBuilder().setGceMachineType("boom-boom-boom"))
-        .setMinimum(MachineTypeConstraint.newBuilder())
+        .setMinimum(MachineTypeConstraint.getDefaultInstance())
         .build();
   }
 
@@ -1963,7 +1967,7 @@ public class SpecValidationsTest {
   private InstanceUrlSpec multiInstanceUrlWithTierVmButNoTier() {
     return InstanceUrlSpec.newBuilder()
         .setScheme(InstanceUrlSpec.Scheme.HTTP)
-        .setTierVm(TierVmInstance.newBuilder())
+        .setTierVm(TierVmInstance.getDefaultInstance())
         .build();
   }
 
