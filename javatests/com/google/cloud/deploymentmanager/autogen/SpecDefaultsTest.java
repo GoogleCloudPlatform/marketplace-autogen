@@ -453,7 +453,7 @@ public class SpecDefaultsTest {
             .setWaiter(
                 WaiterSpec.newBuilder()
                     .setWaiterTimeoutSecs(300)
-                    .setScript(ScriptSpec.newBuilder()));
+                    .setScript(ScriptSpec.getDefaultInstance()));
     ApplicationStatusSpec.Builder expectedAppStatusBuilder = appStatus.clone();
     expectedAppStatusBuilder.getWaiterBuilder().getScriptBuilder().setCheckTimeoutSecs(300);
     ApplicationStatusSpec expectedAppStatus = expectedAppStatusBuilder.build();
