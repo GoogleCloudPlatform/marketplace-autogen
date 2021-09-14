@@ -19,7 +19,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -140,7 +139,7 @@ final class SoyDirectives {
 
     @Override
     public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
-      final String spacer = Strings.repeat(" ", args.get(0).integerValue());
+      final String spacer = " ".repeat(args.get(0).integerValue());
       Iterable<String> pre;
       Iterable<String> toBeIndented;
       if (getIndentFirstArg(args)) {
@@ -428,7 +427,7 @@ final class SoyDirectives {
     }
     
     private static String indentLines(String value, int indent) {
-      return value.replace("\n", "\n" + Strings.repeat(" ", indent));
+      return value.replace("\n", "\n" + " ".repeat(indent));
     }
   }
 
