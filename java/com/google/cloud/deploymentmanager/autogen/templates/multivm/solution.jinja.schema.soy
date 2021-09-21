@@ -83,8 +83,8 @@ outputs:
     type: string
   project:
     type: string
-  {for $password in $spec.passwordsList}
-  password{index($password)}:
+  {for $password, $index in $spec.passwordsList}
+  password{$index}:
     type: string
   {/for}
 
@@ -182,11 +182,11 @@ outputs:
 {/let}
 {$bootDiskProps}{nil}
 
-{for $disk in $spec.additionalDisksList}
+{for $disk, $index in $spec.additionalDisksList}
 {let $diskProps kind="text"}
   {call renders.additionalDiskPropertiesSchema}
-    {param spec: $spec.additionalDisksList[index($disk)]/}
-    {param diskIndex: index($disk)/}
+    {param spec: $spec.additionalDisksList[$index]/}
+    {param diskIndex: $index/}
     {param zonePropertyName: 'zone'/}
     {param tier: $spec/}
   {/call}

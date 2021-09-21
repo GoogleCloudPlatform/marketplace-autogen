@@ -493,7 +493,7 @@ enumLabels:
 {@param passwordsList: list<proto.PasswordSpec>}
 {@param? deployInput: proto.DeployInputSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
-{for $password in $passwordsList}
+{for $password, $index in $passwordsList}
 {if $password.username}
 - label: {($password.displayLabel + ' user') |yamlprimitive: 2}
   value: {$password.username}
@@ -509,7 +509,7 @@ enumLabels:
   {/if}
 {/if}
 - label: {($password.displayLabel + ' password (Temporary)') |yamlprimitive: 2}
-  value: '{{ outputs().password{index($password)} }}'
+  value: '{{ outputs().password{$index} }}'
   {if $password.generateIf}
   showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
   {/if}

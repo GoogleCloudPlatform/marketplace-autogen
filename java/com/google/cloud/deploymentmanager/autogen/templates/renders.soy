@@ -514,8 +514,8 @@ serviceAccounts:
 {$name |tierprefixed: $tier}:
   type: string
   enum:
-    {for $image in $imagesList}
-    - '{index($image)}'
+    {for $image, $index in $imagesList}
+    - '{$index}'
     {/for}
   default: '0'
 {/template}
@@ -841,7 +841,7 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {@param deployInputSpec: proto.DeployInputSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {@param instanceName: string}
-{for $disk in $additionalDisksList}
+{for $disk, $index in $additionalDisksList}
 {let $deviceNameSuffix kind="text"}
   {if $disk.deviceNameSuffix.name}
     {$disk.deviceNameSuffix.name}{nil}
@@ -852,8 +852,8 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {/let}
 - deviceName: {$instanceName}-{$deviceNameSuffix}
   type: PERSISTENT
-  diskType: {{ properties["{diskTypePropertyName(index($disk), $tierSpec)}"] }}
-  diskSizeGb: {{ properties["{diskSizePropertyName(index($disk), $tierSpec)}"] }}
+  diskType: {{ properties["{diskTypePropertyName($index, $tierSpec)}"] }}
+  diskSizeGb: {{ properties["{diskSizePropertyName($index, $tierSpec)}"] }}
   boot: False
   autoDelete: {$disk.preventAutoDeletion ? 'False' : 'True'}
 {/for}

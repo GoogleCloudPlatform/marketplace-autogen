@@ -262,11 +262,11 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: Image version
   {$section}
   enumLabels:
-    {for $image in $spec.imagesList}
+    {for $image, $index in $spec.imagesList}
     {if $image.label}
-    '{index($image)}': '{$image.label}'
+    '{$index}': '{$image.label}'
     {else}
-    '{index($image)}': '{$image.name}'
+    '{$index}': '{$image.name}'
     {/if}
     {/for}
 {/if}
@@ -284,11 +284,11 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: {$spec.bootDisk.displayLabel + ' size in GB' |yamlprimitive: 2}
   {$section}
 
-{for $disk in $spec.additionalDisksList}
-- name: {diskTypePropertyName(index($disk), $spec) |yamlprimitive: 2}
+{for $disk, $index in $spec.additionalDisksList}
+- name: {diskTypePropertyName($index, $spec) |yamlprimitive: 2}
   title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
   {$section}
-- name: {diskSizePropertyName(index($disk), $spec) |yamlprimitive: 2}
+- name: {diskSizePropertyName($index, $spec) |yamlprimitive: 2}
   title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
   {$section}
 {/for}
