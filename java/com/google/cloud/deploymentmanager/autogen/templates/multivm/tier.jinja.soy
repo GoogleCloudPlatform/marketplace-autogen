@@ -59,13 +59,13 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {if length($spec.imagesList) > 1}
   {\n}
   {% set imageProjects = [{nil}
-  {for $image in $spec.imagesList}
-    "{$image.project}"{if not isLast($image)}, {/if}{nil}
+  {for $image, $index in $spec.imagesList}
+    {if $index > 0}, {/if}"{$image.project}"{nil}
   {/for}
   ] %}
   {% set imageNames = [{nil}
-  {for $image in $spec.imagesList}
-    "{$image.name}"{if not isLast($image)}, {/if}{nil}
+  {for $image, $index in $spec.imagesList}
+    {if $index > 0}, {/if}"{$image.name}"{nil}
   {/for}
   ] %}
   {% set selectedImageIndex = properties["image"]|int %}
@@ -287,11 +287,11 @@ outputs:
 
 {template .passwordMetadataItems kind="text" /* visibility="private" */}
 {@param spec: proto.MultiVmDeploymentPackageSpec}
-{for $password in $spec.passwordsList}
+{for $password, $index in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
 {call renders.passwordMetadataFromProperty}
   {param password: $password/}
-  {param passwordIndex: index($password)/}
+  {param passwordIndex: $index/}
 {/call}
 {/let}
 {$passwordMetadata}{nil}

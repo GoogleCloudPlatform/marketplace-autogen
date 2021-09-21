@@ -36,11 +36,11 @@ input:
     - name: image
       title: Image version
       enumLabels:
-        {for $image in $spec.imagesList}
+        {for $image, $index in $spec.imagesList}
         {if $image.label}
-        '{index($image)}': '{$image.label}'
+        '{$index}': '{$image.label}'
         {else}
-        '{index($image)}': '{$image.name}'
+        '{$index}': '{$image.name}'
         {/if}
         {/for}
     {/if}
@@ -63,11 +63,11 @@ input:
       title: {$spec.bootDisk.displayLabel} size in GB
       section: BOOT_DISK
 
-    {for $disk in $spec.additionalDisksList}
-    - name: {diskTypePropertyName(index($disk)) |yamlprimitive: 2}
+    {for $disk, $index in $spec.additionalDisksList}
+    - name: {diskTypePropertyName($index) |yamlprimitive: 2}
       title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
       section: ADDITIONAL_DISKS
-    - name: {diskSizePropertyName(index($disk)) |yamlprimitive: 2}
+    - name: {diskSizePropertyName($index) |yamlprimitive: 2}
       title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
       section: ADDITIONAL_DISKS
     {/for}
@@ -291,8 +291,8 @@ runtime:
 {\n}
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  {for $image in $spec.imagesList}
-  vmImage{index($image)}: https://www.googleapis.com/compute/v1/projects/{$image.project}/global/images/{$image.name}
+  {for $image, $index in $spec.imagesList}
+  vmImage{$index}: https://www.googleapis.com/compute/v1/projects/{$image.project}/global/images/{$image.name}
   {/for}
 
 {\n}

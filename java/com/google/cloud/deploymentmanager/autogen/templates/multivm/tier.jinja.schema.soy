@@ -47,11 +47,11 @@ required:
   - image
   {/if}
 
-  {for $password in $packageSpec.passwordsList}
+  {for $password, $index in $packageSpec.passwordsList}
   {let $passwordRequiredSchema kind="text"}
     {call renders.passwordRequiredSchema}
       {param password: $password/}
-      {param passwordIndex: index($password)/}
+      {param passwordIndex: $index/}
     {/call}
   {/let}
   {$passwordRequiredSchema |indent: 2, true}{nil}
@@ -143,11 +143,11 @@ properties:
   {/let}
   {$bootDiskProps |indent: 2, true}{nil}
 
-  {for $disk in $spec.additionalDisksList}
+  {for $disk, $index in $spec.additionalDisksList}
   {let $diskProps kind="text"}
     {call renders.additionalDiskPropertiesSchema}
-      {param spec: $spec.additionalDisksList[index($disk)]/}
-      {param diskIndex: index($disk)/}
+      {param spec: $spec.additionalDisksList[$index]/}
+      {param diskIndex: $index/}
       {param zonePropertyName: 'zone'/}
       {param tier: $spec/}
     {/call}
@@ -170,9 +170,9 @@ properties:
   {$deployInputProps |indent: 2, true}{nil}
   {/if}
 
-  {for $password in $packageSpec.passwordsList}
+  {for $password, $index in $packageSpec.passwordsList}
   {let $propertyName kind="text"}
-    {call utilities.passwordPropertyName}{param passwordIndex: index($password)/}{/call}
+    {call utilities.passwordPropertyName}{param passwordIndex: $index/}{/call}
   {/let}
   {$propertyName}:
     type: string

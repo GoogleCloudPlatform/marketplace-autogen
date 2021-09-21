@@ -63,13 +63,13 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {if length($spec.imagesList) > 1}
 {\n}
 {% set imageProjects = [{nil}
-{for $image in $spec.imagesList}
-"{$image.project}"{if not isLast($image)}, {/if}{nil}
+{for $image, $index in $spec.imagesList}
+{if $index > 0}, {/if}"{$image.project}"{nil}
 {/for}
 ] %}
 {% set imageNames = [{nil}
-{for $image in $spec.imagesList}
-"{$image.name}"{if not isLast($image)}, {/if}{nil}
+{for $image, $index in $spec.imagesList}
+{if $index > 0}, {/if}"{$image.name}"{nil}
 {/for}
 ] %}
 {% set selectedImageIndex = properties["image"]|int %}
@@ -235,11 +235,11 @@ resources:
         items:
           - {call utilities.deploymentTag data="all"/}
 
-  {for $password in $spec.passwordsList}
+  {for $password, $index in $spec.passwordsList}
   {let $passwordResource kind="text"}
     {call renders.passwordResource}
       {param password: $password/}
-      {param passwordIndex: index($password)/}
+      {param passwordIndex: $index/}
     {/call}
   {/let}
   {$passwordResource |indent: 2, true}{nil}
@@ -266,11 +266,11 @@ resources:
 outputs:
   - name: deployment
     value: {{ deployment }}
-  {for $password in $spec.passwordsList}
+  {for $password, $index in $spec.passwordsList}
   {let $passwordOutput kind="text"}
     {call renders.passwordOutput}
       {param password: $password/}
-      {param passwordIndex: index($password)/}
+      {param passwordIndex: $index/}
     {/call}
   {/let}
   {$passwordOutput |indent: 2, true}{nil}
@@ -307,11 +307,11 @@ outputs:
 
 {template .passwordMetadataItems kind="text" /* visibility="private" */}
 {@param spec: proto.SingleVmDeploymentPackageSpec}
-{for $password in $spec.passwordsList}
+{for $password, $index in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
   {call renders.passwordMetadataFromOutput}
     {param password: $password/}
-    {param passwordIndex: index($password)/}
+    {param passwordIndex: $index/}
   {/call}
 {/let}
 {$passwordMetadata |indent: 0, true}{nil}

@@ -61,11 +61,11 @@ resources:
       {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
       {/for}
 
-      {for $password in $spec.passwordsList}
+      {for $password, $index in $spec.passwordsList}
       {let $passwordProperty kind="text"}
         {call renders.passwordProperty}
           {param password: $password/}
-          {param passwordIndex: index($password)/}
+          {param passwordIndex: $index/}
         {/call}
       {/let}
       {$passwordProperty |indent: 6, true}{nil}
@@ -105,9 +105,9 @@ resources:
       {$propName}: {{ properties["{$propName}"] }}
       {/for}
 
-      {for $disk in $tier.additionalDisksList}
-      {diskTypePropertyName(index($disk), $tier)}: {{ properties["{diskTypePropertyName(index($disk), $tier)}"] }}
-      {diskSizePropertyName(index($disk), $tier)}: {{ properties["{diskSizePropertyName(index($disk), $tier)}"] }}
+      {for $disk, $index in $tier.additionalDisksList}
+      {diskTypePropertyName($index, $tier)}: {{ properties["{diskTypePropertyName($index, $tier)}"] }}
+      {diskSizePropertyName($index, $tier)}: {{ properties["{diskSizePropertyName($index, $tier)}"] }}
       {/for}
 
       {if $spec.stackdriver?.logging}
@@ -118,11 +118,11 @@ resources:
       {/if}
   {/for}
 
-  {for $password in $spec.passwordsList}
+  {for $password, $index in $spec.passwordsList}
   {let $passwordResource kind="text"}
     {call renders.passwordResource}
       {param password: $password/}
-      {param passwordIndex: index($password)/}
+      {param passwordIndex: $index/}
     {/call}
   {/let}
   {$passwordResource |indent: 2, true}{nil}
@@ -135,11 +135,11 @@ outputs:
   - name: project
     value: {{ env["project"] }}
 
-  {for $password in $spec.passwordsList}
+  {for $password, $index in $spec.passwordsList}
   {let $passwordOutput kind="text"}
     {call renders.passwordOutput}
       {param password: $password/}
-      {param passwordIndex: index($password)/}
+      {param passwordIndex: $index/}
     {/call}
   {/let}
   {$passwordOutput |indent: 2, true}{nil}
