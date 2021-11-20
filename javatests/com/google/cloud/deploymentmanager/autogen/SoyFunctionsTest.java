@@ -459,9 +459,24 @@ public class SoyFunctionsTest {
     BooleanExpression expression = BooleanExpression.newBuilder()
         .setHasExternalIp(ExternalIpAvailability.newBuilder().setNegated(true))
         .build();
+
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
         .isEqualTo("properties().externalIP == \"NONE\"");
+  }
+
+  @Test
+  public void testBooleanExpressionDisplayConditionForMultipleParams() {
+    BooleanExpression expression = BooleanExpression.newBuilder()
+        .setHasExternalIp(ExternalIpAvailability.newBuilder().setNegated(false))
+        .setBooleanDeployInputField(BooleanDeployInputField.newBuilder()
+            .setName("enableXYZ")
+            .setNegated(true))
+        .build();
+
+    assertFunctionCall(booleanExpressionDisplayCondition, expression)
+        .hasResultThat()
+        .isEqualTo("!properties().input_enableXYZ and properties().externalIP != \"NONE\"");
   }
 
   @Test
