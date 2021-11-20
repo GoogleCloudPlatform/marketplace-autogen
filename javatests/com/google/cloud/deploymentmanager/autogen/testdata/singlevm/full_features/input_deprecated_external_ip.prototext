@@ -220,6 +220,18 @@ spec {
         }
       }
       action_items {
+        heading: "Custom multiple conditional action item"
+        description: "This action is displayed only when the checkbox for multiple displaying conditional row and action was selected"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction"
+          }
+          has_external_ip {
+            negated: false
+          }
+        }
+      }
+      action_items {
         heading: "External IP action"
         description: "Some action"
         show_if {

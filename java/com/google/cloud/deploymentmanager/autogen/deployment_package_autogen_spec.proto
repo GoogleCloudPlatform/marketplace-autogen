@@ -1005,10 +1005,8 @@ message DeployInputField {
 
 // Allows to build an expression which value should be evaluated to boolean.
 message BooleanExpression {
-  oneof expression {
-    ExternalIpAvailability has_external_ip = 1;
-    BooleanDeployInputField boolean_deploy_input_field = 2;
-  }
+  optional ExternalIpAvailability has_external_ip = 1;
+  optional BooleanDeployInputField boolean_deploy_input_field = 2;
 
   // Uses the value of a deploy input field of type boolean.
   message BooleanDeployInputField {

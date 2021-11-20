@@ -512,9 +512,11 @@ final class SoyFunctions {
       })
   static final class TierPrefixed extends TypedSoyFunction implements SoyJavaFunction {
     @Inject
-    TierPrefixed() {}
+    TierPrefixed(SoyDirectives.TierPrefixed directive) {
+      this.directive = directive;
+    }
 
-    @Inject SoyDirectives.TierPrefixed directive;
+    SoyDirectives.TierPrefixed directive;
 
     @Override
     public SoyValue computeForJava(List<SoyValue> args) {
@@ -563,6 +565,7 @@ final class SoyFunctions {
       implements SoyJavaFunction {
     private final SoyFunctions.TierPrefixed tierPrefixedFunction;
     private final SoyFunctions.FindVmTier findVmTierFunction;
+    private static final String AND = "and";
 
     @Inject
     BooleanExpressionDisplayCondition(SoyFunctions.TierPrefixed tierPrefixedFunction,
@@ -583,37 +586,43 @@ final class SoyFunctions {
     }
 
     public static String apply(BooleanExpression spec, SoyValue tiersList,
-        SoyFunctions.TierPrefixed tierPrefixedFunction,
-        SoyFunctions.FindVmTier findVmTierFunction) {
-      switch (spec.getExpressionCase()) {
-        case BOOLEAN_DEPLOY_INPUT_FIELD:
-          BooleanDeployInputField field = spec.getBooleanDeployInputField();
-          String fieldName = DeployInputFieldName.formatFieldName(field.getName());
-          String propertyExpression = String.format("properties().%s", fieldName);
-          if (field.getNegated()) {
-            propertyExpression = "!" + propertyExpression;
-          }
-          return propertyExpression;
-        case HAS_EXTERNAL_IP:
-          ExternalIpAvailability externalIp = spec.getHasExternalIp();
-          String noneType = Type.NONE.name();
-          SoyValue tierName = StringData.forValue(externalIp.getTier());
-          SoyValue tierSpec = NullData.INSTANCE;
-          if (!Strings.isNullOrEmpty(externalIp.getTier())) {
-            tierSpec = findVmTierFunction.computeForJava(ImmutableList.of(tierName, tiersList));
-          }
-          String externalIpProperty = tierPrefixedFunction
-              .computeForJava(ImmutableList.of(StringData.forValue("externalIP"), tierSpec))
-              .stringValue();
-          if (externalIp.getNegated()) {
-            return String.format("properties().%s == \"%s\"", externalIpProperty, noneType);
-          } else {
-            return String.format("properties().%s != \"%s\"", externalIpProperty, noneType);
-          }
-        default:
-          throw new IllegalArgumentException(
-              "BooleanExpression must have a valid expression choice");
+      SoyFunctions.TierPrefixed tierPrefixedFunction,
+      SoyFunctions.FindVmTier findVmTierFunction) {
+
+      List<String> result = new ArrayList<>();
+
+      if (spec.hasBooleanDeployInputField()) {
+        BooleanDeployInputField field = spec.getBooleanDeployInputField();
+        String fieldName = DeployInputFieldName.formatFieldName(field.getName());
+        String propertyExpression = String.format("properties().%s", fieldName);
+        if (field.getNegated()) {
+          propertyExpression = "!" + propertyExpression;
+        }
+        result.add(propertyExpression);
       }
+
+      if (spec.hasHasExternalIp()) {
+        ExternalIpAvailability externalIp = spec.getHasExternalIp();
+        String noneType = Type.NONE.name();
+        SoyValue tierName = StringData.forValue(externalIp.getTier());
+        SoyValue tierSpec = NullData.INSTANCE;
+        if (!externalIp.getTier().isEmpty()) {
+          tierSpec = findVmTierFunction.computeForJava(ImmutableList.of(tierName, tiersList));
+        }
+        String externalIpProperty = tierPrefixedFunction
+            .computeForJava(ImmutableList.of(StringData.forValue("externalIP"), tierSpec))
+            .stringValue();
+        if (externalIp.getNegated()) {
+          result.add(String.format("properties().%s == \"%s\"", externalIpProperty, noneType));
+        } else {
+          result.add(String.format("properties().%s != \"%s\"", externalIpProperty, noneType));
+        }
+      }
+
+      if (result.isEmpty()) {
+        throw new IllegalArgumentException("No property or hasExternalIP was set.");
+      }
+      return String.join(String.format(" %s ", AND), result);
     }
   }
 
@@ -637,19 +646,17 @@ final class SoyFunctions {
     }
 
     public static String apply(BooleanExpression spec) {
-      switch (spec.getExpressionCase()) {
-        case BOOLEAN_DEPLOY_INPUT_FIELD:
-          BooleanDeployInputField field = spec.getBooleanDeployInputField();
-          String fieldName = DeployInputFieldName.formatFieldName(field.getName());
-          String propertyExpression = String.format("properties[\"%s\"]", fieldName);
-          if (field.getNegated()) {
-            propertyExpression = "!" + propertyExpression;
-          }
-          return propertyExpression;
-        default:
-          throw new IllegalArgumentException(
-              "BooleanExpression must have a valid expression choice");
+      if (!spec.hasBooleanDeployInputField()) {
+        return "";
       }
+
+      BooleanDeployInputField field = spec.getBooleanDeployInputField();
+      String fieldName = DeployInputFieldName.formatFieldName(field.getName());
+      String propertyExpression = String.format("properties[\"%s\"]", fieldName);
+      if (field.getNegated()) {
+        propertyExpression = "!" + propertyExpression;
+      }
+      return propertyExpression;
     }
   }
 

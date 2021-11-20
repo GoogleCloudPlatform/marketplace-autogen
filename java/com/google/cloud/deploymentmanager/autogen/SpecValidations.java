@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.cloud.deploymentmanager.autogen.proto.AcceleratorSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.ApplicationStatusSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.BooleanExpression;
+import com.google.cloud.deploymentmanager.autogen.proto.BooleanExpression.BooleanDeployInputField;
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputField;
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputField.EmailBox;
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputField.GroupedBooleanCheckbox;
@@ -483,17 +484,11 @@ final class SpecValidations {
   }
 
   private static void validateCommonBooleanExpression(BooleanExpression spec) {
-    switch (spec.getExpressionCase()) {
-      case BOOLEAN_DEPLOY_INPUT_FIELD:
-        checkArgument(
-            !Strings.isNullOrEmpty(spec.getBooleanDeployInputField().getName()),
-            "Boolean expression for deploy input field must specify the field's name");
-        break;
-      case HAS_EXTERNAL_IP:
-        // No additional validation rules.
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown configuration for BooleanExpression");
+    if (spec.hasBooleanDeployInputField()) {
+      BooleanDeployInputField field = spec.getBooleanDeployInputField();
+      checkArgument(
+          !field.getName().isEmpty(),
+          "Boolean expression for deploy input field must specify the field's name");
     }
   }
 

@@ -66,6 +66,7 @@ public class VerifyAutogenFileContent {
       // first. This means that the difference between "abc" and "ab" is the empty String and not
       // "c".
       // Because of that we need to compare actual vs expected as well
+
       String diffMessage = generateDiffMessage(tempSolutionDir);
       assertWithMessage(diffMessage).that(StringUtils.difference(expected, fileContent)).isEmpty();
       assertWithMessage(diffMessage).that(StringUtils.difference(fileContent, expected)).isEmpty();

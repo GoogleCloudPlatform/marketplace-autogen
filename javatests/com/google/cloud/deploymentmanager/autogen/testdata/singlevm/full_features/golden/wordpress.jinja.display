@@ -297,6 +297,9 @@ runtime:
     - heading: Custom conditional action item - displayed on negation
       description: This action is displayed only when the checkbox for displaying conditional row and action wasn't selected
       showIf: '{{ !properties().input_showConditionalRowAndAction }}'
+    - heading: Custom multiple conditional action item
+      description: This action is displayed only when the checkbox for multiple displaying conditional row and action was selected
+      showIf: '{{ properties().input_showConditionalRowAndAction and properties().externalIP != "NONE" }}'
     - heading: External IP action
       description: Some action
       showIf: '{{ properties().externalIP != "NONE" }}'
