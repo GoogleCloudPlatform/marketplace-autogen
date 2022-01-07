@@ -3,7 +3,7 @@
 import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
-{template .openPortAction kind="text"}
+{template openPortAction kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle data="all"/}{/let}
@@ -29,7 +29,7 @@ Open {$firewallTitle} traffic{nil}
 - heading: {$heading |yamlprimitive: 2}
   description: >-
     This firewall rule is not enabled.
-    To allow specific network traffic {call .firewallRuleTrafficLabel}{param firewallSpec: $spec/}{/call},
+    To allow specific network traffic {call firewallRuleTrafficLabel}{param firewallSpec: $spec/}{/call},
     create a firewall rule to open {$firewallTitle} traffic
     for target tag "{{ outputs().deployment }}{$targetTagSuffix}".
     <a href="https://cloud.google.com/compute/docs/networking">Learn more</a><br>
@@ -59,7 +59,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .firewallRuleTrafficLabel kind="text"}
+{template firewallRuleTrafficLabel kind="text"}
 {@param firewallSpec: proto.FirewallRuleSpec}
 {switch $firewallSpec.allowedSource}
 {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
@@ -72,19 +72,19 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .firewallDisplayProperties kind="text"}
+{template firewallDisplayProperties kind="text"}
 {@param firewallsList: list<proto.FirewallRuleSpec>}
 {@param? tierSpec: proto.VmTierSpec}
 {let $section kind="text"}
   {if $tierSpec}
-    {call .tierSectionName}{param spec: $tierSpec/}{/call}{nil}
+    {call tierSectionName}{param spec: $tierSpec/}{/call}{nil}
   {else}
     NETWORKING{nil}
   {/if}
 {/let}
 
 {for $firewallRule in $firewallsList}
-  {call .firewallDisplayProperty}
+  {call firewallDisplayProperty}
     {param firewallSpec: $firewallRule/}
     {param section: $section/}
     {param tierSpec: $tierSpec/}
@@ -93,7 +93,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .firewallDisplayProperty kind="text"}
+{template firewallDisplayProperty kind="text"}
 {@param firewallSpec: proto.FirewallRuleSpec}
 {@param section: string}
 {@param? tierSpec: proto.VmTierSpec}
@@ -105,7 +105,7 @@ Open {$firewallTitle} traffic{nil}
 {/let}
 {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle}{param spec: $firewallSpec/}{/call}{/let}
 - name: {$propName}
-  title: Allow {$firewallTitle} traffic {call .firewallRuleTrafficLabel}{param firewallSpec: $firewallSpec/}{/call}
+  title: Allow {$firewallTitle} traffic {call firewallRuleTrafficLabel}{param firewallSpec: $firewallSpec/}{/call}
   section: {$section}
 {if $firewallSpec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $rangePropName kind="text"}
@@ -123,7 +123,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .authScopeDescription kind="text"}
+{template authScopeDescription kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
@@ -142,11 +142,11 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .authScopeBoolGroupName kind="text"}
+{template authScopeBoolGroupName kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
 {@param? tier: proto.VmTierSpec}
 {if $tier}
-{call .tierSectionName}{param spec: $tier/}{/call}_{nil}
+{call tierSectionName}{param spec: $tier/}{/call}_{nil}
 {/if}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
@@ -165,7 +165,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .authScopeBoolGroupTitle kind="text"}
+{template authScopeBoolGroupTitle kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
@@ -184,7 +184,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .makeExternalUrlLink kind="text"}
+{template makeExternalUrlLink kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 // Specifies the right kinds so that HTML escapes are done correctly.
@@ -193,7 +193,7 @@ Open {$firewallTitle} traffic{nil}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $anchorHtml kind="html"}<a href="{$url}">{$url}</a>{/let}{nil}
 {let $output kind="text"}
-  {call .vmOutputExpression}
+  {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
     {param spec: $spec.tierVm/}
     {param tiersList: $tiersList/}
@@ -203,12 +203,12 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .makeInternalUrl kind="text"}
+{template makeInternalUrl kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
-  {call .vmOutputExpression}
+  {call vmOutputExpression}
     {param baseOutputName: 'vmInternalIP'/}
     {param spec: $spec.tierVm/}
     {param tiersList: $tiersList/}
@@ -218,12 +218,12 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .makeExternalUrl kind="text"}
+{template makeExternalUrl kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
-  {call .vmOutputExpression}
+  {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
     {param spec: $spec.tierVm/}
     {param tiersList: $tiersList/}
@@ -233,7 +233,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .vmOutputExpression kind="text"}
+{template vmOutputExpression kind="text"}
 {@param baseOutputName: string}
 {@param? spec: proto.TierVmInstance}
 {@param? tiersList: list<proto.VmTierSpec>}
@@ -255,7 +255,7 @@ Open {$firewallTitle} traffic{nil}
 {/template}
 
 
-{template .deployInputFieldDisplay kind="text"}
+{template deployInputFieldDisplay kind="text"}
 {@param section: proto.DeployInputSection}
 {@param field: proto.DeployInputField}
 {@param? tierList: list<proto.VmTierSpec>}
@@ -283,7 +283,7 @@ level: {$field.level}
     $section.placement == proto.DeployInputSection.Placement.CUSTOM_BOTTOM}
 section: {$section.name |yamlprimitive: 0}
 {elseif $section.placement == proto.DeployInputSection.Placement.TIER}
-section: {call .tierSectionName}{param spec: findVmTier($section.tier, $tierList)/}{/call}
+section: {call tierSectionName}{param spec: findVmTier($section.tier, $tierList)/}{/call}
 {/if}
 
 {if $field.groupedBooleanCheckbox}
@@ -319,7 +319,7 @@ enumLabels:
 {/template}
 
 
-{template .stackdriverDisplay kind="text"}
+{template stackdriverDisplay kind="text"}
 {@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 - name: enableStackdriverLogging
@@ -336,7 +336,7 @@ enumLabels:
 {/template}
 
 
-{template .stackdriverBottomSections kind="text"}
+{template stackdriverBottomSections kind="text"}
 {@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging or $stackdriver?.monitoring}
 - name: STACKDRIVER
@@ -346,10 +346,10 @@ enumLabels:
 {/template}
 
 
-{template .topSections kind="text"}
+{template topSections kind="text"}
 {@param? spec: proto.DeployInputSpec}
 {let $output kind="text"}
-  {call .customSectionsHelper}
+  {call customSectionsHelper}
     {param spec: $spec/}
     {param placement: proto.DeployInputSection.Placement.CUSTOM_TOP/}
   {/call}
@@ -358,10 +358,10 @@ enumLabels:
 {/template}
 
 
-{template .bottomSections kind="text"}
+{template bottomSections kind="text"}
 {@param? spec: proto.DeployInputSpec}
 {let $output kind="text"}
-  {call .customSectionsHelper}
+  {call customSectionsHelper}
     {param spec: $spec/}
     {param placement: proto.DeployInputSection.Placement.CUSTOM_BOTTOM/}
   {/call}
@@ -370,7 +370,7 @@ enumLabels:
 {/template}
 
 
-{template .customSectionsHelper kind="text"}
+{template customSectionsHelper kind="text"}
 {@param? spec: proto.DeployInputSpec}
 {@param placement: proto.DeployInputSection.Placement}
 {if $spec}
@@ -390,7 +390,7 @@ enumLabels:
 {/template}
 
 
-{template .customBooleanGroups kind="text"}
+{template customBooleanGroups kind="text"}
 {@param? spec: proto.DeployInputSpec}
 {if $spec}
 {for $section in $spec.sectionsList}
@@ -412,38 +412,38 @@ enumLabels:
 {/template}
 
 
-{template .tierSectionName kind="text"}
+{template tierSectionName kind="text"}
 {@param spec: proto.VmTierSpec}
 {$spec.name |uppercased}_TIER{nil}
 {/template}
 
 
-{template .authScopeBooleanGroups kind="text"}
+{template authScopeBooleanGroups kind="text"}
 {@param? singleVmSpec: proto.SingleVmDeploymentPackageSpec}
 {@param? multiVmSpec: proto.MultiVmDeploymentPackageSpec}
 {if $singleVmSpec}
 {for $scope in $singleVmSpec.gcpAuthScopesList}
-- name: {call .authScopeBoolGroupName}{param spec: $scope/}{/call}
-  title: {call .authScopeBoolGroupTitle}{param spec: $scope/}{/call}
+- name: {call authScopeBoolGroupName}{param spec: $scope/}{/call}
+  title: {call authScopeBoolGroupTitle}{param spec: $scope/}{/call}
 {/for}
 
 {else}
 
 {for $tier in $multiVmSpec.tiersList}
 {for $scope in $tier.gcpAuthScopesList}
-- name: {call .authScopeBoolGroupName}{param spec: $scope/}{param tier: $tier/}{/call}
-  title: {call .authScopeBoolGroupTitle}{param spec: $scope/}{/call}
+- name: {call authScopeBoolGroupName}{param spec: $scope/}{param tier: $tier/}{/call}
+  title: {call authScopeBoolGroupTitle}{param spec: $scope/}{/call}
 {/for}
 {/for}
 {/if}
 {/template}
 
 
-{template .siteUrlApplicationTableRow kind="text"}
+{template siteUrlApplicationTableRow kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $content kind="text"}
-  {call .instanceUrlApplicationTableRow data="all"}
+  {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Site address'/}
   {/call}
 {/let}
@@ -451,11 +451,11 @@ enumLabels:
 {/template}
 
 
-{template .adminUrlApplicationTableRow kind="text"}
+{template adminUrlApplicationTableRow kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $content kind="text"}
-  {call .instanceUrlApplicationTableRow data="all"}
+  {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Admin URL'/}
   {/call}
 {/let}
@@ -463,15 +463,15 @@ enumLabels:
 {/template}
 
 
-{template .instanceUrlApplicationTableRow kind="text"}
+{template instanceUrlApplicationTableRow kind="text"}
 {@param label: string}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $externalUrl kind="text"}
-  {call .makeExternalUrlLink}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
+  {call makeExternalUrlLink}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
 {let $internalUrl kind="text"}
-  {call .makeInternalUrl}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
+  {call makeInternalUrl}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
 {let $hasExternalIpProp kind="text"}
   {if $spec.tierVm}
@@ -489,7 +489,7 @@ enumLabels:
 {/template}
 
 
-{template .passwordApplicationTableRows kind="text"}
+{template passwordApplicationTableRows kind="text"}
 {@param passwordsList: list<proto.PasswordSpec>}
 {@param? deployInput: proto.DeployInputSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
@@ -517,7 +517,7 @@ enumLabels:
 {/template}
 
 
-{template .infoRowApplicationTableRow kind="text"}
+{template infoRowApplicationTableRow kind="text"}
 {@param infoRow: proto.PostDeployInfo.InfoRow}
 {@param? deployInput: proto.DeployInputSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
@@ -534,31 +534,31 @@ enumLabels:
 {/template}
 
 
-{template .adminActionButton kind="text"}
+{template adminActionButton kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
-{let $actionUrl kind="text"}{call .makeExternalUrl data="all"/}{/let}
+{let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Log into the admin panel
 type: TYPE_URL
 action: {$actionUrl |yamlprimitive: 0}
 {/template}
 
 
-{template .siteActionButton kind="text"}
+{template siteActionButton kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
-{let $actionUrl kind="text"}{call .makeExternalUrl data="all"/}{/let}
+{let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Visit the site
 type: TYPE_URL
 action: {$actionUrl |yamlprimitive: 0}
 {/template}
 
 
-{template .connectActionButton kind="text"}
+{template connectActionButton kind="text"}
 {@param? button: proto.PostDeployInfo.ConnectToInstanceSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {let $output kind="text"}
-  {call .vmOutputExpression}
+  {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
     {param spec: $button.tierVm/}
     {param tiersList: $tiersList/}
@@ -572,16 +572,16 @@ action: '{{ {$output} }}'
 {/template}
 
 
-{template .acceleratorProperty kind="text"}
+{template acceleratorProperty kind="text"}
 {@param? tier: proto.VmTierSpec}
 - name: {'acceleratorType' |tierprefixed: $tier}
   title: GPUs
 {if $tier}
-  section: {call .tierSectionName}{param spec: $tier/}{/call}
+  section: {call tierSectionName}{param spec: $tier/}{/call}
 {/if}
 {/template}
 
 
-{template .acceleratorZoneSubtext kind="text"}
+{template acceleratorZoneSubtext kind="text"}
 subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
 {/template}
