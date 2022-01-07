@@ -5,7 +5,7 @@ import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/r
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 /** Generates a tier .jinja template, used for creating all VMs in a tier. */
-{template .main kind="text"}
+{template main kind="text"}
 {@param spec: proto.VmTierSpec}
 {@param packageSpec: proto.MultiVmDeploymentPackageSpec}
 
@@ -77,9 +77,9 @@ resources: []
 resources:
   {% for vmIndex in range(instanceCount) %}
   {let $instanceName kind="text"}
-    {call .instanceName data="all"/}
+    {call instanceName data="all"/}
   {/let}
-  - name: {call .instanceTmplResourceName data="all"/}
+  - name: {call instanceTmplResourceName data="all"/}
     type: vm_instance.py
     properties:
       instanceName: {$instanceName}
@@ -151,7 +151,7 @@ resources:
 
       //TODO(khajduczenia) Extract metadata items to renders template.
       {let $passwordMetadataItems kind="text"}
-        {call .passwordMetadataItems}{param spec: $packageSpec/}{/call}
+        {call passwordMetadataItems}{param spec: $packageSpec/}{/call}
       {/let}
       {let $startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
         {call renders.startupScriptAndWaiterMetadataItemsUnconditional}
@@ -263,19 +263,19 @@ resources:
 outputs:
   {% for vmIndex in range(instanceCount) %}
   - name: vmId{{ vmIndex }}
-    value: $(ref.{call .instanceName data="all"/}.id)
+    value: $(ref.{call instanceName data="all"/}.id)
   - name: vmExternalIP{{ vmIndex }}
     {% if hasExternalIP %}
-    value: $(ref.{call .instanceTmplResourceName data="all"/}.ip)
+    value: $(ref.{call instanceTmplResourceName data="all"/}.ip)
     {% else %}
     value: NONE
     {% endif %}
   - name: vmInternalIP{{ vmIndex }}
-    value: $(ref.{call .instanceTmplResourceName data="all"/}.internalIP)
+    value: $(ref.{call instanceTmplResourceName data="all"/}.internalIP)
   - name: vmName{{ vmIndex }}
-    value: {call .instanceName data="all"/}
+    value: {call instanceName data="all"/}
   - name: vmSelfLink{{ vmIndex }}
-    value: $(ref.{call .instanceName data="all"/}.selfLink)
+    value: $(ref.{call instanceName data="all"/}.selfLink)
   {% endfor %}
   - name: hasExternalIP
     value: {{ hasExternalIP }}
@@ -285,7 +285,7 @@ outputs:
 {/template}
 
 
-{template .passwordMetadataItems kind="text" /* visibility="private" */}
+{template passwordMetadataItems kind="text" /* visibility="private" */}
 {@param spec: proto.MultiVmDeploymentPackageSpec}
 {for $password, $index in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
@@ -299,13 +299,13 @@ outputs:
 {/template}
 
 
-{template .instanceName kind="text" /* visibility="private" */}
+{template instanceName kind="text" /* visibility="private" */}
 {@param spec: proto.VmTierSpec}
 {call utilities.tierVmPrefix data="all"/}-{{ vmIndex }}{nil}
 {/template}
 
 
-{template .instanceTmplResourceName kind="text" /* visibility="private" */}
+{template instanceTmplResourceName kind="text" /* visibility="private" */}
 {@param spec: proto.VmTierSpec}
 {call utilities.tierVmPrefix data="all"/}-tmpl-{{ vmIndex }}{nil}
 {/template}

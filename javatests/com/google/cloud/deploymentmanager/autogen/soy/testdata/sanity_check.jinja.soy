@@ -12,7 +12,7 @@
  */
 
 /** IMPORTANT: All templates should have type "text". */
-{template .sanityCheck kind="text"}
+{template sanityCheck kind="text"}
 {@param supportFirewall: bool}
 {@param supportStaticIp: bool}
 {@param description: string}
@@ -54,7 +54,7 @@ resources:
             value: |
               /* This demonstrates calling a subtemplate. */
               {let $script kind="text"}
-                {call .startupScript}{param additionalContent: 'func a {}'/}{/call}
+                {call startupScript}{param additionalContent: 'func a {}'/}{/call}
               {/let}
               { $script        // This
                 |indent: 14 }  // should work
@@ -62,7 +62,7 @@ resources:
             value: |
               // This demonstrates calling a subtemplate.
               {let $script1 kind="text"}
-                {call .startupScript}{/call}
+                {call startupScript}{/call}
               {/let}
               {$script1 |indent: 14}
 
@@ -99,7 +99,7 @@ outputs:
 
 //----------------------------------------
 
-{template .startupScript /* visibility="private" */ kind="text"}
+{template startupScript /* visibility="private" */ kind="text"}
 {@param? additionalContent: string}
 {let $shebang: '{{ "#! /bin/bash" }}'/}
 {$shebang}
