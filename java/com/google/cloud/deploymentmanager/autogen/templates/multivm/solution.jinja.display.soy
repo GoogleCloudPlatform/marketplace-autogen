@@ -7,7 +7,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 
 /** Generates solution.jinja.display file. */
-{template .main kind="text"}
+{template main kind="text"}
 {@param spec: proto.MultiVmDeploymentPackageSpec}
 {@param? partnerId: string}
 {@param? partnerInfo: PartnerMarketingInfo}
@@ -39,7 +39,7 @@ input:
       {/if}
 
     {for $tier in $spec.tiersList}
-    {let $tierProperties kind="text"}{call .displayTierProperties}{param spec: $tier/}{/call}{/let}
+    {let $tierProperties kind="text"}{call displayTierProperties}{param spec: $tier/}{/call}{/let}
     {$tierProperties |indent: 4, true}{nil}
     {/for}
 
@@ -241,7 +241,7 @@ metadata_version: v1
 {/template}
 
 
-{template .displayTierProperties kind="text" /*visibility="private"*/}
+{template displayTierProperties kind="text" /*visibility="private"*/}
 {@param spec: proto.VmTierSpec}
 {let $section kind="text"}
 section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}

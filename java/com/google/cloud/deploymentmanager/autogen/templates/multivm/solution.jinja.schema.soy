@@ -6,7 +6,7 @@ import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/r
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 
-{template .main kind="text"}
+{template main kind="text"}
 {@param solutionId: string}
 {@param spec: proto.MultiVmDeploymentPackageSpec}
 {@param? solutionInfo: SolutionMarketingInfo}
@@ -35,7 +35,7 @@ required:
   - zone
 
   {for $tier in $spec.tiersList}
-  {let $list kind="text"}{call .tierRequiredList}{param spec: $tier/}{/call}{/let}
+  {let $list kind="text"}{call tierRequiredList}{param spec: $tier/}{/call}{/let}
   {$list |indent: 2, true}{nil}
   {/for}
 
@@ -55,7 +55,7 @@ properties:
   {$zoneProp |indent: 2, true}{nil}
 
   {for $tier in $spec.tiersList}
-  {let $tierProperties kind="text"}{call .tierProperties}{param spec: $tier/}{/call}{/let}
+  {let $tierProperties kind="text"}{call tierProperties}{param spec: $tier/}{/call}{/let}
   {$tierProperties |indent: 2, true}{nil}
   {/for}
 
@@ -91,7 +91,7 @@ outputs:
 {/template}
 
 
-{template .tierRequiredList kind="text" /* visibility="private" */}
+{template tierRequiredList kind="text" /* visibility="private" */}
 {@param spec: proto.VmTierSpec}
 - {'instanceCount' |tierprefixed: $spec}
 - {'machineType' |tierprefixed: $spec}
@@ -104,7 +104,7 @@ outputs:
 {/template}
 
 
-{template .tierProperties kind="text" /* visibility="private" */}
+{template tierProperties kind="text" /* visibility="private" */}
 {@param spec: proto.VmTierSpec}
 {let $instanceCountProp kind="text"}
   {call renders.tierInstanceAcountPropertySchema}

@@ -3,7 +3,7 @@
 import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Produces the property name for a firewall rule. */
-{template .firewallRulePropName kind="text"}
+{template firewallRulePropName kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {switch $spec.protocol}
@@ -18,21 +18,21 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 /** Produces the targetTag for a firewall rule. */
-{template .firewallRuleTargetTag kind="text"}
+{template firewallRuleTargetTag kind="text"}
 {@param? tierSpec: proto.VmTierSpec}
 {if not $tierSpec}
-{call .deploymentTag data="all"/}{nil}
+{call deploymentTag data="all"/}{nil}
 {else}
-{call .tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
+{call tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
 {/if}
 {/template}
 
 
 /** Produces the name for a firewall rule. */
-{template .firewallRuleName kind="text"}
+{template firewallRuleName kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
-{{ env["deployment"] }}{call .firewallRuleNameSuffix data="all"/}{nil}
+{{ env["deployment"] }}{call firewallRuleNameSuffix data="all"/}{nil}
 {/template}
 
 
@@ -40,11 +40,11 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * Produces the suffix of the name for a firewall rule name.
  * The suffix includes only the "-TCP-80" part.
  */
-{template .firewallRuleNameSuffix kind="text"}
+{template firewallRuleNameSuffix kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
   {let $portSuffix kind="text"}
-    {call .firewallRulePortSuffix}
+    {call firewallRulePortSuffix}
       {param spec: $spec /}
     {/call}
   {/let}
@@ -63,7 +63,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * Returns either the -deployment suffix (for non-tier specs) of -tiername-tier suffix (for a vm
  * tier spec).
  */
-{template .firewallRuleTargetTagSuffix kind="text"}
+{template firewallRuleTargetTagSuffix kind="text"}
 {@param? tierSpec: proto.VmTierSpec}
 {if not $tierSpec}
   -deployment{nil}
@@ -77,7 +77,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * Produces "-{PORT}" if port is provided for firewall rule.
  * In other case it returns "", empty string.
  */
-{template .firewallRulePortSuffix kind="text"}
+{template firewallRulePortSuffix kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {if strLen($spec.port) > 0}
 -{$spec.port}{nil}
@@ -86,7 +86,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 /** Produces the protocol as an uppercased string. */
-{template .firewallRuleProtocol kind="text"}
+{template firewallRuleProtocol kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
@@ -103,7 +103,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * Produces a human-readable title for a firewall rule such as
  * "TCP 123" or "HTTPS".
  */
-{template .firewallRuleTitle kind="text"}
+{template firewallRuleTitle kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {if strLen($spec.port) > 0}
 {switch $spec.protocol}
@@ -119,13 +119,13 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
     UDP port {$spec.port}{nil}
 {/switch}
 {else}
-  {call .firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
+  {call firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
 {/if}
 {/template}
 
 
 /** Produces the property name for firewall rule source ranges. */
-{template .firewallRuleSourceRangesPropName kind="text"}
+{template firewallRuleSourceRangesPropName kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {switch $spec.protocol}
@@ -140,7 +140,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 /** Produces the property name for an API scope. */
-{template .gcpAuthScopePropertyName kind="text"}
+{template gcpAuthScopePropertyName kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {switch $spec.scope}
@@ -161,7 +161,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 /** Produces the URL for an API scope. */
-{template .gcpAuthScopeUrl kind="text"}
+{template gcpAuthScopeUrl kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
 {switch $spec.scope}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
@@ -181,7 +181,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 /** Produces the URL for an InstanceUrlSpec. */
-{template .makeUrl kind="text"}
+{template makeUrl kind="text"}
 {@param spec: proto.InstanceUrlSpec}
 {@param ip: string}
 {let $scheme kind="text"}
@@ -200,7 +200,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 {/template}
 
 
-{template .tierVmPrefix kind="text"}
+{template tierVmPrefix kind="text"}
 {@param spec: proto.VmTierSpec}
 {{ env["deployment"] }}-{$spec.name}-vm{nil}
 {/template}
@@ -208,7 +208,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Constructs an optionally conditional expression to print text
  * related to password generation condition */
-{template .passwordConditional kind="text"}
+{template passwordConditional kind="text"}
 {@param password: proto.PasswordSpec}
 {@param conditionalContent: string}
 {if $password.generateIf}
@@ -221,33 +221,33 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 {/template}
 
 
-{template .passwordPropertyName kind="text"}
+{template passwordPropertyName kind="text"}
 {@param passwordIndex: int}
 generatedPassword{$passwordIndex}{nil}
 {/template}
 
 
-{template .passwordResourceName kind="text"}
+{template passwordResourceName kind="text"}
 {@param passwordIndex: int}
 generated-password-{$passwordIndex}{nil}
 {/template}
 
 
-{template .passwordResourceOutputReference kind="text"}
+{template passwordResourceOutputReference kind="text"}
 {@param passwordIndex: int}
 {let $resourceName kind="text"}
-  {call .passwordResourceName}{param passwordIndex: $passwordIndex/}{/call}
+  {call passwordResourceName}{param passwordIndex: $passwordIndex/}{/call}
 {/let}
 $(ref.{$resourceName}.password){nil}
 {/template}
 
 
-{template .deploymentTag kind="text"}
+{template deploymentTag kind="text"}
 {{ env["deployment"] }}-deployment{nil}
 {/template}
 
 
-{template .tierTag kind="text"}
+{template tierTag kind="text"}
 {@param spec: proto.VmTierSpec}
 {{ env["deployment"] }}-{$spec.name}-tier{nil}
 {/template}
