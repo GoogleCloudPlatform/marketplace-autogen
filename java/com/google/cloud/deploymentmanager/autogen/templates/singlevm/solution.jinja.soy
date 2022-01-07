@@ -6,7 +6,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 
 /** Generates top level template solution.jinja file. */
-{template .main kind="text"}
+{template main kind="text"}
 {@param spec: proto.SingleVmDeploymentPackageSpec}
 
 {let $waiterSpec:
@@ -152,7 +152,7 @@ resources:
 
       //TODO(khajduczenia) Extract metadata items to renders template.
       {let $passwordMetadataItems kind="text"}
-        {call .passwordMetadataItems}{param spec: $spec/}{/call}
+        {call passwordMetadataItems}{param spec: $spec/}{/call}
       {/let}
       {let $startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
         {call renders.startupScriptAndWaiterMetadataItemsUnconditional}
@@ -305,7 +305,7 @@ outputs:
 {/template}
 
 
-{template .passwordMetadataItems kind="text" /* visibility="private" */}
+{template passwordMetadataItems kind="text" /* visibility="private" */}
 {@param spec: proto.SingleVmDeploymentPackageSpec}
 {for $password, $index in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
