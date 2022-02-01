@@ -135,7 +135,7 @@ class OutputWriterFactory {
           builder.put(solution.getPartnerId() + "/" + solution.getSolutionId(),
               solution.getPackage());
         }
-        solutions = builder.build();
+        solutions = builder.buildOrThrow();
       } else {
         solutions = ImmutableMap.of("", (SolutionPackage) message);
       }
