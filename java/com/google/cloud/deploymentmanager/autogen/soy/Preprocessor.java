@@ -103,7 +103,7 @@ final class Preprocessor {
           .put("$1{rb}{rb}", JINJA_EXPRESSION_END_REGEX)
           .put("{lb}#$1", JINJA_COMMENT_BEGIN_REGEX)
           .put("$1#{rb}", JINJA_COMMENT_END_REGEX)
-          .build();
+          .buildOrThrow();
 
   private static final Predicate<String> IS_EMPTY_OR_HAS_ONLY_SPACES =
       new Predicate<String>() {
