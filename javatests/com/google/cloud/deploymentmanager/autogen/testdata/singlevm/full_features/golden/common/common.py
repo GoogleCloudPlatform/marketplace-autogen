@@ -228,6 +228,6 @@ def FormatErrorsDec(func):
     try:
       return func(context)
     except Exception as e:
-      raise Error(FormatException(e.message))
+      raise Error(FormatException(e.message)) from e
 
   return FormatErrorsWrap
