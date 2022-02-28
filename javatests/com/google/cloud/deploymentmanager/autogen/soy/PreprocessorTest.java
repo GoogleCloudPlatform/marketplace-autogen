@@ -50,7 +50,7 @@ public class PreprocessorTest {
   
   @Test
   public void testSoyCommandRegex() {
-    assertTrue(SOY_COMMAND_REGEX.matcher("{template .abc kind=\"text\"}").matches());
+    assertTrue(SOY_COMMAND_REGEX.matcher("{template abc kind=\"text\"}").matches());
     assertTrue(SOY_COMMAND_REGEX.matcher("{if $a > $b}").matches());
     assertTrue(SOY_COMMAND_REGEX.matcher("{/for}").matches());
     assertTrue(SOY_COMMAND_REGEX.matcher("{@param $a: string}").matches());
@@ -95,7 +95,7 @@ public class PreprocessorTest {
   
   @Test
   public void testSoyCommandToCollapseRegex() {
-    assertTrue(SOY_COMMAND_TO_COLLAPSE_REGEX.matcher("{template .abc kind=\"text\"}").matches());
+    assertTrue(SOY_COMMAND_TO_COLLAPSE_REGEX.matcher("{template abc kind=\"text\"}").matches());
     assertTrue(SOY_COMMAND_TO_COLLAPSE_REGEX.matcher("{if $a > $b}").matches());
     assertTrue(SOY_COMMAND_TO_COLLAPSE_REGEX.matcher("{/for}").matches());
     assertTrue(SOY_COMMAND_TO_COLLAPSE_REGEX.matcher("{@param $a: string}").matches());
