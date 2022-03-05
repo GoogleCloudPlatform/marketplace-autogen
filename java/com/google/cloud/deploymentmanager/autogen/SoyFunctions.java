@@ -351,7 +351,7 @@ final class SoyFunctions {
       if (zoneSpec.getDefaultZone().isEmpty()) {
         result.put(DEFAULT_ZONE_PROP_NAME, DEFAULT_ZONE);
       }
-      return result.build();
+      return result.buildOrThrow();
     }
 
     @Override
@@ -489,7 +489,7 @@ final class SoyFunctions {
       for (Map.Entry<K, V> entry : from.entrySet()) {
         result.put(entry.getKey().toString(), entry.getValue().toString());
       }
-      return result.build();
+      return result.buildOrThrow();
     }
   }
 

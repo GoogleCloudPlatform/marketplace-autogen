@@ -4,7 +4,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
-{template .main kind="text"}
+{template main kind="text"}
 {@param spec: proto.MultiVmDeploymentPackageSpec}
 
 {% import "path_utils.jinja" as path_utils with context %}

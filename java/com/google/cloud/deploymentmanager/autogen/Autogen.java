@@ -399,14 +399,14 @@ public class Autogen {
       DeploymentPackageInput input, ImageInfo imageInfo) {
     return makeTemplateParams(input, imageInfo)
         .put("spec", input.getSpec().getSingleVm())
-        .build();
+        .buildOrThrow();
   }
 
   private ImmutableMap<String, Object> makeMultiVmParams(
       DeploymentPackageInput input, ImageInfo imageInfo) {
     return makeTemplateParams(input, imageInfo)
         .put("spec", input.getSpec().getMultiVm())
-        .build();
+        .buildOrThrow();
   }
 
   private Builder<String, Object> makeTemplateParams(

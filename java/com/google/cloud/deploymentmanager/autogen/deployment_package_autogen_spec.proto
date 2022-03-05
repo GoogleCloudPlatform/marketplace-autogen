@@ -753,6 +753,7 @@ message AcceleratorSpec {
   // nvidia-tesla-p4
   // nvidia-tesla-p4-vws
   // nvidia-tesla-t4
+  // nvidia-tesla-t4-vws
   // nvidia-tesla-a100
   repeated string types = 1;
 
@@ -1005,8 +1006,8 @@ message DeployInputField {
 
 // Allows to build an expression which value should be evaluated to boolean.
 message BooleanExpression {
-  optional ExternalIpAvailability has_external_ip = 1;
-  optional BooleanDeployInputField boolean_deploy_input_field = 2;
+  ExternalIpAvailability has_external_ip = 1;
+  BooleanDeployInputField boolean_deploy_input_field = 2;
 
   // Uses the value of a deploy input field of type boolean.
   message BooleanDeployInputField {
