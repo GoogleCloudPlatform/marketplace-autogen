@@ -91,6 +91,7 @@ final class SpecValidations {
           "nvidia-tesla-p4",
           "nvidia-tesla-p4-vws",
           "nvidia-tesla-t4",
+          "nvidia-tesla-t4-vws",
           "nvidia-tesla-a100");
   // LINT.ThenChange()
 
