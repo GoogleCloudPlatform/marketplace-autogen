@@ -1,6 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 RULES_JVM_EXTERNAL_TAG = "3.3"
+
 RULES_JVM_EXTERNAL_SHA = "d85951a92c0908c80bd8551002d66cb23c3434409c814179c0ff026b53544dab"
 
 http_archive(
@@ -35,7 +36,6 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-
 http_archive(
     name = "io_bazel_rules_docker",
     sha256 = "59d5b42ac315e7eadffa944e86e90c2990110a1c8075f1cd145f487e999d22b3",
@@ -47,6 +47,7 @@ load(
     "@io_bazel_rules_docker//repositories:repositories.bzl",
     container_repositories = "repositories",
 )
+
 container_repositories()
 
 load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
@@ -59,6 +60,7 @@ load(
 )
 
 java_image_repos()
+
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
@@ -69,11 +71,11 @@ maven_install(
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.code.gson:gson:2.8.5",
         "com.google.common.html.types:types:1.0.8",
-        "com.google.guava:guava:24.0-jre",
-        "com.google.inject:guice:4.2.0",
+        "com.google.guava:guava:31.1-jre",
+        "com.google.inject:guice:5.1.0",
         "com.google.protobuf:protobuf-java-util:3.12.2",
         "com.google.protobuf:protobuf-java:3.12.2",
-        "com.google.template:soy:2020-08-24",
+        "com.google.template:soy:2022-03-07",
         "com.google.truth.extensions:truth-liteproto-extension:1.0",
         "com.google.truth.extensions:truth-proto-extension:1.0",
         "com.google.truth:truth:1.0",
@@ -88,16 +90,18 @@ maven_install(
         "org.ow2.asm:asm:7.0",
         "org.yaml:snakeyaml:1.19",
     ],
+    fetch_sources = True,
+    # See https://github.com/bazelbuild/rules_jvm_external/#repository-aliases
+    # This can be removed if none of your external dependencies uses `maven_jar`.
+    generate_compat_repositories = True,
     repositories = [
         "https://jcenter.bintray.com",
         "https://maven.google.com",
         "https://repo1.maven.org/maven2",
     ],
-    fetch_sources = True,
     version_conflict_policy = "pinned",
-    # See https://github.com/bazelbuild/rules_jvm_external/#repository-aliases
-    # This can be removed if none of your external dependencies uses `maven_jar`.
-    generate_compat_repositories = True,
 )
+
 load("@maven//:compat.bzl", "compat_repositories")
+
 compat_repositories()

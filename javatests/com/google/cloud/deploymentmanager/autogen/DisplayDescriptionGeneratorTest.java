@@ -88,62 +88,65 @@ public class DisplayDescriptionGeneratorTest {
       .architectureDiagramDescription("This is an example of a sophisticated architecture.")
       .build();
 
-  private static final Map<String, Object> DESCRIPTION = ImmutableMap.<String, Object>builder()
-      .put("author", ImmutableMap.of(
-          "title", "partner_name",
-          "descriptionHtml", "partner long description",
-          "shortDescription", "partner short description",
-          "url", "http://partner_name.com"
-      ))
-      .put("title", "solution name")
-      .put("version", "1.0")
-      .put("descriptionHtml", "solution long description")
-      .put("url", "http://partner_name.com/solution_name")
-      .put("tagline", "Partner's Solution")
-      .put("eulaUrl", "http://partner_name.com/eula")
-      .put("documentations", ImmutableList.of(
-          ImmutableMap.of(
-              "destinations",
-              ImmutableList.of("DESTINATION_CONFIGURATION", "DESTINATION_SOLUTION_DETAILS"),
-              "title", "documentation 1",
-              "description", "documentation 1 description",
-              "url", "http://partner_name.com/solution_name/doc1"
-          ),
-          ImmutableMap.of(
-              "destinations", ImmutableList.of("DESTINATION_POST_DEPLOY"),
-              "title", "documentation 2",
-              "description", "documentation 2 description",
-              "url", "http://partner_name.com/solution_name/doc2"
-          )
-      ))
-      .put("softwareGroups", ImmutableList.of(
-          ImmutableMap.of(
-              "type", "SOFTWARE_GROUP_OS",
-              "software", ImmutableList.of(
+  private static final Map<String, Object> DESCRIPTION =
+      ImmutableMap.<String, Object>builder()
+          .put(
+              "author",
+              ImmutableMap.of(
+                  "title", "partner_name",
+                  "descriptionHtml", "partner long description",
+                  "shortDescription", "partner short description",
+                  "url", "http://partner_name.com"))
+          .put("title", "solution name")
+          .put("version", "1.0")
+          .put("descriptionHtml", "solution long description")
+          .put("url", "http://partner_name.com/solution_name")
+          .put("tagline", "Partner's Solution")
+          .put("eulaUrl", "http://partner_name.com/eula")
+          .put(
+              "documentations",
+              ImmutableList.of(
                   ImmutableMap.of(
-                      "licenseTitle", "component 1 license",
-                      "licenseUrl", "http://license1.io"
-                  ),
+                      "destinations",
+                      ImmutableList.of("DESTINATION_CONFIGURATION", "DESTINATION_SOLUTION_DETAILS"),
+                      "title",
+                      "documentation 1",
+                      "description",
+                      "documentation 1 description",
+                      "url",
+                      "http://partner_name.com/solution_name/doc1"),
                   ImmutableMap.of(
-                      "licenseTitle", "component 2 license",
-                      "licenseUrl", "http://license2.io"
-                  )
-              )
-          )
-      ))
-      .put("support", ImmutableList.of(
-          ImmutableMap.of(
-              "title", "Support",
-              "descriptionHtml", "support info",
-              "url", "http://partner_name.com/support",
-              "showSupportId", true
-          )
-      ))
-      .put("logo", "some_logo.png")
-      .put("icon", "icon_a.jpg")
-      .put("architectureDiagram", "architecture_diag.png")
-      .put("architectureDescription", "This is an example of a sophisticated architecture.")
-      .build();
+                      "destinations", ImmutableList.of("DESTINATION_POST_DEPLOY"),
+                      "title", "documentation 2",
+                      "description", "documentation 2 description",
+                      "url", "http://partner_name.com/solution_name/doc2")))
+          .put(
+              "softwareGroups",
+              ImmutableList.of(
+                  ImmutableMap.of(
+                      "type",
+                      "SOFTWARE_GROUP_OS",
+                      "software",
+                      ImmutableList.of(
+                          ImmutableMap.of(
+                              "licenseTitle", "component 1 license",
+                              "licenseUrl", "http://license1.io"),
+                          ImmutableMap.of(
+                              "licenseTitle", "component 2 license",
+                              "licenseUrl", "http://license2.io")))))
+          .put(
+              "support",
+              ImmutableList.of(
+                  ImmutableMap.of(
+                      "title", "Support",
+                      "descriptionHtml", "support info",
+                      "url", "http://partner_name.com/support",
+                      "showSupportId", true)))
+          .put("logo", "some_logo.png")
+          .put("icon", "icon_a.jpg")
+          .put("architectureDiagram", "architecture_diag.png")
+          .put("architectureDescription", "This is an example of a sophisticated architecture.")
+          .buildOrThrow();
 
   @Test
   public void toConfigDisplayDescription() {

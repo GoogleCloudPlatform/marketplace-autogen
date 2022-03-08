@@ -127,7 +127,7 @@ This is useful in a lot of cases, instead of clumsier expressions like:
 
 It can also let you store the output of a subtemplate:
 
-    {let $var}{call .subtemplate/}{/let}
+    {let $var}{call subtemplate/}{/let}
 
 There is one problem with this, however. The preprocessor does rewrite this
 into:
@@ -147,18 +147,18 @@ insert `{nil}`.
 
 Consider the following sub-template:
 
-    {template .sub}
+    {template sub}
     my name is
     {/template}
 
 If you call this template:
 
-    {call .sub} John
+    {call sub} John
 
 there will be a line break right before " John". To prevent this, insert a
 `{nil}` on the last line of your sub-template, like so:
 
-    {template .sub}
+    {template sub}
     my name is{nil}
     {/template}
 
@@ -167,6 +167,6 @@ there will be a line break right before " John". To prevent this, insert a
 To indent the output of a sub-template, first store it in a variable and then
 use the `|indent` print directive.
 
-    {let $resource kind="text"}{call .createResource/}{/let}
+    {let $resource kind="text"}{call createResource/}{/let}
     resources:
       - {$resource |indent: 4}

@@ -37,14 +37,15 @@ import javax.inject.Qualifier;
 /**
  * Supports rendering of yaml jinja soy templates, which are jinja templates that generate yaml
  * files.
- * 
+ *
  * <p>This works around soy's limitation to enable easy crafting of yaml jinja soy templates by:
+ *
  * <ul>
- * <li>Preserving indentations and line breaks
- * <li>Allowing jinja delimiters directly in the soy template without the need to escape them
- * <li>Adding new soy directives to support yaml conventions (see {@link SoyDirectives})
+ *   <li>Preserving indentations and line breaks
+ *   <li>Allowing jinja delimiters directly in the soy template without the need to escape them
+ *   <li>Adding new soy directives to support yaml conventions (see {@link SoyDirectives})
  * </ul>
- * 
+ *
  * <p>See {@link TemplateRendererTest} for examples of how to take advantage of this templating
  * system.
  */
@@ -73,7 +74,7 @@ public final class TemplateRenderer {
         return this;
       }
 
-      /** Adds a resource file from the bundled resources. */  
+      /** Adds a resource file from the bundled resources. */
       public Builder addContentFromResource(String resourceName) {
         try {
           String content =
@@ -108,7 +109,7 @@ public final class TemplateRenderer {
     }
 
   }
-  
+
   /**
    * Base Guice module to use if you want to add custom modules to your soy environment.
    * {@code SoyModule} is already installed as part of this.

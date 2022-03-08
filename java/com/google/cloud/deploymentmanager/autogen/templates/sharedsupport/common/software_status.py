@@ -93,8 +93,8 @@ def _Timeout(context):
   timeout = context.properties.get('timeout', DEFAULT_TIMEOUT)
   try:
     return str(int(timeout))
-  except ValueError:
-    raise PropertyError('Invalid timeout value: {}'.format(timeout))
+  except ValueError as e:
+    raise PropertyError('Invalid timeout value: {}'.format(timeout)) from e
 
 
 def _SuccessNumber(context):
@@ -105,8 +105,8 @@ def _SuccessNumber(context):
     if number < 1:
       raise PropertyError('successNumber value must be greater than 0.')
     return number
-  except ValueError:
-    raise PropertyError('Invalid successNumber value: {}'.format(number))
+  except ValueError as e:
+    raise PropertyError('Invalid successNumber value: {}'.format(number)) from e
 
 
 def _FailureNumber(context):
@@ -117,8 +117,8 @@ def _FailureNumber(context):
     if number < 1:
       raise PropertyError('failureNumber value must be greater than 0.')
     return number
-  except ValueError:
-    raise PropertyError('Invalid failureNumber value: {}'.format(number))
+  except ValueError as e:
+    raise PropertyError('Invalid failureNumber value: {}'.format(number)) from e
 
 
 def _WaiterDependsOn(context):

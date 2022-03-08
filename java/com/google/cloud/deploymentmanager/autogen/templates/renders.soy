@@ -4,17 +4,17 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 /** Constructs all firewall resources. */
-{template .firewallResources kind="text"}
+{template firewallResources kind="text"}
 {@param specList: list<proto.FirewallRuleSpec>}
 {@param? tierSpec: proto.VmTierSpec}
 {for $spec in $specList}
-{call .firewallResource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+{call firewallResource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/for}
 {/template}
 
 
 /** Constructs a firewall resource. */
-{template .firewallResource kind="text" /* visibility="private" */}
+{template firewallResource kind="text" /* visibility="private" */}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
 /* Note that prop names don't take into account the tier. */
@@ -22,7 +22,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: null/}{/call}
 {/let}
 {let $source kind="text"}
-  {call .firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
+  {call firewallRuleSource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/let}
 {% if properties["{$propName}"] %}
 - name: {call utilities.firewallRuleName data="all"/}
@@ -41,7 +41,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 
 /** Source for firewall rule with source Traffic.Public */
-{template .firewallRuleSpecPublicSource kind="text"}
+{template firewallRuleSpecPublicSource kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {let $sourcesPropName kind="text"}
   {call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: null/}{/call}
@@ -60,22 +60,22 @@ sourceRanges: ["0.0.0.0/0"]
 /*
  * Produces source information for firewall rule according Traffic enum in allowedSource.
  */
-{template .firewallRuleSource kind="text"}
+{template firewallRuleSource kind="text"}
   {@param spec: proto.FirewallRuleSpec}
   {@param? tierSpec: proto.VmTierSpec}
   {switch $spec.allowedSource}
     {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
-      {call .firewallRuleSpecPublicSource data="all"/}
+      {call firewallRuleSpecPublicSource data="all"/}
     {case proto.FirewallRuleSpec.TrafficSource.TIER}
-      {call .firewallRuleSpecTierSource data="all"/}
+      {call firewallRuleSpecTierSource data="all"/}
     {case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
-      {call .firewallRuleSpecDeploymentSource data="all"/}
+      {call firewallRuleSpecDeploymentSource data="all"/}
   {/switch}
 {/template}
 
 
 /** Source for firewall rule with source Traffic.Tier */
-{template .firewallRuleSpecTierSource kind="text"}
+{template firewallRuleSpecTierSource kind="text"}
 {@param? tierSpec: proto.VmTierSpec}
 {if $tierSpec}
 sourceTags:
@@ -85,7 +85,7 @@ sourceTags:
 
 
 /** Source for firewall rule with source Traffic.Deployment */
-{template .firewallRuleSpecDeploymentSource kind="text"}
+{template firewallRuleSpecDeploymentSource kind="text"}
 {@param? tierSpec: proto.VmTierSpec}
 {if $tierSpec}
 sourceTags:
@@ -95,7 +95,7 @@ sourceTags:
 
 
 /** Creates Firewall check box and range input field for a Firewall rule spec */
-{template .firewallProps kind="text"}
+{template firewallProps kind="text"}
 {@param spec: proto.FirewallRuleSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {let $firewallPropName kind="text"}
@@ -120,7 +120,7 @@ sourceTags:
 
 
 /** Constructs password instance property */
-{template .passwordProperty kind="text"}
+{template passwordProperty kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
@@ -139,7 +139,7 @@ sourceTags:
 
 
 /** Constructs password resource */
-{template .passwordResource kind="text"}
+{template passwordResource kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $resourceName kind="text"}
@@ -159,7 +159,7 @@ sourceTags:
 
 
 /** Constructs password output */
-{template .passwordOutput kind="text"}
+{template passwordOutput kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $outputReference kind="text"}
@@ -176,7 +176,7 @@ sourceTags:
 
 
 /** Constructs password metadata entry */
-{template .passwordMetadataFromOutput kind="text"}
+{template passwordMetadataFromOutput kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $outputReference kind="text"}
@@ -193,7 +193,7 @@ sourceTags:
 
 
 /** Constructs password property metadata entry */
-{template .passwordMetadataFromProperty kind="text"}
+{template passwordMetadataFromProperty kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
@@ -210,7 +210,7 @@ sourceTags:
 
 
 /** Constructs password property schema entry */
-{template .passwordRequiredSchema kind="text"}
+{template passwordRequiredSchema kind="text"}
 {@param password: proto.PasswordSpec}
 {@param passwordIndex: int}
 {let $propertyName kind="text"}
@@ -223,7 +223,7 @@ sourceTags:
 
 
 /** Constructs waiter resources. */
-{template .startupScriptAndWaiterResources kind="text"}
+{template startupScriptAndWaiterResources kind="text"}
 {@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 {@param? startupSpec: proto.GceStartupScriptSpec}
 {@param? enableJinjaVarName: string}
@@ -297,7 +297,7 @@ sourceTags:
 {/template}
 
 
-{template .startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
+{template startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
 {@param? startupSpec: proto.GceStartupScriptSpec}
 {@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 {if $startupSpec?.bashScriptContent and not $waiterSpec?.script}
@@ -313,7 +313,7 @@ sourceTags:
  * Lists all metadata items for a startup script and waiter related configuration
  * that are included conditionally (depending on waiter being enabled or not).
  */
-{template .startupScriptAndWaiterMetadataItemsConditional kind="text"}
+{template startupScriptAndWaiterMetadataItemsConditional kind="text"}
 {@param? startupSpec: proto.GceStartupScriptSpec}
 {@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 {@param statusWaiterEnabled: bool}
@@ -365,7 +365,7 @@ sourceTags:
 
 
 /** List all metadata items for GceMetadataItem specs. */
-{template .gceMetadataItems kind="text"}
+{template gceMetadataItems kind="text"}
 {@param specList: list<proto.GceMetadataItem>}
 {@param? tierSpecList: list<proto.VmTierSpec>}
 {@param? deployInput: proto.DeployInputSpec}
@@ -410,7 +410,7 @@ sourceTags:
 
 
 /** Converts Stackdriver's properties to integer. */
-{template .stackdriverPropertiesJinja kind="text"}
+{template stackdriverPropertiesJinja kind="text"}
 {@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
@@ -424,7 +424,7 @@ sourceTags:
 
 
 /** Renders Stackdriver's properties in schema. */
-{template .stackdriverPropertiesSchema kind="text"}
+{template stackdriverPropertiesSchema kind="text"}
 {@param stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 enableStackdriverLogging:
@@ -440,7 +440,7 @@ enableStackdriverMonitoring:
 
 
 /** Renders Stackdriver's metadata items. */
-{template .stackdriverMetadataItems kind="text"}
+{template stackdriverMetadataItems kind="text"}
 {@param? stackdriver: proto.StackdriverSpec}
 {if $stackdriver?.logging}
 - key: google-logging-enable
@@ -454,7 +454,7 @@ enableStackdriverMonitoring:
 
 
 /** Defines serviceAccounts section of a VM. */
-{template .serviceAccountsSection kind="text"}
+{template serviceAccountsSection kind="text"}
 {@param gcpAuthScopesList: list<proto.GcpAuthScopeSpec>}
 {@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
 serviceAccounts:
@@ -478,7 +478,7 @@ serviceAccounts:
 {/template}
 
 
-{template .zonePropertySchema kind="text"}
+{template zonePropertySchema kind="text"}
 {@param name: string}
 {@param? zoneSpec: proto.ZoneSpec}
 {$name}:
@@ -507,7 +507,7 @@ serviceAccounts:
 {/template}
 
 
-{template .imagePropertySchema kind="text"}
+{template imagePropertySchema kind="text"}
 {@param name: string}
 {@param imagesList: list<proto.ImageSpec>}
 {@param? tier: proto.VmTierSpec}
@@ -521,7 +521,7 @@ serviceAccounts:
 {/template}
 
 
-{template .machineTypePropertySchema kind="text"}
+{template machineTypePropertySchema kind="text"}
 {@param name: string}
 {@param spec: proto.MachineTypeSpec}
 {@param? tier: proto.VmTierSpec}
@@ -543,7 +543,7 @@ serviceAccounts:
 {/template}
 
 
-{template .acceleratorPropertiesSchema kind="text"}
+{template acceleratorPropertiesSchema kind="text"}
 {@param namePrefix: string}
 {@param spec: proto.AcceleratorSpec}
 {@param? tier: proto.VmTierSpec}
@@ -572,7 +572,7 @@ serviceAccounts:
 {/template}
 
 
-{template .networkPropertiesSchema kind="text"}
+{template networkPropertiesSchema kind="text"}
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
 {@param spec: proto.NetworkInterfacesSpec}
@@ -617,7 +617,7 @@ serviceAccounts:
 {/template}
 
 
-{template .ipForwardingPropertySchema kind="text"}
+{template ipForwardingPropertySchema kind="text"}
 {@param name: string}
 {@param spec: proto.IpForwardingSpec}
 {@param? tier: proto.VmTierSpec}
@@ -630,7 +630,7 @@ serviceAccounts:
 {/template}
 
 
-{template .bootDiskPropertiesSchema kind="text"}
+{template bootDiskPropertiesSchema kind="text"}
 {@param spec: proto.DiskSpec}
 {@param zonePropertyName: string}
 {@param? tier: proto.VmTierSpec}
@@ -654,7 +654,7 @@ serviceAccounts:
 {/template}
 
 
-{template .additionalDiskPropertiesSchema kind="text"}
+{template additionalDiskPropertiesSchema kind="text"}
 {@param spec: proto.DiskSpec}
 {@param diskIndex: int}
 {@param zonePropertyName: string}
@@ -679,7 +679,7 @@ serviceAccounts:
 {/template}
 
 
-{template .tierInstanceAcountPropertySchema kind="text"}
+{template tierInstanceAcountPropertySchema kind="text"}
 {@param name: string}
 {@param spec: proto.VmTierSpec.TierInstanceCount}
 {@param? tier: proto.VmTierSpec}
@@ -698,7 +698,7 @@ serviceAccounts:
 {/template}
 
 
-{template .deployInputPropertiesSchema kind="text"}
+{template deployInputPropertiesSchema kind="text"}
 {@param inputSpec: proto.DeployInputSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {let $fields: $tierSpec ?
@@ -706,14 +706,14 @@ serviceAccounts:
   : listDeployInputFields($inputSpec)/}
 {for $field in $fields}
 {let $fieldSchema kind="text"}
-  {call .deployInputFieldSchema}{param field: $field/}{/call}
+  {call deployInputFieldSchema}{param field: $field/}{/call}
 {/let}
 {$fieldSchema}{nil}
 {/for}
 {/template}
 
 
-{template .deployInputFieldSchema /* visibility = "private" */ kind="text"}
+{template deployInputFieldSchema /* visibility = "private" */ kind="text"}
 {@param field: proto.DeployInputField}
 {deployInputFieldName($field) |yamlprimitive: 0}:
 {if $field.booleanCheckbox}
@@ -788,7 +788,7 @@ serviceAccounts:
 {/template}
 
 
-{template .deployInputRequiredSchema kind="text"}
+{template deployInputRequiredSchema kind="text"}
 {@param? inputSpec: proto.DeployInputSpec}
 {@param? tierSpec: proto.VmTierSpec}
 {if $inputSpec}
@@ -804,7 +804,7 @@ serviceAccounts:
 {/template}
 
 
-{template .jinjaConditionalContent kind="text"}
+{template jinjaConditionalContent kind="text"}
 {@param enabledContent: string}
 {@param disabledContent: string}
 {@param jinjaConditionalVariableName: string}
@@ -824,7 +824,7 @@ serviceAccounts:
 {/template}
 
 
-{template .localSsdPropertyItem kind="text"}
+{template localSsdPropertyItem kind="text"}
 {@param localSsdSpec: proto.LocalSsdSpec}
 {@param deployInput: proto.DeployInputSpec}
 {if $localSsdSpec.count and $localSsdSpec.count > 0}
@@ -836,7 +836,7 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {/template}
 
 
-{template .additionalDiskSection kind="text"}
+{template additionalDiskSection kind="text"}
 {@param additionalDisksList: list<proto.DiskSpec>}
 {@param deployInputSpec: proto.DeployInputSpec}
 {@param? tierSpec: proto.VmTierSpec}
