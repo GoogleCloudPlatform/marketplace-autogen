@@ -33,7 +33,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
     targetTags: ["{call utilities.firewallRuleTargetTag data="all"/}"]
     allowed:
       - IPProtocol: {call utilities.firewallRuleProtocol}{param spec: $spec/}{/call}
-        {if strLen($spec.port) > 0}
+        {if $spec.port.length() > 0}
         ports: ["{$spec.port}"]
         {/if}
 {% endif %}
@@ -808,15 +808,15 @@ serviceAccounts:
 {@param enabledContent: string}
 {@param disabledContent: string}
 {@param jinjaConditionalVariableName: string}
-{if strLen($enabledContent) > 0}
+{if $enabledContent.length() > 0}
 {% if {$jinjaConditionalVariableName} %}
 {$enabledContent}{nil}
-{if strLen($disabledContent) > 0}
+{if $disabledContent.length() > 0}
 {% else %}
 {$disabledContent}{nil}
 {/if}
 {% endif %}
-{elseif strLen($disabledContent) > 0}
+{elseif $disabledContent.length() > 0}
 {% if not {$jinjaConditionalVariableName} %}
 {$disabledContent}{nil}
 {% endif %}

@@ -79,7 +79,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  */
 {template firewallRulePortSuffix kind="text"}
 {@param spec: proto.FirewallRuleSpec}
-{if strLen($spec.port) > 0}
+{if $spec.port.length() > 0}
 -{$spec.port}{nil}
 {/if}
 {/template}
@@ -105,7 +105,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  */
 {template firewallRuleTitle kind="text"}
 {@param spec: proto.FirewallRuleSpec}
-{if strLen($spec.port) > 0}
+{if $spec.port.length() > 0}
 {switch $spec.protocol}
   {case proto.FirewallRuleSpec.Protocol.TCP}
     {if $spec.port == 80}

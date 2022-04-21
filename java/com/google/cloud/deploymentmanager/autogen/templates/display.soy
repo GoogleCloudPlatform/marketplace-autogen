@@ -39,7 +39,7 @@ Open {$firewallTitle} traffic{nil}
     gcloud --project={{ outputs().project }} compute firewall-rules
     create "{{ outputs().deployment }}{call utilities.firewallRuleNameSuffix}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}"
     --network {{ outputs().{$tierMainNetwork} }}
-    {if $spec.port and strLen($spec.port) > 0}
+    {if $spec.port and $spec.port.length() > 0}
     --allow {$protocol |lowercased}:{$spec.port}
     {else}
     --allow {$protocol |lowercased}
@@ -312,7 +312,7 @@ placeholder: {$box.placeholder |yamlprimitive: 0}
 {let $valueLabels: fieldValueLabelMap($field)/}
 {if $valueLabels}
 enumLabels:
-  {for $key in mapKeys($valueLabels)}
+  {for $key in $valueLabels.keys()}
   '{$key}': {$valueLabels[$key] |yamlprimitive: 2}
   {/for}
 {/if}
