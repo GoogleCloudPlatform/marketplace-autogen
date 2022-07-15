@@ -49,7 +49,6 @@ An example YAML showing how this template can be used:
   - prefix: optional. The prefix to use for naming created resources. The
             deployment name is used if this is not specified.
 """
-import six
 import yaml
 
 RTC_ENDPOINT = 'https://runtimeconfig.googleapis.com/v1beta1'
@@ -128,7 +127,7 @@ def _WaiterDependsOn(context):
     raise PropertyError('waiterDependsOn must be a list: {}'.format(depends_on))
 
   for item in depends_on:
-    if not isinstance(item, six.string_types):
+    if not isinstance(item, str):
       raise PropertyError(
           'waiterDependsOn must be a list of strings: {}'.format(depends_on))
 
