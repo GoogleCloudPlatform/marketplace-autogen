@@ -745,7 +745,7 @@ message AcceleratorSpec {
 
   // One or more accelerator types. If the list contains exactly one item, the
   // type will not be selectable by the user.
-  // Currently avaiable types:
+  // Currently available types:
   // nvidia-tesla-k80
   // nvidia-tesla-p100
   // nvidia-tesla-v100
@@ -755,6 +755,7 @@ message AcceleratorSpec {
   // nvidia-tesla-t4
   // nvidia-tesla-t4-vws
   // nvidia-tesla-a100
+  // nvidia-a100-80gb
   repeated string types = 1;
 
   // LINT.ThenChange()
