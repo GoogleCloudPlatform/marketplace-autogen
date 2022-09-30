@@ -71,12 +71,13 @@ final class SpecValidations {
 
   protected static final int INFO_ROW_MAX_LENGTH = 128;
 
-  private static final ImmutableSet<String> METADATA_KEY_BLACKLIST = ImmutableSet.of(
-      "status-config-url",
-      "status-uptime-deadline",
-      "status-variable-path",
-      "startup-script",
-      "startup-script-url");
+  private static final ImmutableSet<String> METADATA_KEY_BLACKLIST =
+      ImmutableSet.of(
+          "status-config-url",
+          "status-uptime-deadline",
+          "status-variable-path",
+          "startup-script",
+          "startup-script-url");
   private static final ImmutableSet<Integer> VALID_GPU_COUNTS = ImmutableSet.of(0, 1, 2, 4, 8);
 
   private static final Pattern TIER_NAME_REGEX = Pattern.compile("[a-z0-9]+");
@@ -92,7 +93,8 @@ final class SpecValidations {
           "nvidia-tesla-p4-vws",
           "nvidia-tesla-t4",
           "nvidia-tesla-t4-vws",
-          "nvidia-tesla-a100");
+          "nvidia-tesla-a100",
+          "nvidia-a100-80gb");
   // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
@@ -179,15 +181,13 @@ final class SpecValidations {
   private static void validateCommonDiskOptions(DiskSpec input) {
     checkArgument(input.hasDiskSize(), "Disk size must be specified");
     checkArgument(
-        input.getDiskSize().getDefaultSizeGb() > 0,
-        "A valid default disk size must be specified");
+        input.getDiskSize().getDefaultSizeGb() > 0, "A valid default disk size must be specified");
     checkArgument(input.hasDiskType(), "Disk type must be specified");
     checkArgument(
         !input.getDiskType().getDefaultType().isEmpty(),
         "A valid default disk type must be specified");
     checkArgument(
-        !input.getDisplayLabel().isEmpty(),
-        "A valid disk display label must be specified");
+        !input.getDisplayLabel().isEmpty(), "A valid disk display label must be specified");
   }
 
   private static void validateBootDisk(DiskSpec input) {
@@ -197,8 +197,7 @@ final class SpecValidations {
   private static void validateAdditionalDisks(List<DiskSpec> input) {
     for (DiskSpec disk : input) {
       validateCommonDiskOptions(disk);
-      checkArgument(disk.hasDeviceNameSuffix(),
-          "Disk must have a device name specified");
+      checkArgument(disk.hasDeviceNameSuffix(), "Disk must have a device name specified");
     }
   }
 
@@ -259,12 +258,9 @@ final class SpecValidations {
       return;
     }
     validateCommonInstanceUrl(spec, urlName);
+    checkArgument(spec.hasTierVm(), "A tier VM is required for " + urlName);
     checkArgument(
-        spec.hasTierVm(),
-        "A tier VM is required for " + urlName);
-    checkArgument(
-        spec.getTierVm().getTier().length() > 0,
-        "Tier VM must have a valid tier for " + urlName);
+        spec.getTierVm().getTier().length() > 0, "Tier VM must have a valid tier for " + urlName);
   }
 
   private static void validateCommonInstanceUrl(@Nullable InstanceUrlSpec spec, String urlName) {
@@ -281,9 +277,7 @@ final class SpecValidations {
       ConnectToInstanceSpec spec, PostDeployInfo postDeployInfo) {
     validateCommonInstanceConnectSpec(spec, postDeployInfo);
 
-    checkArgument(
-        !spec.hasTierVm(),
-        "Tier VM must not be specified for a single vm spec");
+    checkArgument(!spec.hasTierVm(), "Tier VM must not be specified for a single vm spec");
   }
 
   private static void validateMultiVmInstanceConnectSpec(
@@ -292,8 +286,7 @@ final class SpecValidations {
 
     checkArgument(
         spec.hasTierVm() && !Strings.isNullOrEmpty(spec.getTierVm().getTier()),
-        "Multi-vm connect button spec must specify valid tier name"
-    );
+        "Multi-vm connect button spec must specify valid tier name");
   }
 
   private static void validateCommonInstanceConnectSpec(
@@ -303,8 +296,8 @@ final class SpecValidations {
     // the connect button and connect_button_label of post deploy info, it should fail.
     checkArgument(
         Strings.isNullOrEmpty(spec.getDisplayLabel())
-        || Strings.isNullOrEmpty(postDeployInfo.getConnectButtonLabel())
-        || spec.getDisplayLabel().equals(postDeployInfo.getConnectButtonLabel()),
+            || Strings.isNullOrEmpty(postDeployInfo.getConnectButtonLabel())
+            || spec.getDisplayLabel().equals(postDeployInfo.getConnectButtonLabel()),
         "At most only one of connect button's display_label and post deploy's "
             + "connect_button_label can be specified, or they must have the same value");
   }
@@ -363,8 +356,7 @@ final class SpecValidations {
   }
 
   private static void validateCommonPassword(PasswordSpec password) {
-    checkArgument(
-        !password.getMetadataKey().isEmpty(), "Password must have a valid metadata key");
+    checkArgument(!password.getMetadataKey().isEmpty(), "Password must have a valid metadata key");
     checkArgument(password.getLength() > 0, "Password must have a valid length");
     checkArgument(
         !password.getDisplayLabel().isEmpty(), "Password must have a valid display label");
@@ -567,33 +559,42 @@ final class SpecValidations {
     checkArgument(accelerators.size() <= 1, "At most one accelerator allowed.");
 
     AcceleratorSpec accelerator = accelerators.get(0);
-    checkArgument(accelerator.getTypesList().size() >= 1,
-        "Accelerators must have at least one type.");
+    checkArgument(
+        accelerator.getTypesList().size() >= 1, "Accelerators must have at least one type.");
     Set<String> gpuTypes = ImmutableSet.copyOf(accelerator.getTypesList());
     Set<String> unsupportedTypes = Sets.difference(gpuTypes, SUPPORTED_ACCELERATOR_TYPES);
-    checkArgument(unsupportedTypes.isEmpty(),
-        "Unsupported accelerator types: %s", unsupportedTypes);
+    checkArgument(
+        unsupportedTypes.isEmpty(), "Unsupported accelerator types: %s", unsupportedTypes);
     checkArgument(accelerator.getMinCount() >= 0, "Accelerator min count must not be negative.");
-    checkArgument(VALID_GPU_COUNTS.contains(accelerator.getMinCount()),
-        "Accelerator min count must be one of: %s", VALID_GPU_COUNTS.toString());
+    checkArgument(
+        VALID_GPU_COUNTS.contains(accelerator.getMinCount()),
+        "Accelerator min count must be one of: %s",
+        VALID_GPU_COUNTS.toString());
     if (accelerator.getMaxCount() != 0) {
       checkArgument(accelerator.getMaxCount() > 0, "Accelerator max count must be greater than 0.");
-      checkArgument(accelerator.getMinCount() <= accelerator.getMaxCount(),
+      checkArgument(
+          accelerator.getMinCount() <= accelerator.getMaxCount(),
           "Accelerator min count must not be greater than max count.");
-      checkArgument(VALID_GPU_COUNTS.contains(accelerator.getMaxCount()),
-          "Accelerator max count must be one of: %s", VALID_GPU_COUNTS.toString());
+      checkArgument(
+          VALID_GPU_COUNTS.contains(accelerator.getMaxCount()),
+          "Accelerator max count must be one of: %s",
+          VALID_GPU_COUNTS.toString());
     }
     if (accelerator.getDefaultCount() != 0) {
-      checkArgument(accelerator.getDefaultCount() >= 0,
-          "Accelerator default count must not be negative.");
-      checkArgument(accelerator.getDefaultCount() >= accelerator.getMinCount(),
+      checkArgument(
+          accelerator.getDefaultCount() >= 0, "Accelerator default count must not be negative.");
+      checkArgument(
+          accelerator.getDefaultCount() >= accelerator.getMinCount(),
           "Accelerator default count must not be less than min count.");
       if (accelerator.getMaxCount() != 0) {
-        checkArgument(accelerator.getDefaultCount() <= accelerator.getMaxCount(),
+        checkArgument(
+            accelerator.getDefaultCount() <= accelerator.getMaxCount(),
             "Accelerator default count must not be greater than max count.");
       }
-      checkArgument(VALID_GPU_COUNTS.contains(accelerator.getDefaultCount()),
-          "Accelerator default count must be one of: %s", VALID_GPU_COUNTS.toString());
+      checkArgument(
+          VALID_GPU_COUNTS.contains(accelerator.getDefaultCount()),
+          "Accelerator default count must be one of: %s",
+          VALID_GPU_COUNTS.toString());
     }
     if (!accelerator.getDefaultType().isEmpty()) {
       checkArgument(
@@ -609,7 +610,8 @@ final class SpecValidations {
     Set<String> runningFieldNames = new HashSet<>();
     Set<String> runningDisplayGroups = new HashSet<>();
     for (DeployInputSection section : spec.getSectionsList()) {
-      checkArgument(section.getPlacement() != Placement.PLACEMENT_UNSPECIFIED,
+      checkArgument(
+          section.getPlacement() != Placement.PLACEMENT_UNSPECIFIED,
           "Deploy input section must have a valid placement");
       switch (section.getPlacement()) {
         case MAIN:
@@ -628,8 +630,8 @@ final class SpecValidations {
           checkArgument(
               !section.getTitle().isEmpty(), "Custom deploy input section must have a valid title");
       }
-      checkArgument(section.getFieldsCount() > 0,
-          "Deploy input section must have at least 1 field");
+      checkArgument(
+          section.getFieldsCount() > 0, "Deploy input section must have at least 1 field");
       validateDeployInputFields(section.getFieldsList(), runningFieldNames, runningDisplayGroups);
     }
   }
@@ -658,76 +660,91 @@ final class SpecValidations {
       switch (field.getTypeCase()) {
         case BOOLEAN_CHECKBOX:
           break;
-        case GROUPED_BOOLEAN_CHECKBOX: {
-          GroupedBooleanCheckbox checkbox = field.getGroupedBooleanCheckbox();
-          if (!isInBooleanGroup) {
-            checkArgument(checkbox.hasDisplayGroup(),
-                String.format("The first grouped boolean checkbox '%s' must have a display group",
-                    field.getName()));
-          }
-          if (checkbox.hasDisplayGroup()) {
-            GroupedBooleanCheckbox.DisplayGroup displayGroup = checkbox.getDisplayGroup();
-            checkArgument(!displayGroup.getName().isEmpty(),
-                String.format("Field '%s' has a display group without a name", field.getName()));
-            if (!runningDisplayGroups.add(displayGroup.getName())) {
-              throw new IllegalArgumentException(
-                  "Display groups with the same name: " + displayGroup.getName());
+        case GROUPED_BOOLEAN_CHECKBOX:
+          {
+            GroupedBooleanCheckbox checkbox = field.getGroupedBooleanCheckbox();
+            if (!isInBooleanGroup) {
+              checkArgument(
+                  checkbox.hasDisplayGroup(),
+                  String.format(
+                      "The first grouped boolean checkbox '%s' must have a display group",
+                      field.getName()));
             }
-            checkArgument(!displayGroup.getTitle().isEmpty(),
-                String.format("Display group '%s' must have a title", displayGroup.getName()));
+            if (checkbox.hasDisplayGroup()) {
+              GroupedBooleanCheckbox.DisplayGroup displayGroup = checkbox.getDisplayGroup();
+              checkArgument(
+                  !displayGroup.getName().isEmpty(),
+                  String.format("Field '%s' has a display group without a name", field.getName()));
+              if (!runningDisplayGroups.add(displayGroup.getName())) {
+                throw new IllegalArgumentException(
+                    "Display groups with the same name: " + displayGroup.getName());
+              }
+              checkArgument(
+                  !displayGroup.getTitle().isEmpty(),
+                  String.format("Display group '%s' must have a title", displayGroup.getName()));
+            }
+            break;
           }
-          break;
-        }
-        case INTEGER_BOX: {
-          if (field.getRequired()) {
-            IntegerBox box = field.getIntegerBox();
-            checkArgument(box.hasDefaultValue() || box.hasTestDefaultValue(),
-                String.format(
-                    "Field '%s' is required - it should have defaultValue or testDefaultValue",
-                    field.getName()));
+        case INTEGER_BOX:
+          {
+            if (field.getRequired()) {
+              IntegerBox box = field.getIntegerBox();
+              checkArgument(
+                  box.hasDefaultValue() || box.hasTestDefaultValue(),
+                  String.format(
+                      "Field '%s' is required - it should have defaultValue or testDefaultValue",
+                      field.getName()));
+            }
+            break;
           }
-          break;
-        }
-        case INTEGER_DROPDOWN: {
-          IntegerDropdown dropdown = field.getIntegerDropdown();
-          checkArgument(dropdown.getValuesCount() > 0,
-              String.format("Field '%s' must have at least 1 value", field.getName()));
-          if (dropdown.hasDefaultValueIndex()) {
-            checkArgument(dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),
-                String.format(
-                    "Invalid default index %d while there are only %d values in field '%s'",
-                    dropdown.getDefaultValueIndex().getValue(),
-                    dropdown.getValuesCount(),
-                    field.getName()));
+        case INTEGER_DROPDOWN:
+          {
+            IntegerDropdown dropdown = field.getIntegerDropdown();
+            checkArgument(
+                dropdown.getValuesCount() > 0,
+                String.format("Field '%s' must have at least 1 value", field.getName()));
+            if (dropdown.hasDefaultValueIndex()) {
+              checkArgument(
+                  dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),
+                  String.format(
+                      "Invalid default index %d while there are only %d values in field '%s'",
+                      dropdown.getDefaultValueIndex().getValue(),
+                      dropdown.getValuesCount(),
+                      field.getName()));
+            }
+            break;
           }
-          break;
-        }
-        case STRING_BOX: {
-          if (field.getRequired()) {
-            StringBox box = field.getStringBox();
-            boolean hasDefaultValue = !Strings.isNullOrEmpty(box.getDefaultValue());
-            boolean hasTestDefaultValue = !Strings.isNullOrEmpty(box.getTestDefaultValue());
-            checkArgument(hasDefaultValue || hasTestDefaultValue,
-                String.format(
-                    "Field '%s' is required - it should have defaultValue or testDefaultValue",
-                    field.getName()));
+        case STRING_BOX:
+          {
+            if (field.getRequired()) {
+              StringBox box = field.getStringBox();
+              boolean hasDefaultValue = !Strings.isNullOrEmpty(box.getDefaultValue());
+              boolean hasTestDefaultValue = !Strings.isNullOrEmpty(box.getTestDefaultValue());
+              checkArgument(
+                  hasDefaultValue || hasTestDefaultValue,
+                  String.format(
+                      "Field '%s' is required - it should have defaultValue or testDefaultValue",
+                      field.getName()));
+            }
+            break;
           }
-          break;
-        }
-        case STRING_DROPDOWN: {
-          StringDropdown dropdown = field.getStringDropdown();
-          checkArgument(dropdown.getValuesCount() > 0,
-              String.format("Field '%s' must have at least 1 value", field.getName()));
-          if (dropdown.hasDefaultValueIndex()) {
-            checkArgument(dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),
-                String.format(
-                    "Invalid default index %d while there are only %d values in field '%s'",
-                    dropdown.getDefaultValueIndex().getValue(),
-                    dropdown.getValuesCount(),
-                    field.getName()));
+        case STRING_DROPDOWN:
+          {
+            StringDropdown dropdown = field.getStringDropdown();
+            checkArgument(
+                dropdown.getValuesCount() > 0,
+                String.format("Field '%s' must have at least 1 value", field.getName()));
+            if (dropdown.hasDefaultValueIndex()) {
+              checkArgument(
+                  dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),
+                  String.format(
+                      "Invalid default index %d while there are only %d values in field '%s'",
+                      dropdown.getDefaultValueIndex().getValue(),
+                      dropdown.getValuesCount(),
+                      field.getName()));
+            }
+            break;
           }
-          break;
-        }
         case ZONE_DROPDOWN:
           break;
         case EMAIL_BOX:
