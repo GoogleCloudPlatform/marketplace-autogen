@@ -10,7 +10,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {let $protocol kind="text"}{call utilities.firewallRuleProtocol data="all"/}{/let}
 {let $heading kind="text"}
 Open {$firewallTitle} traffic{nil}
-{if $tierSpec}{sp}for {$tierSpec.title}{/if}
+{if $tierSpec}{sp}for {$tierSpec.getTitle()}{/if}
 {/let}
 {let $tierMainNetwork kind="text"}
   {if $tierSpec}
@@ -23,7 +23,7 @@ Open {$firewallTitle} traffic{nil}
   {if not $tierSpec}
     -deployment{nil}
   {else}
-    -{$tierSpec.name}-tier{nil}
+    -{$tierSpec.getName()}-tier{nil}
   {/if}
 {/let}
 - heading: {$heading |yamlprimitive: 2}
@@ -39,15 +39,15 @@ Open {$firewallTitle} traffic{nil}
     gcloud --project={{ outputs().project }} compute firewall-rules
     create "{{ outputs().deployment }}{call utilities.firewallRuleNameSuffix}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}"
     --network {{ outputs().{$tierMainNetwork} }}
-    {if $spec.port and $spec.port.length() > 0}
-    --allow {$protocol |lowercased}:{$spec.port}
+    {if $spec.getPort() and $spec.getPort().length() > 0}
+    --allow {$protocol |lowercased}:{$spec.getPort()}
     {else}
     --allow {$protocol |lowercased}
     {/if}
-    {if $tierSpec and $spec.allowedSource != proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+    {if $tierSpec and $spec.getAllowedSource() != proto.FirewallRuleSpec.TrafficSource.PUBLIC}
     {let $sourceTag kind="text"}
-      {if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.TIER}
-        "{{ outputs().deployment }}-{$tierSpec.name}-tier"{nil}
+      {if $spec.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.TIER}
+        "{{ outputs().deployment }}-{$tierSpec.getName()}-tier"{nil}
       {else}
         "{{ outputs().deployment }}-deployment"{nil}
       {/if}
@@ -61,7 +61,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template firewallRuleTrafficLabel kind="text"}
 {@param firewallSpec: proto.FirewallRuleSpec}
-{switch $firewallSpec.allowedSource}
+{switch $firewallSpec.getAllowedSource()}
 {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
   from the Internet{nil}
 {case proto.FirewallRuleSpec.TrafficSource.TIER}
@@ -107,7 +107,7 @@ Open {$firewallTitle} traffic{nil}
 - name: {$propName}
   title: Allow {$firewallTitle} traffic {call firewallRuleTrafficLabel}{param firewallSpec: $firewallSpec/}{/call}
   section: {$section}
-{if $firewallSpec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{if $firewallSpec.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $rangePropName kind="text"}
   {call utilities.firewallRuleSourceRangesPropName}
     {param spec: $firewallSpec/}
@@ -125,7 +125,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template authScopeDescription kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
-{switch $spec.scope}
+{switch $spec.getScope()}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     read only access to all of Google Cloud Platform APIs{nil}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
@@ -148,7 +148,7 @@ Open {$firewallTitle} traffic{nil}
 {if $tier}
 {call tierSectionName}{param spec: $tier/}{/call}_{nil}
 {/if}
-{switch $spec.scope}
+{switch $spec.getScope()}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     CLOUD_PLATFORM_READONLY_API_ACCESS{nil}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
@@ -167,7 +167,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template authScopeBoolGroupTitle kind="text"}
 {@param spec: proto.GcpAuthScopeSpec}
-{switch $spec.scope}
+{switch $spec.getScope()}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     Google Cloud Platform Readonly API{nil}
   {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
@@ -238,12 +238,12 @@ Open {$firewallTitle} traffic{nil}
 {@param? spec: proto.TierVmInstance}
 {@param? tiersList: list<proto.VmTierSpec>}
 {if $spec}
-  {let $tier: findVmTier($spec.tier, $tiersList)/}
+  {let $tier: findVmTier($spec.getTier(), $tiersList)/}
   {let $prefix kind="text"}{$baseOutputName |tierprefixed: $tier}{nil}{/let}
   {let $instanceCount kind="text"}
     properties().{'instanceCount' |tierprefixed: $tier}"]{nil}
   {/let}
-  {let $vmIndex: $spec.index ?: 0/}
+  {let $vmIndex: $spec.getIndex() ?: 0/}
   {if $vmIndex >= 0}
     outputs()["{$prefix}" + {$vmIndex}]{nil}
   {else}
@@ -260,52 +260,52 @@ Open {$firewallTitle} traffic{nil}
 {@param field: proto.DeployInputField}
 {@param? tierList: list<proto.VmTierSpec>}
 name: {deployInputFieldName($field) |yamlprimitive: 0}
-{if $field.title}
-title: {$field.title |yamlprimitive: 0}
+{if $field.getTitle()}
+title: {$field.getTitle() |yamlprimitive: 0}
 {/if}
-{if $field.description}
-subtext: {$field.description |yamlprimitive: 0}
+{if $field.getDescription()}
+subtext: {$field.getDescription() |yamlprimitive: 0}
 {/if}
-{if $field.tooltip}
-tooltip: {$field.tooltip |yamlprimitive: 0}
+{if $field.getTooltip()}
+tooltip: {$field.getTooltip() |yamlprimitive: 0}
 {/if}
-{if $field.integerBox?.validation?.description}
-validation: {$field.integerBox.validation.description |yamlprimitive: 0}
-{elseif $field.stringBox?.validation?.description}
-validation: {$field.stringBox.validation.description |yamlprimitive: 0}
-{elseif $field.emailBox?.validation?.description}
-validation: {$field.emailBox.validation.description |yamlprimitive: 0}
+{if $field.integerBox?.validation?.getDescription()}
+validation: {$field.integerBox.validation.getDescription() |yamlprimitive: 0}
+{elseif $field.stringBox?.validation?.getDescription()}
+validation: {$field.stringBox.validation.getDescription() |yamlprimitive: 0}
+{elseif $field.emailBox?.validation?.getDescription()}
+validation: {$field.emailBox.validation.getDescription() |yamlprimitive: 0}
 {/if}
-{if $field.level}
-level: {$field.level}
+{if $field.getLevel()}
+level: {$field.getLevel()}
 {/if}
-{if $section.placement == proto.DeployInputSection.Placement.CUSTOM_TOP or
-    $section.placement == proto.DeployInputSection.Placement.CUSTOM_BOTTOM}
-section: {$section.name |yamlprimitive: 0}
-{elseif $section.placement == proto.DeployInputSection.Placement.TIER}
-section: {call tierSectionName}{param spec: findVmTier($section.tier, $tierList)/}{/call}
+{if $section.getPlacement() == proto.DeployInputSection.Placement.CUSTOM_TOP or
+    $section.getPlacement() == proto.DeployInputSection.Placement.CUSTOM_BOTTOM}
+section: {$section.getName() |yamlprimitive: 0}
+{elseif $section.getPlacement() == proto.DeployInputSection.Placement.TIER}
+section: {call tierSectionName}{param spec: findVmTier($section.getTier(), $tierList)/}{/call}
 {/if}
 
 {if $field.groupedBooleanCheckbox}
 {let $displayGroup: findDisplayGroup($field, $section)/}
-boolean_group: {$displayGroup.name |yamlprimitive: 0}
+boolean_group: {$displayGroup.getName() |yamlprimitive: 0}
 
 {elseif $field.integerBox}
 {let $box: $field.integerBox/}
-{if $box.placeholder}
-placeholder: {$box.placeholder |yamlprimitive: 0}
+{if $box.getPlaceholder()}
+placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
 
 {elseif $field.stringBox}
 {let $box: $field.stringBox/}
-{if $box.placeholder}
-placeholder: {$box.placeholder |yamlprimitive: 0}
+{if $box.getPlaceholder()}
+placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
 
 {elseif $field.emailBox}
 {let $box: $field.emailBox/}
-{if $box.placeholder}
-placeholder: {$box.placeholder |yamlprimitive: 0}
+{if $box.getPlaceholder()}
+placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
 {/if}
 
@@ -375,14 +375,14 @@ enumLabels:
 {@param placement: proto.DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.sectionsList}
-{if $section.placement == $placement}
-- name: {$section.name |yamlprimitive: 2}
-  title: {$section.title |yamlprimitive: 2}
-  {if $section.tooltip}
-  tooltip: {$section.tooltip |yamlprimitive: 2}
+{if $section.getPlacement() == $placement}
+- name: {$section.getName() |yamlprimitive: 2}
+  title: {$section.getTitle() |yamlprimitive: 2}
+  {if $section.getTooltip()}
+  tooltip: {$section.getTooltip() |yamlprimitive: 2}
   {/if}
-  {if $section.description}
-  subtext: {$section.description |yamlprimitive: 2}
+  {if $section.getDescription()}
+  subtext: {$section.getDescription() |yamlprimitive: 2}
   {/if}
 {/if}
 {/for}
@@ -397,13 +397,13 @@ enumLabels:
 {for $field in $section.fieldsList}
 {if $field.groupedBooleanCheckbox and $field.groupedBooleanCheckbox.displayGroup}
 {let $group: $field.groupedBooleanCheckbox.displayGroup/}
-- name: {$group.name |yamlprimitive: 2}
-  title: {$group.title |yamlprimitive: 2}
-  {if $group.tooltip}
-  tooltip: {$group.tooltip |yamlprimitive: 2}
+- name: {$group.getName() |yamlprimitive: 2}
+  title: {$group.getTitle() |yamlprimitive: 2}
+  {if $group.getTooltip()}
+  tooltip: {$group.getTooltip() |yamlprimitive: 2}
   {/if}
-  {if $group.description}
-  subtext: {$group.description |yamlprimitive: 2}
+  {if $group.getDescription()}
+  subtext: {$group.getDescription() |yamlprimitive: 2}
   {/if}
 {/if}
 {/for}
@@ -414,7 +414,7 @@ enumLabels:
 
 {template tierSectionName kind="text"}
 {@param spec: proto.VmTierSpec}
-{$spec.name |uppercased}_TIER{nil}
+{$spec.getName() |uppercased}_TIER{nil}
 {/template}
 
 
@@ -475,7 +475,7 @@ enumLabels:
 {/let}
 {let $hasExternalIpProp kind="text"}
   {if $spec.tierVm}
-    {'hasExternalIP' |tierprefixed: findVmTier($spec.tierVm.tier, $tiersList)}{nil}
+    {'hasExternalIP' |tierprefixed: findVmTier($spec.tierVm.getTier(), $tiersList)}{nil}
   {else}
     hasExternalIP{nil}
   {/if}
@@ -494,21 +494,21 @@ enumLabels:
 {@param? deployInput: proto.DeployInputSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
 {for $password, $index in $passwordsList}
-{if $password.username}
-- label: {($password.displayLabel + ' user') |yamlprimitive: 2}
-  value: {$password.username}
+{if $password.getUsername()}
+- label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
+  value: {$password.getUsername()}
   {if $password.generateIf}
   showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
   {/if}
-{elseif $password.usernameFromDeployInputField}
-{let $field: findDeployInputField($password.usernameFromDeployInputField, $deployInput)/}
-- label: {($password.displayLabel + ' user') |yamlprimitive: 2}
+{elseif $password.getUsernameFromDeployInputField()}
+{let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
+- label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
   value: '{{ properties().{deployInputFieldName($field)} }}'
   {if $password.generateIf}
   showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
   {/if}
 {/if}
-- label: {($password.displayLabel + ' password (Temporary)') |yamlprimitive: 2}
+- label: {($password.getDisplayLabel() + ' password (Temporary)') |yamlprimitive: 2}
   value: '{{ outputs().password{$index} }}'
   {if $password.generateIf}
   showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
@@ -521,11 +521,11 @@ enumLabels:
 {@param infoRow: proto.PostDeployInfo.InfoRow}
 {@param? deployInput: proto.DeployInputSpec}
 {@param? tiersList: list<proto.VmTierSpec>}
-- label: {$infoRow.label |yamlprimitive: 8}
-{if $infoRow.value}
-  value: {$infoRow.value |yamlprimitive: 8}
-{elseif $infoRow.valueFromDeployInputField}
-  {let $field: findDeployInputField($infoRow.valueFromDeployInputField, $deployInput)/}
+- label: {$infoRow.getLabel() |yamlprimitive: 8}
+{if $infoRow.getValue()}
+  value: {$infoRow.getValue() |yamlprimitive: 8}
+{elseif $infoRow.getValueFromDeployInputField()}
+  {let $field: findDeployInputField($infoRow.getValueFromDeployInputField(), $deployInput)/}
   value: '{{ properties().{deployInputFieldName($field)} }}'
 {/if}
 {if $infoRow.showIf}
@@ -564,8 +564,8 @@ action: {$actionUrl |yamlprimitive: 0}
     {param tiersList: $tiersList/}
   {/call}
 {/let}
-{if $button.displayLabel}
-label: {$button.displayLabel |yamlprimitive: 4}
+{if checkNotNull($button).getDisplayLabel()}
+label: {checkNotNull($button).getDisplayLabel() |yamlprimitive: 4}
 {/if}
 type: TYPE_GCE_VM_SSH
 action: '{{ {$output} }}'

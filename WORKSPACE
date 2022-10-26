@@ -63,7 +63,7 @@ maven_install(
         "com.google.inject:guice:5.1.0",
         "com.google.protobuf:protobuf-java-util:3.12.2",
         "com.google.protobuf:protobuf-java:3.12.2",
-        "com.google.template:soy:2022-03-07",
+        "com.google.template:soy:2022-10-26",
         "com.google.truth.extensions:truth-liteproto-extension:1.0",
         "com.google.truth.extensions:truth-proto-extension:1.0",
         "com.google.truth:truth:1.0",

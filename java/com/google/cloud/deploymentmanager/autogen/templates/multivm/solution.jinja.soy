@@ -13,19 +13,19 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {% set tiersWithNoExternalIPCount = 0 %}
 {for $tier in $spec.tiersList}
 {let $tierExternalIPs: tierPrefixed('externalIPs', $tier)/}
-{% set {$tierExternalIPs} = properties["{$tier.name}_externalIP"] %}
+{% set {$tierExternalIPs} = properties["{$tier.getName()}_externalIP"] %}
 {% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 
 {let $tierMainNetwork: tierPrefixed('mainNetwork', $tier)/}
-{% set {$tierMainNetwork} = path_utils.networkPath(properties["{$tier.name}_network"][0]) %}
+{% set {$tierMainNetwork} = path_utils.networkPath(properties["{$tier.getName()}_network"][0]) %}
 {/for}
 {\n}
 
 resources:
   {for $tier in $spec.tiersList}
-  - name: {$tier.name}-tier
+  - name: {$tier.getName()}-tier
     type: {tierTemplateName($tier)}
     properties:
       instanceCount: {{ properties["{'instanceCount' |tierprefixed: $tier}"] }}
@@ -76,7 +76,7 @@ resources:
         {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}
       {/let}
       {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
-      {if $firewallRule.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+      {if $firewallRule.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
       {let $sourcesPropName kind="text"}
         {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}
       {/let}
@@ -148,31 +148,31 @@ outputs:
   {for $tier in $spec.tiersList}
   {% for vmIndex in range(properties["{'instanceCount' |tierprefixed: $tier}"]) %}
   - name: {'vmId{{ vmIndex }}' |tierprefixed: $tier}
-    value: $(ref.{$tier.name}-tier.vmId{{ vmIndex }})
+    value: $(ref.{$tier.getName()}-tier.vmId{{ vmIndex }})
   - name: {'vmExternalIP{{ vmIndex }}' |tierprefixed: $tier}
-    value: $(ref.{$tier.name}-tier.vmExternalIP{{ vmIndex }})
+    value: $(ref.{$tier.getName()}-tier.vmExternalIP{{ vmIndex }})
   - name: {'vmInternalIP{{ vmIndex }}' |tierprefixed: $tier}
-    value: $(ref.{$tier.name}-tier.vmInternalIP{{ vmIndex }})
+    value: $(ref.{$tier.getName()}-tier.vmInternalIP{{ vmIndex }})
   - name: {'vmName{{ vmIndex }}' |tierprefixed: $tier}
-    value: $(ref.{$tier.name}-tier.vmName{{ vmIndex }})
+    value: $(ref.{$tier.getName()}-tier.vmName{{ vmIndex }})
   - name: {'vmSelfLink{{ vmIndex }}' |tierprefixed: $tier}
-    value: $(ref.{$tier.name}-tier.vmSelfLink{{ vmIndex }})
+    value: $(ref.{$tier.getName()}-tier.vmSelfLink{{ vmIndex }})
   {% endfor %}
   {let $tierMainNetwork: tierPrefixed('mainNetwork', $tier)/}
   - name: {$tierMainNetwork}
     value: {{ {$tierMainNetwork} }}
   {/for}
   {if $spec.siteUrl}
-  {let $urlTier: findVmTier($spec.siteUrl.tierVm.tier, $spec.tiersList)/}
+  {let $urlTier: findVmTier($spec.siteUrl.tierVm.getTier(), $spec.tiersList)/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
-    value: $(ref.{$urlTier.name}-tier.hasExternalIP)
+    value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)
   {/if}
-  {if $spec.adminUrl and (not $spec.siteUrl or $spec.siteUrl.tierVm.tier != $spec.adminUrl.tierVm.tier)}
-  {let $urlTier: findVmTier($spec.adminUrl.tierVm.tier, $spec.tiersList)/}
+  {if $spec.adminUrl and (not $spec.siteUrl or $spec.siteUrl.tierVm.getTier() != $spec.adminUrl.tierVm.getTier())}
+  {let $urlTier: findVmTier($spec.adminUrl.tierVm.getTier(), $spec.tiersList)/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
-    value: $(ref.{$urlTier.name}-tier.hasExternalIP)
+    value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)
   {/if}
 
   - name: tiersWithNoExternalIPStatus

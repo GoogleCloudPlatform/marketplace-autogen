@@ -10,7 +10,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {@param packageSpec: proto.MultiVmDeploymentPackageSpec}
 
 {let $waiterSpec:
-    $spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER
+    $spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.WAITER
     ? $spec.applicationStatus.waiter : null/}
 
 {% import "path_utils.jinja" as path_utils with context %}
@@ -60,12 +60,12 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
   {\n}
   {% set imageProjects = [{nil}
   {for $image, $index in $spec.imagesList}
-    {if $index > 0}, {/if}"{$image.project}"{nil}
+    {if $index > 0}, {/if}"{$image.getProject()}"{nil}
   {/for}
   ] %}
   {% set imageNames = [{nil}
   {for $image, $index in $spec.imagesList}
-    {if $index > 0}, {/if}"{$image.name}"{nil}
+    {if $index > 0}, {/if}"{$image.getName()}"{nil}
   {/for}
   ] %}
   {% set selectedImageIndex = properties["image"]|int %}
@@ -86,7 +86,7 @@ resources:
       {if length($spec.imagesList) > 1}
       sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
       {else}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{$spec.imagesList[0].project}/global/images/{$spec.imagesList[0].name}
+      sourceImage: https://www.googleapis.com/compute/v1/projects/{$spec.imagesList[0].getProject()}/global/images/{$spec.imagesList[0].getName()}
       {/if}
       zone: {{ zone }}
       machineType: {{ machineType }}
