@@ -18,7 +18,7 @@ java_library(
         "@maven//:com_ibm_icu_icu4j",
         "@maven//:commons_cli_commons_cli",
         "@maven//:javax_inject_javax_inject",
-        "@maven//:org_ow2_asm_asm_all",
+        "@maven//:org_ow2_asm_asm",
         "@maven//:org_yaml_snakeyaml",
     ],
 )
