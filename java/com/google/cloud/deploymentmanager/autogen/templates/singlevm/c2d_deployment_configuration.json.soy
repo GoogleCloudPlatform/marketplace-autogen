@@ -7,8 +7,8 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 {lb}
   "defaultDeploymentType": "SINGLE_VM",
-  "imageName": "{$spec.imagesList[0].name}",
-  "projectId": "{$spec.imagesList[0].project}",
+  "imageName": "{$spec.imagesList[0].getName()}",
+  "projectId": "{$spec.imagesList[0].getProject()}",
   "templateName": "nonexistent_template",
   "useSolutionPackage": true
 {rb}

@@ -40,7 +40,6 @@ The generated password satisfies the following requirements:
 """
 
 import random
-import six
 import yaml
 
 PROPERTY_LENGTH = 'length'
@@ -70,9 +69,6 @@ class InputError(Exception):
 
 def GenerateConfig(context):
   """Entry function to generate the DM config."""
-  if six.PY2:
-    raise Exception('Use Python 3 when When using password generation')
-
   props = context.properties
   length = props.setdefault(PROPERTY_LENGTH, MIN_LENGTH)
   include_symbols = props.setdefault(PROPERTY_INCLUDE_SYMBOLS, False)

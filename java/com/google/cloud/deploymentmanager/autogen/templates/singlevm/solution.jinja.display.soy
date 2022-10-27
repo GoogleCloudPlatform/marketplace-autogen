@@ -16,7 +16,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 {let $partnerName kind="text"}
 {if $partnerInfo}
-  {$partnerInfo.name}{nil}
+  {$partnerInfo.getName()}{nil}
 {elseif $partnerId}
   {$partnerId}{nil}
 {/if}
@@ -37,10 +37,10 @@ input:
       title: Image version
       enumLabels:
         {for $image, $index in $spec.imagesList}
-        {if $image.label}
-        '{$index}': '{$image.label}'
+        {if $image.getLabel()}
+        '{$index}': '{$image.getLabel()}'
         {else}
-        '{$index}': '{$image.name}'
+        '{$index}': '{$image.getName()}'
         {/if}
         {/for}
     {/if}
@@ -57,18 +57,18 @@ input:
     {$acceleratorProperty |indent: 4, true}{nil}
     {/if}
     - name: bootDiskType
-      title: {$spec.bootDisk.displayLabel} type
+      title: {$spec.bootDisk.getDisplayLabel()} type
       section: BOOT_DISK
     - name: bootDiskSizeGb
-      title: {$spec.bootDisk.displayLabel} size in GB
+      title: {$spec.bootDisk.getDisplayLabel()} size in GB
       section: BOOT_DISK
 
     {for $disk, $index in $spec.additionalDisksList}
     - name: {diskTypePropertyName($index) |yamlprimitive: 2}
-      title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
+      title: {$disk.getDisplayLabel() + ' type' |yamlprimitive: 2}
       section: ADDITIONAL_DISKS
     - name: {diskSizePropertyName($index) |yamlprimitive: 2}
-      title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
+      title: {$disk.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
       section: ADDITIONAL_DISKS
     {/for}
 
@@ -167,7 +167,7 @@ input:
   {let $customBooleanGroups kind="text"}
     {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
-  {if (strLen($authScopeBooleanGroups) + strLen($customBooleanGroups)) > 0}
+  {if ($authScopeBooleanGroups.length() + $customBooleanGroups.length()) > 0}
   boolean_groups:
     {$authScopeBooleanGroups |indent: 4, true}{nil}
     {$customBooleanGroups |indent: 4, true}{nil}
@@ -234,13 +234,13 @@ runtime:
   {/let}
 
 
-  {if strLen($adminButton) > 0}
+  {if $adminButton.length() > 0}
   primaryButton:
     {$adminButton |indent: 4, true}{nil}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
 
-  {elseif strLen($siteButton) > 0}  // if strLen($adminButton) > 0
+  {elseif $siteButton.length() > 0}  // if strLen($adminButton) > 0
   primaryButton:
     {$siteButton |indent: 4, true}{nil}
   secondaryButton:
@@ -258,12 +258,12 @@ runtime:
 
   {if $spec.postDeploy}
     {for $action in $spec.postDeploy.actionItemsList}
-    - heading: {$action.heading |yamlprimitive: 6}
-      {if $action.description}
-      description: {$action.description |yamlprimitive: 6}
+    - heading: {$action.getHeading() |yamlprimitive: 6}
+      {if $action.getDescription()}
+      description: {$action.getDescription() |yamlprimitive: 6}
       {/if}
-      {if $action.snippet}
-      snippet: {$action.snippet |yamlprimitive: 6}
+      {if $action.getSnippet()}
+      snippet: {$action.getSnippet() |yamlprimitive: 6}
       {/if}
       {if $action.showIf}
       showIf: '{{ {booleanExpressionDisplayCondition($action.showIf)} }}'
@@ -292,7 +292,7 @@ runtime:
 annotations:
   autogenSpecType: 'SINGLE_VM'
   {for $image, $index in $spec.imagesList}
-  vmImage{$index}: https://www.googleapis.com/compute/v1/projects/{$image.project}/global/images/{$image.name}
+  vmImage{$index}: https://www.googleapis.com/compute/v1/projects/{$image.getProject()}/global/images/{$image.getName()}
   {/for}
 
 {\n}

@@ -15,7 +15,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 {let $partnerName kind="text"}
 {if $partnerInfo}
-  {$partnerInfo.name}{nil}
+  {$partnerInfo.getName()}{nil}
 {elseif $partnerId}
   {$partnerId}{nil}
 {/if}
@@ -72,7 +72,7 @@ input:
 
     {for $tier in $spec.tiersList}
     - name: {call displayLib.tierSectionName}{param spec: $tier/}{/call}
-      title: {$tier.title |yamlprimitive: 6}
+      title: {$tier.getTitle() |yamlprimitive: 6}
     {/for}
 
     {call displayLib.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
@@ -92,7 +92,7 @@ input:
   {let $customBooleanGroups kind="text"}
     {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
-  {if (strLen($authScopeBooleanGroups) + strLen($customBooleanGroups)) > 0}
+  {if ($authScopeBooleanGroups.length() + $customBooleanGroups.length()) > 0}
   boolean_groups:
     {$authScopeBooleanGroups |indent: 4, true}{nil}
     {$customBooleanGroups |indent: 4, true}{nil}
@@ -167,26 +167,26 @@ runtime:
     {/if}
   {/let}
 
-  {if strLen($adminButton) > 0}
+  {if $adminButton.length() > 0}
   primaryButton:
     {$adminButton |indent: 4, true}{nil}
-  {if strLen($siteButton) > 0}
+  {if $siteButton.length() > 0}
   secondaryButton:
     {$siteButton |indent: 4, true}{nil}
-  {elseif strLen($connectButton) > 0}
+  {elseif $connectButton.length() > 0}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
 
-  {elseif strLen($siteButton) > 0}  // if strLen($adminButton) > 0
+  {elseif $siteButton.length() > 0}  // if strLen($adminButton) > 0
   primaryButton:
     {$siteButton |indent: 4, true}{nil}
-  {if strLen($connectButton) > 0}
+  {if $connectButton.length() > 0}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
 
-  {elseif strLen($connectButton) > 0}  // elseif strLen(siteButton) > 0
+  {elseif $connectButton.length() > 0}  // elseif strLen(siteButton) > 0
   primaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
@@ -202,12 +202,12 @@ runtime:
 
     {if $spec.postDeploy}
     {for $action in $spec.postDeploy.actionItemsList}
-    - heading: {$action.heading |yamlprimitive: 6}
-      {if $action.description}
-      description: {$action.description |yamlprimitive: 6}
+    - heading: {$action.getHeading() |yamlprimitive: 6}
+      {if $action.getDescription()}
+      description: {$action.getDescription() |yamlprimitive: 6}
       {/if}
-      {if $action.snippet}
-      snippet: {$action.snippet |yamlprimitive: 6}
+      {if $action.getSnippet()}
+      snippet: {$action.getSnippet() |yamlprimitive: 6}
       {/if}
       {if $action.showIf}
       showIf: '{{ {booleanExpressionDisplayCondition($action.showIf, $spec.tiersList)} }}'
@@ -249,11 +249,11 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 
 - name: {'instanceCount' |tierprefixed: $spec}
   title: Instance Count
-  {if $spec.instanceCount.tooltip}
-  tooltip: {$spec.instanceCount.tooltip}
+  {if $spec.instanceCount.getTooltip()}
+  tooltip: {$spec.instanceCount.getTooltip()}
   {/if}
-  {if $spec.instanceCount.description}
-  subtext: {$spec.instanceCount.description}
+  {if $spec.instanceCount.getDescription()}
+  subtext: {$spec.instanceCount.getDescription()}
   {/if}
   {$section}
 
@@ -263,10 +263,10 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   {$section}
   enumLabels:
     {for $image, $index in $spec.imagesList}
-    {if $image.label}
-    '{$index}': '{$image.label}'
+    {if $image.getLabel()}
+    '{$index}': '{$image.getLabel()}'
     {else}
-    '{$index}': '{$image.name}'
+    '{$index}': '{$image.getName()}'
     {/if}
     {/for}
 {/if}
@@ -278,18 +278,18 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 {call displayLib.acceleratorProperty}{param tier: $spec/}{/call}
 {/if}
 - name: {'bootDiskType' |tierprefixed: $spec}
-  title: {$spec.bootDisk.displayLabel + ' type' |yamlprimitive: 2}
+  title: {$spec.bootDisk.getDisplayLabel() + ' type' |yamlprimitive: 2}
   {$section}
 - name: {'bootDiskSizeGb' |tierprefixed: $spec}
-  title: {$spec.bootDisk.displayLabel + ' size in GB' |yamlprimitive: 2}
+  title: {$spec.bootDisk.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   {$section}
 
 {for $disk, $index in $spec.additionalDisksList}
 - name: {diskTypePropertyName($index, $spec) |yamlprimitive: 2}
-  title: {$disk.displayLabel + ' type' |yamlprimitive: 2}
+  title: {$disk.getDisplayLabel() + ' type' |yamlprimitive: 2}
   {$section}
 - name: {diskSizePropertyName($index, $spec) |yamlprimitive: 2}
-  title: {$disk.displayLabel + ' size in GB' |yamlprimitive: 2}
+  title: {$disk.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   {$section}
 {/for}
 

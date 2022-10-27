@@ -33,8 +33,8 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
     targetTags: ["{call utilities.firewallRuleTargetTag data="all"/}"]
     allowed:
       - IPProtocol: {call utilities.firewallRuleProtocol}{param spec: $spec/}{/call}
-        {if strLen($spec.port) > 0}
-        ports: ["{$spec.port}"]
+        {if $spec.getPort().length() > 0}
+        ports: ["{$spec.getPort()}"]
         {/if}
 {% endif %}
 {/template}
@@ -63,7 +63,7 @@ sourceRanges: ["0.0.0.0/0"]
 {template firewallRuleSource kind="text"}
   {@param spec: proto.FirewallRuleSpec}
   {@param? tierSpec: proto.VmTierSpec}
-  {switch $spec.allowedSource}
+  {switch $spec.getAllowedSource()}
     {case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
       {call firewallRuleSpecPublicSource data="all"/}
     {case proto.FirewallRuleSpec.TrafficSource.TIER}
@@ -103,12 +103,12 @@ sourceTags:
 {/let}
 {$firewallPropName}:
   type: boolean
-  default: {if $spec.defaultOff}False{else}True{/if}
+  default: {if $spec.getDefaultOff()}False{else}True{/if}
   x-googleProperty:
     type: GCE_FIREWALL
     gceFirewall:
       networkProperty: {'network' |tierprefixed: $tierSpec}
-{if $spec.allowedSource == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{if $spec.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
 {call utilities.firewallRuleSourceRangesPropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}:
   type: string
   x-googleProperty:
@@ -151,8 +151,8 @@ sourceTags:
 - name: {$resourceName}
   type: password.py
   properties:
-    length: {$password.length}
-    includeSymbols: {if $password.allowSpecialChars}True{else}False{/if}
+    length: {$password.getLength()}
+    includeSymbols: {if $password.getAllowSpecialChars()}True{else}False{/if}
 {/param}
 {/call}
 {/template}
@@ -185,7 +185,7 @@ sourceTags:
 {call utilities.passwordConditional}
 {param password: $password/}
 {param conditionalContent kind="text"}
-- key: {$password.metadataKey |yamlprimitive: 12}
+- key: {$password.getMetadataKey() |yamlprimitive: 12}
   value: {$outputReference}
 {/param}
 {/call}
@@ -202,7 +202,7 @@ sourceTags:
 {call utilities.passwordConditional}
 {param password: $password/}
 {param conditionalContent kind="text"}
-- key: {$password.metadataKey |yamlprimitive: 12}
+- key: {$password.getMetadataKey() |yamlprimitive: 12}
   value: {{ properties["{$propertyName}"] }}
 {/param}
 {/call}
@@ -248,9 +248,9 @@ sourceTags:
 - name: software-status
   type: software_status.py
   properties:
-    timeout: {$waiterSpec.waiterTimeoutSecs}
+    timeout: {$waiterSpec.getWaiterTimeoutSecs()}
     {if $dependsOnTierSpec}
-    prefix: {{ env['deployment'] }}-{$dependsOnTierSpec.name}
+    prefix: {{ env['deployment'] }}-{$dependsOnTierSpec.getName()}
     {/if}
     waiterDependsOn:
       {if $dependsOnList}
@@ -278,11 +278,11 @@ sourceTags:
   properties:
     {if $startupSpec}
     initScript: |-
-      {$startupSpec.bashScriptContent |indent: 6}
+      {$startupSpec.getBashScriptContent() |indent: 6}
     {/if}
-    {if $waiterSpec.script.checkScriptContent}
+    {if $waiterSpec.script.getCheckScriptContent()}
     checkScript: |-
-      {$waiterSpec.script.checkScriptContent |indent: 6}
+      {$waiterSpec.script.getCheckScriptContent() |indent: 6}
     {/if}
 {/if}
 
@@ -300,11 +300,11 @@ sourceTags:
 {template startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
 {@param? startupSpec: proto.GceStartupScriptSpec}
 {@param? waiterSpec: proto.ApplicationStatusSpec.WaiterSpec}
-{if $startupSpec?.bashScriptContent and not $waiterSpec?.script}
+{if $startupSpec?.getBashScriptContent() and not $waiterSpec?.script}
 - key: startup-script
   value: |-
     #!/bin/bash
-    {$startupSpec.bashScriptContent |indent: 4, false}
+    {$startupSpec?.getBashScriptContent() |indent: 4, false}
 {/if}
 {/template}
 
@@ -328,10 +328,10 @@ sourceTags:
 
 {if $waiterSpec.script}
 - key: status-uptime-deadline
-  value: {$waiterSpec.script.checkTimeoutSecs}
+  value: {$waiterSpec.script.getCheckTimeoutSecs()}
 {else}
 - key: status-uptime-deadline
-  value: {$waiterSpec.waiterTimeoutSecs}
+  value: {$waiterSpec.getWaiterTimeoutSecs()}
 {/if}
 
 {if $waiterSpec.script}
@@ -341,7 +341,7 @@ sourceTags:
   value: $(ref.software-status-script.startup-script)
 {/if}
 
-{if $waiterSpec.script?.disableStartupScriptUrl}
+{if $waiterSpec.script?.getDisableStartupScriptUrl()}
 - key: startup-script-url
   value: ''
 {/if}
@@ -352,11 +352,11 @@ sourceTags:
 
 /* If startup script and waiter are defined, use the startup script directly
  * when waiter usage is disabled. */
-{if $startupSpec?.bashScriptContent and $waiterSpec?.script}
+{if $startupSpec?.getBashScriptContent() and $waiterSpec?.script}
 - key: startup-script
   value: |-
     #!/bin/bash
-    {$startupSpec.bashScriptContent |indent: 4, false}
+    {$startupSpec?.getBashScriptContent() |indent: 4, false}
 {/if}
 
 {/if} // $statusWaiterEnabled
@@ -370,27 +370,27 @@ sourceTags:
 {@param? tierSpecList: list<proto.VmTierSpec>}
 {@param? deployInput: proto.DeployInputSpec}
 {for $metadata in $specList}
-- key: {$metadata.key |yamlprimitive: 2}
+- key: {$metadata.getKey() |yamlprimitive: 2}
 
-  {if $metadata.value}
-  value: {$metadata.value |yamlprimitive: 2}
+  {if $metadata.getValue()}
+  value: {$metadata.getValue() |yamlprimitive: 2}
 
   {elseif $metadata.tierVmNames}
   {let $tierVmNames: $metadata.tierVmNames/}
-  {let $tier: findVmTier($tierVmNames.tier, $tierSpecList)/}
+  {let $tier: findVmTier($tierVmNames.getTier(), $tierSpecList)/}
   {let $vmPrefix kind="text"}{call utilities.tierVmPrefix}{param spec: $tier/}{/call}{/let}
   {let $instanceCount kind="text"}
     properties["{'instanceCount' |tierprefixed: $tier}"]{nil}
   {/let}
 
   {if $metadata.tierVmNames.allVms}
-  {% set delimiter = joiner("{$metadata.tierVmNames.allVms.delimiter |doublequoted}") %}
+  {% set delimiter = joiner("{$metadata.tierVmNames.allVms.getDelimiter() |doublequoted}") %}
   value: {% for vmIndex in range({$instanceCount}) -%}
     {{- delimiter() }}{$vmPrefix}-{{ vmIndex -}}
   {%- endfor %}
 
   {else}
-  {let $vmIndex: $tierVmNames.vmIndex ?: 0/}
+  {let $vmIndex: $tierVmNames.getVmIndex() ?: 0/}
   {if $vmIndex >= 0}
   value: {$vmPrefix}-{$vmIndex}
   {else}
@@ -399,8 +399,8 @@ sourceTags:
 
   {/if /* $metadata.tierVmNames.allVms */}
 
-  {elseif $metadata.valueFromDeployInputField}
-  {let $field: findDeployInputField($metadata.valueFromDeployInputField, $deployInput)/}
+  {elseif $metadata.getValueFromDeployInputField()}
+  {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
   value: |-
          {{ properties["{deployInputFieldName($field)}"] }}
 
@@ -429,12 +429,12 @@ sourceTags:
 {if $stackdriver?.logging}
 enableStackdriverLogging:
   type: boolean
-  default: {if $stackdriver?.logging.defaultOn}True{else}False{/if}
+  default: {if $stackdriver?.logging.getDefaultOn()}True{else}False{/if}
 {/if}
 {if $stackdriver?.monitoring}
 enableStackdriverMonitoring:
   type: boolean
-  default: {if $stackdriver?.monitoring.defaultOn}True{else}False{/if}
+  default: {if $stackdriver?.monitoring.getDefaultOn()}True{else}False{/if}
 {/if}
 {/template}
 
@@ -483,8 +483,8 @@ serviceAccounts:
 {@param? zoneSpec: proto.ZoneSpec}
 {$name}:
   type: string
-  {if $zoneSpec and $zoneSpec.defaultZone}
-  default: {$zoneSpec.defaultZone}
+  {if $zoneSpec and $zoneSpec.getDefaultZone()}
+  default: {$zoneSpec.getDefaultZone()}
   {/if}
   x-googleProperty:
     type: GCE_ZONE
@@ -527,17 +527,17 @@ serviceAccounts:
 {@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
-  default: {$spec.defaultMachineType.gceMachineType}
+  default: {$spec.defaultMachineType.getGceMachineType()}
   x-googleProperty:
     type: GCE_MACHINE_TYPE
     zoneProperty: zone
     {if $spec.minimum}
     gceMachineType:
-      {if $spec.minimum.cpu}
-      minCpu: {$spec.minimum.cpu}
+      {if $spec.minimum.getCpu()}
+      minCpu: {$spec.minimum.getCpu()}
       {/if}
-      {if $spec.minimum.ramGb}
-      minRamGb: {$spec.minimum.ramGb}
+      {if $spec.minimum.getRamGb()}
+      minRamGb: {$spec.minimum.getRamGb()}
       {/if}
     {/if}
 {/template}
@@ -549,7 +549,7 @@ serviceAccounts:
 {@param? tier: proto.VmTierSpec}
 {$namePrefix + 'Type' |tierprefixed: $tier}:
   type: string
-  default: {$spec.defaultType}
+  default: {$spec.getDefaultType()}
   x-googleProperty:
     type: GCE_GPU_TYPE
     gceGpuType:
@@ -561,9 +561,9 @@ serviceAccounts:
 
 {$namePrefix + 'Count' |tierprefixed: $tier}:
   type: integer
-  default: {$spec.defaultCount ?: 0}
-  {if $spec.minCount > 0}
-  minimum: {$spec.minCount}
+  default: {$spec.getDefaultCount() ?: 0}
+  {if $spec.getMinCount() > 0}
+  minimum: {$spec.getMinCount()}
   {/if}
   x-googleProperty:
     type: GCE_GPU_COUNT
@@ -581,8 +581,8 @@ serviceAccounts:
 {$networkPropName}:
   type: array
   default: [default]
-  minItems: {$spec.minCount}
-  maxItems: {$spec.maxCount}
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
   x-googleProperty:
     type: GCE_NETWORK
     gceNetwork:
@@ -596,8 +596,8 @@ serviceAccounts:
       {/if}
 {'sub' + $nameSuffix |tierprefixed: $tier}:
   type: array
-  minItems: {$spec.minCount}
-  maxItems: {$spec.maxCount}
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
   x-googleProperty:
     type: GCE_SUBNETWORK
     zoneProperty: {$zonePropertyName}
@@ -605,14 +605,14 @@ serviceAccounts:
       networkProperty: {$networkPropName}
 {'externalIP' |tierprefixed: $tier}:
   type: array
-  default: [{externalIpTypeName($spec.externalIp.defaultType)}]
-  minItems: {$spec.minCount}
-  maxItems: {$spec.maxCount}
+  default: [{externalIpTypeName($spec.externalIp.getDefaultType())}]
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
   x-googleProperty:
     type: GCE_EXTERNAL_IP
     gceExternalIp:
       networkProperty: {$networkPropName}
-      notConfigurable: {if $spec.externalIp.notConfigurable}True{else}False{/if}
+      notConfigurable: {if $spec.externalIp.getNotConfigurable()}True{else}False{/if}
       allowStaticIps: True
 {/template}
 
@@ -626,7 +626,7 @@ serviceAccounts:
   enum:
     - 'On'
     - 'Off'
-  default: {if $spec.defaultOff}'Off'{else}'On'{/if}
+  default: {if $spec.getDefaultOff()}'Off'{else}'On'{/if}
 {/template}
 
 
@@ -636,15 +636,15 @@ serviceAccounts:
 {@param? tier: proto.VmTierSpec}
 {'bootDiskType' |tierprefixed: $tier}:
   type: string
-  default: {$spec.diskType.defaultType}
+  default: {$spec.diskType.getDefaultType()}
   x-googleProperty:
     type: GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
 {'bootDiskSizeGb' |tierprefixed: $tier}:
   type: integer
-  default: {$spec.diskSize.defaultSizeGb}
-  {if $spec.diskSize.minSizeGb}
-  minimum: {$spec.diskSize.minSizeGb}
+  default: {$spec.diskSize.getDefaultSizeGb()}
+  {if $spec.diskSize.getMinSizeGb()}
+  minimum: {$spec.diskSize.getMinSizeGb()}
   {/if}
   maximum: 10000
   x-googleProperty:
@@ -661,15 +661,15 @@ serviceAccounts:
 {@param? tier: proto.VmTierSpec}
 {diskTypePropertyName($diskIndex, $tier)}:
   type: string
-  default: {$spec.diskType.defaultType}
+  default: {$spec.diskType.getDefaultType()}
   x-googleProperty:
     type: GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
 {diskSizePropertyName($diskIndex, $tier)}:
   type: integer
-  default: {$spec.diskSize.defaultSizeGb}
-  {if $spec.diskSize.minSizeGb}
-  minimum: {$spec.diskSize.minSizeGb}
+  default: {$spec.diskSize.getDefaultSizeGb()}
+  {if $spec.diskSize.getMinSizeGb()}
+  minimum: {$spec.diskSize.getMinSizeGb()}
   {/if}
   maximum: 10000
   x-googleProperty:
@@ -685,10 +685,10 @@ serviceAccounts:
 {@param? tier: proto.VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: integer
-  default: {$spec.defaultValue}
+  default: {$spec.getDefaultValue()}
   {if $spec.range}
-  minimum: {$spec.range.startValue}
-  maximum: {$spec.range.endValue}
+  minimum: {$spec.range.getStartValue()}
+  maximum: {$spec.range.getEndValue()}
   {elseif $spec.list}
   enum:
     {for $value in $spec.list.valuesList}
@@ -718,27 +718,27 @@ serviceAccounts:
 {deployInputFieldName($field) |yamlprimitive: 0}:
 {if $field.booleanCheckbox}
   type: boolean
-  default: {if $field.booleanCheckbox.defaultValue}True{else}False{/if}
+  default: {if $field.booleanCheckbox.getDefaultValue()}True{else}False{/if}
 {elseif $field.groupedBooleanCheckbox}
   type: boolean
-  default: {if $field.groupedBooleanCheckbox.defaultValue}True{else}False{/if}
+  default: {if $field.groupedBooleanCheckbox.getDefaultValue()}True{else}False{/if}
 {elseif $field.integerBox}
   {let $box: $field.integerBox/}
   type: integer
   {if $box.defaultValue}
-  default: {$box.defaultValue.value ?: 0}
+  default: {$box.defaultValue.getValue() ?: 0}
   {/if}
   {if $box.validation.min}
-  minimum: {$box.validation.min.value ?: 0}
+  minimum: {$box.validation.min.getValue() ?: 0}
   {/if}
   {if $box.validation.max}
-  maximum: {$box.validation.max.value ?: 0}
+  maximum: {$box.validation.max.getValue() ?: 0}
   {/if}
 {elseif $field.integerDropdown}
   {let $dropdown: $field.integerDropdown/}
   type: integer
   {if $dropdown.defaultValueIndex}
-  {let $defaultIndex: $dropdown.defaultValueIndex.value ?: 0/}
+  {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
   default: {$dropdown.valuesList[$defaultIndex]}
   {/if}
   enum:
@@ -748,20 +748,20 @@ serviceAccounts:
 {elseif $field.stringBox}
   {let $box: $field.stringBox/}
   type: string
-  {if $box.defaultValue}
-  default: {$box.defaultValue |yamlprimitive: 2}
+  {if $box.getDefaultValue()}
+  default: {$box.getDefaultValue() |yamlprimitive: 2}
   {/if}
-  {if $box.validation?.regex}
-  pattern: {$box.validation.regex |yamlprimitive: 2}
+  {if $box.validation?.getRegex()}
+  pattern: {$box.validation.getRegex() |yamlprimitive: 2}
   {/if}
 {elseif $field.emailBox}
   {let $box: $field.emailBox/}
   type: string
-  {if $box.defaultValue}
-  default: {$box.defaultValue |yamlprimitive: 2}
+  {if $box.getDefaultValue()}
+  default: {$box.getDefaultValue() |yamlprimitive: 2}
   {/if}
-  {if $box.validation?.regex}
-  pattern: {$box.validation.regex |yamlprimitive: 2}
+  {if $box.validation?.getRegex()}
+  pattern: {$box.validation.getRegex() |yamlprimitive: 2}
   {/if}
   x-googleProperty:
     type: EMAIL_ADDRESS
@@ -769,7 +769,7 @@ serviceAccounts:
   {let $dropdown: $field.stringDropdown/}
   type: string
   {if $dropdown.defaultValueIndex}
-  {let $defaultIndex: $dropdown.defaultValueIndex.value ?: 0/}
+  {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
   default: {$dropdown.valuesList[$defaultIndex] |yamlprimitive: 2}
   {/if}
   enum:
@@ -780,7 +780,7 @@ serviceAccounts:
   {let $dropdown: $field.zoneDropdown/}
   type: string
   {if $dropdown.defaultValue}
-  default: {$dropdown.defaultValue.value ?: '' |yamlprimitive: 2}
+  default: {$dropdown.defaultValue.getValue() ?: '' |yamlprimitive: 2}
   {/if}
   x-googleProperty:
     type: GCE_ZONE
@@ -796,7 +796,7 @@ serviceAccounts:
   listDeployInputFields($inputSpec, $tierSpec)
   : listDeployInputFields($inputSpec)/}
 {for $field in $fields}
-{if $field.required}
+{if $field.getRequired()}
 - {deployInputFieldName($field)}
 {/if}
 {/for}
@@ -808,15 +808,15 @@ serviceAccounts:
 {@param enabledContent: string}
 {@param disabledContent: string}
 {@param jinjaConditionalVariableName: string}
-{if strLen($enabledContent) > 0}
+{if $enabledContent.length() > 0}
 {% if {$jinjaConditionalVariableName} %}
 {$enabledContent}{nil}
-{if strLen($disabledContent) > 0}
+{if $disabledContent.length() > 0}
 {% else %}
 {$disabledContent}{nil}
 {/if}
 {% endif %}
-{elseif strLen($disabledContent) > 0}
+{elseif $disabledContent.length() > 0}
 {% if not {$jinjaConditionalVariableName} %}
 {$disabledContent}{nil}
 {% endif %}
@@ -827,10 +827,10 @@ serviceAccounts:
 {template localSsdPropertyItem kind="text"}
 {@param localSsdSpec: proto.LocalSsdSpec}
 {@param deployInput: proto.DeployInputSpec}
-{if $localSsdSpec.count and $localSsdSpec.count > 0}
-localSSDs: {$localSsdSpec.count}{nil}
-{elseif $localSsdSpec.countFromDeployInputField}
-{let $field: findDeployInputField($localSsdSpec.countFromDeployInputField, $deployInput)/}
+{if $localSsdSpec.getCount() and $localSsdSpec.getCount() > 0}
+localSSDs: {$localSsdSpec.getCount()}{nil}
+{elseif $localSsdSpec.getCountFromDeployInputField()}
+{let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
 localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {/if}
 {/template}
@@ -843,10 +843,10 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {@param instanceName: string}
 {for $disk, $index in $additionalDisksList}
 {let $deviceNameSuffix kind="text"}
-  {if $disk.deviceNameSuffix.name}
-    {$disk.deviceNameSuffix.name}{nil}
-  {elseif $disk.deviceNameSuffix.nameFromDeployInputField}
-    {let $field: findDeployInputField($disk.deviceNameSuffix.nameFromDeployInputField, $deployInputSpec)/}
+  {if $disk.deviceNameSuffix.getName()}
+    {$disk.deviceNameSuffix.getName()}{nil}
+  {elseif $disk.deviceNameSuffix.getNameFromDeployInputField()}
+    {let $field: findDeployInputField($disk.deviceNameSuffix.getNameFromDeployInputField(), $deployInputSpec)/}
     {{ properties["{deployInputFieldName($field)}"] }}{nil}
   {/if}
 {/let}
@@ -855,6 +855,6 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
   diskType: {{ properties["{diskTypePropertyName($index, $tierSpec)}"] }}
   diskSizeGb: {{ properties["{diskSizePropertyName($index, $tierSpec)}"] }}
   boot: False
-  autoDelete: {$disk.preventAutoDeletion ? 'False' : 'True'}
+  autoDelete: {$disk.getPreventAutoDeletion() ? 'False' : 'True'}
 {/for}
 {/template}

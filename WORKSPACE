@@ -1,8 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-RULES_JVM_EXTERNAL_TAG = "3.3"
-
-RULES_JVM_EXTERNAL_SHA = "d85951a92c0908c80bd8551002d66cb23c3434409c814179c0ff026b53544dab"
+RULES_JVM_EXTERNAL_TAG = "4.2"
+RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
 
 http_archive(
     name = "rules_jvm_external",
@@ -11,25 +10,14 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
-http_archive(
-    name = "six",
-    build_file = "@//third_party:six.BUILD",
-    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-    strip_prefix = "six-1.10.0",
-    urls = [
-        "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
-        "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
-    ],
-)
-
 # proto_library, cc_proto_library, and java_proto_library rules implicitly
 # depend on @com_google_protobuf for protoc and proto runtimes.
 # This statement defines the @com_google_protobuf repo.
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "aed089110977f7cabda19d550b4d503eb93fa0f73c7a470c4695f27b63029544",
-    strip_prefix = "protobuf-3.9.1",
-    urls = ["https://github.com/protocolbuffers/protobuf/releases/download/v3.9.1/protobuf-all-3.9.1.zip"],
+    sha256 = "cf6b0458b280081a07b236278abf48321bac0a268bc14ef3510da624ea243993",
+    strip_prefix = "protobuf-21.8",
+    urls = ["https://github.com/protocolbuffers/protobuf/releases/download/v21.8/protobuf-all-21.8.zip"]
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -75,7 +63,7 @@ maven_install(
         "com.google.inject:guice:5.1.0",
         "com.google.protobuf:protobuf-java-util:3.12.2",
         "com.google.protobuf:protobuf-java:3.12.2",
-        "com.google.template:soy:2022-03-07",
+        "com.google.template:soy:2022-10-26",
         "com.google.truth.extensions:truth-liteproto-extension:1.0",
         "com.google.truth.extensions:truth-proto-extension:1.0",
         "com.google.truth:truth:1.0",
@@ -86,8 +74,7 @@ maven_install(
         "org.apache.commons:commons-lang3:3.6",
         "org.hamcrest:hamcrest-core:1.3",
         "org.hamcrest:hamcrest-library:1.3",
-        "org.ow2.asm:asm-all:6.0_BETA",
-        "org.ow2.asm:asm:7.0",
+        "org.ow2.asm:asm:9.4",
         "org.yaml:snakeyaml:1.19",
     ],
     fetch_sources = True,

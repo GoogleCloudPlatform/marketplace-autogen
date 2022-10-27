@@ -13,10 +13,10 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {@param? templateVersion: string}
 
 {let $waiterSpec:
-    ($spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.WAITER)
+    ($spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.WAITER)
     ? $spec.applicationStatus.waiter : null/}
 {let $enableLegacyStatus:
-    $spec.applicationStatus?.type == proto.ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
+    $spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
 
 imports:
   - name: common.py
@@ -48,7 +48,7 @@ info:
   version: '1.0'
   {/if}
   {if $solutionInfo}
-  title: {$solutionInfo.name + ' Template' |yamlprimitive: 2}
+  title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 2}
   {else}
   title: {$solutionId + ' template' |yamlprimitive: 2}
   {/if}
@@ -125,7 +125,7 @@ properties:
   {for $scope in $spec.gcpAuthScopesList}
   {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}:
     type: boolean
-    default: {if $scope.defaultOff}False{else}True{/if}
+    default: {if $scope.getDefaultOff()}False{else}True{/if}
   {/for}
 
   {let $bootDiskProps kind="text"}
