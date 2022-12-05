@@ -1,19 +1,19 @@
 {namespace vm.single.jinja}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {ApplicationStatusSpec,ExternalIpSpec,SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 
 /** Generates top level template solution.jinja file. */
 {template main kind="text"}
-{@param spec: proto.SingleVmDeploymentPackageSpec}
+{@param spec: SingleVmDeploymentPackageSpec}
 
 {let $waiterSpec:
-    $spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.WAITER
+    $spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.WAITER
     ? $spec.applicationStatus.waiter : null/}
 {let $enableLegacyStatus:
-    $spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
+    $spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
 
 {% import "path_utils.jinja" as path_utils with context %}
 {\n}
@@ -40,7 +40,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 
-{% set hasExternalIP = externalIPs and externalIPs[0] != "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+{% set hasExternalIP = externalIPs and externalIPs[0] != "{externalIpTypeName(ExternalIpSpec.Type.NONE)}" %}
 
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
@@ -306,7 +306,7 @@ outputs:
 
 
 {template passwordMetadataItems kind="text" /* visibility="private" */}
-{@param spec: proto.SingleVmDeploymentPackageSpec}
+{@param spec: SingleVmDeploymentPackageSpec}
 {for $password, $index in $spec.passwordsList}
 {let $passwordMetadata kind="text"}
   {call renders.passwordMetadataFromOutput}

@@ -1,11 +1,11 @@
 {namespace vm.multi.jinja}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {ExternalIpSpec,FirewallRuleSpec,MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 {template main kind="text"}
-{@param spec: proto.MultiVmDeploymentPackageSpec}
+{@param spec: MultiVmDeploymentPackageSpec}
 
 {% import "path_utils.jinja" as path_utils with context %}
 {\n}
@@ -14,7 +14,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {for $tier in $spec.tiersList}
 {let $tierExternalIPs: tierPrefixed('externalIPs', $tier)/}
 {% set {$tierExternalIPs} = properties["{$tier.getName()}_externalIP"] %}
-{% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(proto.ExternalIpSpec.Type.NONE)}" %}
+{% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(ExternalIpSpec.Type.NONE)}" %}
 {% set tiersWithNoExternalIPCount = tiersWithNoExternalIPCount + 1 %}
 {% endif %}
 
@@ -76,7 +76,7 @@ resources:
         {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}
       {/let}
       {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
-      {if $firewallRule.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+      {if $firewallRule.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
       {let $sourcesPropName kind="text"}
         {call utilities.firewallRuleSourceRangesPropName}{param spec: $firewallRule/}{/call}
       {/let}

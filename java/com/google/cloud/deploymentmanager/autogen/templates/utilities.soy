@@ -1,17 +1,17 @@
 {namespace utilities}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Produces the property name for a firewall rule. */
 {template firewallRulePropName kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
 {switch $spec.getProtocol()}
-  {case proto.FirewallRuleSpec.Protocol.TCP}
+  {case FirewallRuleSpec.Protocol.TCP}
     {'enableTcp' + $spec.getPort() |tierprefixed: $tierSpec}{nil}
-  {case proto.FirewallRuleSpec.Protocol.UDP}
+  {case FirewallRuleSpec.Protocol.UDP}
     {'enableUdp' + $spec.getPort() |tierprefixed: $tierSpec}{nil}
-  {case proto.FirewallRuleSpec.Protocol.ICMP}
+  {case FirewallRuleSpec.Protocol.ICMP}
     {'enableIcmp' + $spec.getPort() |tierprefixed: $tierSpec}{nil}
 {/switch}
 {/template}
@@ -19,7 +19,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the targetTag for a firewall rule. */
 {template firewallRuleTargetTag kind="text"}
-{@param? tierSpec: proto.VmTierSpec}
+{@param? tierSpec: VmTierSpec}
 {if not $tierSpec}
 {call deploymentTag data="all"/}{nil}
 {else}
@@ -30,8 +30,8 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the name for a firewall rule. */
 {template firewallRuleName kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
 {{ env["deployment"] }}{call firewallRuleNameSuffix data="all"/}{nil}
 {/template}
 
@@ -41,19 +41,19 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * The suffix includes only the "-TCP-80" part.
  */
 {template firewallRuleNameSuffix kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
   {let $portSuffix kind="text"}
     {call firewallRulePortSuffix}
       {param spec: $spec /}
     {/call}
   {/let}
 {switch $spec.getProtocol()}
-  {case proto.FirewallRuleSpec.Protocol.TCP}
+  {case FirewallRuleSpec.Protocol.TCP}
     -{'tcp' + $portSuffix |tierprefixed: $tierSpec, '-'}{nil}
-  {case proto.FirewallRuleSpec.Protocol.UDP}
+  {case FirewallRuleSpec.Protocol.UDP}
     -{'udp' + $portSuffix |tierprefixed: $tierSpec, '-'}{nil}
-  {case proto.FirewallRuleSpec.Protocol.ICMP}
+  {case FirewallRuleSpec.Protocol.ICMP}
     -{'icmp' |tierprefixed: $tierSpec, '-'}{nil}
 {/switch}
 {/template}
@@ -64,7 +64,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * tier spec).
  */
 {template firewallRuleTargetTagSuffix kind="text"}
-{@param? tierSpec: proto.VmTierSpec}
+{@param? tierSpec: VmTierSpec}
 {if not $tierSpec}
   -deployment{nil}
 {else}
@@ -78,7 +78,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * In other case it returns "", empty string.
  */
 {template firewallRulePortSuffix kind="text"}
-{@param spec: proto.FirewallRuleSpec}
+{@param spec: FirewallRuleSpec}
 {if $spec.getPort().length() > 0}
 -{$spec.getPort()}{nil}
 {/if}
@@ -87,13 +87,13 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the protocol as an uppercased string. */
 {template firewallRuleProtocol kind="text"}
-{@param spec: proto.FirewallRuleSpec}
+{@param spec: FirewallRuleSpec}
 {switch $spec.getProtocol()}
-  {case proto.FirewallRuleSpec.Protocol.TCP}
+  {case FirewallRuleSpec.Protocol.TCP}
     TCP{nil}
-  {case proto.FirewallRuleSpec.Protocol.UDP}
+  {case FirewallRuleSpec.Protocol.UDP}
     UDP{nil}
-  {case proto.FirewallRuleSpec.Protocol.ICMP}
+  {case FirewallRuleSpec.Protocol.ICMP}
     ICMP{nil}
 {/switch}
 {/template}
@@ -104,10 +104,10 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
  * "TCP 123" or "HTTPS".
  */
 {template firewallRuleTitle kind="text"}
-{@param spec: proto.FirewallRuleSpec}
+{@param spec: FirewallRuleSpec}
 {if $spec.getPort().length() > 0}
 {switch $spec.getProtocol()}
-  {case proto.FirewallRuleSpec.Protocol.TCP}
+  {case FirewallRuleSpec.Protocol.TCP}
     {if $spec.getPort() == 80}
       HTTP{nil}
     {elseif $spec.getPort() == 443 }
@@ -115,7 +115,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
     {else}
       TCP port {$spec.getPort()}{nil}
     {/if}
-  {case proto.FirewallRuleSpec.Protocol.UDP}
+  {case FirewallRuleSpec.Protocol.UDP}
     UDP port {$spec.getPort()}{nil}
 {/switch}
 {else}
@@ -126,14 +126,14 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the property name for firewall rule source ranges. */
 {template firewallRuleSourceRangesPropName kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
 {switch $spec.getProtocol()}
-  {case proto.FirewallRuleSpec.Protocol.TCP}
+  {case FirewallRuleSpec.Protocol.TCP}
     {'tcp' + $spec.getPort() + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
-  {case proto.FirewallRuleSpec.Protocol.UDP}
+  {case FirewallRuleSpec.Protocol.UDP}
     {'udp' + $spec.getPort() + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
-  {case proto.FirewallRuleSpec.Protocol.ICMP}
+  {case FirewallRuleSpec.Protocol.ICMP}
     {'icmp' + $spec.getPort() + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
 {/switch}
 {/template}
@@ -141,20 +141,20 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the property name for an API scope. */
 {template gcpAuthScopePropertyName kind="text"}
-{@param spec: proto.GcpAuthScopeSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: GcpAuthScopeSpec}
+{@param? tierSpec: VmTierSpec}
 {switch $spec.getScope()}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     {'enableCloudReadonlyApi' |tierprefixed: $tierSpec}{nil}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
     {'enableCloudApi' |tierprefixed: $tierSpec}{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
     {'enableComputeReadonlyApi' |tierprefixed: $tierSpec}{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
     {'enableComputeApi' |tierprefixed: $tierSpec}{nil}
-  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
     {'enableSourceReadWriteApi' |tierprefixed: $tierSpec}{nil}
-  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     {'enableProjecthostingApi' |tierprefixed: $tierSpec}{nil}
 {/switch}
 {/template}
@@ -162,19 +162,19 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the URL for an API scope. */
 {template gcpAuthScopeUrl kind="text"}
-{@param spec: proto.GcpAuthScopeSpec}
+{@param spec: GcpAuthScopeSpec}
 {switch $spec.getScope()}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     https://www.googleapis.com/auth/cloud-platform.read-only{nil}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
     https://www.googleapis.com/auth/cloud-platform{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
     https://www.googleapis.com/auth/compute.readonly{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
     https://www.googleapis.com/auth/compute{nil}
-  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
     https://www.googleapis.com/auth/source.read_write{nil}
-  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     https://www.googleapis.com/auth/projecthosting{nil}
 {/switch}
 {/template}
@@ -182,13 +182,13 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 /** Produces the URL for an InstanceUrlSpec. */
 {template makeUrl kind="text"}
-{@param spec: proto.InstanceUrlSpec}
+{@param spec: InstanceUrlSpec}
 {@param ip: string}
 {let $scheme kind="text"}
   {switch $spec.getScheme()}
-    {case proto.InstanceUrlSpec.Scheme.HTTP}
+    {case InstanceUrlSpec.Scheme.HTTP}
       http{nil}
-    {case proto.InstanceUrlSpec.Scheme.HTTPS}
+    {case InstanceUrlSpec.Scheme.HTTPS}
       https{nil}
   {/switch}
 {/let}
@@ -201,7 +201,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 
 
 {template tierVmPrefix kind="text"}
-{@param spec: proto.VmTierSpec}
+{@param spec: VmTierSpec}
 {{ env["deployment"] }}-{$spec.getName()}-vm{nil}
 {/template}
 
@@ -209,7 +209,7 @@ import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployme
 /** Constructs an optionally conditional expression to print text
  * related to password generation condition */
 {template passwordConditional kind="text"}
-{@param password: proto.PasswordSpec}
+{@param password: PasswordSpec}
 {@param conditionalContent: string}
 {if $password.generateIf}
 {% if {booleanExpressionJinjaExpression($password.generateIf)} %}
@@ -248,6 +248,6 @@ $(ref.{$resourceName}.password){nil}
 
 
 {template tierTag kind="text"}
-{@param spec: proto.VmTierSpec}
+{@param spec: VmTierSpec}
 {{ env["deployment"] }}-{$spec.getName()}-tier{nil}
 {/template}

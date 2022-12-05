@@ -1,11 +1,11 @@
 {namespace display}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {DeployInputField,DeployInputSection,DeployInputSpec,FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,MultiVmDeploymentPackageSpec,PasswordSpec,PostDeployInfo,SingleVmDeploymentPackageSpec,StackdriverSpec,TierVmInstance,VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 {template openPortAction kind="text"}
-{@param spec: proto.FirewallRuleSpec}
-{@param? tierSpec: proto.VmTierSpec}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
 {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle data="all"/}{/let}
 {let $protocol kind="text"}{call utilities.firewallRuleProtocol data="all"/}{/let}
 {let $heading kind="text"}
@@ -44,9 +44,9 @@ Open {$firewallTitle} traffic{nil}
     {else}
     --allow {$protocol |lowercased}
     {/if}
-    {if $tierSpec and $spec.getAllowedSource() != proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+    {if $tierSpec and $spec.getAllowedSource() != FirewallRuleSpec.TrafficSource.PUBLIC}
     {let $sourceTag kind="text"}
-      {if $spec.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.TIER}
+      {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.TIER}
         "{{ outputs().deployment }}-{$tierSpec.getName()}-tier"{nil}
       {else}
         "{{ outputs().deployment }}-deployment"{nil}
@@ -60,21 +60,21 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template firewallRuleTrafficLabel kind="text"}
-{@param firewallSpec: proto.FirewallRuleSpec}
+{@param firewallSpec: FirewallRuleSpec}
 {switch $firewallSpec.getAllowedSource()}
-{case proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{case FirewallRuleSpec.TrafficSource.PUBLIC}
   from the Internet{nil}
-{case proto.FirewallRuleSpec.TrafficSource.TIER}
+{case FirewallRuleSpec.TrafficSource.TIER}
   between VMs in this group{nil}
-{case proto.FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+{case FirewallRuleSpec.TrafficSource.DEPLOYMENT}
   from other VMs in this deployment{nil}
 {/switch}
 {/template}
 
 
 {template firewallDisplayProperties kind="text"}
-{@param firewallsList: list<proto.FirewallRuleSpec>}
-{@param? tierSpec: proto.VmTierSpec}
+{@param firewallsList: list<FirewallRuleSpec>}
+{@param? tierSpec: VmTierSpec}
 {let $section kind="text"}
   {if $tierSpec}
     {call tierSectionName}{param spec: $tierSpec/}{/call}{nil}
@@ -94,9 +94,9 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template firewallDisplayProperty kind="text"}
-{@param firewallSpec: proto.FirewallRuleSpec}
+{@param firewallSpec: FirewallRuleSpec}
 {@param section: string}
-{@param? tierSpec: proto.VmTierSpec}
+{@param? tierSpec: VmTierSpec}
 {let $propName kind="text"}
   {call utilities.firewallRulePropName}
     {param spec: $firewallSpec/}
@@ -107,7 +107,7 @@ Open {$firewallTitle} traffic{nil}
 - name: {$propName}
   title: Allow {$firewallTitle} traffic {call firewallRuleTrafficLabel}{param firewallSpec: $firewallSpec/}{/call}
   section: {$section}
-{if $firewallSpec.getAllowedSource() == proto.FirewallRuleSpec.TrafficSource.PUBLIC}
+{if $firewallSpec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $rangePropName kind="text"}
   {call utilities.firewallRuleSourceRangesPropName}
     {param spec: $firewallSpec/}
@@ -124,69 +124,69 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template authScopeDescription kind="text"}
-{@param spec: proto.GcpAuthScopeSpec}
+{@param spec: GcpAuthScopeSpec}
 {switch $spec.getScope()}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     read only access to all of Google Cloud Platform APIs{nil}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
     full access to all of Google Cloud Platform APIs{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
     read access to Google Compute Engine APIs{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
     read write access to Google Compute Engine APIs{nil}
-  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
     read write access to Google Cloud Source Repositories APIs{nil}
-  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     project hosting access to (Deprecated) Google Code Project Hosting APIs{nil}
 {/switch}
 {/template}
 
 
 {template authScopeBoolGroupName kind="text"}
-{@param spec: proto.GcpAuthScopeSpec}
-{@param? tier: proto.VmTierSpec}
+{@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec}
 {if $tier}
 {call tierSectionName}{param spec: $tier/}{/call}_{nil}
 {/if}
 {switch $spec.getScope()}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     CLOUD_PLATFORM_READONLY_API_ACCESS{nil}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
     CLOUD_PLATFORM_API_ACCESS{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
     COMPUTE_READONLY_API_ACCESS{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
     COMPUTE_API_ACCESS{nil}
-  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
     SOURCE_READ_WRITE_API_ACCESS{nil}
-  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     PROJECT_HOSTING_API_ACCESS{nil}
 {/switch}
 {/template}
 
 
 {template authScopeBoolGroupTitle kind="text"}
-{@param spec: proto.GcpAuthScopeSpec}
+{@param spec: GcpAuthScopeSpec}
 {switch $spec.getScope()}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     Google Cloud Platform Readonly API{nil}
-  {case proto.GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
     Google Cloud Platform API{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
     Compute Readonly API{nil}
-  {case proto.GcpAuthScopeSpec.Scope.COMPUTE}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
     Compute API{nil}
-  {case proto.GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
     Cloud Source Repositories Readwrite API{nil}
-  {case proto.GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     (Deprecated) Code Project Hosting APIs{nil}
 {/switch}
 {/template}
 
 
 {template makeExternalUrlLink kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 // Specifies the right kinds so that HTML escapes are done correctly.
 // Note that we do not put the IP expression into the original URL to
 // prevent it from being incorrectly escaped.
@@ -204,8 +204,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template makeInternalUrl kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call vmOutputExpression}
@@ -219,8 +219,8 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template makeExternalUrl kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call vmOutputExpression}
@@ -235,8 +235,8 @@ Open {$firewallTitle} traffic{nil}
 
 {template vmOutputExpression kind="text"}
 {@param baseOutputName: string}
-{@param? spec: proto.TierVmInstance}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param? spec: TierVmInstance}
+{@param? tiersList: list<VmTierSpec>}
 {if $spec}
   {let $tier: findVmTier($spec.getTier(), $tiersList)/}
   {let $prefix kind="text"}{$baseOutputName |tierprefixed: $tier}{nil}{/let}
@@ -256,9 +256,9 @@ Open {$firewallTitle} traffic{nil}
 
 
 {template deployInputFieldDisplay kind="text"}
-{@param section: proto.DeployInputSection}
-{@param field: proto.DeployInputField}
-{@param? tierList: list<proto.VmTierSpec>}
+{@param section: DeployInputSection}
+{@param field: DeployInputField}
+{@param? tierList: list<VmTierSpec>}
 name: {deployInputFieldName($field) |yamlprimitive: 0}
 {if $field.getTitle()}
 title: {$field.getTitle() |yamlprimitive: 0}
@@ -279,10 +279,10 @@ validation: {$field.emailBox.validation.getDescription() |yamlprimitive: 0}
 {if $field.getLevel()}
 level: {$field.getLevel()}
 {/if}
-{if $section.getPlacement() == proto.DeployInputSection.Placement.CUSTOM_TOP or
-    $section.getPlacement() == proto.DeployInputSection.Placement.CUSTOM_BOTTOM}
+{if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
+    $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
 section: {$section.getName() |yamlprimitive: 0}
-{elseif $section.getPlacement() == proto.DeployInputSection.Placement.TIER}
+{elseif $section.getPlacement() == DeployInputSection.Placement.TIER}
 section: {call tierSectionName}{param spec: findVmTier($section.getTier(), $tierList)/}{/call}
 {/if}
 
@@ -320,7 +320,7 @@ enumLabels:
 
 
 {template stackdriverDisplay kind="text"}
-{@param stackdriver: proto.StackdriverSpec}
+{@param stackdriver: StackdriverSpec}
 {if $stackdriver?.logging}
 - name: enableStackdriverLogging
   title: Enable Stackdriver Logging
@@ -337,7 +337,7 @@ enumLabels:
 
 
 {template stackdriverBottomSections kind="text"}
-{@param stackdriver: proto.StackdriverSpec}
+{@param stackdriver: StackdriverSpec}
 {if $stackdriver?.logging or $stackdriver?.monitoring}
 - name: STACKDRIVER
   title: Stackdriver
@@ -347,11 +347,11 @@ enumLabels:
 
 
 {template topSections kind="text"}
-{@param? spec: proto.DeployInputSpec}
+{@param? spec: DeployInputSpec}
 {let $output kind="text"}
   {call customSectionsHelper}
     {param spec: $spec/}
-    {param placement: proto.DeployInputSection.Placement.CUSTOM_TOP/}
+    {param placement: DeployInputSection.Placement.CUSTOM_TOP/}
   {/call}
 {/let}
 {$output |indent: 4, true}{nil}
@@ -359,11 +359,11 @@ enumLabels:
 
 
 {template bottomSections kind="text"}
-{@param? spec: proto.DeployInputSpec}
+{@param? spec: DeployInputSpec}
 {let $output kind="text"}
   {call customSectionsHelper}
     {param spec: $spec/}
-    {param placement: proto.DeployInputSection.Placement.CUSTOM_BOTTOM/}
+    {param placement: DeployInputSection.Placement.CUSTOM_BOTTOM/}
   {/call}
 {/let}
 {$output |indent: 4, true}{nil}
@@ -371,8 +371,8 @@ enumLabels:
 
 
 {template customSectionsHelper kind="text"}
-{@param? spec: proto.DeployInputSpec}
-{@param placement: proto.DeployInputSection.Placement}
+{@param? spec: DeployInputSpec}
+{@param placement: DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.sectionsList}
 {if $section.getPlacement() == $placement}
@@ -391,7 +391,7 @@ enumLabels:
 
 
 {template customBooleanGroups kind="text"}
-{@param? spec: proto.DeployInputSpec}
+{@param? spec: DeployInputSpec}
 {if $spec}
 {for $section in $spec.sectionsList}
 {for $field in $section.fieldsList}
@@ -413,14 +413,14 @@ enumLabels:
 
 
 {template tierSectionName kind="text"}
-{@param spec: proto.VmTierSpec}
+{@param spec: VmTierSpec}
 {$spec.getName() |uppercased}_TIER{nil}
 {/template}
 
 
 {template authScopeBooleanGroups kind="text"}
-{@param? singleVmSpec: proto.SingleVmDeploymentPackageSpec}
-{@param? multiVmSpec: proto.MultiVmDeploymentPackageSpec}
+{@param? singleVmSpec: SingleVmDeploymentPackageSpec}
+{@param? multiVmSpec: MultiVmDeploymentPackageSpec}
 {if $singleVmSpec}
 {for $scope in $singleVmSpec.gcpAuthScopesList}
 - name: {call authScopeBoolGroupName}{param spec: $scope/}{/call}
@@ -440,8 +440,8 @@ enumLabels:
 
 
 {template siteUrlApplicationTableRow kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $content kind="text"}
   {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Site address'/}
@@ -452,8 +452,8 @@ enumLabels:
 
 
 {template adminUrlApplicationTableRow kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $content kind="text"}
   {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Admin URL'/}
@@ -465,8 +465,8 @@ enumLabels:
 
 {template instanceUrlApplicationTableRow kind="text"}
 {@param label: string}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $externalUrl kind="text"}
   {call makeExternalUrlLink}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
@@ -490,9 +490,9 @@ enumLabels:
 
 
 {template passwordApplicationTableRows kind="text"}
-{@param passwordsList: list<proto.PasswordSpec>}
-{@param? deployInput: proto.DeployInputSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param passwordsList: list<PasswordSpec>}
+{@param? deployInput: DeployInputSpec}
+{@param? tiersList: list<VmTierSpec>}
 {for $password, $index in $passwordsList}
 {if $password.getUsername()}
 - label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
@@ -518,9 +518,9 @@ enumLabels:
 
 
 {template infoRowApplicationTableRow kind="text"}
-{@param infoRow: proto.PostDeployInfo.InfoRow}
-{@param? deployInput: proto.DeployInputSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param infoRow: PostDeployInfo.InfoRow}
+{@param? deployInput: DeployInputSpec}
+{@param? tiersList: list<VmTierSpec>}
 - label: {$infoRow.getLabel() |yamlprimitive: 8}
 {if $infoRow.getValue()}
   value: {$infoRow.getValue() |yamlprimitive: 8}
@@ -535,8 +535,8 @@ enumLabels:
 
 
 {template adminActionButton kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Log into the admin panel
 type: TYPE_URL
@@ -545,8 +545,8 @@ action: {$actionUrl |yamlprimitive: 0}
 
 
 {template siteActionButton kind="text"}
-{@param spec: proto.InstanceUrlSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param spec: InstanceUrlSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Visit the site
 type: TYPE_URL
@@ -555,8 +555,8 @@ action: {$actionUrl |yamlprimitive: 0}
 
 
 {template connectActionButton kind="text"}
-{@param? button: proto.PostDeployInfo.ConnectToInstanceSpec}
-{@param? tiersList: list<proto.VmTierSpec>}
+{@param? button: PostDeployInfo.ConnectToInstanceSpec}
+{@param? tiersList: list<VmTierSpec>}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
@@ -573,7 +573,7 @@ action: '{{ {$output} }}'
 
 
 {template acceleratorProperty kind="text"}
-{@param? tier: proto.VmTierSpec}
+{@param? tier: VmTierSpec}
 - name: {'acceleratorType' |tierprefixed: $tier}
   title: GPUs
 {if $tier}

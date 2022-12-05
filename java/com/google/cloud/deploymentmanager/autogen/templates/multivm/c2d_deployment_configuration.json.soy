@@ -1,9 +1,9 @@
 {namespace vm.multi.c2d_deployment_configuration}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
-{@param spec: proto.MultiVmDeploymentPackageSpec}
+{@param spec: MultiVmDeploymentPackageSpec}
 
 {lb}
   "defaultDeploymentType": "MULTI_VM",

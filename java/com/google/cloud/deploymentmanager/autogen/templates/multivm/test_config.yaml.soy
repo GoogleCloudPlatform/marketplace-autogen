@@ -1,11 +1,11 @@
 {namespace vm.multi.test_config}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /** Generates top level template solution.jinja file. */
 {template main kind="text"}
 {@param solutionId: string}
-{@param spec: proto.MultiVmDeploymentPackageSpec}
+{@param spec: MultiVmDeploymentPackageSpec}
 
 {let $template: $solutionId + '.jinja'/}
 

@@ -1,6 +1,6 @@
 {namespace vm.multi.display}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {MultiVmDeploymentPackageSpec,VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {PartnerMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 import * as displayLib from 'com/google/cloud/deploymentmanager/autogen/templates/display.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
@@ -8,7 +8,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 /** Generates solution.jinja.display file. */
 {template main kind="text"}
-{@param spec: proto.MultiVmDeploymentPackageSpec}
+{@param spec: MultiVmDeploymentPackageSpec}
 {@param? partnerId: string}
 {@param? partnerInfo: PartnerMarketingInfo}
 {@param? descriptionYaml: string}
@@ -242,7 +242,7 @@ metadata_version: v1
 
 
 {template displayTierProperties kind="text" /*visibility="private"*/}
-{@param spec: proto.VmTierSpec}
+{@param spec: VmTierSpec}
 {let $section kind="text"}
 section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 {/let}

@@ -1,13 +1,13 @@
 {namespace vm.single.display}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {PartnerMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 import * as displayLib from 'com/google/cloud/deploymentmanager/autogen/templates/display.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
 
 /** Generates solution.jinja.display file. */
 {template main kind="text"}
-{@param spec: proto.SingleVmDeploymentPackageSpec}
+{@param spec: SingleVmDeploymentPackageSpec}
 {@param? partnerId: string}
 {@param? partnerInfo: PartnerMarketingInfo}
 {@param? descriptionYaml: string}
