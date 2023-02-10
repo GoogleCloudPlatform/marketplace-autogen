@@ -1,6 +1,6 @@
 {namespace vm.single.schema}
 
-import * as proto from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {ApplicationStatusSpec,SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
 import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
@@ -8,15 +8,15 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 /** Generates solution.jinja.schema file. */
 {template main kind="text"}
 {@param solutionId: string}
-{@param spec: proto.SingleVmDeploymentPackageSpec}
+{@param spec: SingleVmDeploymentPackageSpec}
 {@param? solutionInfo: SolutionMarketingInfo}
 {@param? templateVersion: string}
 
 {let $waiterSpec:
-    ($spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.WAITER)
+    ($spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.WAITER)
     ? $spec.applicationStatus.waiter : null/}
 {let $enableLegacyStatus:
-    $spec.applicationStatus?.getType() == proto.ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
+    $spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
 
 imports:
   - name: common.py

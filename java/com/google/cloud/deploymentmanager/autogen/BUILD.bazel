@@ -19,7 +19,6 @@ proto_library(
 
 java_proto_library(
     name = "deployment_package_autogen_spec_java_proto",
-    strict_deps = 0,
     deps = [":deployment_package_autogen_spec_proto"],
 )
 
@@ -30,7 +29,6 @@ proto_library(
 
 java_proto_library(
     name = "marketing_info_java_proto",
-    strict_deps = 0,
     deps = [":marketing_info_proto"],
 )
 
@@ -45,7 +43,6 @@ proto_library(
 
 java_proto_library(
     name = "autogen_java_proto",
-    strict_deps = 0,
     deps = [":autogen_proto"],
 )
 
