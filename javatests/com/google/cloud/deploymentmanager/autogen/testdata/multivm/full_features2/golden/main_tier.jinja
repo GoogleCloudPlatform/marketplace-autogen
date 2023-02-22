@@ -9,6 +9,7 @@
 {% endfor %}
 {% set subnetworks = properties["subnetwork"] %}
 {% set externalIPs = properties["externalIP"] %}
+{% set image = properties["image"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 {% set hasExternalIP = externalIPs is defined and externalIPs[0] != "NONE" %}
@@ -24,10 +25,6 @@
 {% set enableComputeApi = properties["enableComputeApi"] %}
 {% set enableSourceReadWriteApi = properties["enableSourceReadWriteApi"] %}
 {% set enableProjecthostingApi = properties["enableProjecthostingApi"] %}
-
-{% set imageProjects = ["click-to-deploy-images", "click-to-deploy-images"  ] %}
-{% set imageNames = ["jenkins-v20180130", "jenkins-v20180123"  ] %}
-  {% set selectedImageIndex = properties["image"]|int %}
 {% if instanceCount <= 0 %}
 resources: []
 {% else %}
@@ -37,7 +34,7 @@ resources:
     type: vm_instance.py
     properties:
       instanceName: {{ env["deployment"] }}-main-vm-{{ vmIndex }}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      sourceImage: https://www.googleapis.com/compute/v1/{{ image }}
       zone: {{ zone }}
       machineType: {{ machineType }}
       networks:

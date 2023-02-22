@@ -14,6 +14,7 @@
 {% endfor %}
 {% set subnetworks = properties["subnetwork"] %}
 {% set externalIPs = properties["externalIP"] %}
+{% set image = properties["image"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 {% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
@@ -24,16 +25,12 @@
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
 
-{% set imageProjects = ["bitnami-launchpad", "bitnami-launchpad", "click-to-deploy-images"] %}
-{% set imageNames = ["bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64", "bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64", "wordpress-453-1607261609-debian-8-jessie-v20160718"] %}
-{% set selectedImageIndex = properties["image"]|int %}
-
 resources:
   - name: {{ name }}
     type: vm_instance.py
     properties:
       instanceName: {{ instanceName }}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
+      sourceImage: https://www.googleapis.com/compute/v1/{{ image }}
       zone: {{ zone }}
       machineType: {{ machineType }}
       networks:

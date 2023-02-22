@@ -39,9 +39,11 @@ properties:
   image:
     type: string
     enum:
-      - '0'
-      - '1'
-    default: '0'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180123'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   machineType:
     type: string
     default: e2-standard-2

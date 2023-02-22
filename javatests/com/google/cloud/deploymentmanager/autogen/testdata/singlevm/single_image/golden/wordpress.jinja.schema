@@ -30,6 +30,13 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
+    default: 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   machineType:
     type: string
     default: f1-micro

@@ -257,19 +257,17 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   {/if}
   {$section}
 
-{if length($spec.imagesList) > 1}
 - name: {'image' |tierprefixed: $spec}
   title: Image version
   {$section}
   enumLabels:
     {for $image, $index in $spec.imagesList}
     {if $image.getLabel()}
-    '{$index}': '{$image.getLabel()}'
+    'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getLabel()}'
     {else}
-    '{$index}': '{$image.getName()}'
+    'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getName()}'
     {/if}
     {/for}
-{/if}
 
 - name: {'machineType' |tierprefixed: $spec}
   title: Machine type

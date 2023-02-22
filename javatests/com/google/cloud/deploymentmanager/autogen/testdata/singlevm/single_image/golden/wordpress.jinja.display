@@ -46,6 +46,10 @@ description:
 
 input:
   properties:
+    - name: image
+      title: Image version
+      enumLabels:
+        'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64': 'Wordpress 4.5'
     - name: zone
       title: Zone
     - name: machineType

@@ -515,9 +515,11 @@ serviceAccounts:
   type: string
   enum:
     {for $image, $index in $imagesList}
-    - '{$index}'
+    - 'projects/{$image.getProject()}/global/images/{$image.getName()}'
     {/for}
-  default: '0'
+  default: 'projects/{$imagesList[0].getProject()}/global/images/{$imagesList[0].getName()}'
+  x-googleProperty:
+    type: GCE_DISK_IMAGE
 {/template}
 
 

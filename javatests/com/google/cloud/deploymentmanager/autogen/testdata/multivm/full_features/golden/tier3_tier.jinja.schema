@@ -19,6 +19,7 @@ required:
   - network
   - bootDiskType
   - bootDiskSizeGb
+  - image
   - generatedPassword0
   - generatedPassword1
 
@@ -32,6 +33,13 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   machineType:
     type: string
     default: e2-standard-2

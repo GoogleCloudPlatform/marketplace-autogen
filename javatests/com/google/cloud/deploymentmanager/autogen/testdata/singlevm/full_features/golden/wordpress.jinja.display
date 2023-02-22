@@ -49,9 +49,9 @@ input:
     - name: image
       title: Image version
       enumLabels:
-        '0': 'Wordpress 4.5'
-        '1': 'Wordpress 4.6'
-        '2': 'wordpress-453-1607261609-debian-8-jessie-v20160718'
+        'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64': 'Wordpress 4.5'
+        'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64': 'Wordpress 4.6'
+        'projects/click-to-deploy-images/global/images/wordpress-453-1607261609-debian-8-jessie-v20160718': 'wordpress-453-1607261609-debian-8-jessie-v20160718'
     - name: zone
       title: Zone
       subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'

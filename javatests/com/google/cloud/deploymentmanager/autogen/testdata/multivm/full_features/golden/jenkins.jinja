@@ -97,6 +97,7 @@ resources:
       machineType: {{ properties["tier2_machineType"] }}
       bootDiskType: {{ properties["tier2_bootDiskType"] }}
       bootDiskSizeGb: {{ properties["tier2_bootDiskSizeGb"] }}
+      image: '{{ properties["tier2_image"] }}'
       acceleratorType: {{ properties["tier2_acceleratorType"] }}
       acceleratorCount: {{ properties["tier2_acceleratorCount"] }}
       generatedPassword0: $(ref.generated-password-0.password)
@@ -137,6 +138,7 @@ resources:
       machineType: {{ properties["tier3_machineType"] }}
       bootDiskType: {{ properties["tier3_bootDiskType"] }}
       bootDiskSizeGb: {{ properties["tier3_bootDiskSizeGb"] }}
+      image: '{{ properties["tier3_image"] }}'
       acceleratorType: {{ properties["tier3_acceleratorType"] }}
       acceleratorCount: {{ properties["tier3_acceleratorCount"] }}
       generatedPassword0: $(ref.generated-password-0.password)
