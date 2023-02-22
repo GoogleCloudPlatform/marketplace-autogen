@@ -37,6 +37,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 {% set externalIPs = properties["externalIP"] %}
 
+{% set image = properties["image"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 
@@ -60,21 +61,6 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {% set {$propName} = properties["{$propName}"] %}
 {/for}
 
-{if length($spec.imagesList) > 1}
-{\n}
-{% set imageProjects = [{nil}
-{for $image, $index in $spec.imagesList}
-{if $index > 0}, {/if}"{$image.getProject()}"{nil}
-{/for}
-] %}
-{% set imageNames = [{nil}
-{for $image, $index in $spec.imagesList}
-{if $index > 0}, {/if}"{$image.getName()}"{nil}
-{/for}
-] %}
-{% set selectedImageIndex = properties["image"]|int %}
-{/if}
-
 {\n}
 resources:
   - name: {{ name }}
@@ -84,11 +70,7 @@ resources:
         {{ instanceName }}{nil}
       {/let}
       instanceName: {$instanceName}
-      {if length($spec.imagesList) > 1}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{{ imageProjects[selectedImageIndex] }}/global/images/{{ imageNames[selectedImageIndex] }}
-      {else}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/{$spec.imagesList[0].getProject()}/global/images/{$spec.imagesList[0].getName()}
-      {/if}
+      sourceImage: https://www.googleapis.com/compute/v1/{{ image }}
       zone: {{ zone }}
       machineType: {{ machineType }}
       networks:

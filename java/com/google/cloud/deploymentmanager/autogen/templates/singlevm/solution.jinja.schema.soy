@@ -75,7 +75,6 @@ properties:
   {/let}
   {$zoneProp |indent: 2, true}{nil}
 
-  {if length($spec.imagesList) > 1}
   {let $imageProp kind="text"}
     {call renders.imagePropertySchema}
       {param name: 'image'/}
@@ -83,7 +82,6 @@ properties:
     {/call}
   {/let}
   {$imageProp |indent: 2, true}{nil}
-  {/if}
 
   {let $machineTypeProp kind="text"}
     {call renders.machineTypePropertySchema}

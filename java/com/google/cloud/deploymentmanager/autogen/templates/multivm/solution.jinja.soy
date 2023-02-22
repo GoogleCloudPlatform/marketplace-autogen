@@ -40,9 +40,7 @@ resources:
       machineType: {{ properties["{'machineType' |tierprefixed: $tier}"] }}
       bootDiskType: {{ properties["{'bootDiskType' |tierprefixed: $tier}"] }}
       bootDiskSizeGb: {{ properties["{'bootDiskSizeGb' |tierprefixed: $tier}"] }}
-      {if length($tier.imagesList) > 1}
       image: '{{ properties["{'image' |tierprefixed: $tier}"] }}'
-      {/if}
 
       {if length($tier.acceleratorsList) > 0}
       {let $accelerator: $tier.acceleratorsList[0]/}

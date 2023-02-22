@@ -12,6 +12,7 @@
 {% endfor %}
 {% set subnetworks = properties["subnetwork"] %}
 {% set externalIPs = properties["externalIP"] %}
+{% set image = properties["image"] %}
 {% set bootDiskType = properties["bootDiskType"] %}
 {% set bootDiskSizeGb = properties["bootDiskSizeGb"] %}
 {% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
@@ -25,7 +26,7 @@ resources:
     type: vm_instance.py
     properties:
       instanceName: {{ instanceName }}
-      sourceImage: https://www.googleapis.com/compute/v1/projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
+      sourceImage: https://www.googleapis.com/compute/v1/{{ image }}
       zone: {{ zone }}
       machineType: {{ machineType }}
       networks:

@@ -20,11 +20,13 @@ required:
   - tier2_bootDiskType
   - tier2_bootDiskSizeGb
   - tier2_network
+  - tier2_image
   - tier3_instanceCount
   - tier3_machineType
   - tier3_bootDiskType
   - tier3_bootDiskSizeGb
   - tier3_network
+  - tier3_image
   - input_domain
   - input_adminEmailAddress
   - input_showConditionals
@@ -49,9 +51,11 @@ properties:
   main_image:
     type: string
     enum:
-      - '0'
-      - '1'
-    default: '0'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180123'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   main_machineType:
     type: string
     default: e2-standard-2
@@ -229,6 +233,13 @@ properties:
       - 1
       - 2
       - 4
+  tier2_image:
+    type: string
+    enum:
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   tier2_machineType:
     type: string
     default: e2-standard-2
@@ -320,6 +331,13 @@ properties:
     default: 1
     minimum: 1
     maximum: 10
+  tier3_image:
+    type: string
+    enum:
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
   tier3_machineType:
     type: string
     default: e2-standard-2

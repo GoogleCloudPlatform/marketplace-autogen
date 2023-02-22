@@ -32,18 +32,16 @@ description:
 
 input:
   properties:
-    {if length($spec.imagesList) > 1}
     - name: image
       title: Image version
       enumLabels:
         {for $image, $index in $spec.imagesList}
         {if $image.getLabel()}
-        '{$index}': '{$image.getLabel()}'
+        'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getLabel()}'
         {else}
-        '{$index}': '{$image.getName()}'
+        'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getName()}'
         {/if}
         {/for}
-    {/if}
     - name: zone
       title: Zone
       {if $solutionHasGpus}

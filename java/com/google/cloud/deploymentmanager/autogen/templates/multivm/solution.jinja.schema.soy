@@ -98,9 +98,7 @@ outputs:
 - {'bootDiskType' |tierprefixed: $spec}
 - {'bootDiskSizeGb' |tierprefixed: $spec}
 - {'network' |tierprefixed: $spec}
-{if length($spec.imagesList) > 1}
 - {'image' |tierprefixed: $spec}
-{/if}
 {/template}
 
 
@@ -115,7 +113,6 @@ outputs:
 {/let}
 {$instanceCountProp}{nil}
 
-{if length($spec.imagesList) > 1}
 {let $imageProp kind="text"}
   {call renders.imagePropertySchema}
     {param name: 'image'/}
@@ -124,7 +121,6 @@ outputs:
   {/call}
 {/let}
 {$imageProp}{nil}
-{/if}
 
 {let $machineTypeProp kind="text"}
   {call renders.machineTypePropertySchema}

@@ -47,8 +47,8 @@ input:
       title: Image version
       section: MAIN_TIER
       enumLabels:
-        '0': 'jenkins-v20180130'
-        '1': 'jenkins-v20180123'
+        'projects/click-to-deploy-images/global/images/jenkins-v20180130': 'jenkins-v20180130'
+        'projects/click-to-deploy-images/global/images/jenkins-v20180123': 'jenkins-v20180123'
     - name: main_machineType
       title: Machine type
       section: MAIN_TIER
@@ -143,6 +143,11 @@ input:
     - name: tier2_instanceCount
       title: Instance Count
       section: TIER2_TIER
+    - name: tier2_image
+      title: Image version
+      section: TIER2_TIER
+      enumLabels:
+        'projects/click-to-deploy-images/global/images/jenkins-v20180130': 'jenkins-v20180130'
     - name: tier2_machineType
       title: Machine type
       section: TIER2_TIER
@@ -175,6 +180,11 @@ input:
       title: Instance Count
       tooltip: Specify a value between 1 and 10.
       section: TIER3_TIER
+    - name: tier3_image
+      title: Image version
+      section: TIER3_TIER
+      enumLabels:
+        'projects/click-to-deploy-images/global/images/jenkins-v20180130': 'jenkins-v20180130'
     - name: tier3_machineType
       title: Machine type
       section: TIER3_TIER
