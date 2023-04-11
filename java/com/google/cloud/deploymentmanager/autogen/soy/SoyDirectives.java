@@ -376,7 +376,7 @@ final class SoyDirectives {
   @Singleton
   static class YamlPrimitive extends BaseDirective {
 
-    private final Representer representer = new Representer();
+    private final Representer representer = new Representer(new DumperOptions());
     private final Resolver resolver = new Resolver();
     private final DumperOptions dumperOptions;
     
