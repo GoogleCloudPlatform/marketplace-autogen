@@ -94,7 +94,8 @@ final class SpecValidations {
           "nvidia-tesla-t4",
           "nvidia-tesla-t4-vws",
           "nvidia-tesla-a100",
-          "nvidia-a100-80gb");
+          "nvidia-a100-80gb",
+          "nvidia-l4");
   // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;

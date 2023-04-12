@@ -50,6 +50,8 @@ import javax.annotation.Nullable;
 import javax.inject.Qualifier;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -466,7 +468,11 @@ public class Autogen {
     DumperOptions dumperOptions = new DumperOptions();
     dumperOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
     dumperOptions.setWidth(3000);  // No auto line breaking on a field.
-    return new Yaml(new SafeConstructor(), new Representer(), dumperOptions)
+    dumperOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);
+    return new Yaml(
+            new SafeConstructor(new LoaderOptions()),
+            new Representer(dumperOptions),
+            dumperOptions)
         .dump(message)
         .trim();
   }
