@@ -75,7 +75,7 @@ maven_install(
         "org.hamcrest:hamcrest-core:1.3",
         "org.hamcrest:hamcrest-library:1.3",
         "org.ow2.asm:asm:9.4",
-        "org.yaml:snakeyaml:1.19",
+        "org.yaml:snakeyaml:1.32",
     ],
     fetch_sources = True,
     # See https://github.com/bazelbuild/rules_jvm_external/#repository-aliases

@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
@@ -376,7 +377,7 @@ final class SoyDirectives {
   @Singleton
   static class YamlPrimitive extends BaseDirective {
 
-    private final Representer representer = new Representer(new DumperOptions());
+    private final Representer representer;
     private final Resolver resolver = new Resolver();
     private final DumperOptions dumperOptions;
     
@@ -384,6 +385,12 @@ final class SoyDirectives {
     YamlPrimitive() {
       dumperOptions = new DumperOptions();
       dumperOptions.setWidth(2048);  // Avoid auto-line breaking, unless it's really long.
+      dumperOptions.setDefaultScalarStyle(ScalarStyle.PLAIN);
+      representer = new Representer(dumperOptions);
+      // Representer only sets the ScalarStyle from DumperOptions if used within a
+      // YAML Object. See:
+      // https://bitbucket.org/snakeyaml/snakeyaml/src/49e794037c6be07053ce930f71f9c31b09180920/src/main/java/org/yaml/snakeyaml/Yaml.java#lines-194
+      representer.setDefaultScalarStyle(ScalarStyle.PLAIN);
     }
     
     @Override
