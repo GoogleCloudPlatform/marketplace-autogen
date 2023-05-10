@@ -488,18 +488,18 @@ serviceAccounts:
   {/if}
   x-googleProperty:
     type: GCE_ZONE
-    {if $zoneSpec and (length($zoneSpec.whitelistedZonesList) > 0 or
-      length($zoneSpec.whitelistedRegionsList) > 0)}
+    {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
+      length($zoneSpec.getWhitelistedRegionsList()) > 0)}
     gceZone:
-      {if length($zoneSpec.whitelistedZonesList) > 0}
+      {if length($zoneSpec.getWhitelistedZonesList()) > 0}
       whitelistedZones:
-      {for $zone in $zoneSpec.whitelistedZonesList}
+      {for $zone in $zoneSpec.getWhitelistedZonesList()}
       - {$zone}
       {/for}
       {/if}
-      {if length($zoneSpec.whitelistedRegionsList) > 0}
+      {if length($zoneSpec.getWhitelistedRegionsList()) > 0}
       whitelistedRegions:
-      {for $region in $zoneSpec.whitelistedRegionsList}
+      {for $region in $zoneSpec.getWhitelistedRegionsList()}
       - {$region}
       {/for}
       {/if}
@@ -557,7 +557,7 @@ serviceAccounts:
     gceGpuType:
       machineTypeProperty: {'machineType' |tierprefixed: $tier}
       gpuType:
-        {for $gpuType in $spec.typesList}
+        {for $gpuType in $spec.getTypesList()}
         - {$gpuType}
         {/for}
 
@@ -590,9 +590,9 @@ serviceAccounts:
     gceNetwork:
       allowSharedVpcs: True
       machineTypeProperty: {'machineType' |tierprefixed: $tier}
-      {if length($spec.labelsList) > 0}
+      {if length($spec.getLabelsList()) > 0}
       labels:
-      {for $label in $spec.labelsList}
+      {for $label in $spec.getLabelsList()}
       - {$label}
       {/for}
       {/if}
@@ -693,7 +693,7 @@ serviceAccounts:
   maximum: {$spec.range.getEndValue()}
   {elseif $spec.list}
   enum:
-    {for $value in $spec.list.valuesList}
+    {for $value in $spec.list.getValuesList()}
     - {$value}
     {/for}
   {/if}
@@ -741,10 +741,10 @@ serviceAccounts:
   type: integer
   {if $dropdown.defaultValueIndex}
   {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
-  default: {$dropdown.valuesList[$defaultIndex]}
+  default: {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
   enum:
-  {for $value in $dropdown.valuesList}
+  {for $value in $dropdown.getValuesList()}
   - {$value}
   {/for}
 {elseif $field.stringBox}
@@ -772,10 +772,10 @@ serviceAccounts:
   type: string
   {if $dropdown.defaultValueIndex}
   {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
-  default: {$dropdown.valuesList[$defaultIndex] |yamlprimitive: 2}
+  default: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
   {/if}
   enum:
-  {for $value in $dropdown.valuesList}
+  {for $value in $dropdown.getValuesList()}
   - {$value |yamlprimitive: 4}
   {/for}
 {elseif $field.zoneDropdown}

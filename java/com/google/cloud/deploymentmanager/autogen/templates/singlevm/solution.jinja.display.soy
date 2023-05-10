@@ -35,7 +35,7 @@ input:
     - name: image
       title: Image version
       enumLabels:
-        {for $image, $index in $spec.imagesList}
+        {for $image, $index in $spec.getImagesList()}
         {if $image.getLabel()}
         'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getLabel()}'
         {else}
@@ -61,7 +61,7 @@ input:
       title: {$spec.bootDisk.getDisplayLabel()} size in GB
       section: BOOT_DISK
 
-    {for $disk, $index in $spec.additionalDisksList}
+    {for $disk, $index in $spec.getAdditionalDisksList()}
     - name: {diskTypePropertyName($index) |yamlprimitive: 2}
       title: {$disk.getDisplayLabel() + ' type' |yamlprimitive: 2}
       section: ADDITIONAL_DISKS
@@ -82,7 +82,7 @@ input:
       section: NETWORKING
 
     {let $firewallDisplayProperties kind="text"}
-      {call displayLib.firewallDisplayProperties}{param firewallsList: $spec.firewallRulesList/}{/call}
+      {call displayLib.firewallDisplayProperties}{param firewallsList: $spec.getFirewallRulesList()/}{/call}
     {/let}
     {$firewallDisplayProperties |indent: 4, true}{nil}
 
@@ -94,7 +94,7 @@ input:
       level: 1
     {/if}
 
-    {for $scope in $spec.gcpAuthScopesList}
+    {for $scope in $spec.getGcpAuthScopesList()}
     - name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}
       title: Allow {call displayLib.authScopeDescription}{param spec: $scope/}{/call} on the VM
       section: API_ACCESS
@@ -102,8 +102,8 @@ input:
     {/for}
 
     {if $spec.deployInput}
-    {for $section in $spec.deployInput.sectionsList}
-    {for $field in $section.fieldsList}
+    {for $section in $spec.deployInput.getSectionsList()}
+    {for $field in $section.getFieldsList()}
     {let $fieldDisplay kind="text"}
       {call displayLib.deployInputFieldDisplay}
         {param section: $section/}
@@ -130,19 +130,19 @@ input:
     - name: BOOT_DISK
       title: Boot Disk
       tooltip: Each instance requires a disk to boot from.
-    {if length($spec.additionalDisksList) == 1}
+    {if length($spec.getAdditionalDisksList()) == 1}
     - name: ADDITIONAL_DISKS
       title: Additional Disk
       tooltip: The additional disk will be attached to the instance.
     {/if}
-    {if length($spec.additionalDisksList) > 1}
+    {if length($spec.getAdditionalDisksList()) > 1}
     - name: ADDITIONAL_DISKS
       title: Additional Disks
       tooltip: The additional disks will be attached to the instance.
     {/if}
     - name: NETWORKING
       title: Networking
-    {if length($spec.gcpAuthScopesList) > 0}
+    {if length($spec.getGcpAuthScopesList()) > 0}
     - name: API_ACCESS
       title: API Access
       tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
@@ -192,7 +192,7 @@ runtime:
 
       {let $passwordRows kind="text"}
         {call displayLib.passwordApplicationTableRows}
-          {param passwordsList: $spec.passwordsList/}
+          {param passwordsList: $spec.getPasswordsList()/}
           {param deployInput: $spec.deployInput/}
         {/call}
       {/let}
@@ -206,7 +206,7 @@ runtime:
         value: '{{ properties().machineType }}'
 
       {if $spec.postDeploy}
-      {for $row in $spec.postDeploy.infoRowsList}
+      {for $row in $spec.postDeploy.getInfoRowsList()}
       {let $rowDisplay kind="text"}
         {call displayLib.infoRowApplicationTableRow}
           {param infoRow: $row/}
@@ -255,7 +255,7 @@ runtime:
       showIf: '{{ !outputs().hasExternalIP }}'
 
   {if $spec.postDeploy}
-    {for $action in $spec.postDeploy.actionItemsList}
+    {for $action in $spec.postDeploy.getActionItemsList()}
     - heading: {$action.getHeading() |yamlprimitive: 6}
       {if $action.getDescription()}
       description: {$action.getDescription() |yamlprimitive: 6}
@@ -269,15 +269,15 @@ runtime:
     {/for}
     {/if}
 
-    {for $firewallRule in $spec.firewallRulesList}
+    {for $firewallRule in $spec.getFirewallRulesList()}
     {let $item kind="text"}{call displayLib.openPortAction}{param spec: $firewallRule/}{/call}{/let}
     {$item |indent: 4}
     {/for}
 
-    {if length($spec.passwordsList) > 1}
+    {if length($spec.getPasswordsList()) > 1}
     - heading: Change the temporary passwords
       description: For additional security, it is recommended that you change the passwords.
-    {elseif length($spec.passwordsList) > 0}
+    {elseif length($spec.getPasswordsList()) > 0}
     - heading: Change the temporary password
       description: For additional security, it is recommended that you change the password.
     {/if}
@@ -289,7 +289,7 @@ runtime:
 {\n}
 annotations:
   autogenSpecType: 'SINGLE_VM'
-  {for $image, $index in $spec.imagesList}
+  {for $image, $index in $spec.getImagesList()}
   vmImage{$index}: https://www.googleapis.com/compute/v1/projects/{$image.getProject()}/global/images/{$image.getName()}
   {/for}
 
