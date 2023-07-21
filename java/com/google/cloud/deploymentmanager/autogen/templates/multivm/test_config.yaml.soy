@@ -24,7 +24,7 @@ resources:
     {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
   {/for}
   {for $key in $defaultMap.keys()}
-    {$key |yamlprimitive: 4}: {$defaultMap[$key] |yamlprimitive: 4}
+    {$key |yamlprimitive: 4}: {$defaultMap.get($key) |yamlprimitive: 4}
   {/for}
   {/if}
 {/template}

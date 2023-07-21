@@ -313,7 +313,7 @@ placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {if $valueLabels}
 enumLabels:
   {for $key in $valueLabels.keys()}
-  '{$key}': {$valueLabels[$key] |yamlprimitive: 2}
+  '{$key}': {$valueLabels.get($key) |yamlprimitive: 2}
   {/for}
 {/if}
 {/template}
