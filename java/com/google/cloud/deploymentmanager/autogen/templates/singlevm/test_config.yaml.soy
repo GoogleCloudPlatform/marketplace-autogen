@@ -17,7 +17,7 @@ resources:
   type: {$template}
   {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
   {let $defaultMap: getTestConfigDefaultValues($spec)/}
-  {if $testDefaultedFields.length() > 0 or $defaultMap.keys().length() > 0}
+  {if $testDefaultedFields.length > 0 or $defaultMap.keys().length > 0}
   properties:
   {/if}
     {for $field in $testDefaultedFields}

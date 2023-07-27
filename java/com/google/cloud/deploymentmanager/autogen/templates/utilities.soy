@@ -79,7 +79,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
  */
 {template firewallRulePortSuffix kind="text"}
 {@param spec: FirewallRuleSpec}
-{if $spec.getPort().length() > 0}
+{if $spec.getPort().length > 0}
 -{$spec.getPort()}{nil}
 {/if}
 {/template}
@@ -105,7 +105,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
  */
 {template firewallRuleTitle kind="text"}
 {@param spec: FirewallRuleSpec}
-{if $spec.getPort().length() > 0}
+{if $spec.getPort().length > 0}
 {switch $spec.getProtocol()}
   {case FirewallRuleSpec.Protocol.TCP}
     {if $spec.getPort() == 80}

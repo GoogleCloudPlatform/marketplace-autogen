@@ -165,7 +165,7 @@ input:
   {let $customBooleanGroups kind="text"}
     {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
-  {if ($authScopeBooleanGroups.length() + $customBooleanGroups.length()) > 0}
+  {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
   boolean_groups:
     {$authScopeBooleanGroups |indent: 4, true}{nil}
     {$customBooleanGroups |indent: 4, true}{nil}
@@ -232,13 +232,13 @@ runtime:
   {/let}
 
 
-  {if $adminButton.length() > 0}
+  {if $adminButton.length > 0}
   primaryButton:
     {$adminButton |indent: 4, true}{nil}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
 
-  {elseif $siteButton.length() > 0}  // if strLen($adminButton) > 0
+  {elseif $siteButton.length > 0}  // if strLen($adminButton) > 0
   primaryButton:
     {$siteButton |indent: 4, true}{nil}
   secondaryButton:

@@ -175,10 +175,10 @@ resources:
         {/call}
       {/let}
 
-      {if $passwordMetadataItems.length()
-          + $gceMetadataItems.length()
-          + $startupScriptAndWaiterMetadataItemsUnconditional.length()
-          + $stackdriverMetadataItems.length() > 0}
+      {if $passwordMetadataItems.length
+          + $gceMetadataItems.length
+          + $startupScriptAndWaiterMetadataItemsUnconditional.length
+          + $stackdriverMetadataItems.length > 0}
       metadata:
         items:
           {$passwordMetadataItems |indent: 10, true}{nil}
@@ -186,22 +186,22 @@ resources:
           {$startupScriptAndWaiterMetadataItemsConditional |indent: 10, true}{nil}
           {$gceMetadataItems |indent: 10, true}{nil}
           {$stackdriverMetadataItems |indent: 10, true}{nil}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() == 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length == 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length > 0}
       {% if enableStatusWaiter %}
       metadata:
         items:
           {$startupScriptAndWaiterMetadataItemsStatusWaiterEnabled |indent: 10, true}{nil}
       {% endif %}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() == 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length == 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length > 0}
       {% if not enableStatusWaiter %}
       metadata:
         items:
           {$startupScriptAndWaiterMetadataItemsStatusWaiterDisabled |indent: 10, true}{nil}
       {% endif %}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() > 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length > 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length > 0}
       metadata:
         items:
           {% if enableStatusWaiter %}
@@ -237,7 +237,7 @@ resources:
       {param tierSpec: $spec/}
     {/call}
   {/let}
-  {if $firewallResources.length() > 0}
+  {if $firewallResources.length > 0}
   {$firewallResources |indent: 2, true}{nil}
   {/if}
 
