@@ -13,7 +13,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {@param? templateVersion: string}
 
 imports:
-  {for $tier in $spec.tiersList}
+  {for $tier in $spec.getTiersList()}
   - path: {tierTemplateName($tier)}
   {/for}
 
@@ -34,7 +34,7 @@ info:
 required:
   - zone
 
-  {for $tier in $spec.tiersList}
+  {for $tier in $spec.getTiersList()}
   {let $list kind="text"}{call tierRequiredList}{param spec: $tier/}{/call}{/let}
   {$list |indent: 2, true}{nil}
   {/for}
@@ -54,7 +54,7 @@ properties:
   {/let}
   {$zoneProp |indent: 2, true}{nil}
 
-  {for $tier in $spec.tiersList}
+  {for $tier in $spec.getTiersList()}
   {let $tierProperties kind="text"}{call tierProperties}{param spec: $tier/}{/call}{/let}
   {$tierProperties |indent: 2, true}{nil}
   {/for}
@@ -83,7 +83,7 @@ outputs:
     type: string
   project:
     type: string
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   password{$index}:
     type: string
   {/for}
@@ -116,7 +116,7 @@ outputs:
 {let $imageProp kind="text"}
   {call renders.imagePropertySchema}
     {param name: 'image'/}
-    {param imagesList: $spec.imagesList/}
+    {param imagesList: $spec.getImagesList() /}
     {param tier: $spec/}
   {/call}
 {/let}
@@ -131,11 +131,11 @@ outputs:
 {/let}
 {$machineTypeProp}{nil}
 
-{if length($spec.acceleratorsList) > 0}
+{if length($spec.getAcceleratorsList()) > 0}
 {let $acceleratorProps kind="text"}
   {call renders.acceleratorPropertiesSchema}
     {param namePrefix: 'accelerator'/}
-    {param spec: $spec.acceleratorsList[0]/}
+    {param spec: $spec.getAcceleratorsList()[0] /}
     {param tier: $spec/}
   {/call}
 {/let}
@@ -163,7 +163,7 @@ outputs:
 {$ipForwardingProp}{nil}
 {/if}
 
-{for $scope in $spec.gcpAuthScopesList}
+{for $scope in $spec.getGcpAuthScopesList()}
 {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{param tierSpec: $spec/}{/call}:
   type: boolean
   default: {if $scope.getDefaultOff()}False{else}True{/if}
@@ -178,10 +178,10 @@ outputs:
 {/let}
 {$bootDiskProps}{nil}
 
-{for $disk, $index in $spec.additionalDisksList}
+{for $disk, $index in $spec.getAdditionalDisksList()}
 {let $diskProps kind="text"}
   {call renders.additionalDiskPropertiesSchema}
-    {param spec: $spec.additionalDisksList[$index]/}
+    {param spec: $spec.getAdditionalDisksList()[$index] /}
     {param diskIndex: $index/}
     {param zonePropertyName: 'zone'/}
     {param tier: $spec/}
@@ -190,7 +190,7 @@ outputs:
 {$diskProps}{nil}
 {/for}
 
-{for $firewallRule in $spec.firewallRulesList}
+{for $firewallRule in $spec.getFirewallRulesList()}
 {call renders.firewallProps}{param spec: $firewallRule/}{param tierSpec: $spec/}{/call}
 {/for}
 {/template}

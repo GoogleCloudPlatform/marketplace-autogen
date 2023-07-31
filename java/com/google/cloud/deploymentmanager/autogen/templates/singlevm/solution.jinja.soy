@@ -23,7 +23,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {% set instanceName = "%s-vm" % deployment %}
 {% set zone = properties["zone"] %}
 {% set machineType = properties["machineType"] %}
-{if length($spec.acceleratorsList) > 0}
+{if length($spec.getAcceleratorsList()) > 0}
 {% set acceleratorType = properties["acceleratorType"] %}
 {% set acceleratorCount = properties["acceleratorCount"] %}
 {/if}
@@ -56,7 +56,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {/call}
 {/if}
 
-{for $scope in $spec.gcpAuthScopesList}
+{for $scope in $spec.getGcpAuthScopesList()}
 {let $propName kind="text"}{call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}{/let}
 {% set {$propName} = properties["{$propName}"] %}
 {/for}
@@ -91,11 +91,11 @@ resources:
       {% endif %}
       bootDiskType: {{ bootDiskType }}
       bootDiskSizeGb: {{ bootDiskSizeGb }}
-      {if length($spec.additionalDisksList) > 0}
+      {if length($spec.getAdditionalDisksList()) > 0}
       disks:
         {let $additionalDisksSection kind="text"}
           {call renders.additionalDiskSection}
-            {param additionalDisksList: $spec.additionalDisksList/}
+            {param additionalDisksList: $spec.getAdditionalDisksList()/}
             {param deployInputSpec: $spec.deployInput/}
             {param instanceName: $instanceName/}
           {/call}
@@ -116,7 +116,7 @@ resources:
       canIpForward: {{ canIpForward }}
       {/if}
 
-      {if length($spec.acceleratorsList) > 0}
+      {if length($spec.getAcceleratorsList()) > 0}
       {% if acceleratorCount > 0 %}
       guestAccelerators:
         - acceleratorType: {{ acceleratorType }}
@@ -126,7 +126,7 @@ resources:
 
       {let $serviceAccounts kind="text"}
         {call renders.serviceAccountsSection}
-          {param gcpAuthScopesList: $spec.gcpAuthScopesList/}
+          {param gcpAuthScopesList: $spec.getGcpAuthScopesList()/}
           {param waiterSpec: $waiterSpec/}
         {/call}
       {/let}
@@ -165,7 +165,7 @@ resources:
       {/let}
       {let $gceMetadataItems kind="text"}
         {call renders.gceMetadataItems}
-          {param specList: $spec.gceMetadataItemsList/}
+          {param specList: $spec.getGceMetadataItemsList()/}
           {param deployInput: $spec.deployInput/}
         {/call}
       {/let}
@@ -177,10 +177,10 @@ resources:
 
       // Waiter's metadata are rendered conditionally - with other metadata items list empty,
       // the metadata attribute should be rendered conditionally too. b/69837703.
-      {if $passwordMetadataItems.length()
-          + $gceMetadataItems.length()
-          + $startupScriptAndWaiterMetadataItemsUnconditional.length()
-          + $stackdriverMetadataItems.length() > 0}
+      {if $passwordMetadataItems.length
+          + $gceMetadataItems.length
+          + $startupScriptAndWaiterMetadataItemsUnconditional.length
+          + $stackdriverMetadataItems.length > 0}
       metadata:
         items:
           {$passwordMetadataItems |indent: 10, true}{nil}
@@ -188,22 +188,22 @@ resources:
           {$startupScriptAndWaiterMetadataItemsConditional |indent: 10, true}{nil}
           {$gceMetadataItems |indent: 10, true}{nil}
           {$stackdriverMetadataItems |indent: 10, true}{nil}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() == 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length == 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length > 0}
       {% if enableStatusWaiter %}
       metadata:
         items:
           {$startupScriptAndWaiterMetadataItemsStatusWaiterEnabled |indent: 10, true}{nil}
       {% endif %}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() == 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length == 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length > 0}
       {% if not enableStatusWaiter %}
       metadata:
         items:
           {$startupScriptAndWaiterMetadataItemsStatusWaiterDisabled |indent: 10, true}{nil}
       {% endif %}
-      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length() > 0
-              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length() > 0}
+      {elseif $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled.length > 0
+              and $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled.length > 0}
       metadata:
         items:
           {% if enableStatusWaiter %}
@@ -217,7 +217,7 @@ resources:
         items:
           - {call utilities.deploymentTag data="all"/}
 
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   {let $passwordResource kind="text"}
     {call renders.passwordResource}
       {param password: $password/}
@@ -238,9 +238,9 @@ resources:
   {$waiterResources |indent: 2, true}{nil}
 
   {let $firewallResources kind="text"}
-    {call renders.firewallResources}{param specList: $spec.firewallRulesList/}{/call}
+    {call renders.firewallResources}{param specList: $spec.getFirewallRulesList()/}{/call}
   {/let}
-  {if $firewallResources.length() > 0}
+  {if $firewallResources.length > 0}
   {$firewallResources |indent: 2, true}{nil}
   {/if}
 
@@ -248,7 +248,7 @@ resources:
 outputs:
   - name: deployment
     value: {{ deployment }}
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   {let $passwordOutput kind="text"}
     {call renders.passwordOutput}
       {param password: $password/}
@@ -289,7 +289,7 @@ outputs:
 
 {template passwordMetadataItems kind="text" /* visibility="private" */}
 {@param spec: SingleVmDeploymentPackageSpec}
-{for $password, $index in $spec.passwordsList}
+{for $password, $index in $spec.getPasswordsList()}
 {let $passwordMetadata kind="text"}
   {call renders.passwordMetadataFromOutput}
     {param password: $password/}

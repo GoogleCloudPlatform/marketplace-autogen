@@ -9,9 +9,9 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 {% import "path_utils.jinja" as path_utils with context %}
 {\n}
-{% set allTiersCount = {length($spec.tiersList)} %}
+{% set allTiersCount = {length($spec.getTiersList())} %}
 {% set tiersWithNoExternalIPCount = 0 %}
-{for $tier in $spec.tiersList}
+{for $tier in $spec.getTiersList()}
 {let $tierExternalIPs: tierPrefixed('externalIPs', $tier)/}
 {% set {$tierExternalIPs} = properties["{$tier.getName()}_externalIP"] %}
 {% if {$tierExternalIPs} and {$tierExternalIPs}[0] == "{externalIpTypeName(ExternalIpSpec.Type.NONE)}" %}
@@ -24,7 +24,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {\n}
 
 resources:
-  {for $tier in $spec.tiersList}
+  {for $tier in $spec.getTiersList()}
   - name: {$tier.getName()}-tier
     type: {tierTemplateName($tier)}
     properties:
@@ -42,8 +42,8 @@ resources:
       bootDiskSizeGb: {{ properties["{'bootDiskSizeGb' |tierprefixed: $tier}"] }}
       image: '{{ properties["{'image' |tierprefixed: $tier}"] }}'
 
-      {if length($tier.acceleratorsList) > 0}
-      {let $accelerator: $tier.acceleratorsList[0]/}
+      {if length($tier.getAcceleratorsList()) > 0}
+      {let $accelerator: $tier.getAcceleratorsList()[0]/}
       acceleratorType: {{ properties["{'acceleratorType' |tierprefixed: $tier}"] }}
       acceleratorCount: {{ properties["{'acceleratorCount' |tierprefixed: $tier}"] }}
       {/if}
@@ -52,14 +52,14 @@ resources:
       ipForward: {{ properties["{'ipForward' |tierprefixed: $tier}"] }}
       {/if}
 
-      {for $scope in $tier.gcpAuthScopesList}
+      {for $scope in $tier.getGcpAuthScopesList()}
       {let $propName kind="text"}
         {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}
       {/let}
       {$propName}: {{ properties["{$propName |tierprefixed: $tier}"] }}
       {/for}
 
-      {for $password, $index in $spec.passwordsList}
+      {for $password, $index in $spec.getPasswordsList()}
       {let $passwordProperty kind="text"}
         {call renders.passwordProperty}
           {param password: $password/}
@@ -69,7 +69,7 @@ resources:
       {$passwordProperty |indent: 6, true}{nil}
       {/for}
 
-      {for $firewallRule in $tier.firewallRulesList}
+      {for $firewallRule in $tier.getFirewallRulesList()}
       {let $propName kind="text"}
         {call utilities.firewallRulePropName}{param spec: $firewallRule/}{/call}
       {/let}
@@ -103,7 +103,7 @@ resources:
       {$propName}: {{ properties["{$propName}"] }}
       {/for}
 
-      {for $disk, $index in $tier.additionalDisksList}
+      {for $disk, $index in $tier.getAdditionalDisksList()}
       {diskTypePropertyName($index, $tier)}: {{ properties["{diskTypePropertyName($index, $tier)}"] }}
       {diskSizePropertyName($index, $tier)}: {{ properties["{diskSizePropertyName($index, $tier)}"] }}
       {/for}
@@ -116,7 +116,7 @@ resources:
       {/if}
   {/for}
 
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   {let $passwordResource kind="text"}
     {call renders.passwordResource}
       {param password: $password/}
@@ -133,7 +133,7 @@ outputs:
   - name: project
     value: {{ env["project"] }}
 
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   {let $passwordOutput kind="text"}
     {call renders.passwordOutput}
       {param password: $password/}
@@ -143,7 +143,7 @@ outputs:
   {$passwordOutput |indent: 2, true}{nil}
   {/for}
 
-  {for $tier in $spec.tiersList}
+  {for $tier in $spec.getTiersList()}
   {% for vmIndex in range(properties["{'instanceCount' |tierprefixed: $tier}"]) %}
   - name: {'vmId{{ vmIndex }}' |tierprefixed: $tier}
     value: $(ref.{$tier.getName()}-tier.vmId{{ vmIndex }})
@@ -161,13 +161,13 @@ outputs:
     value: {{ {$tierMainNetwork} }}
   {/for}
   {if $spec.siteUrl}
-  {let $urlTier: findVmTier($spec.siteUrl.tierVm.getTier(), $spec.tiersList)/}
+  {let $urlTier: findVmTier($spec.siteUrl.tierVm.getTier(), $spec.getTiersList())/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
     value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)
   {/if}
   {if $spec.adminUrl and (not $spec.siteUrl or $spec.siteUrl.tierVm.getTier() != $spec.adminUrl.tierVm.getTier())}
-  {let $urlTier: findVmTier($spec.adminUrl.tierVm.getTier(), $spec.tiersList)/}
+  {let $urlTier: findVmTier($spec.adminUrl.tierVm.getTier(), $spec.getTiersList())/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
     value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)

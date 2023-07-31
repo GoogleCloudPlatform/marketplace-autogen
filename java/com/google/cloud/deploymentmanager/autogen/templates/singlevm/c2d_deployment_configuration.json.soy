@@ -7,8 +7,8 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
 
 {lb}
   "defaultDeploymentType": "SINGLE_VM",
-  "imageName": "{$spec.imagesList[0].getName()}",
-  "projectId": "{$spec.imagesList[0].getProject()}",
+  "imageName": "{$spec.getImagesList()[0].getName()}",
+  "projectId": "{$spec.getImagesList()[0].getProject()}",
   "templateName": "nonexistent_template",
   "useSolutionPackage": true
 {rb}

@@ -757,6 +757,7 @@ message AcceleratorSpec {
   // nvidia-tesla-a100
   // nvidia-a100-80gb
   // nvidia-l4
+  // nvidia-l4-vws
   repeated string types = 1;
 
   // LINT.ThenChange()

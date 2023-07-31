@@ -38,19 +38,19 @@ input:
       {$acceleratorZoneSubtext |indent: 6, true}{nil}
       {/if}
 
-    {for $tier in $spec.tiersList}
+    {for $tier in $spec.getTiersList()}
     {let $tierProperties kind="text"}{call displayTierProperties}{param spec: $tier/}{/call}{/let}
     {$tierProperties |indent: 4, true}{nil}
     {/for}
 
     {if $spec.deployInput}
-    {for $section in $spec.deployInput.sectionsList}
-    {for $field in $section.fieldsList}
+    {for $section in $spec.deployInput.getSectionsList()}
+    {for $field in $section.getFieldsList()}
     {let $fieldDisplay kind="text"}
       {call displayLib.deployInputFieldDisplay}
         {param section: $section/}
         {param field: $field/}
-        {param tierList: $spec.tiersList/}
+        {param tierList: $spec.getTiersList()/}
       {/call}
     {/let}
     - {$fieldDisplay |indent: 6 |trim}
@@ -70,7 +70,7 @@ input:
   sections:
     {call displayLib.topSections}{param spec: $spec.deployInput/}{/call}{nil}
 
-    {for $tier in $spec.tiersList}
+    {for $tier in $spec.getTiersList()}
     - name: {call displayLib.tierSectionName}{param spec: $tier/}{/call}
       title: {$tier.getTitle() |yamlprimitive: 6}
     {/for}
@@ -92,7 +92,7 @@ input:
   {let $customBooleanGroups kind="text"}
     {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
   {/let}
-  {if ($authScopeBooleanGroups.length() + $customBooleanGroups.length()) > 0}
+  {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
   boolean_groups:
     {$authScopeBooleanGroups |indent: 4, true}{nil}
     {$customBooleanGroups |indent: 4, true}{nil}
@@ -107,7 +107,7 @@ runtime:
       {let $row kind="text"}
         {call displayLib.siteUrlApplicationTableRow}
           {param spec: $spec.siteUrl/}
-          {param tiersList: $spec.tiersList/}
+          {param tiersList: $spec.getTiersList()/}
         {/call}
       {/let}
       {$row |indent: 6, true}{nil}
@@ -117,7 +117,7 @@ runtime:
       {let $row kind="text"}
         {call displayLib.adminUrlApplicationTableRow}
           {param spec: $spec.adminUrl/}
-          {param tiersList: $spec.tiersList/}
+          {param tiersList: $spec.getTiersList()/}
         {/call}
       {/let}
       {$row |indent: 6, true}{nil}
@@ -125,9 +125,9 @@ runtime:
 
       {let $passwordRows kind="text"}
         {call displayLib.passwordApplicationTableRows}
-          {param passwordsList: $spec.passwordsList/}
-          {param deployInput: $spec.deployInput/}
-          {param tiersList: $spec.tiersList/}
+          {param passwordsList: $spec.getPasswordsList()/}
+          {param deployInput: $spec.getDeployInput()/}
+          {param tiersList: $spec.getTiersList()/}
         {/call}
       {/let}
       {$passwordRows |indent: 6, true}{nil}
@@ -136,12 +136,12 @@ runtime:
         value: '{{ properties().zone }}'
 
       {if $spec.postDeploy}
-      {for $row in $spec.postDeploy.infoRowsList}
+      {for $row in $spec.postDeploy.getInfoRowsList()}
       {let $rowDisplay kind="text"}
         {call displayLib.infoRowApplicationTableRow}
           {param infoRow: $row/}
           {param deployInput: $spec.deployInput/}
-          {param tiersList: $spec.tiersList/}
+          {param tiersList: $spec.getTiersList()/}
         {/call}
       {/let}
       {$rowDisplay |indent: 6, true}{nil}
@@ -150,43 +150,43 @@ runtime:
 
   {let $adminButton kind="text"}
     {if $spec.adminUrl}
-      {call displayLib.adminActionButton}{param spec: $spec.adminUrl/}{param tiersList: $spec.tiersList/}{/call}
+      {call displayLib.adminActionButton}{param spec: $spec.adminUrl/}{param tiersList: $spec.getTiersList()/}{/call}
     {/if}
   {/let}
   {let $siteButton kind="text"}
     {if $spec.siteUrl}
-      {call displayLib.siteActionButton}{param spec: $spec.siteUrl/}{param tiersList: $spec.tiersList/}{/call}
+      {call displayLib.siteActionButton}{param spec: $spec.siteUrl/}{param tiersList: $spec.getTiersList()/}{/call}
     {/if}
   {/let}
   {let $connectButton kind="text"}
     {if $spec.postDeploy.connectButton}
       {call displayLib.connectActionButton}
         {param button: $spec.postDeploy.connectButton/}
-        {param tiersList: $spec.tiersList/}
+        {param tiersList: $spec.getTiersList()/}
       {/call}
     {/if}
   {/let}
 
-  {if $adminButton.length() > 0}
+  {if $adminButton.length > 0}
   primaryButton:
     {$adminButton |indent: 4, true}{nil}
-  {if $siteButton.length() > 0}
+  {if $siteButton.length > 0}
   secondaryButton:
     {$siteButton |indent: 4, true}{nil}
-  {elseif $connectButton.length() > 0}
+  {elseif $connectButton.length > 0}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
 
-  {elseif $siteButton.length() > 0}  // if strLen($adminButton) > 0
+  {elseif $siteButton.length > 0}  // if strLen($adminButton) > 0
   primaryButton:
     {$siteButton |indent: 4, true}{nil}
-  {if $connectButton.length() > 0}
+  {if $connectButton.length > 0}
   secondaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
 
-  {elseif $connectButton.length() > 0}  // elseif strLen(siteButton) > 0
+  {elseif $connectButton.length > 0}  // elseif strLen(siteButton) > 0
   primaryButton:
     {$connectButton |indent: 4, true}{nil}
   {/if}
@@ -201,7 +201,7 @@ runtime:
       showIf: "{{ outputs().tiersWithNoExternalIPStatus == 'SOME' }}"
 
     {if $spec.postDeploy}
-    {for $action in $spec.postDeploy.actionItemsList}
+    {for $action in $spec.postDeploy.getActionItemsList()}
     - heading: {$action.getHeading() |yamlprimitive: 6}
       {if $action.getDescription()}
       description: {$action.getDescription() |yamlprimitive: 6}
@@ -210,13 +210,13 @@ runtime:
       snippet: {$action.getSnippet() |yamlprimitive: 6}
       {/if}
       {if $action.showIf}
-      showIf: '{{ {booleanExpressionDisplayCondition($action.showIf, $spec.tiersList)} }}'
+      showIf: '{{ {booleanExpressionDisplayCondition($action.showIf, $spec.getTiersList())} }}'
       {/if}
     {/for}
     {/if}
 
-    {for $tier in $spec.tiersList}
-    {for $firewallRule in $tier.firewallRulesList}
+    {for $tier in $spec.getTiersList()}
+    {for $firewallRule in $tier.getFirewallRulesList()}
     {let $item kind="text"}
       {call displayLib.openPortAction}{param spec: $firewallRule/}{param tierSpec: $tier/}{/call}
     {/let}
@@ -224,10 +224,10 @@ runtime:
     {/for}
     {/for}
 
-    {if length($spec.passwordsList) > 1}
+    {if length($spec.getPasswordsList()) > 1}
     - heading: Change the temporary passwords
       description: For additional security, it is recommended that you change the passwords.
-    {elseif length($spec.passwordsList) > 0}
+    {elseif length($spec.getPasswordsList()) > 0}
     - heading: Change the temporary password
       description: For additional security, it is recommended that you change the password.
     {/if}
@@ -261,7 +261,7 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: Image version
   {$section}
   enumLabels:
-    {for $image, $index in $spec.imagesList}
+    {for $image, $index in $spec.getImagesList()}
     {if $image.getLabel()}
     'projects/{$image.getProject()}/global/images/{$image.getName()}': '{$image.getLabel()}'
     {else}
@@ -272,7 +272,7 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 - name: {'machineType' |tierprefixed: $spec}
   title: Machine type
   {$section}
-{if length($spec.acceleratorsList) > 0}
+{if length($spec.getAcceleratorsList()) > 0}
 {call displayLib.acceleratorProperty}{param tier: $spec/}{/call}
 {/if}
 - name: {'bootDiskType' |tierprefixed: $spec}
@@ -282,7 +282,7 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   title: {$spec.bootDisk.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   {$section}
 
-{for $disk, $index in $spec.additionalDisksList}
+{for $disk, $index in $spec.getAdditionalDisksList()}
 - name: {diskTypePropertyName($index, $spec) |yamlprimitive: 2}
   title: {$disk.getDisplayLabel() + ' type' |yamlprimitive: 2}
   {$section}
@@ -305,7 +305,7 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
 
 {let $firewallDisplayProperties kind="text"}
   {call displayLib.firewallDisplayProperties}
-    {param firewallsList: $spec.firewallRulesList/}
+    {param firewallsList: $spec.getFirewallRulesList()/}
     {param tierSpec: $spec/}
   {/call}
 {/let}
@@ -319,7 +319,7 @@ section: {call displayLib.tierSectionName}{param spec: $spec/}{/call}{nil}
   level: 1
 {/if}
 
-{for $scope in $spec.gcpAuthScopesList}
+{for $scope in $spec.getGcpAuthScopesList()}
 - name: {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{param tierSpec: $spec/}{/call}
   title: Allow {call displayLib.authScopeDescription}{param spec: $scope/}{/call} on the VM
   {$section}

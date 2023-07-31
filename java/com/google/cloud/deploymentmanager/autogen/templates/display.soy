@@ -39,7 +39,7 @@ Open {$firewallTitle} traffic{nil}
     gcloud --project={{ outputs().project }} compute firewall-rules
     create "{{ outputs().deployment }}{call utilities.firewallRuleNameSuffix}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}"
     --network {{ outputs().{$tierMainNetwork} }}
-    {if $spec.getPort() and $spec.getPort().length() > 0}
+    {if $spec.getPort() and $spec.getPort().length > 0}
     --allow {$protocol |lowercased}:{$spec.getPort()}
     {else}
     --allow {$protocol |lowercased}
@@ -313,7 +313,7 @@ placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {if $valueLabels}
 enumLabels:
   {for $key in $valueLabels.keys()}
-  '{$key}': {$valueLabels[$key] |yamlprimitive: 2}
+  '{$key}': {$valueLabels.get($key) |yamlprimitive: 2}
   {/for}
 {/if}
 {/template}
@@ -374,7 +374,7 @@ enumLabels:
 {@param? spec: DeployInputSpec}
 {@param placement: DeployInputSection.Placement}
 {if $spec}
-{for $section in $spec.sectionsList}
+{for $section in $spec.getSectionsList()}
 {if $section.getPlacement() == $placement}
 - name: {$section.getName() |yamlprimitive: 2}
   title: {$section.getTitle() |yamlprimitive: 2}
@@ -393,8 +393,8 @@ enumLabels:
 {template customBooleanGroups kind="text"}
 {@param? spec: DeployInputSpec}
 {if $spec}
-{for $section in $spec.sectionsList}
-{for $field in $section.fieldsList}
+{for $section in $spec.getSectionsList()}
+{for $field in $section.getFieldsList()}
 {if $field.groupedBooleanCheckbox and $field.groupedBooleanCheckbox.displayGroup}
 {let $group: $field.groupedBooleanCheckbox.displayGroup/}
 - name: {$group.getName() |yamlprimitive: 2}
@@ -422,15 +422,15 @@ enumLabels:
 {@param? singleVmSpec: SingleVmDeploymentPackageSpec}
 {@param? multiVmSpec: MultiVmDeploymentPackageSpec}
 {if $singleVmSpec}
-{for $scope in $singleVmSpec.gcpAuthScopesList}
+{for $scope in $singleVmSpec.getGcpAuthScopesList()}
 - name: {call authScopeBoolGroupName}{param spec: $scope/}{/call}
   title: {call authScopeBoolGroupTitle}{param spec: $scope/}{/call}
 {/for}
 
 {else}
 
-{for $tier in $multiVmSpec.tiersList}
-{for $scope in $tier.gcpAuthScopesList}
+{for $tier in $multiVmSpec!.getTiersList()}
+{for $scope in $tier.getGcpAuthScopesList()}
 - name: {call authScopeBoolGroupName}{param spec: $scope/}{param tier: $tier/}{/call}
   title: {call authScopeBoolGroupTitle}{param spec: $scope/}{/call}
 {/for}

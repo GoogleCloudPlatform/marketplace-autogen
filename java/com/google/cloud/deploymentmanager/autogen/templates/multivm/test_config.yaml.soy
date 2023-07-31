@@ -18,13 +18,13 @@ resources:
 
   {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
   {let $defaultMap: getTestConfigDefaultValues($spec)/}
-  {if $testDefaultedFields.length() > 0 or $defaultMap.keys().length() > 0}
+  {if $testDefaultedFields.length > 0 or $defaultMap.keys().length > 0}
   properties:
   {for $field in $testDefaultedFields}
     {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
   {/for}
   {for $key in $defaultMap.keys()}
-    {$key |yamlprimitive: 4}: {$defaultMap[$key] |yamlprimitive: 4}
+    {$key |yamlprimitive: 4}: {$defaultMap.get($key) |yamlprimitive: 4}
   {/for}
   {/if}
 {/template}

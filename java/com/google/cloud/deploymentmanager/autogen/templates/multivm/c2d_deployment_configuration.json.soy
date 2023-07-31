@@ -7,8 +7,8 @@ import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmana
 
 {lb}
   "defaultDeploymentType": "MULTI_VM",
-  "imageName": "{$spec.tiersList[0].imagesList[0].getName()}",
-  "projectId": "{$spec.tiersList[0].imagesList[0].getProject()}",
+  "imageName": "{$spec.getTiersList()[0].getImagesList()[0].getName()}",
+  "projectId": "{$spec.getTiersList()[0].getImagesList()[0].getProject()}",
   "templateName": "nonexistent_template",
   "useSolutionPackage": true
 {rb}

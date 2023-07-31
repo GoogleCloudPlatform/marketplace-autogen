@@ -78,7 +78,7 @@ properties:
   {let $imageProp kind="text"}
     {call renders.imagePropertySchema}
       {param name: 'image'/}
-      {param imagesList: $spec.imagesList/}
+      {param imagesList: $spec.getImagesList() /}
     {/call}
   {/let}
   {$imageProp |indent: 2, true}{nil}
@@ -95,7 +95,7 @@ properties:
   {let $acceleratorProps kind="text"}
     {call renders.acceleratorPropertiesSchema}
       {param namePrefix: 'accelerator'/}
-      {param spec: $spec.acceleratorsList[0]/}
+      {param spec: $spec.getAcceleratorsList()[0] /}
     {/call}
   {/let}
   {$acceleratorProps |indent: 2, true}{nil}
@@ -120,7 +120,7 @@ properties:
   {$ipForwardingProp |indent: 2, true}{nil}
   {/if}
 
-  {for $scope in $spec.gcpAuthScopesList}
+  {for $scope in $spec.getGcpAuthScopesList()}
   {call utilities.gcpAuthScopePropertyName}{param spec: $scope/}{/call}:
     type: boolean
     default: {if $scope.getDefaultOff()}False{else}True{/if}
@@ -134,10 +134,10 @@ properties:
   {/let}
   {$bootDiskProps |indent: 2, true}{nil}
 
-  {for $disk, $index in $spec.additionalDisksList}
+  {for $disk, $index in $spec.getAdditionalDisksList()}
     {let $diskProps kind="text"}
     {call renders.additionalDiskPropertiesSchema}
-      {param spec: $spec.additionalDisksList[$index]/}
+      {param spec: $spec.getAdditionalDisksList()[$index] /}
       {param diskIndex: $index/}
       {param zonePropertyName: 'zone'/}
     {/call}
@@ -145,7 +145,7 @@ properties:
     {$diskProps |indent: 2, true}{nil}
   {/for}
 
-  {for $firewallRule in $spec.firewallRulesList}
+  {for $firewallRule in $spec.getFirewallRulesList()}
   {let $firewallProp kind="text"}{call renders.firewallProps}{param spec: $firewallRule/}{/call}{/let}
   {$firewallProp |indent: 2, true}{nil}
   {/for}
@@ -172,7 +172,7 @@ properties:
 outputs:
   deployment:
     type: string
-  {for $password, $index in $spec.passwordsList}
+  {for $password, $index in $spec.getPasswordsList()}
   password{$index}:
     type: string
   {/for}
