@@ -40,7 +40,7 @@ required:
   {/for}
 
   {let $deployInputRequiredList kind="text"}
-    {call renders.deployInputRequiredSchema}{param inputSpec: $spec.deployInput/}{/call}
+    {call renders.deployInputRequiredSchema}{param inputSpec: $spec.getDeployInput()/}{/call}
   {/let}
   {$deployInputRequiredList |indent: 2, true}{nil}
 
@@ -49,7 +49,7 @@ properties:
   {let $zoneProp kind="text"}
     {call renders.zonePropertySchema}
       {param name: 'zone'/}
-      {param zoneSpec: $spec.zone/}
+      {param zoneSpec: $spec.getZone()/}
     {/call}
   {/let}
   {$zoneProp |indent: 2, true}{nil}
@@ -59,19 +59,19 @@ properties:
   {$tierProperties |indent: 2, true}{nil}
   {/for}
 
-  {if $spec.deployInput}
+  {if $spec.getDeployInput()}
   {let $deployInputProps kind="text"}
     {call renders.deployInputPropertiesSchema}
-      {param inputSpec: $spec.deployInput/}
+      {param inputSpec: $spec.getDeployInput()/}
     {/call}
   {/let}
   {$deployInputProps |indent: 2, true}{nil}
   {/if}
 
-  {if $spec.stackdriver}
+  {if $spec.getStackdriver()}
   {let $stackdriverPropertiesSchema kind="text"}
     {call renders.stackdriverPropertiesSchema}
-      {param stackdriver: $spec.stackdriver/}
+      {param stackdriver: $spec.getStackdriver()/}
     {/call}
   {/let}
   {$stackdriverPropertiesSchema |indent: 2, true}{nil}
@@ -107,7 +107,7 @@ outputs:
 {let $instanceCountProp kind="text"}
   {call renders.tierInstanceAcountPropertySchema}
     {param name: 'instanceCount'/}
-    {param spec: $spec.instanceCount/}
+    {param spec: $spec.getInstanceCount()! /}
     {param tier: $spec/}
   {/call}
 {/let}
@@ -125,7 +125,7 @@ outputs:
 {let $machineTypeProp kind="text"}
   {call renders.machineTypePropertySchema}
     {param name: 'machineType'/}
-    {param spec: $spec.machineType/}
+    {param spec: $spec.getMachineType()! /}
     {param tier: $spec/}
   {/call}
 {/let}
@@ -146,17 +146,17 @@ outputs:
   {call renders.networkPropertiesSchema}
     {param nameSuffix: 'network'/}
     {param zonePropertyName: 'zone'/}
-    {param spec: $spec.networkInterfaces/}
+    {param spec: $spec.getNetworkInterfaces()! /}
     {param tier: $spec/}
   {/call}
 {/let}
 {$networkProps}{nil}
 
-{if $spec.ipForwarding}
+{if $spec.getIpForwarding()}
 {let $ipForwardingProp kind="text"}
   {call renders.ipForwardingPropertySchema}
     {param name: 'ipForward'/}
-    {param spec: $spec.ipForwarding/}
+    {param spec: $spec.getIpForwarding()/}
     {param tier: $spec/}
   {/call}
 {/let}
@@ -171,7 +171,7 @@ outputs:
 
 {let $bootDiskProps kind="text"}
   {call renders.bootDiskPropertiesSchema}
-    {param spec: $spec.bootDisk/}
+    {param spec: $spec.getBootDisk()! /}
     {param zonePropertyName: 'zone'/}
     {param tier: $spec/}
   {/call}

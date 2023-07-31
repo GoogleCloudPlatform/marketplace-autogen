@@ -55,10 +55,10 @@ input:
     {$acceleratorProperty |indent: 4, true}{nil}
     {/if}
     - name: bootDiskType
-      title: {$spec.bootDisk.getDisplayLabel()} type
+      title: {$spec.getBootDisk()!.getDisplayLabel()} type
       section: BOOT_DISK
     - name: bootDiskSizeGb
-      title: {$spec.bootDisk.getDisplayLabel()} size in GB
+      title: {$spec.getBootDisk()!.getDisplayLabel()} size in GB
       section: BOOT_DISK
 
     {for $disk, $index in $spec.getAdditionalDisksList()}
@@ -86,7 +86,7 @@ input:
     {/let}
     {$firewallDisplayProperties |indent: 4, true}{nil}
 
-    {if $spec.ipForwarding}
+    {if $spec.getIpForwarding()}
     - name: ipForward
       title: IP forwarding
       tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
@@ -101,8 +101,8 @@ input:
       boolean_group: {call displayLib.authScopeBoolGroupName}{param spec: $scope/}{/call}
     {/for}
 
-    {if $spec.deployInput}
-    {for $section in $spec.deployInput.getSectionsList()}
+    {if $spec.getDeployInput()}
+    {for $section in $spec.getDeployInput().getSectionsList()}
     {for $field in $section.getFieldsList()}
     {let $fieldDisplay kind="text"}
       {call displayLib.deployInputFieldDisplay}
@@ -115,17 +115,17 @@ input:
     {/for}
     {/if}
 
-    {if $spec.stackdriver}
+    {if $spec.getStackdriver()}
     {let $stackdriverDisplay kind="text"}
       {call displayLib.stackdriverDisplay}
-        {param stackdriver: $spec.stackdriver/}
+        {param stackdriver: $spec.getStackdriver()/}
       {/call}
     {/let}
     {$stackdriverDisplay |indent: 4, true}{nil}
     {/if}
 
   sections:
-    {call displayLib.topSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.topSections}{param spec: $spec.getDeployInput()/}{/call}{nil}
 
     - name: BOOT_DISK
       title: Boot Disk
@@ -148,12 +148,12 @@ input:
       tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
     {/if}
 
-    {call displayLib.bottomSections}{param spec: $spec.deployInput/}{/call}{nil}
+    {call displayLib.bottomSections}{param spec: $spec.getDeployInput()/}{/call}{nil}
 
-    {if $spec.stackdriver}
+    {if $spec.getStackdriver()}
     {let $stackdriverBottomSections kind="text"}
       {call displayLib.stackdriverBottomSections}
-        {param stackdriver: $spec.stackdriver/}
+        {param stackdriver: $spec.getStackdriver()/}
       {/call}
     {/let}
     {$stackdriverBottomSections |indent: 4, true}{nil}
@@ -163,7 +163,7 @@ input:
     {call displayLib.authScopeBooleanGroups}{param singleVmSpec: $spec/}{/call}
   {/let}
   {let $customBooleanGroups kind="text"}
-    {call displayLib.customBooleanGroups}{param spec: $spec.deployInput/}{/call}
+    {call displayLib.customBooleanGroups}{param spec: $spec.getDeployInput()/}{/call}
   {/let}
   {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
   boolean_groups:
@@ -176,16 +176,16 @@ runtime:
   deployingMessage: Deployment can take several minutes to complete.
   applicationTable:
     rows:
-      {if $spec.siteUrl}
+      {if $spec.getSiteUrl()}
       {let $row kind="text"}
-        {call displayLib.siteUrlApplicationTableRow}{param spec: $spec.siteUrl/}{/call}
+        {call displayLib.siteUrlApplicationTableRow}{param spec: $spec.getSiteUrl()/}{/call}
       {/let}
       {$row |indent: 6, true}{nil}
       {/if}
 
-      {if $spec.adminUrl}
+      {if $spec.getAdminUrl()}
       {let $row kind="text"}
-        {call displayLib.adminUrlApplicationTableRow}{param spec: $spec.adminUrl/}{/call}
+        {call displayLib.adminUrlApplicationTableRow}{param spec: $spec.getAdminUrl()/}{/call}
       {/let}
       {$row |indent: 6, true}{nil}
       {/if}
@@ -193,7 +193,7 @@ runtime:
       {let $passwordRows kind="text"}
         {call displayLib.passwordApplicationTableRows}
           {param passwordsList: $spec.getPasswordsList()/}
-          {param deployInput: $spec.deployInput/}
+          {param deployInput: $spec.getDeployInput()/}
         {/call}
       {/let}
       {$passwordRows |indent: 6, true}{nil}
@@ -205,12 +205,12 @@ runtime:
       - label: Instance machine type
         value: '{{ properties().machineType }}'
 
-      {if $spec.postDeploy}
-      {for $row in $spec.postDeploy.getInfoRowsList()}
+      {if $spec.getPostDeploy()}
+      {for $row in $spec.getPostDeploy().getInfoRowsList()}
       {let $rowDisplay kind="text"}
         {call displayLib.infoRowApplicationTableRow}
           {param infoRow: $row/}
-          {param deployInput: $spec.deployInput/}
+          {param deployInput: $spec.getDeployInput()/}
         {/call}
       {/let}
       {$rowDisplay |indent: 6, true}{nil}
@@ -218,17 +218,17 @@ runtime:
       {/if}
 
   {let $adminButton kind="text"}
-    {if $spec.adminUrl}
-      {call displayLib.adminActionButton}{param spec: $spec.adminUrl/}{/call}
+    {if $spec.getAdminUrl()}
+      {call displayLib.adminActionButton}{param spec: $spec.getAdminUrl()/}{/call}
     {/if}
   {/let}
   {let $siteButton kind="text"}
-    {if $spec.siteUrl}
-      {call displayLib.siteActionButton}{param spec: $spec.siteUrl/}{/call}
+    {if $spec.getSiteUrl()}
+      {call displayLib.siteActionButton}{param spec: $spec.getSiteUrl()/}{/call}
     {/if}
   {/let}
   {let $connectButton kind="text"} // The connect button spec is always present for single vm.
-    {call displayLib.connectActionButton}{param button: $spec.postDeploy.connectButton/}{/call}
+    {call displayLib.connectActionButton}{param button: $spec.getPostDeploy()!.getConnectButton()/}{/call}
   {/let}
 
 
@@ -254,8 +254,8 @@ runtime:
       description: 'The VM instance has been configured with no external IP or internet access. Connecting to it directly may not be possible. Consider using a <a href="https://cloud.google.com/compute/docs/instances/connecting-advanced#bastion_host">bastion host</a> to access this VM.'
       showIf: '{{ !outputs().hasExternalIP }}'
 
-  {if $spec.postDeploy}
-    {for $action in $spec.postDeploy.getActionItemsList()}
+  {if $spec.getPostDeploy()}
+    {for $action in $spec.getPostDeploy().getActionItemsList()}
     - heading: {$action.getHeading() |yamlprimitive: 6}
       {if $action.getDescription()}
       description: {$action.getDescription() |yamlprimitive: 6}
@@ -263,8 +263,8 @@ runtime:
       {if $action.getSnippet()}
       snippet: {$action.getSnippet() |yamlprimitive: 6}
       {/if}
-      {if $action.showIf}
-      showIf: '{{ {booleanExpressionDisplayCondition($action.showIf)} }}'
+      {if $action.getShowIf()}
+      showIf: '{{ {booleanExpressionDisplayCondition($action.getShowIf())} }}'
       {/if}
     {/for}
     {/if}

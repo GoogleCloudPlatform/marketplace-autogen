@@ -195,7 +195,7 @@ Open {$firewallTitle} traffic{nil}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
-    {param spec: $spec.tierVm/}
+    {param spec: $spec.getTierVm()/}
     {param tiersList: $tiersList/}
   {/call}
 {/let}
@@ -210,7 +210,7 @@ Open {$firewallTitle} traffic{nil}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmInternalIP'/}
-    {param spec: $spec.tierVm/}
+    {param spec: $spec.getTierVm()/}
     {param tiersList: $tiersList/}
   {/call}
 {/let}
@@ -225,7 +225,7 @@ Open {$firewallTitle} traffic{nil}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
-    {param spec: $spec.tierVm/}
+    {param spec: $spec.getTierVm()/}
     {param tiersList: $tiersList/}
   {/call}
 {/let}
@@ -269,12 +269,12 @@ subtext: {$field.getDescription() |yamlprimitive: 0}
 {if $field.getTooltip()}
 tooltip: {$field.getTooltip() |yamlprimitive: 0}
 {/if}
-{if $field.integerBox?.validation?.getDescription()}
-validation: {$field.integerBox.validation.getDescription() |yamlprimitive: 0}
-{elseif $field.stringBox?.validation?.getDescription()}
-validation: {$field.stringBox.validation.getDescription() |yamlprimitive: 0}
-{elseif $field.emailBox?.validation?.getDescription()}
-validation: {$field.emailBox.validation.getDescription() |yamlprimitive: 0}
+{if $field.getIntegerBox()?.getValidation()?.getDescription()}
+validation: {$field.getIntegerBox().getValidation().getDescription() |yamlprimitive: 0}
+{elseif $field.getStringBox()?.getValidation()?.getDescription()}
+validation: {$field.getStringBox().getValidation().getDescription() |yamlprimitive: 0}
+{elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+validation: {$field.getEmailBox().getValidation().getDescription() |yamlprimitive: 0}
 {/if}
 {if $field.getLevel()}
 level: {$field.getLevel()}
@@ -286,24 +286,24 @@ section: {$section.getName() |yamlprimitive: 0}
 section: {call tierSectionName}{param spec: findVmTier($section.getTier(), $tierList)/}{/call}
 {/if}
 
-{if $field.groupedBooleanCheckbox}
+{if $field.getGroupedBooleanCheckbox()}
 {let $displayGroup: findDisplayGroup($field, $section)/}
 boolean_group: {$displayGroup.getName() |yamlprimitive: 0}
 
-{elseif $field.integerBox}
-{let $box: $field.integerBox/}
+{elseif $field.getIntegerBox()}
+{let $box: $field.getIntegerBox()/}
 {if $box.getPlaceholder()}
 placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
 
-{elseif $field.stringBox}
-{let $box: $field.stringBox/}
+{elseif $field.getStringBox()}
+{let $box: $field.getStringBox()/}
 {if $box.getPlaceholder()}
 placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
 
-{elseif $field.emailBox}
-{let $box: $field.emailBox/}
+{elseif $field.getEmailBox()}
+{let $box: $field.getEmailBox()/}
 {if $box.getPlaceholder()}
 placeholder: {$box.getPlaceholder() |yamlprimitive: 0}
 {/if}
@@ -321,13 +321,13 @@ enumLabels:
 
 {template stackdriverDisplay kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.logging}
+{if $stackdriver?.getLogging()}
 - name: enableStackdriverLogging
   title: Enable Stackdriver Logging
   tooltip: 'Stackdriver Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
   section: STACKDRIVER
 {/if}
-{if $stackdriver?.monitoring}
+{if $stackdriver?.getMonitoring()}
 - name: enableStackdriverMonitoring
   title: Enable Stackdriver Monitoring
   tooltip: 'Stackdriver Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
@@ -338,7 +338,7 @@ enumLabels:
 
 {template stackdriverBottomSections kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.logging or $stackdriver?.monitoring}
+{if $stackdriver?.getLogging() or $stackdriver?.getMonitoring()}
 - name: STACKDRIVER
   title: Stackdriver
   subtext: Monitoring and management for services, containers, applications, and infrastructure
@@ -395,8 +395,8 @@ enumLabels:
 {if $spec}
 {for $section in $spec.getSectionsList()}
 {for $field in $section.getFieldsList()}
-{if $field.groupedBooleanCheckbox and $field.groupedBooleanCheckbox.displayGroup}
-{let $group: $field.groupedBooleanCheckbox.displayGroup/}
+{if $field.getGroupedBooleanCheckbox() and $field.getGroupedBooleanCheckbox().getDisplayGroup()}
+{let $group: $field.getGroupedBooleanCheckbox().getDisplayGroup()/}
 - name: {$group.getName() |yamlprimitive: 2}
   title: {$group.getTitle() |yamlprimitive: 2}
   {if $group.getTooltip()}
@@ -474,8 +474,8 @@ enumLabels:
   {call makeInternalUrl}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
 {let $hasExternalIpProp kind="text"}
-  {if $spec.tierVm}
-    {'hasExternalIP' |tierprefixed: findVmTier($spec.tierVm.getTier(), $tiersList)}{nil}
+  {if $spec.getTierVm()}
+    {'hasExternalIP' |tierprefixed: findVmTier($spec.getTierVm().getTier(), $tiersList)}{nil}
   {else}
     hasExternalIP{nil}
   {/if}
@@ -497,21 +497,21 @@ enumLabels:
 {if $password.getUsername()}
 - label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
   value: {$password.getUsername()}
-  {if $password.generateIf}
-  showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
+  {if $password.getGenerateIf()}
+  showIf: '{{ {booleanExpressionDisplayCondition($password.getGenerateIf(), $tiersList)} }}'
   {/if}
 {elseif $password.getUsernameFromDeployInputField()}
 {let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
 - label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
   value: '{{ properties().{deployInputFieldName($field)} }}'
-  {if $password.generateIf}
-  showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
+  {if $password.getGenerateIf()}
+  showIf: '{{ {booleanExpressionDisplayCondition($password.getGenerateIf(), $tiersList)} }}'
   {/if}
 {/if}
 - label: {($password.getDisplayLabel() + ' password (Temporary)') |yamlprimitive: 2}
   value: '{{ outputs().password{$index} }}'
-  {if $password.generateIf}
-  showIf: '{{ {booleanExpressionDisplayCondition($password.generateIf, $tiersList)} }}'
+  {if $password.getGenerateIf()}
+  showIf: '{{ {booleanExpressionDisplayCondition($password.getGenerateIf(), $tiersList)} }}'
   {/if}
 {/for}
 {/template}
@@ -528,8 +528,8 @@ enumLabels:
   {let $field: findDeployInputField($infoRow.getValueFromDeployInputField(), $deployInput)/}
   value: '{{ properties().{deployInputFieldName($field)} }}'
 {/if}
-{if $infoRow.showIf}
-  showIf: '{{ {booleanExpressionDisplayCondition($infoRow.showIf, $tiersList)} }}'
+{if $infoRow.getShowIf()}
+  showIf: '{{ {booleanExpressionDisplayCondition($infoRow.getShowIf(), $tiersList)} }}'
 {/if}
 {/template}
 
@@ -560,7 +560,7 @@ action: {$actionUrl |yamlprimitive: 0}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
-    {param spec: $button.tierVm/}
+    {param spec: $button!.getTierVm() /}
     {param tiersList: $tiersList/}
   {/call}
 {/let}

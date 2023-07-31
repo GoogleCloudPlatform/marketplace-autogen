@@ -16,7 +16,7 @@ resources:
 - name: {$solutionId}
   type: {$template}
 
-  {let $testDefaultedFields: $spec.deployInput ? findInputsWithTestDefaultValues($spec.deployInput) : [] /}
+  {let $testDefaultedFields: $spec.getDeployInput() ? findInputsWithTestDefaultValues($spec.getDeployInput()) : [] /}
   {let $defaultMap: getTestConfigDefaultValues($spec)/}
   {if $testDefaultedFields.length > 0 or $defaultMap.keys().length > 0}
   properties:

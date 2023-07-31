@@ -9,8 +9,8 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {@param packageSpec: MultiVmDeploymentPackageSpec}
 
 {let $waiterSpec:
-    ($spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.WAITER)
-    ? $spec.applicationStatus.waiter : null/}
+    ($spec.getApplicationStatus()?.getType() == ApplicationStatusSpec.StatusType.WAITER)
+    ? $spec.getApplicationStatus()!.getWaiter() : null/}
 
 imports:
   - name: common.py
@@ -25,7 +25,7 @@ imports:
   {if $waiterSpec}
   - name: software_status.py
     path: common/software_status.py
-  {if $waiterSpec.script}
+  {if $waiterSpec.getScript()}
   - name: software_status_script.py
     path: common/software_status_script.py
   {/if}
@@ -60,7 +60,7 @@ required:
 
   {let $deployInputRequiredList kind="text"}
     {call renders.deployInputRequiredSchema}
-      {param inputSpec: $packageSpec.deployInput/}
+      {param inputSpec: $packageSpec.getDeployInput() /}
       {param tierSpec: $spec/}
     {/call}
   {/let}
@@ -71,7 +71,7 @@ properties:
   {let $instanceCountProp kind="text"}
     {call renders.tierInstanceAcountPropertySchema}
       {param name: 'instanceCount'/}
-      {param spec: $spec.instanceCount/}
+      {param spec: $spec.getInstanceCount()! /}
     {/call}
   {/let}
   {$instanceCountProp |indent: 2, true}{nil}
@@ -90,7 +90,7 @@ properties:
   {let $machineTypeProp kind="text"}
     {call renders.machineTypePropertySchema}
       {param name: 'machineType'/}
-      {param spec: $spec.machineType/}
+      {param spec: $spec.getMachineType()! /}
     {/call}
   {/let}
   {$machineTypeProp |indent: 2, true}{nil}
@@ -109,16 +109,16 @@ properties:
     {call renders.networkPropertiesSchema}
       {param nameSuffix: 'network'/}
       {param zonePropertyName: 'zone'/}
-      {param spec: $spec.networkInterfaces/}
+      {param spec: $spec.getNetworkInterfaces()! /}
     {/call}
   {/let}
   {$networkProps |indent: 2, true}{nil}
 
-  {if $spec.ipForwarding}
+  {if $spec.getIpForwarding()}
   {let $ipForwardingProp kind="text"}
     {call renders.ipForwardingPropertySchema}
       {param name: 'ipForward'/}
-      {param spec: $spec.ipForwarding/}
+      {param spec: $spec.getIpForwarding()/}
     {/call}
   {/let}
   {$ipForwardingProp |indent: 2, true}{nil}
@@ -132,7 +132,7 @@ properties:
 
   {let $bootDiskProps kind="text"}
     {call renders.bootDiskPropertiesSchema}
-      {param spec: $spec.bootDisk/}
+      {param spec: $spec.getBootDisk()! /}
       {param zonePropertyName: 'zone'/}
     {/call}
   {/let}
@@ -155,10 +155,10 @@ properties:
   {$firewallProp |indent: 2, true}{nil}
   {/for}
 
-  {if $packageSpec.deployInput}
+  {if $packageSpec.getDeployInput()}
   {let $deployInputProps kind="text"}
     {call renders.deployInputPropertiesSchema}
-      {param inputSpec: $packageSpec.deployInput/}
+      {param inputSpec: $packageSpec.getDeployInput()/}
       {param tierSpec: $spec/}
     {/call}
   {/let}
@@ -178,10 +178,10 @@ properties:
     type: integer
   {/for}
 
-  {if $packageSpec.stackdriver}
+  {if $packageSpec.getStackdriver()}
   {let $stackdriverPropertiesSchema kind="text"}
     {call renders.stackdriverPropertiesSchema}
-      {param stackdriver: $packageSpec.stackdriver/}
+      {param stackdriver: $packageSpec.getStackdriver()/}
     {/call}
   {/let}
   {$stackdriverPropertiesSchema |indent: 2, true}{nil}
