@@ -1,4 +1,4 @@
-# Deployment Manager Autogen [![Build Status](https://travis-ci.com/GoogleCloudPlatform/deploymentmanager-autogen.svg?branch=master)](https://travis-ci.com/GoogleCloudPlatform/deploymentmanager-autogen)
+# Deployment Manager Autogen
 
 *Deployment Manager Autogen* is a Java-based tool for generating fully functional [Deployment Manager](https://cloud.google.com/deployment-manager/docs/) templates from simplified YAML, JSON, or Prototext configuration files.
 
