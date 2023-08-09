@@ -48,7 +48,7 @@ resources:
       acceleratorCount: {{ properties["{'acceleratorCount' |tierprefixed: $tier}"] }}
       {/if}
 
-      {if $tier.ipForwarding}
+      {if $tier.getIpForwarding()}
       ipForward: {{ properties["{'ipForward' |tierprefixed: $tier}"] }}
       {/if}
 
@@ -84,9 +84,9 @@ resources:
       {/if}
       {/for}
 
-      {if $spec.deployInput}
+      {if $spec.getDeployInput()}
 
-      {for $field in listDeployInputFields($spec.deployInput, $tier)}
+      {for $field in listDeployInputFields($spec.getDeployInput(), $tier)}
       {if deployInputFieldIsString($field)}
       {deployInputFieldName($field) |yamlprimitive: 6}: |-
         {{ properties["{deployInputFieldName($field)}"] }}
@@ -108,10 +108,10 @@ resources:
       {diskSizePropertyName($index, $tier)}: {{ properties["{diskSizePropertyName($index, $tier)}"] }}
       {/for}
 
-      {if $spec.stackdriver?.logging}
+      {if $spec.getStackdriver()?.getLogging()}
       enableStackdriverLogging: {{ properties["enableStackdriverLogging"] }}
       {/if}
-      {if $spec.stackdriver?.monitoring}
+      {if $spec.getStackdriver()?.getMonitoring()}
       enableStackdriverMonitoring: {{ properties["enableStackdriverMonitoring"] }}
       {/if}
   {/for}
@@ -160,14 +160,14 @@ outputs:
   - name: {$tierMainNetwork}
     value: {{ {$tierMainNetwork} }}
   {/for}
-  {if $spec.siteUrl}
-  {let $urlTier: findVmTier($spec.siteUrl.tierVm.getTier(), $spec.getTiersList())/}
+  {if $spec.getSiteUrl()}
+  {let $urlTier: findVmTier($spec.getSiteUrl().getTierVm()!.getTier(), $spec.getTiersList())/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
     value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)
   {/if}
-  {if $spec.adminUrl and (not $spec.siteUrl or $spec.siteUrl.tierVm.getTier() != $spec.adminUrl.tierVm.getTier())}
-  {let $urlTier: findVmTier($spec.adminUrl.tierVm.getTier(), $spec.getTiersList())/}
+  {if $spec.getAdminUrl() and (not $spec.getSiteUrl() or $spec.getSiteUrl().getTierVm()!.getTier() != $spec.getAdminUrl().getTierVm()!.getTier())}
+  {let $urlTier: findVmTier($spec.getAdminUrl().getTierVm()!.getTier()!, $spec.getTiersList())/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}
     value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)

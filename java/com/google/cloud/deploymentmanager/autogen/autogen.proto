@@ -19,12 +19,12 @@ syntax = "proto3";
 
 package cloud.deploymentmanager.autogen;
 
+import "java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto";
+import "java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto";
+
 option java_multiple_files = true;
 option java_package = "com.google.cloud.deploymentmanager.autogen.proto";
 option java_outer_classname = "AutogenProtos";
-
-import "java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto";
-import "java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto";
 
 // Input for generating a deployment package.
 //
