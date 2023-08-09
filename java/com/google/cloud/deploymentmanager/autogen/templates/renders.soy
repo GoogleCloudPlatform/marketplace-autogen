@@ -216,7 +216,7 @@ sourceTags:
 {let $propertyName kind="text"}
   {call utilities.passwordPropertyName}{param passwordIndex: $passwordIndex/}{/call}
 {/let}
-{if not $password.generateIf}
+{if not $password.getGenerateIf()}
 - {$propertyName}
 {/if}
 {/template}
@@ -271,7 +271,7 @@ sourceTags:
     {% endif %}
     {/if}
 
-{if $waiterSpec.script}
+{if $waiterSpec.getScript()}
 - name: software-status-script
   type: software_status_script.py
 
@@ -280,9 +280,9 @@ sourceTags:
     initScript: |-
       {$startupSpec.getBashScriptContent() |indent: 6}
     {/if}
-    {if $waiterSpec.script.getCheckScriptContent()}
+    {if $waiterSpec.getScript().getCheckScriptContent()}
     checkScript: |-
-      {$waiterSpec.script.getCheckScriptContent() |indent: 6}
+      {$waiterSpec.getScript().getCheckScriptContent() |indent: 6}
     {/if}
 {/if}
 
@@ -300,7 +300,7 @@ sourceTags:
 {template startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
 {@param? startupSpec: GceStartupScriptSpec}
 {@param? waiterSpec: ApplicationStatusSpec.WaiterSpec}
-{if $startupSpec?.getBashScriptContent() and not $waiterSpec?.script}
+{if $startupSpec?.getBashScriptContent() and not $waiterSpec?.getScript()}
 - key: startup-script
   value: |-
     #!/bin/bash
@@ -326,22 +326,22 @@ sourceTags:
 - key: status-variable-path
   value: $(ref.software-status.variable-path)
 
-{if $waiterSpec.script}
+{if $waiterSpec.getScript()}
 - key: status-uptime-deadline
-  value: {$waiterSpec.script.getCheckTimeoutSecs()}
+  value: {$waiterSpec.getScript().getCheckTimeoutSecs()}
 {else}
 - key: status-uptime-deadline
   value: {$waiterSpec.getWaiterTimeoutSecs()}
 {/if}
 
-{if $waiterSpec.script}
+{if $waiterSpec.getScript()}
 // When the waiter script is defined, we use software_status_script.py resource
 // to define the startup procedure.
 - key: startup-script
   value: $(ref.software-status-script.startup-script)
 {/if}
 
-{if $waiterSpec.script?.getDisableStartupScriptUrl()}
+{if $waiterSpec.getScript()?.getDisableStartupScriptUrl()}
 - key: startup-script-url
   value: ''
 {/if}
@@ -352,7 +352,7 @@ sourceTags:
 
 /* If startup script and waiter are defined, use the startup script directly
  * when waiter usage is disabled. */
-{if $startupSpec?.getBashScriptContent() and $waiterSpec?.script}
+{if $startupSpec?.getBashScriptContent() and $waiterSpec?.getScript()}
 - key: startup-script
   value: |-
     #!/bin/bash
@@ -375,16 +375,16 @@ sourceTags:
   {if $metadata.getValue()}
   value: {$metadata.getValue() |yamlprimitive: 2}
 
-  {elseif $metadata.tierVmNames}
-  {let $tierVmNames: $metadata.tierVmNames/}
+  {elseif $metadata.getTierVmNames()}
+  {let $tierVmNames: $metadata.getTierVmNames()/}
   {let $tier: findVmTier($tierVmNames.getTier(), $tierSpecList)/}
   {let $vmPrefix kind="text"}{call utilities.tierVmPrefix}{param spec: $tier/}{/call}{/let}
   {let $instanceCount kind="text"}
     properties["{'instanceCount' |tierprefixed: $tier}"]{nil}
   {/let}
 
-  {if $metadata.tierVmNames.allVms}
-  {% set delimiter = joiner("{$metadata.tierVmNames.allVms.getDelimiter() |doublequoted}") %}
+  {if $metadata.getTierVmNames().getAllVms()}
+  {% set delimiter = joiner("{$metadata.getTierVmNames().getAllVms().getDelimiter() |doublequoted}") %}
   value: {% for vmIndex in range({$instanceCount}) -%}
     {{- delimiter() }}{$vmPrefix}-{{ vmIndex -}}
   {%- endfor %}
@@ -397,7 +397,7 @@ sourceTags:
   value: {$vmPrefix}-{{ {$instanceCount} - {-$vmIndex} }}
   {/if}
 
-  {/if /* $metadata.tierVmNames.allVms */}
+  {/if /* $metadata.getTierVmNames().getAllVms() */}
 
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
@@ -412,11 +412,11 @@ sourceTags:
 /** Converts Stackdriver's properties to integer. */
 {template stackdriverPropertiesJinja kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.logging}
+{if $stackdriver?.getLogging()}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
 {/if}
-{if $stackdriver?.monitoring}
+{if $stackdriver?.getMonitoring()}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
 {/if}
@@ -426,15 +426,15 @@ sourceTags:
 /** Renders Stackdriver's properties in schema. */
 {template stackdriverPropertiesSchema kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.logging}
+{if $stackdriver?.getLogging()}
 enableStackdriverLogging:
   type: boolean
-  default: {if $stackdriver?.logging.getDefaultOn()}True{else}False{/if}
+  default: {if $stackdriver?.getLogging()!.getDefaultOn()}True{else}False{/if}
 {/if}
-{if $stackdriver?.monitoring}
+{if $stackdriver?.getMonitoring()}
 enableStackdriverMonitoring:
   type: boolean
-  default: {if $stackdriver?.monitoring.getDefaultOn()}True{else}False{/if}
+  default: {if $stackdriver?.getMonitoring()!.getDefaultOn()}True{else}False{/if}
 {/if}
 {/template}
 
@@ -442,11 +442,11 @@ enableStackdriverMonitoring:
 /** Renders Stackdriver's metadata items. */
 {template stackdriverMetadataItems kind="text"}
 {@param? stackdriver: StackdriverSpec}
-{if $stackdriver?.logging}
+{if $stackdriver?.getLogging()}
 - key: google-logging-enable
   value: {{ enableStackdriverLogging }}
 {/if}
-{if $stackdriver?.monitoring}
+{if $stackdriver?.getMonitoring()}
 - key: google-monitoring-enable
   value: {{ enableStackdriverMonitoring }}
 {/if}
@@ -529,17 +529,17 @@ serviceAccounts:
 {@param? tier: VmTierSpec}
 {$name |tierprefixed: $tier}:
   type: string
-  default: {$spec.defaultMachineType.getGceMachineType()}
+  default: {$spec.getDefaultMachineType()!.getGceMachineType()}
   x-googleProperty:
     type: GCE_MACHINE_TYPE
     zoneProperty: zone
-    {if $spec.minimum}
+    {if $spec.getMinimum()}
     gceMachineType:
-      {if $spec.minimum.getCpu()}
-      minCpu: {$spec.minimum.getCpu()}
+      {if $spec.getMinimum().getCpu()}
+      minCpu: {$spec.getMinimum().getCpu()}
       {/if}
-      {if $spec.minimum.getRamGb()}
-      minRamGb: {$spec.minimum.getRamGb()}
+      {if $spec.getMinimum().getRamGb()}
+      minRamGb: {$spec.getMinimum().getRamGb()}
       {/if}
     {/if}
 {/template}
@@ -607,14 +607,14 @@ serviceAccounts:
       networkProperty: {$networkPropName}
 {'externalIP' |tierprefixed: $tier}:
   type: array
-  default: [{externalIpTypeName($spec.externalIp.getDefaultType())}]
+  default: [{externalIpTypeName($spec.getExternalIp()!.getDefaultType())}]
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
   x-googleProperty:
     type: GCE_EXTERNAL_IP
     gceExternalIp:
       networkProperty: {$networkPropName}
-      notConfigurable: {if $spec.externalIp.getNotConfigurable()}True{else}False{/if}
+      notConfigurable: {if $spec.getExternalIp()!.getNotConfigurable()}True{else}False{/if}
       allowStaticIps: True
 {/template}
 
@@ -638,15 +638,15 @@ serviceAccounts:
 {@param? tier: VmTierSpec}
 {'bootDiskType' |tierprefixed: $tier}:
   type: string
-  default: {$spec.diskType.getDefaultType()}
+  default: {$spec.getDiskType()!.getDefaultType()}
   x-googleProperty:
     type: GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
 {'bootDiskSizeGb' |tierprefixed: $tier}:
   type: integer
-  default: {$spec.diskSize.getDefaultSizeGb()}
-  {if $spec.diskSize.getMinSizeGb()}
-  minimum: {$spec.diskSize.getMinSizeGb()}
+  default: {$spec.getDiskSize()!.getDefaultSizeGb()}
+  {if $spec.getDiskSize()!.getMinSizeGb()}
+  minimum: {$spec.getDiskSize()!.getMinSizeGb()}
   {/if}
   maximum: 10000
   x-googleProperty:
@@ -663,15 +663,15 @@ serviceAccounts:
 {@param? tier: VmTierSpec}
 {diskTypePropertyName($diskIndex, $tier)}:
   type: string
-  default: {$spec.diskType.getDefaultType()}
+  default: {$spec.getDiskType()!.getDefaultType()}
   x-googleProperty:
     type: GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
 {diskSizePropertyName($diskIndex, $tier)}:
   type: integer
-  default: {$spec.diskSize.getDefaultSizeGb()}
-  {if $spec.diskSize.getMinSizeGb()}
-  minimum: {$spec.diskSize.getMinSizeGb()}
+  default: {$spec.getDiskSize()!.getDefaultSizeGb()}
+  {if $spec.getDiskSize()!.getMinSizeGb()}
+  minimum: {$spec.getDiskSize()!.getMinSizeGb()}
   {/if}
   maximum: 10000
   x-googleProperty:
@@ -688,12 +688,12 @@ serviceAccounts:
 {$name |tierprefixed: $tier}:
   type: integer
   default: {$spec.getDefaultValue()}
-  {if $spec.range}
-  minimum: {$spec.range.getStartValue()}
-  maximum: {$spec.range.getEndValue()}
-  {elseif $spec.list}
+  {if $spec.getRange()}
+  minimum: {$spec.getRange().getStartValue()}
+  maximum: {$spec.getRange().getEndValue()}
+  {elseif $spec.getList()}
   enum:
-    {for $value in $spec.list.getValuesList()}
+    {for $value in $spec.getList().getValuesList()}
     - {$value}
     {/for}
   {/if}
@@ -718,71 +718,71 @@ serviceAccounts:
 {template deployInputFieldSchema /* visibility = "private" */ kind="text"}
 {@param field: DeployInputField}
 {deployInputFieldName($field) |yamlprimitive: 0}:
-{if $field.booleanCheckbox}
+{if $field.getBooleanCheckbox()}
   type: boolean
-  default: {if $field.booleanCheckbox.getDefaultValue()}True{else}False{/if}
-{elseif $field.groupedBooleanCheckbox}
+  default: {if $field.getBooleanCheckbox().getDefaultValue()}True{else}False{/if}
+{elseif $field.getGroupedBooleanCheckbox()}
   type: boolean
-  default: {if $field.groupedBooleanCheckbox.getDefaultValue()}True{else}False{/if}
-{elseif $field.integerBox}
-  {let $box: $field.integerBox/}
+  default: {if $field.getGroupedBooleanCheckbox().getDefaultValue()}True{else}False{/if}
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox()/}
   type: integer
-  {if $box.defaultValue}
-  default: {$box.defaultValue.getValue() ?: 0}
+  {if $box.getDefaultValue()}
+  default: {$box.getDefaultValue().getValue() ?: 0}
   {/if}
-  {if $box.validation.min}
-  minimum: {$box.validation.min.getValue() ?: 0}
+  {if $box.getValidation()!.getMin()}
+  minimum: {$box.getValidation()!.getMin().getValue() ?: 0}
   {/if}
-  {if $box.validation.max}
-  maximum: {$box.validation.max.getValue() ?: 0}
+  {if $box.getValidation()!.getMax()}
+  maximum: {$box.getValidation()!.getMax().getValue() ?: 0}
   {/if}
-{elseif $field.integerDropdown}
-  {let $dropdown: $field.integerDropdown/}
+{elseif $field.getIntegerDropdown()}
+  {let $dropdown: $field.getIntegerDropdown()/}
   type: integer
-  {if $dropdown.defaultValueIndex}
-  {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
   default: {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
   enum:
   {for $value in $dropdown.getValuesList()}
   - {$value}
   {/for}
-{elseif $field.stringBox}
-  {let $box: $field.stringBox/}
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox()/}
   type: string
   {if $box.getDefaultValue()}
   default: {$box.getDefaultValue() |yamlprimitive: 2}
   {/if}
-  {if $box.validation?.getRegex()}
-  pattern: {$box.validation.getRegex() |yamlprimitive: 2}
+  {if $box.getValidation()?.getRegex()}
+  pattern: {$box.getValidation().getRegex() |yamlprimitive: 2}
   {/if}
-{elseif $field.emailBox}
-  {let $box: $field.emailBox/}
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
   type: string
   {if $box.getDefaultValue()}
   default: {$box.getDefaultValue() |yamlprimitive: 2}
   {/if}
-  {if $box.validation?.getRegex()}
-  pattern: {$box.validation.getRegex() |yamlprimitive: 2}
+  {if $box.getValidation()?.getRegex()}
+  pattern: {$box.getValidation().getRegex() |yamlprimitive: 2}
   {/if}
   x-googleProperty:
     type: EMAIL_ADDRESS
-{elseif $field.stringDropdown}
-  {let $dropdown: $field.stringDropdown/}
+{elseif $field.getStringDropdown()}
+  {let $dropdown: $field.getStringDropdown()/}
   type: string
-  {if $dropdown.defaultValueIndex}
-  {let $defaultIndex: $dropdown.defaultValueIndex.getValue() ?: 0/}
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
   default: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
   {/if}
   enum:
   {for $value in $dropdown.getValuesList()}
   - {$value |yamlprimitive: 4}
   {/for}
-{elseif $field.zoneDropdown}
-  {let $dropdown: $field.zoneDropdown/}
+{elseif $field.getZoneDropdown()}
+  {let $dropdown: $field.getZoneDropdown()/}
   type: string
-  {if $dropdown.defaultValue}
-  default: {$dropdown.defaultValue.getValue() ?: '' |yamlprimitive: 2}
+  {if $dropdown.getDefaultValue()}
+  default: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
   {/if}
   x-googleProperty:
     type: GCE_ZONE
@@ -845,10 +845,10 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {@param instanceName: string}
 {for $disk, $index in $additionalDisksList}
 {let $deviceNameSuffix kind="text"}
-  {if $disk.deviceNameSuffix.getName()}
-    {$disk.deviceNameSuffix.getName()}{nil}
-  {elseif $disk.deviceNameSuffix.getNameFromDeployInputField()}
-    {let $field: findDeployInputField($disk.deviceNameSuffix.getNameFromDeployInputField(), $deployInputSpec)/}
+  {if $disk.getDeviceNameSuffix()!.getName()}
+    {$disk.getDeviceNameSuffix()!.getName()}{nil}
+  {elseif $disk.getDeviceNameSuffix()!.getNameFromDeployInputField()}
+    {let $field: findDeployInputField($disk.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInputSpec)/}
     {{ properties["{deployInputFieldName($field)}"] }}{nil}
   {/if}
 {/let}

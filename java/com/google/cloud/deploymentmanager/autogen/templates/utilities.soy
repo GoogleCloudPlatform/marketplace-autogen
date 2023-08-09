@@ -211,8 +211,8 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 {template passwordConditional kind="text"}
 {@param password: PasswordSpec}
 {@param conditionalContent: string}
-{if $password.generateIf}
-{% if {booleanExpressionJinjaExpression($password.generateIf)} %}
+{if $password.getGenerateIf()}
+{% if {booleanExpressionJinjaExpression($password.getGenerateIf())} %}
 {$conditionalContent}{nil}
 {% endif %}
 {else}

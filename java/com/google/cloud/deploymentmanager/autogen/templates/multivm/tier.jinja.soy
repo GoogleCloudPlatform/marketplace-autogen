@@ -10,8 +10,8 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {@param packageSpec: MultiVmDeploymentPackageSpec}
 
 {let $waiterSpec:
-    $spec.applicationStatus?.getType() == ApplicationStatusSpec.StatusType.WAITER
-    ? $spec.applicationStatus.waiter : null/}
+    $spec.getApplicationStatus()?.getType() == ApplicationStatusSpec.StatusType.WAITER
+    ? $spec.getApplicationStatus()!.getWaiter() : null/}
 
 {% import "path_utils.jinja" as path_utils with context %}
 
@@ -42,13 +42,13 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
 
-{if $spec.ipForwarding}
+{if $spec.getIpForwarding()}
 {% set canIpForward = properties["ipForward"] == "On" %}
 {/if}
 
-{if $packageSpec.stackdriver}
+{if $packageSpec.getStackdriver()}
 {call renders.stackdriverPropertiesJinja}
-  {param stackdriver: $packageSpec.stackdriver/}
+  {param stackdriver: $packageSpec.getStackdriver()/}
 {/call}
 {/if}
 
@@ -95,23 +95,23 @@ resources:
         {let $additionalDisksSection kind="text"}
           {call renders.additionalDiskSection}
             {param additionalDisksList: $spec.getAdditionalDisksList()/}
-            {param deployInputSpec: $packageSpec.deployInput/}
+            {param deployInputSpec: $packageSpec.getDeployInput()! /}
             {param tierSpec: $spec/}
             {param instanceName: $instanceName/}
           {/call}
         {/let}
         {$additionalDisksSection |indent: 8, true}{nil}
       {/if}
-      {if $spec.localSsds}
+      {if $spec.getLocalSsds()}
       {let $localSsdItem kind="text"}
         {call renders.localSsdPropertyItem}
-          {param localSsdSpec: $spec.localSsds/}
-          {param deployInput: $packageSpec.deployInput/}
+          {param localSsdSpec: $spec.getLocalSsds()/}
+          {param deployInput: $packageSpec.getDeployInput()! /}
         {/call}
       {/let}
       {$localSsdItem |indent: 6}
       {/if}
-      {if $spec.ipForwarding}
+      {if $spec.getIpForwarding()}
       canIpForward: {{ canIpForward }}
       {/if}
 
@@ -138,20 +138,20 @@ resources:
       {let $startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
         {call renders.startupScriptAndWaiterMetadataItemsUnconditional}
           {param waiterSpec: $waiterSpec/}
-          {param startupSpec: $spec.gceStartupScript/}
+          {param startupSpec: $spec.getGceStartupScript()/}
         {/call}
       {/let}
       {let $startupScriptAndWaiterMetadataItemsStatusWaiterEnabled kind="text"}
         {call renders.startupScriptAndWaiterMetadataItemsConditional}
           {param waiterSpec: $waiterSpec/}
-          {param startupSpec: $spec.gceStartupScript/}
+          {param startupSpec: $spec.getGceStartupScript()/}
           {param statusWaiterEnabled: true/}
         {/call}
       {/let}
       {let $startupScriptAndWaiterMetadataItemsStatusWaiterDisabled kind="text"}
         {call renders.startupScriptAndWaiterMetadataItemsConditional}
           {param waiterSpec: $waiterSpec/}
-          {param startupSpec: $spec.gceStartupScript/}
+          {param startupSpec: $spec.getGceStartupScript()/}
           {param statusWaiterEnabled: false/}
         {/call}
       {/let}
@@ -166,12 +166,12 @@ resources:
         {call renders.gceMetadataItems}
           {param specList: $spec.getGceMetadataItemsList()/}
           {param tierSpecList: $packageSpec.getTiersList()/}
-          {param deployInput: $packageSpec.deployInput/}
+          {param deployInput: $packageSpec.getDeployInput()/}
         {/call}
       {/let}
       {let $stackdriverMetadataItems kind="text"}
         {call renders.stackdriverMetadataItems}
-          {param stackdriver: $packageSpec.stackdriver/}
+          {param stackdriver: $packageSpec.getStackdriver()/}
         {/call}
       {/let}
 
@@ -223,7 +223,7 @@ resources:
   {let $waiterResources kind="text"}
     {call renders.startupScriptAndWaiterResources}
       {param waiterSpec: $waiterSpec/}
-      {param startupSpec: $spec.gceStartupScript/}
+      {param startupSpec: $spec.getGceStartupScript()/}
       {param enableJinjaVarName: 'enableStatusWaiter'/}
       {param dependsOnTierSpec: $spec/}
       {param dependsOnTierInstanceCountJinjaVarName: 'instanceCount'/}
