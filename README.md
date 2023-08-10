@@ -1,6 +1,6 @@
-# Deployment Manager Autogen
+# Marketplace Autogen
 
-*Deployment Manager Autogen* is a Java-based tool for generating fully functional [Deployment Manager](https://cloud.google.com/deployment-manager/docs/) templates from simplified YAML, JSON, or Prototext configuration files.
+* Marketplace Autogen* is a Java-based tool for generating fully functional [Deployment Manager](https://cloud.google.com/deployment-manager/docs/) templates from simplified YAML, JSON, or Prototext configuration files.
 
 It currently supports single- and multi-VM configurations.
 
@@ -42,13 +42,13 @@ To review these options at any time, provide `--help` as the argument for Autoge
 
 * `--exclude_shared_support_files` (optional)
 
-  If this parameter is provided, Autogen will NOT include the shared support files used for deployment in this solution (look [here](java/com/google/cloud/deploymentmanager/autogen/templates/sharedsupport/common) for those files). By default, Autogen always includes these files, which is the recommended option.
+  If this parameter is provided, Autogen will NOT include the shared support files used for deployment in this solution (look [here](./java/com/google/cloud/deploymentmanager/autogen/templates/dm/sharedsupport/common) for those files). By default, Autogen always includes these files, which is the recommended option.
 
 ### Example configurations
 
 We have provided a full featured example configuration in the [example-config](example-config/) folder.
 
-Please refer to the comments inside the example configuration and the proto files ([autogen.proto](java/com/google/cloud/deploymentmanager/autogen/autogen.proto), [deployment_package_autogen_spec.proto](java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto) and [marketing_info.proto](java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto)) for more information about their fields, including which of them are required and which are optional.
+Please refer to the comments inside the example configuration and the proto files ([autogen.proto](./java/com/google/cloud/deploymentmanager/autogen/autogen.proto), [deployment_package_autogen_spec.proto](./java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto) and [marketing_info.proto](./java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto)) for more information about their fields, including which of them are required and which are optional.
 
 To create your deployment package, change the fields of the provided examples to reflect the configuration of your solution, and then run Autogen.
 
