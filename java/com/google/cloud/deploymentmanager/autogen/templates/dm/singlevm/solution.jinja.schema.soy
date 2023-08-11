@@ -1,16 +1,22 @@
-{namespace vm.multi.tierSchema}
+{namespace vm.single.schema}
 
-import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/renders.soy';
-import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/utilities.soy';
-import {ApplicationStatusSpec, MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import * as renders from 'com/google/cloud/deploymentmanager/autogen/templates/dm/renders.soy';
+import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates/dm/utilities.soy';
+import {ApplicationStatusSpec, SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 
+/** Generates solution.jinja.schema file. */
 {template main kind="text"}
-{@param spec: VmTierSpec}
-{@param packageSpec: MultiVmDeploymentPackageSpec}
+{@param solutionId: string}
+{@param spec: SingleVmDeploymentPackageSpec}
+{@param? solutionInfo: SolutionMarketingInfo}
+{@param? templateVersion: string}
 
 {let $waiterSpec:
     ($spec.getApplicationStatus()?.getType() == ApplicationStatusSpec.StatusType.WAITER)
     ? $spec.getApplicationStatus()!.getWaiter() : null/}
+{let $enableLegacyStatus:
+    $spec.getApplicationStatus()?.getType() == ApplicationStatusSpec.StatusType.LEGACY_DETECTOR/}
 
 imports:
   - name: common.py
@@ -35,48 +41,38 @@ imports:
     path: common/vm_instance.py
 
 {\n}
+info:
+  {if $templateVersion}
+  version: {$templateVersion |yamlprimitive: 2}
+  {else}
+  version: '1.0'
+  {/if}
+  {if $solutionInfo}
+  title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 2}
+  {else}
+  title: {$solutionId + ' template' |yamlprimitive: 2}
+  {/if}
+
+{\n}
 required:
-  - instanceCount
   - zone
   - machineType
   - network
   - bootDiskType
   - bootDiskSizeGb
-  - image
-
-  {for $password, $index in $packageSpec.getPasswordsList()}
-  {let $passwordRequiredSchema kind="text"}
-    {call renders.passwordRequiredSchema}
-      {param password: $password/}
-      {param passwordIndex: $index/}
-    {/call}
-  {/let}
-  {$passwordRequiredSchema |indent: 2, true}{nil}
-  {/for}
-
-  {for $depTier in dependentTiers($spec, $packageSpec)}
-  - {'instanceCount' |tierprefixed: $depTier}
-  {/for}
-
   {let $deployInputRequiredList kind="text"}
-    {call renders.deployInputRequiredSchema}
-      {param inputSpec: $packageSpec.getDeployInput() /}
-      {param tierSpec: $spec/}
-    {/call}
+    {call renders.deployInputRequiredSchema}{param inputSpec: $spec.getDeployInput()/}{/call}
   {/let}
   {$deployInputRequiredList |indent: 2, true}{nil}
 
 {\n}
 properties:
-  {let $instanceCountProp kind="text"}
-    {call renders.tierInstanceAcountPropertySchema}
-      {param name: 'instanceCount'/}
-      {param spec: $spec.getInstanceCount()! /}
+  {let $zoneProp kind="text"}
+    {call renders.zonePropertySchema}
+      {param name: 'zone'/}
+      {param zoneSpec: $spec.getZone()/}
     {/call}
   {/let}
-  {$instanceCountProp |indent: 2, true}{nil}
-
-  {let $zoneProp kind="text"}{call renders.zonePropertySchema}{param name: 'zone'/}{/call}{/let}
   {$zoneProp |indent: 2, true}{nil}
 
   {let $imageProp kind="text"}
@@ -95,7 +91,7 @@ properties:
   {/let}
   {$machineTypeProp |indent: 2, true}{nil}
 
-  {if length($spec.getAcceleratorsList()) > 0}
+  {if solutionHasGpus($spec)}
   {let $acceleratorProps kind="text"}
     {call renders.acceleratorPropertiesSchema}
       {param namePrefix: 'accelerator'/}
@@ -139,15 +135,14 @@ properties:
   {$bootDiskProps |indent: 2, true}{nil}
 
   {for $disk, $index in $spec.getAdditionalDisksList()}
-  {let $diskProps kind="text"}
+    {let $diskProps kind="text"}
     {call renders.additionalDiskPropertiesSchema}
       {param spec: $spec.getAdditionalDisksList()[$index] /}
       {param diskIndex: $index/}
       {param zonePropertyName: 'zone'/}
-      {param tier: $spec/}
     {/call}
-  {/let}
-  {$diskProps |indent: 2, true}{nil}
+    {/let}
+    {$diskProps |indent: 2, true}{nil}
   {/for}
 
   {for $firewallRule in $spec.getFirewallRulesList()}
@@ -155,36 +150,49 @@ properties:
   {$firewallProp |indent: 2, true}{nil}
   {/for}
 
-  {if $packageSpec.getDeployInput()}
+  {if $spec.getDeployInput()}
   {let $deployInputProps kind="text"}
     {call renders.deployInputPropertiesSchema}
-      {param inputSpec: $packageSpec.getDeployInput()/}
-      {param tierSpec: $spec/}
+      {param inputSpec: $spec.getDeployInput()/}
     {/call}
   {/let}
   {$deployInputProps |indent: 2, true}{nil}
   {/if}
 
-  {for $password, $index in $packageSpec.getPasswordsList()}
-  {let $propertyName kind="text"}
-    {call utilities.passwordPropertyName}{param passwordIndex: $index/}{/call}
-  {/let}
-  {$propertyName}:
-    type: string
-  {/for}
-
-  {for $depTier in dependentTiers($spec, $packageSpec)}
-  {'instanceCount' |tierprefixed: $depTier}:
-    type: integer
-  {/for}
-
-  {if $packageSpec.getStackdriver()}
+  {if $spec.getStackdriver()}
   {let $stackdriverPropertiesSchema kind="text"}
     {call renders.stackdriverPropertiesSchema}
-      {param stackdriver: $packageSpec.getStackdriver()/}
+      {param stackdriver: $spec.getStackdriver()/}
     {/call}
   {/let}
   {$stackdriverPropertiesSchema |indent: 2, true}{nil}
+  {/if}
+
+{\n}
+outputs:
+  deployment:
+    type: string
+  {for $password, $index in $spec.getPasswordsList()}
+  password{$index}:
+    type: string
+  {/for}
+  project:
+    type: string
+  vmId:
+    type: string
+  vmExternalIP:
+    type: string
+  vmInternalIP:
+    type: string
+  vmName:
+    type: string
+  vmSelfLink:
+    type: string
+  {if $enableLegacyStatus}
+  x-status-type:
+    type: string
+  x-status-instance:
+    type: string
   {/if}
 
 {/template}

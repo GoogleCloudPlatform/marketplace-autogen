@@ -63,7 +63,7 @@ import org.yaml.snakeyaml.representer.Representer;
 public class Autogen {
 
   private static final String BUNDLED_RESOURCE_PATH =
-      "com/google/cloud/deploymentmanager/autogen/templates";
+      "com/google/cloud/deploymentmanager/autogen/templates/dm";
   private static final String BUNDLED_SHARED_SUPPORT_RESOURCE_PATH =
       BUNDLED_RESOURCE_PATH + "/sharedsupport";
 

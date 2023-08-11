@@ -14,7 +14,7 @@ constructs.
 ## Preprocessing
 
 To support (1) and (2) above, the soy templates are preprocessed by
-[`Preprocessor.java`](http://cs/piper///depot/google3/third_party/java/marketplace_autogen/java/com/google/cloud/deploymentmanager/autogen/soy/Preprocessor.java).
+[`Preprocessor.java`](./Preprocessor.java).
 
 ### Preserving Indentations and Line Breaks
 
