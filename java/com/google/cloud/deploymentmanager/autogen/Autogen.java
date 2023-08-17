@@ -63,9 +63,9 @@ import org.yaml.snakeyaml.representer.Representer;
 public class Autogen {
 
   private static final String BUNDLED_RESOURCE_PATH =
-      "com/google/cloud/deploymentmanager/autogen/templates/dm";
+      "com/google/cloud/deploymentmanager/autogen/templates";
   private static final String BUNDLED_SHARED_SUPPORT_RESOURCE_PATH =
-      BUNDLED_RESOURCE_PATH + "/sharedsupport";
+      BUNDLED_RESOURCE_PATH + "/dm/sharedsupport";
 
   private static final String MEDIA_RESOURCE_PREFIX = "@media/";
   private static final String RESOURCE_PATH_PREFIX = "resources/en-us/";
@@ -83,6 +83,24 @@ public class Autogen {
       "common/software_status_script.py.schema",
       "common/vm_instance.py",
       "common/vm_instance.py.schema");
+
+  private static final ImmutableList<String> DEPLOYMENT_MANAGER_SOY_FILES =
+      ImmutableList.of(
+          "singlevm/c2d_deployment_configuration.json.soy",
+          "singlevm/solution.jinja.soy",
+          "singlevm/solution.jinja.schema.soy",
+          "singlevm/solution.jinja.display.soy",
+          "singlevm/test_config.yaml.soy",
+          "multivm/c2d_deployment_configuration.json.soy",
+          "multivm/solution.jinja.soy",
+          "multivm/solution.jinja.schema.soy",
+          "multivm/solution.jinja.display.soy",
+          "multivm/test_config.yaml.soy",
+          "multivm/tier.jinja.soy",
+          "multivm/tier.jinja.schema.soy",
+          "display.soy",
+          "renders.soy",
+          "utilities.soy");
 
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()
@@ -125,22 +143,10 @@ public class Autogen {
     @Singleton
     @TemplateFileSet
     TemplateRenderer.FileSet provideFileSet(TemplateRenderer.FileSet.Builder builder) {
+      DEPLOYMENT_MANAGER_SOY_FILES.forEach(
+          file -> builder.addContentFromResource(resource("dm/" + file), true));
+
       return builder
-          .addContentFromResource(resource("singlevm/c2d_deployment_configuration.json.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.schema.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.display.soy"))
-          .addContentFromResource(resource("singlevm/test_config.yaml.soy"))
-          .addContentFromResource(resource("multivm/c2d_deployment_configuration.json.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.schema.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.display.soy"))
-          .addContentFromResource(resource("multivm/test_config.yaml.soy"))
-          .addContentFromResource(resource("multivm/tier.jinja.soy"))
-          .addContentFromResource(resource("multivm/tier.jinja.schema.soy"))
-          .addContentFromResource(resource("display.soy"))
-          .addContentFromResource(resource("renders.soy"))
-          .addContentFromResource(resource("utilities.soy"))
           .addProtoDescriptors(
               DeploymentPackageAutogenSpecProtos.getDescriptor(),
               MarketingInfoProtos.getDescriptor())

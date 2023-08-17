@@ -16,6 +16,7 @@ package com.google.cloud.deploymentmanager.autogen.soy;
 
 import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer.Module.SoyFiles;
 import com.google.common.io.Resources;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -35,17 +36,22 @@ import java.util.Set;
 import javax.inject.Qualifier;
 
 /**
- * Supports rendering of yaml jinja soy templates, which are jinja templates that generate yaml
- * files.
+ * Supports rendering of soy templates
  *
- * <p>This works around soy's limitation to enable easy crafting of yaml jinja soy templates by:
+ * <p>For Deployment manager, the soy templates generate jinja templates. A Preprocessor is used to
+ * work around soy's limitation to enable easy crafting of jinja soy templates by:
  *
  * <ul>
  *   <li>Preserving indentations and line breaks
  *   <li>Allowing jinja delimiters directly in the soy template without the need to escape them
- *   <li>Adding new soy directives to support yaml conventions (see {@link SoyDirectives})
  * </ul>
  *
+ * <p> For Terraform, we are not utilizing a Preprocessor since the Preprocessor is invalid for
+ * Terraform syntax.
+ * 
+ * <p>All Soy templates can utilize soy directives to support yaml conventions
+ * (see{@link SoyDirectives})
+ * 
  * <p>See {@link TemplateRendererTest} for examples of how to take advantage of this templating
  * system.
  */
@@ -69,18 +75,19 @@ public final class TemplateRenderer {
       }
 
       /** Adds the content of a file. */
-      public Builder add(String content, String filePath) {
-        soyFileSetBuilder.add(Preprocessor.preprocess(content), filePath);
+      private Builder add(String content, String filePath, boolean preProcess) {
+        content = preProcess ? Preprocessor.preprocess(content) : content;
+        soyFileSetBuilder.add(content, filePath);
         return this;
       }
 
       /** Adds a resource file from the bundled resources. */
-      public Builder addContentFromResource(String resourceName) {
+      @CanIgnoreReturnValue
+      public Builder addContentFromResource(String resourceName, boolean preProcess) {
         try {
           String content =
               Resources.toString(Resources.getResource(resourceName), StandardCharsets.UTF_8);
-          add(content, resourceName);
-          return this;
+          return add(content, resourceName, preProcess);
         } catch (IOException ioe) {
           throw new RuntimeException(ioe);
         }

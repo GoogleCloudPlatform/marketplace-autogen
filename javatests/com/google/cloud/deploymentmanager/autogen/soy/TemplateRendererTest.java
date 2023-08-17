@@ -43,7 +43,7 @@ public class TemplateRendererTest {
         Guice.createInjector(Autogen.getAutogenModule()).getInstance(FileSet.Builder.class);
     TemplateRenderer renderer =
         fileSet
-            .addContentFromResource(testDataResource("sanity_check.jinja.soy"))
+            .addContentFromResource(testDataResource("sanity_check.jinja.soy"), true)
             .build()
             .newRenderer("test.sanityCheck");
     renderer.setData(
