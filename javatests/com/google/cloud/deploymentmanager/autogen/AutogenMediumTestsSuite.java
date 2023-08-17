@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -93,17 +94,21 @@ public class AutogenMediumTestsSuite {
 
       List<Solution> solutions = new ArrayList<>();
       if (dmGoldenFolder.exists()) {
-        solutions.add(new Solution(inputSpecFile, solutionFolder, dmGoldenFolder));
+        solutions.add(
+            new Solution(
+                inputSpecFile, solutionFolder, dmGoldenFolder, DeploymentTool.DEPLOYMENT_MANAGER));
       }
 
       if (terraformGoldenFolder.exists()) {
-        solutions.add(new Solution(inputSpecFile, solutionFolder, terraformGoldenFolder));
+        solutions.add(
+            new Solution(
+                inputSpecFile, solutionFolder, terraformGoldenFolder, DeploymentTool.TERRAFORM));
       }
 
       return solutions.stream();
     }
 
-    Solution(File inputSpecFile, File solutionFolder, File goldenFolder) {
+    Solution(File inputSpecFile, File solutionFolder, File goldenFolder, DeploymentTool tool) {
       this.name = relativePathFunction(ROOT, inputSpecFile);
       this.solutionFolder = solutionFolder;
       this.goldenFolder = goldenFolder;
@@ -114,6 +119,7 @@ public class AutogenMediumTestsSuite {
                   DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
                   TextFormat.getParser()
                       .merge(Files.asCharSource(inputSpecFile, UTF_8).read(), input);
+                  input.setDeploymentTool(tool);
                   return AUTOGEN.generateDeploymentPackage(
                       input.build(), SharedSupportFilesStrategy.INCLUDED);
                 } catch (IOException e) {

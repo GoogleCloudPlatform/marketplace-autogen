@@ -41,6 +41,14 @@ public final class AutogenCli {
       DeploymentPackageInput solution, AutogenSettings settings) {
     SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
             ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
+    if (solution.getDeploymentTool().equals(DeploymentPackageInput.DeploymentTool.TERRAFORM)
+        && !settings.isDevFeaturesEnabled()) {
+      throw new IllegalArgumentException(
+          "Terraform deployment tool cannot be used without enabling --dev_features. WARNING:"
+              + " Terraform Autogen in development and does not support full Autogen feature"
+              + " support");
+    }
+
     return injector.get().getInstance(Autogen.class).generateDeploymentPackage(solution, strategy);
   }
 
