@@ -1,0 +1,83 @@
+/**
+ * Contains Terraform blocks shared between single and multi-vm templates
+ */
+{namespace blocks}
+
+
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+/**
+ * Produces a google_compute_firewall resource for each FirewallRuleSpec
+ */
+{template firewallResources kind="text"}
+  {@param specList: list<FirewallRuleSpec>}
+
+  {for $spec in $specList}
+    {call firewallResource}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+
+/**
+ * Produces a google_compute_firewall resource
+ */
+{template firewallResource kind="text" whitespace="preserve"}
+{@param spec: FirewallRuleSpec}
+resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
+  count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
+
+  name = "${lb}var.goog_cm_deployment_name{rb}-{call util.firewallRuleNameSuffix}{param spec: $spec/}{/call}"
+  network = element(var.networks, 0)
+
+  allow {lb}
+    {if $spec.getPort().length > 0}ports = ["{$spec.getPort()}"]{/if}
+    protocol = "{call util.firewallRuleProtocol}{param spec: $spec/}{/call}"
+  {rb}
+
+  source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
+{rb}
+{/template}
+
+
+
+/**
+ * Produces two terraform variables for each FirewallRuleSpec
+ */
+{template firewallVariables kind="text"}
+  {@param specList: list<FirewallRuleSpec>}
+
+  {for $spec in $specList}
+    {call firewallVariable}
+      {param spec: $spec /}
+    {/call}
+    {call firewallSourceRangesVariable}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+
+/**
+ * Produces a boolean variable determining whether a firewall resource is created
+ */
+{template firewallVariable kind="text" whitespace="preserve"}{@param spec: FirewallRuleSpec}
+variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
+  description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
+  type        = bool
+  default     = {if $spec.getDefaultOff()}false{else}true{/if}
+{rb}
+{/template}
+
+/**
+ * Produces a string variable detemining the source range of a firewall resource
+ */
+{template firewallSourceRangesVariable kind="text" whitespace="preserve"}{@param spec: FirewallRuleSpec}
+variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}" {lb}
+  description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
+  type        = string
+  default     = ""
+{rb}
+{/template}

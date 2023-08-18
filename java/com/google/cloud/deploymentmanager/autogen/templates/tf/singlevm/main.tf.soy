@@ -1,5 +1,7 @@
 {namespace vm.single.tf}
 
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text" whitespace="preserve"}
@@ -45,4 +47,8 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {rb}
+
+{call blocks.firewallResources}
+  {param specList: $spec.getFirewallRulesList()/}
+{/call}
 {/template}

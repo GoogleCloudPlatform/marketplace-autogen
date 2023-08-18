@@ -40,3 +40,33 @@ resource "google_compute_instance" "instance" {
     }
   }
 }
+
+
+resource "google_compute_firewall" tcp_80 {
+  count = var.enable_tcp_80 ? 1 : 0
+
+  name = "${var.goog_cm_deployment_name}-tcp-80"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["80"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_80_source_ranges) : trimspace(range)])
+}
+
+resource "google_compute_firewall" tcp_443 {
+  count = var.enable_tcp_443 ? 1 : 0
+
+  name = "${var.goog_cm_deployment_name}-tcp-443"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["443"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
+}
+

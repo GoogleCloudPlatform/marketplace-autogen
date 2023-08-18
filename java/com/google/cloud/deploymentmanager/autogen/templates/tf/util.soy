@@ -1,0 +1,127 @@
+{namespace util}
+
+import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+/**
+ * Produces Terraform variable name for firewall boolean
+ * Format: enable_{protocol}_{port} or enable_{protocol}
+ * Ex: enable_tcp_443
+ */
+{template firewallRuleVarName kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  enable_
+  {call firewallRuleProtocol}
+    {param spec: $spec /}
+  {/call}
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}
+{/template}
+
+{template firewallRuleProtocol kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {switch $spec.getProtocol()}
+    {case FirewallRuleSpec.Protocol.TCP}
+      tcp
+    {case FirewallRuleSpec.Protocol.UDP}
+      udp
+    {case FirewallRuleSpec.Protocol.ICMP}
+      icmp
+  {/switch}
+{/template}
+
+/**
+ * Produces Terraform variable name for firewall sources range
+ * Format: {protocol}_{port}_source_ranges or {protocol}_source_ranges
+ * Ex: tcp_443_source_ranges
+ */
+{template firewallRuleSourceRangesVarName kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {call firewallRuleProtocol}
+    {param spec: $spec /}
+  {/call}
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}_source_ranges
+{/template}
+
+/**
+ * Produces Terraform resource name for a firewall rule.
+ * Format: {protocol}_{port} or {protocol}
+ * Ex: tcp_443
+ */
+{template firewallRuleResourceName kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {call firewallRuleProtocol}
+    {param spec: $spec /}
+  {/call}
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}
+{/template}
+
+/**
+ * Produces the suffix of the GCP name for a firewall rule.
+ * Format: {protocol}-{port} or {protocol}
+ * Ex: tcp-80
+ */
+{template firewallRuleNameSuffix kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {call firewallRuleProtocol}
+    {param spec: $spec /}
+  {/call}
+  {$spec.getPort().length > 0 ? '-' + $spec.getPort() : ''}
+{/template}
+
+/**
+ * Produces a human-readable title for a firewall rule such as
+ * "TCP 123" or "HTTPS".
+ */
+{template firewallRuleTitle kind="text"}
+{@param spec: FirewallRuleSpec}
+{if $spec.getPort().length > 0}
+{switch $spec.getProtocol()}
+  {case FirewallRuleSpec.Protocol.TCP}
+    {if $spec.getPort() == 80}
+      HTTP{nil}
+    {elseif $spec.getPort() == 443 }
+      HTTPS{nil}
+    {else}
+      TCP port {$spec.getPort()}{nil}
+    {/if}
+  {case FirewallRuleSpec.Protocol.UDP}
+    UDP port {$spec.getPort()}{nil}
+{/switch}
+{else}
+  {call firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
+{/if}
+{/template}
+
+/**
+ * Produces the description for a firewall boolean variable.
+ */
+{template firewallVariableDescription kind="text"}{@param spec: FirewallRuleSpec}
+{literal}Allow {/literal}
+{call firewallRuleTitle}{param spec: $spec/}{/call}
+{literal} traffic from the Internet{/literal}
+{/template}
+
+/**
+ * Produces the description for a firewall source ranges variable.
+ * Ex: Source IP Ranges for HTTPS traffic
+ */
+{template firewallSourceRangesVarDescription kind="text"}
+{@param spec: FirewallRuleSpec}
+{literal}Source IP ranges for {/literal}
+{call firewallRuleTitle}{param spec: $spec/}{/call}
+{literal} traffic{/literal}
+{/template}
+
+/**
+ * Produces the imageUri
+ * Format: projects/{project}/global/images/{image}
+ * Ex: projects/test-project/global/images/test-image
+ */
+{template imageUri kind="text"}
+{@param spec: ImageSpec}
+projects/{$spec.getProject()}/global/images/{$spec.getName()}
+{/template}

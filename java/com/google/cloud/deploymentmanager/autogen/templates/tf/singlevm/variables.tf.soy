@@ -1,0 +1,68 @@
+{namespace vm.single.variables}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main kind="text" whitespace="preserve"}{@param spec: SingleVmDeploymentPackageSpec}
+variable "project_id" {lb}
+  description = "The ID of the project in which to provision resources."
+  type        = string
+{rb}
+
+// Marketplace requires this variable name to be declared
+variable "goog_cm_deployment_name" {lb}
+  description = "The name of the deployment and VM instance."
+  type        = string
+{rb}
+
+variable "source_image" {lb}
+  description = "The image name for the disk for the VM instance."
+  type        = string
+  default     = "{call util.imageUri}{param spec: $spec.getImagesList()[0]/}{/call}"
+{rb}
+
+variable "zone" {lb}
+  description = "The zone for the solution to be deployed."
+  type        = string
+  default     = "us-west1-a"
+{rb}
+
+variable "machine_type" {lb}
+  description = "The machine type to create, e.g. e2-small"
+  type        = string
+  default     = "n2-standard-4"
+{rb}
+
+variable "boot_disk_type" {lb}
+  description = "The boot disk type for the VM instance."
+  type        = string
+  default     = "pd-standard"
+{rb}
+
+variable "boot_disk_size" {lb}
+  description = "The boot disk size for the VM instance in GBs"
+  type        = string
+  default     = "20"
+{rb}
+
+variable "networks" {lb}
+  description = "The network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+{rb}
+
+variable "sub_networks" {lb}
+  description = "The sub network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+{rb}
+
+variable "external_ips" {lb}
+  description = "The external IPs assigned to the VM for public access."
+  type        = list(string)
+  default     = ["EPHEMERAL"]
+{rb}
+
+{call blocks.firewallVariables}{param specList: $spec.getFirewallRulesList()/}{/call}
+{/template}

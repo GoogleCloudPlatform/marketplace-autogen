@@ -103,7 +103,12 @@ public class Autogen {
           "utilities.soy");
 
   private static final ImmutableList<String> TERRAFORM_SOY_FILES =
-      ImmutableList.of("singlevm/main.tf.soy");
+      ImmutableList.of(
+          "singlevm/main.tf.soy",
+          "singlevm/variables.tf.soy",
+          "singlevm/marketplace_test.tfvars.soy",
+          "blocks.soy",
+          "util.soy");
 
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()
@@ -291,10 +296,20 @@ public class Autogen {
     ImageInfo imageInfo = ImageInfo.builder().build();
     ImmutableMap<String, Object> params = makeSingleVmParams(input, imageInfo);
 
-    builder.addFiles(
-        SolutionPackage.File.newBuilder()
-            .setPath("main.tf")
-            .setContent(fileSet.newRenderer("vm.single.tf.main").setData(params).render()));
+    builder
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("main.tf")
+                .setContent(fileSet.newRenderer("vm.single.tf.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("variables.tf")
+                .setContent(
+                    fileSet.newRenderer("vm.single.variables.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("marketplace_test.tfvars")
+                .setContent(fileSet.newRenderer("vm.single.tfvars.main").setData(params).render()));
 
     return builder.build();
   }
