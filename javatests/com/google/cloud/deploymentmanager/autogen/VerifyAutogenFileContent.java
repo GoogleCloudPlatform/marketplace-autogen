@@ -50,14 +50,13 @@ public class VerifyAutogenFileContent {
   @Test
   public void goldenVerifyFile() throws Exception {
     File tempDir = Files.createTempDir();
-    File tempSolutionDir = new File(tempDir, goldenFolder.replace("golden", ""));
-    File actualFile = new File(tempSolutionDir, fileRelativePath);
+    File actualFile = new File(tempDir, fileRelativePath);
     Files.createParentDirs(actualFile);
     File goldenFile = new File(goldenFolder, fileRelativePath);
     if (actualFile.getPath().endsWith(".png") || actualFile.getPath().endsWith(".jpg")) {
       Files.write(BaseEncoding.base64().decode(fileContent), actualFile);
       String expected = BaseEncoding.base64().encode(Files.toByteArray(goldenFile));
-      assertWithMessage(generateDiffMessage(tempSolutionDir)).that(fileContent).isEqualTo(expected);
+      assertWithMessage(generateDiffMessage(tempDir)).that(fileContent).isEqualTo(expected);
     } else {
       Files.asCharSink(actualFile, StandardCharsets.UTF_8).write(fileContent);
       String expected = Files.asCharSource(goldenFile, StandardCharsets.UTF_8).read();
@@ -67,7 +66,7 @@ public class VerifyAutogenFileContent {
       // "c".
       // Because of that we need to compare actual vs expected as well
 
-      String diffMessage = generateDiffMessage(tempSolutionDir);
+      String diffMessage = generateDiffMessage(tempDir);
       assertWithMessage(diffMessage).that(StringUtils.difference(expected, fileContent)).isEmpty();
       assertWithMessage(diffMessage).that(StringUtils.difference(fileContent, expected)).isEmpty();
     }
@@ -76,10 +75,7 @@ public class VerifyAutogenFileContent {
   private String generateDiffMessage(File tempDir) {
     return String.format(
         "Diff found in %s.\nRun this test locally with --test_strategy=local. "
-            + "The diff command is: \ndiff -ur %s/%s/golden %s\n",
-        fileRelativePath,
-        AutogenMediumTestsSuite.RELATIVE_TESTDATA_PATH,
-        solutionName,
-        new File(tempDir, solutionName).getAbsolutePath());
+            + "The diff command is: \ndiff -ur %s %s\n",
+        fileRelativePath, goldenFolder, tempDir);
   }
 }

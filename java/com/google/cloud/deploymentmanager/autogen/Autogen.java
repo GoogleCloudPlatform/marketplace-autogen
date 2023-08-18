@@ -102,6 +102,9 @@ public class Autogen {
           "renders.soy",
           "utilities.soy");
 
+  private static final ImmutableList<String> TERRAFORM_SOY_FILES =
+      ImmutableList.of("singlevm/main.tf.soy");
+
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()
           .build(
@@ -145,6 +148,8 @@ public class Autogen {
     TemplateRenderer.FileSet provideFileSet(TemplateRenderer.FileSet.Builder builder) {
       DEPLOYMENT_MANAGER_SOY_FILES.forEach(
           file -> builder.addContentFromResource(resource("dm/" + file), true));
+      TERRAFORM_SOY_FILES.forEach(
+          file -> builder.addContentFromResource(resource("tf/" + file), false));
 
       return builder
           .addProtoDescriptors(
@@ -220,6 +225,20 @@ public class Autogen {
   /** Builds the deployment package for {@link SingleVmDeploymentPackageSpec} */
   private SolutionPackage buildSingleVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
+    switch (input.getDeploymentTool()) {
+      case DEPLOYMENT_TOOL_UNSPECIFIED:
+      case DEPLOYMENT_MANAGER:
+        return buildDmSingleVm(input, sharedSupportFilesStrategy);
+      case TERRAFORM:
+        return buildTerraformSingleVm(input);
+      case UNRECOGNIZED:
+        throw new AssertionError("unrecognized deployment tool");
+    }
+    throw new AssertionError("unreachable");
+  }
+
+  private SolutionPackage buildDmSingleVm(
+      DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     String solutionId = input.getSolutionId();
     ImageInfo imageInfo = generateImages(input, builder);
@@ -267,9 +286,27 @@ public class Autogen {
     return builder.build();
   }
 
+  private SolutionPackage buildTerraformSingleVm(DeploymentPackageInput input) {
+    SolutionPackage.Builder builder = SolutionPackage.newBuilder();
+    ImageInfo imageInfo = ImageInfo.builder().build();
+    ImmutableMap<String, Object> params = makeSingleVmParams(input, imageInfo);
+
+    builder.addFiles(
+        SolutionPackage.File.newBuilder()
+            .setPath("main.tf")
+            .setContent(fileSet.newRenderer("vm.single.tf.main").setData(params).render()));
+
+    return builder.build();
+  }
+
   /** Builds the deployment package for {@link MultiVmDeploymentPackageSpec} */
   private SolutionPackage buildMultiVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
+    if (input.getDeploymentTool().equals(DeploymentPackageInput.DeploymentTool.TERRAFORM)) {
+      throw new UnsupportedOperationException(
+          "Terraform Autogen doesn't currently support multi-vm deployment");
+    }
+
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     String solutionId = input.getSolutionId();
     ImageInfo imageInfo = generateImages(input, builder);
