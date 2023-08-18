@@ -1,5 +1,12 @@
 {namespace vm.single.tfvars}
 
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
 {template main}
-goog_cm_deployment_name="test-deployment"
+{@param spec: SingleVmDeploymentPackageSpec}
+{let $defaultMap: getTestConfigDefaultValues($spec)/}
+goog_cm_deployment_name="test-deployment"{\n}
+{for $entry in $defaultMap.entries()}
+{$entry.key}="{$entry.value}"{\n}
+{/for}
 {/template}

@@ -17,13 +17,12 @@ variable "source_image" {
 variable "zone" {
   description = "The zone for the solution to be deployed."
   type        = string
-  default     = "us-west1-a"
 }
 
 variable "machine_type" {
   description = "The machine type to create, e.g. e2-small"
   type        = string
-  default     = "n2-standard-4"
+  default     = "f1-micro"
 }
 
 variable "boot_disk_type" {
@@ -34,8 +33,8 @@ variable "boot_disk_type" {
 
 variable "boot_disk_size" {
   description = "The boot disk size for the VM instance in GBs"
-  type        = string
-  default     = "20"
+  type        = number
+  default     = 10
 }
 
 variable "networks" {

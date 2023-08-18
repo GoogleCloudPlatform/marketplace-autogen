@@ -4,7 +4,8 @@ import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
-{template main kind="text" whitespace="preserve"}{@param spec: SingleVmDeploymentPackageSpec}
+{template main kind="text" whitespace="preserve"}
+{@param spec: SingleVmDeploymentPackageSpec}
 variable "project_id" {lb}
   description = "The ID of the project in which to provision resources."
   type        = string
@@ -24,26 +25,26 @@ variable "source_image" {lb}
 
 variable "zone" {lb}
   description = "The zone for the solution to be deployed."
-  type        = string
-  default     = "us-west1-a"
+  type        = string{if $spec.getZone()?.getDefaultZone()}
+  default     = "{$spec.getZone().getDefaultZone()}"{/if}
 {rb}
 
 variable "machine_type" {lb}
   description = "The machine type to create, e.g. e2-small"
   type        = string
-  default     = "n2-standard-4"
+  default     = "{$spec.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"
 {rb}
 
 variable "boot_disk_type" {lb}
   description = "The boot disk type for the VM instance."
   type        = string
-  default     = "pd-standard"
+  default     = "{$spec.getBootDisk()!.getDiskType()!.getDefaultType()}"
 {rb}
 
 variable "boot_disk_size" {lb}
   description = "The boot disk size for the VM instance in GBs"
-  type        = string
-  default     = "20"
+  type        = number
+  default     = {$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 
 variable "networks" {lb}
