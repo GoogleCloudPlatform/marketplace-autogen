@@ -1,4 +1,3 @@
-
 variable "project_id" {
   description = "The ID of the project in which to provision resources."
   type        = string
@@ -57,7 +56,6 @@ variable "external_ips" {
   default     = ["EPHEMERAL"]
 }
 
-
 variable "enable_tcp_80" {
   description = "Allow HTTP traffic from the Internet"
   type        = bool
@@ -81,6 +79,3 @@ variable "tcp_443_source_ranges" {
   type        = string
   default     = ""
 }
-
-
-

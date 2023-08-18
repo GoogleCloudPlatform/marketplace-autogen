@@ -38,20 +38,15 @@ import javax.inject.Qualifier;
 /**
  * Supports rendering of soy templates
  *
- * <p>For Deployment manager, the soy templates generate jinja templates. A Preprocessor is used to
- * work around soy's limitation to enable easy crafting of jinja soy templates by:
+ * <p>Uses a preprocessor to works around soy's limitation to enable easy crafting of yaml jinja soy
+ * templates by:
  *
  * <ul>
  *   <li>Preserving indentations and line breaks
  *   <li>Allowing jinja delimiters directly in the soy template without the need to escape them
+ *   <li>Adding new soy directives to support yaml conventions (see {@link SoyDirectives})
  * </ul>
  *
- * <p> For Terraform, we are not utilizing a Preprocessor since the Preprocessor is invalid for
- * Terraform syntax.
- * 
- * <p>All Soy templates can utilize soy directives to support yaml conventions
- * (see{@link SoyDirectives})
- * 
  * <p>See {@link TemplateRendererTest} for examples of how to take advantage of this templating
  * system.
  */
@@ -75,19 +70,18 @@ public final class TemplateRenderer {
       }
 
       /** Adds the content of a file. */
-      private Builder add(String content, String filePath, boolean preProcess) {
-        content = preProcess ? Preprocessor.preprocess(content) : content;
-        soyFileSetBuilder.add(content, filePath);
+      private Builder add(String content, String filePath) {
+        soyFileSetBuilder.add(Preprocessor.preprocess(content), filePath);
         return this;
       }
 
       /** Adds a resource file from the bundled resources. */
       @CanIgnoreReturnValue
-      public Builder addContentFromResource(String resourceName, boolean preProcess) {
+      public Builder addContentFromResource(String resourceName) {
         try {
           String content =
               Resources.toString(Resources.getResource(resourceName), StandardCharsets.UTF_8);
-          return add(content, resourceName, preProcess);
+          return add(content, resourceName);
         } catch (IOException ioe) {
           throw new RuntimeException(ioe);
         }

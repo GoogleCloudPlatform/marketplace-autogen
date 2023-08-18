@@ -10,11 +10,11 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
 {template firewallRuleVarName kind="text"}
   {@param spec: FirewallRuleSpec}
 
-  enable_
+  enable_{nil}
   {call firewallRuleProtocol}
     {param spec: $spec /}
   {/call}
-  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}{nil}
 {/template}
 
 {template firewallRuleProtocol kind="text"}
@@ -22,11 +22,11 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
 
   {switch $spec.getProtocol()}
     {case FirewallRuleSpec.Protocol.TCP}
-      tcp
+      tcp{nil}
     {case FirewallRuleSpec.Protocol.UDP}
-      udp
+      udp{nil}
     {case FirewallRuleSpec.Protocol.ICMP}
-      icmp
+      icmp{nil}
   {/switch}
 {/template}
 
@@ -41,7 +41,7 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
   {call firewallRuleProtocol}
     {param spec: $spec /}
   {/call}
-  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}_source_ranges
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}_source_ranges{nil}
 {/template}
 
 /**
@@ -55,7 +55,7 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
   {call firewallRuleProtocol}
     {param spec: $spec /}
   {/call}
-  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}
+  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}{nil}
 {/template}
 
 /**
@@ -69,7 +69,7 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
   {call firewallRuleProtocol}
     {param spec: $spec /}
   {/call}
-  {$spec.getPort().length > 0 ? '-' + $spec.getPort() : ''}
+  {$spec.getPort().length > 0 ? '-' + $spec.getPort() : ''}{nil}
 {/template}
 
 /**
@@ -100,9 +100,13 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
  * Produces the description for a firewall boolean variable.
  */
 {template firewallVariableDescription kind="text"}{@param spec: FirewallRuleSpec}
-{literal}Allow {/literal}
-{call firewallRuleTitle}{param spec: $spec/}{/call}
-{literal} traffic from the Internet{/literal}
+{let $firewallTitle kind="text"}
+  {call firewallRuleTitle}
+    {param spec: $spec/}
+  {/call}
+{/let}
+
+Allow {$firewallTitle} traffic from the Internet{nil}
 {/template}
 
 /**
@@ -111,9 +115,13 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
  */
 {template firewallSourceRangesVarDescription kind="text"}
 {@param spec: FirewallRuleSpec}
-{literal}Source IP ranges for {/literal}
-{call firewallRuleTitle}{param spec: $spec/}{/call}
-{literal} traffic{/literal}
+{let $firewallTitle kind="text"}
+  {call firewallRuleTitle}
+    {param spec: $spec/}
+  {/call}
+{/let}
+
+Source IP ranges for {$firewallTitle} traffic{nil}
 {/template}
 
 /**
@@ -123,5 +131,5 @@ import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/dep
  */
 {template imageUri kind="text"}
 {@param spec: ImageSpec}
-projects/{$spec.getProject()}/global/images/{$spec.getName()}
+projects/{$spec.getProject()}/global/images/{$spec.getName()}{nil}
 {/template}

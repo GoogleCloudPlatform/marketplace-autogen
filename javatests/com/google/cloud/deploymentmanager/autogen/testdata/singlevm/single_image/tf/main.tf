@@ -1,4 +1,3 @@
-
 provider "google" {
   project = var.project_id
 }
@@ -39,9 +38,7 @@ resource "google_compute_instance" "instance" {
       }
     }
   }
-
 }
-
 
 resource "google_compute_firewall" tcp_80 {
   count = var.enable_tcp_80 ? 1 : 0
@@ -70,4 +67,3 @@ resource "google_compute_firewall" tcp_443 {
 
   source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
 }
-

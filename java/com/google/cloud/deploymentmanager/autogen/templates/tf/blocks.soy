@@ -14,6 +14,7 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
   {@param specList: list<FirewallRuleSpec>}
 
   {for $spec in $specList}
+    {\n}
     {call firewallResource}
       {param spec: $spec /}
     {/call}
@@ -24,19 +25,19 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
 /**
  * Produces a google_compute_firewall resource
  */
-{template firewallResource kind="text" whitespace="preserve"}
+{template firewallResource kind="text"}
 {@param spec: FirewallRuleSpec}
 resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
   count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
-
+{\n}
   name = "${lb}var.goog_cm_deployment_name{rb}-{call util.firewallRuleNameSuffix}{param spec: $spec/}{/call}"
   network = element(var.networks, 0)
-
+{\n}
   allow {lb}{if $spec.getPort().length > 0}
     ports = ["{$spec.getPort()}"]{/if}
     protocol = "{call util.firewallRuleProtocol}{param spec: $spec/}{/call}"
   {rb}
-
+{\n}
   source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
 {rb}
 {/template}
@@ -50,9 +51,11 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
   {@param specList: list<FirewallRuleSpec>}
 
   {for $spec in $specList}
+    {\n}
     {call firewallVariable}
       {param spec: $spec /}
     {/call}
+    {\n}
     {call firewallSourceRangesVariable}
       {param spec: $spec /}
     {/call}
@@ -63,7 +66,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 /**
  * Produces a boolean variable determining whether a firewall resource is created
  */
-{template firewallVariable kind="text" whitespace="preserve"}
+{template firewallVariable kind="text"}
 {@param spec: FirewallRuleSpec}
 variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
@@ -75,7 +78,7 @@ variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
 /**
  * Produces a string variable detemining the source range of a firewall resource
  */
-{template firewallSourceRangesVariable kind="text" whitespace="preserve"}
+{template firewallSourceRangesVariable kind="text"}
 {@param spec: FirewallRuleSpec}
 variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
@@ -84,14 +87,14 @@ variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
 {rb}
 {/template}
 
-{template acceleratorVariables kind="text" whitespace="preserve"}
+{template acceleratorVariables kind="text"}
 {@param spec: AcceleratorSpec}
 variable "accelerator_type" {lb}
   description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
   type        = string
   default     = "{$spec.getDefaultType()}"
 {rb}
-
+{\n}
 variable "accelerator_count" {lb}
   description = "The number of the guest accelerator cards exposed to this instance."
   type        = number

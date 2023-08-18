@@ -152,9 +152,8 @@ public class Autogen {
     @TemplateFileSet
     TemplateRenderer.FileSet provideFileSet(TemplateRenderer.FileSet.Builder builder) {
       DEPLOYMENT_MANAGER_SOY_FILES.forEach(
-          file -> builder.addContentFromResource(resource("dm/" + file), true));
-      TERRAFORM_SOY_FILES.forEach(
-          file -> builder.addContentFromResource(resource("tf/" + file), false));
+          file -> builder.addContentFromResource(resource("dm/" + file)));
+      TERRAFORM_SOY_FILES.forEach(file -> builder.addContentFromResource(resource("tf/" + file)));
 
       return builder
           .addProtoDescriptors(
