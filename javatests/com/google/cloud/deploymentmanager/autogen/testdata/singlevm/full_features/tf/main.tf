@@ -40,6 +40,16 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  guest_accelerator {
+    type = var.accelerator_type
+    count = var.accelerator_count
+  }
+
+  scheduling {
+    // GPUs do not support live migration
+    on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
+  }
+
 }
 
 
@@ -69,5 +79,18 @@ resource "google_compute_firewall" tcp_443 {
   }
 
   source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
+}
+
+resource "google_compute_firewall" icmp {
+  count = var.enable_icmp ? 1 : 0
+
+  name = "${var.goog_cm_deployment_name}-icmp"
+  network = element(var.networks, 0)
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
 }
 

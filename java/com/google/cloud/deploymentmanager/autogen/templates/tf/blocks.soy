@@ -32,8 +32,8 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
   name = "${lb}var.goog_cm_deployment_name{rb}-{call util.firewallRuleNameSuffix}{param spec: $spec/}{/call}"
   network = element(var.networks, 0)
 
-  allow {lb}
-    {if $spec.getPort().length > 0}ports = ["{$spec.getPort()}"]{/if}
+  allow {lb}{if $spec.getPort().length > 0}
+    ports = ["{$spec.getPort()}"]{/if}
     protocol = "{call util.firewallRuleProtocol}{param spec: $spec/}{/call}"
   {rb}
 
@@ -63,7 +63,8 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 /**
  * Produces a boolean variable determining whether a firewall resource is created
  */
-{template firewallVariable kind="text" whitespace="preserve"}{@param spec: FirewallRuleSpec}
+{template firewallVariable kind="text" whitespace="preserve"}
+{@param spec: FirewallRuleSpec}
 variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
   type        = bool
@@ -74,10 +75,26 @@ variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
 /**
  * Produces a string variable detemining the source range of a firewall resource
  */
-{template firewallSourceRangesVariable kind="text" whitespace="preserve"}{@param spec: FirewallRuleSpec}
+{template firewallSourceRangesVariable kind="text" whitespace="preserve"}
+{@param spec: FirewallRuleSpec}
 variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
   type        = string
   default     = ""
+{rb}
+{/template}
+
+{template acceleratorVariables kind="text" whitespace="preserve"}
+{@param spec: AcceleratorSpec}
+variable "accelerator_type" {lb}
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  type        = string
+  default     = "{$spec.getDefaultType()}"
+{rb}
+
+variable "accelerator_count" {lb}
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = "{$spec.getDefaultCount() ?: 0}"
 {rb}
 {/template}

@@ -19,6 +19,7 @@ variable "source_image" {
 variable "zone" {
   description = "The zone for the solution to be deployed."
   type        = string
+  default     = "us-west1-b"
 }
 
 variable "machine_type" {
@@ -82,5 +83,29 @@ variable "tcp_443_source_ranges" {
   default     = ""
 }
 
+variable "enable_icmp" {
+  description = "Allow icmp traffic from the Internet"
+  type        = bool
+  default     = true
+}
 
+variable "icmp_source_ranges" {
+  description = "Source IP ranges for icmp traffic"
+  type        = string
+  default     = ""
+}
+
+
+
+variable "accelerator_type" {
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  type        = string
+  default     = "nvidia-tesla-k80"
+}
+
+variable "accelerator_count" {
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = "1"
+}
 

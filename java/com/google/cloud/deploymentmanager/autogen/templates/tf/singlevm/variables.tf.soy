@@ -11,7 +11,7 @@ variable "project_id" {lb}
   type        = string
 {rb}
 
-// Marketplace requires this variable name to be declared
+{literal}// Marketplace requires this variable name to be declared{/literal}
 variable "goog_cm_deployment_name" {lb}
   description = "The name of the deployment and VM instance."
   type        = string
@@ -66,4 +66,8 @@ variable "external_ips" {lb}
 {rb}
 
 {call blocks.firewallVariables}{param specList: $spec.getFirewallRulesList()/}{/call}
+
+{if solutionHasGpus($spec)}{call blocks.acceleratorVariables}
+  {param spec: $spec.getAcceleratorsList()[0]/}
+{/call}{/if}
 {/template}
