@@ -88,6 +88,9 @@ spec:
       description: Source IP ranges for icmp traffic
       varType: string
       required: true
+    - name: ip_forward
+      varType: bool
+      defaultValue: false
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

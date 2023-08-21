@@ -157,6 +157,16 @@ spec:
             type: ET_GCE_FIREWALL
             gceFirewallRange:
               firewallVariable: enable_icmp
+        ip_forward:
+          name: ip_forward
+          title: IP forwarding
+          tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_IP_FORWARDING
+            gceIpForwarding:
+              networkVariable: network
+              notConfigurable: true
       sections:
       - name: boot_disk
         title: Boot Disk

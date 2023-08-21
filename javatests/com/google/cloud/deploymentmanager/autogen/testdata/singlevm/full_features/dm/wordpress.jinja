@@ -20,6 +20,7 @@
 {% set hasExternalIP = externalIPs and externalIPs[0] != "NONE" %}
 {# Software status only works if the VM has an external IP. #}
 {% set enableStatusWaiter = hasExternalIP %}
+{% set canIpForward = properties["ipForward"] == "On" %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
@@ -71,6 +72,7 @@ resources:
           boot: False
           autoDelete: True
       localSSDs: 3
+      canIpForward: {{ canIpForward }}
       {% if acceleratorCount > 0 %}
       guestAccelerators:
         - acceleratorType: {{ acceleratorType }}

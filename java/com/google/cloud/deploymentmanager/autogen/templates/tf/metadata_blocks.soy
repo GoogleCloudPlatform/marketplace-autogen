@@ -132,3 +132,13 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   varType: string
   required: true
 {/template}
+
+
+{template ipForwardingPropertySchema kind="text"}
+{@param name: string}
+{@param spec: IpForwardingSpec}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+{/template}

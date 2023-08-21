@@ -211,3 +211,20 @@ goog_cm_deployment_name:
       firewallVariable: {$firewallPropName |trim}
 {/if}
 {/template}
+
+
+{template ipForwardingPropertyDisplay kind="text"}
+{@param name: string}
+{@param spec: IpForwardingSpec}
+{@param? tier: VmTierSpec}
+{$name |tierprefixed: $tier}:
+  name: {$name |tierprefixed: $tier}
+  title: IP forwarding
+  tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_IP_FORWARDING
+    gceIpForwarding:
+      networkVariable: {'network' |tierprefixed: $tier}
+      notConfigurable: {$spec.getNotConfigurable()}
+{/template}

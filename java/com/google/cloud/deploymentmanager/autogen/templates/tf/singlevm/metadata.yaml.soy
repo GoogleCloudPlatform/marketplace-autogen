@@ -104,6 +104,16 @@ spec:
     {$firewallProps |indent: 4, true}{nil}
     {/for}
 
+    {if $spec.getIpForwarding()}
+    {let $ipForwardingProp kind="text"}
+      {call blocks.ipForwardingPropertySchema}
+        {param name: 'ip_forward' /}
+        {param spec: $spec.getIpForwarding() /}
+      {/call}
+    {/let}
+    {$ipForwardingProp |indent: 4, true}{nil}
+    {/if}
+
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

@@ -99,6 +99,16 @@ spec:
         {$firewallDisplay |indent: 8, true}{nil}
         {/for}
 
+        {if $spec.getIpForwarding()}
+        {let $ipForwardingDisplay kind="text"}
+          {call blocks.ipForwardingPropertyDisplay}
+            {param name: 'ip_forward' /}
+            {param spec: $spec.getIpForwarding() /}
+          {/call}
+        {/let}
+        {$ipForwardingDisplay |indent: 8, true}{nil}
+        {/if}
+
       sections:
       - name: boot_disk
         title: Boot Disk
