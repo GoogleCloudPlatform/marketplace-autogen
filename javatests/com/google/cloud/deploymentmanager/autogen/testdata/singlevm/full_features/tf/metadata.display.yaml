@@ -1,0 +1,95 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools-display
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    title: 'WordPress: Apache & PHP Template'
+  ui:
+    input:
+      variables:
+        project_id:
+          name: project_id
+          title: Project Id
+          invisible: true
+        goog_cm_deployment_name:
+          name: goog_cm_deployment_name
+          title: Goog Cm Deployment Name
+        source_image:
+          name: source_image
+          title: Source Image
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        machine_type:
+          name: machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minRamGb: 0.5
+        boot_disk_size:
+          name: boot_disk_size
+          title: Boot disk size in GB
+          tooltip: Persistent disk performance is tied to the size of the persistent disk volume. You are charged for the actual amount of provisioned disk space.
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: boot_disk_type
+        boot_disk_type:
+          name: boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        zone:
+          name: zone
+          title: Zone
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+        network:
+          name: network
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        subnetwork:
+          name: subnetwork
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: network
+        external_ips:
+          name: external_ips
+          title: External IP
+          tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: network
+              type: IP_EPHEMERAL
+      sections:
+      - name: boot_disk
+        title: Boot Disk
+        tooltip: Each instance requires a disk to boot from.
+      - name: networking
+        title: Networking

@@ -1,0 +1,92 @@
+{namespace metadata.blocks}
+
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+
+{template projectIdPropertySchema kind="text"}
+- name: project_id
+  description: The ID of the project in which to provision resources.
+  varType: string
+  required: true
+{/template}
+
+
+{template deploymentNamePropertySchema kind="text"}
+- name: goog_cm_deployment_name
+  description: The name of the deployment and VM instance.
+  varType: string
+  required: true
+{/template}
+
+
+{template bootDiskPropertiesSchema kind="text"}
+{@param spec: DiskSpec}
+{@param? tier: VmTierSpec}
+- name: {'boot_disk_size' |tierprefixed: $tier}
+  description: The boot disk size for the VM instance in GBs
+  varType: string
+  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
+
+- name: {'boot_disk_type' |tierprefixed: $tier}
+  description: The boot disk type for the VM instance.
+  varType: string
+  defaultValue: {$spec.getDiskType()!.getDefaultType()}
+{/template}
+
+
+{template zonePropertySchema kind="text"}
+{@param name: string}
+{@param? zoneSpec: ZoneSpec}
+- name: {$name}
+  description: The zone for the solution to be deployed.
+  varType: string
+  {if $zoneSpec and $zoneSpec.getDefaultZone()}
+  defaultValue: {$zoneSpec.getDefaultZone()}
+  {/if}
+{/template}
+
+
+{template imagePropertySchema kind="text"}
+{@param name: string}
+{@param imagesList: list<ImageSpec>}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  description: The image name for the disk for the VM instance.
+  varType: string
+  defaultValue: projects/{$imagesList[0].getProject()}/global/images/{$imagesList[0].getName()}
+{/template}
+
+
+{template machineTypePropertySchema kind="text"}
+{@param name: string}
+{@param spec: MachineTypeSpec}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  description: The machine type to create, e.g. e2-small
+  varType: string
+  defaultValue: {$spec.getDefaultMachineType()!.getGceMachineType()}
+{/template}
+
+
+{template networkPropertiesSchema kind="text"}
+{@param nameSuffix: string}
+{@param spec: NetworkInterfacesSpec}
+{@param? tier: VmTierSpec}
+{let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
+- name: {$networkPropName}
+  description: The network name to attach the VM instance.
+  varType: list(string)
+  defaultValue:
+  - default
+- name: {'sub' + $nameSuffix |tierprefixed: $tier}
+  description: The sub network name to attach the VM instance.
+  varType: list(string)
+  defaultValue:
+  - default
+- name: {'external_ips' |tierprefixed: $tier}
+  description: The external IPs assigned to the VM for public access.
+  varType: list(string)
+  defaultValue:
+  - EPHEMERAL
+{/template}

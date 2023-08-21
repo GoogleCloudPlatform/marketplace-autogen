@@ -1,0 +1,89 @@
+{namespace vm.single.metadata.display}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/metadata_display_blocks.soy';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+
+{template main kind="text"}
+{@param spec: SingleVmDeploymentPackageSpec}
+{@param solutionId: string}
+{@param? solutionInfo: SolutionMarketingInfo}
+{@param? templateVersion: string}
+
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools-display
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    {if $solutionInfo}
+    title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 4}
+    {else}
+    title: {$solutionId + ' template' |yamlprimitive: 4}
+    {/if}
+  ui:
+    input:
+      variables:
+        {let $projectIdDisplay kind="text"}
+          {call blocks.projectIdPropertyDisplay}
+          {/call}
+        {/let}
+        {$projectIdDisplay |indent: 8, true}{nil}
+
+        {let $deploymentNameDisplay kind="text"}
+          {call blocks.deploymentNamePropertyDisplay}
+          {/call}
+        {/let}
+        {$deploymentNameDisplay |indent: 8, true}{nil}
+
+        {let $imageDisplay kind="text"}
+          {call blocks.imagePropertyDisplay}
+            {param name: 'source_image' /}
+            {param imagesList: $spec.getImagesList() /}
+          {/call}
+        {/let}
+        {$imageDisplay |indent: 8, true}{nil}
+
+        {let $machineTypeDisplay kind="text"}
+          {call blocks.machineTypePropertyDisplay}
+            {param name: 'machine_type' /}
+            {param spec: $spec.getMachineType()! /}
+            {param zonePropertyName: 'zone' /}
+          {/call}
+        {/let}
+        {$machineTypeDisplay |indent: 8, true}{nil}
+
+        {let $bootDiskDisplay kind="text"}
+          {call blocks.bootDiskPropertiesDisplay}
+            {param spec: $spec.getBootDisk()! /}
+            {param zonePropertyName: 'zone' /}
+          {/call}
+        {/let}
+        {$bootDiskDisplay |indent: 8, true}{nil}
+
+        {let $zoneDisplay kind="text"}
+          {call blocks.zonePropertyDisplay}
+            {param name: 'zone'/}
+            {param zoneSpec: $spec.getZone() /}
+          {/call}
+        {/let}
+        {$zoneDisplay |indent: 8, true}{nil}
+
+        {let $networkDisplay kind="text"}
+          {call blocks.networkPropertiesDisplay}
+            {param nameSuffix: 'network' /}
+            {param zonePropertyName: 'zone' /}
+            {param spec: $spec.getNetworkInterfaces()! /}
+          {/call}
+        {/let}
+        {$networkDisplay |indent: 8, true}{nil}
+
+      sections:
+      - name: boot_disk
+        title: Boot Disk
+        tooltip: Each instance requires a disk to boot from.
+      - name: networking
+        title: Networking
+{/template}

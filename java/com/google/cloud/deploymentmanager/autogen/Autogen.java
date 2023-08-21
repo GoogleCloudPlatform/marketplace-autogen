@@ -107,8 +107,12 @@ public class Autogen {
           "singlevm/main.tf.soy",
           "singlevm/variables.tf.soy",
           "singlevm/marketplace_test.tfvars.soy",
+          "singlevm/metadata.yaml.soy",
+          "singlevm/metadata.display.yaml.soy",
           "blocks.soy",
-          "util.soy");
+          "util.soy",
+          "metadata_blocks.soy",
+          "metadata_display_blocks.soy");
 
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()
@@ -308,7 +312,20 @@ public class Autogen {
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("marketplace_test.tfvars")
-                .setContent(fileSet.newRenderer("vm.single.tfvars.main").setData(params).render()));
+                .setContent(fileSet.newRenderer("vm.single.tfvars.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.yaml")
+                .setContent(
+                    fileSet.newRenderer("vm.single.metadata.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.display.yaml")
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.single.metadata.display.main")
+                        .setData(params)
+                        .render()));
 
     return builder.build();
   }
