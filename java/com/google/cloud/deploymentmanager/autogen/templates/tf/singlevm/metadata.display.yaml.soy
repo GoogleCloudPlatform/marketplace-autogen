@@ -55,6 +55,16 @@ spec:
         {/let}
         {$machineTypeDisplay |indent: 8, true}{nil}
 
+        {if solutionHasGpus($spec)}
+        {let $acceleratorDisplay kind="text"}
+          {call blocks.acceleratorPropertiesDisplay}
+            {param namePrefix: 'accelerator' /}
+            {param spec: $spec.getAcceleratorsList()[0] /}
+          {/call}
+        {/let}
+        {$acceleratorDisplay |indent: 8, true}{nil}
+        {/if}
+
         {let $bootDiskDisplay kind="text"}
           {call blocks.bootDiskPropertiesDisplay}
             {param spec: $spec.getBootDisk()! /}

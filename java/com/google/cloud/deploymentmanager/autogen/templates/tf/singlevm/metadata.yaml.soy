@@ -77,6 +77,16 @@ spec:
     {/let}
     {$machineTypeProp |indent: 4, true}{nil}
 
+    {if solutionHasGpus($spec)}
+    {let $acceleratorProps kind="text"}
+      {call blocks.acceleratorPropertiesSchema}
+        {param namePrefix: 'accelerator' /}
+        {param spec: $spec.getAcceleratorsList()[0] /}
+      {/call}
+    {/let}
+    {$acceleratorProps |indent: 4, true}{nil}
+    {/if}
+
     {let $networkProps kind="text"}
       {call blocks.networkPropertiesSchema}
         {param nameSuffix: 'network' /}

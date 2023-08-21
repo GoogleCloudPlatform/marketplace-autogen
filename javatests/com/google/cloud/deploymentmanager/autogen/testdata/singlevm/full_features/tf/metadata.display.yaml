@@ -30,6 +30,22 @@ spec:
             zoneProperty: zone
             gceMachineType:
               minRamGb: 0.5
+        accelerator_type:
+          name: accelerator_type
+          title: Accelerator type
+          xGoogleProperty:
+            type: ET_GCE_GPU_TYPE
+            gceGpuType:
+              machineType: machine_type
+              gpuType:
+                - nvidia-tesla-k80
+        accelerator_count:
+          name: accelerator_count
+          title: Accelerator count
+          xGoogleProperty:
+            type: ET_GCE_GPU_COUNT
+            gceGpuCount:
+              machineTypeVariable: machine_type
         boot_disk_size:
           name: boot_disk_size
           title: Boot disk size in GB

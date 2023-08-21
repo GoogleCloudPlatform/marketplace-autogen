@@ -108,6 +108,31 @@ goog_cm_deployment_name:
 {/template}
 
 
+{template acceleratorPropertiesDisplay kind="text"}
+{@param namePrefix: string}
+{@param spec: AcceleratorSpec}
+{@param? tier: VmTierSpec}
+{$namePrefix + '_type' |tierprefixed: $tier}:
+  name: {$namePrefix + '_type' |tierprefixed: $tier}
+  title: Accelerator type
+  xGoogleProperty:
+    type: ET_GCE_GPU_TYPE
+    gceGpuType:
+      machineType: {'machine_type' |tierprefixed: $tier}
+      gpuType:
+        {for $gpuType in $spec.getTypesList()}
+        - {$gpuType}
+        {/for}
+{$namePrefix + '_count' |tierprefixed: $tier}:
+  name: {$namePrefix + '_count' |tierprefixed: $tier}
+  title: Accelerator count
+  xGoogleProperty:
+    type: ET_GCE_GPU_COUNT
+    gceGpuCount:
+      machineTypeVariable: {'machine_type' |tierprefixed: $tier}
+{/template}
+
+
 {template networkPropertiesDisplay kind="text"}
 {@param nameSuffix: string}
 {@param zonePropertyName: string}

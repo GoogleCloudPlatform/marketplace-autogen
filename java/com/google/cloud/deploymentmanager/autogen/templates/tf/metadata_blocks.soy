@@ -69,6 +69,21 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
+{template acceleratorPropertiesSchema kind="text"}
+{@param namePrefix: string}
+{@param spec: AcceleratorSpec}
+{@param? tier: VmTierSpec}
+- name: {$namePrefix + '_type' |tierprefixed: $tier}
+  description: The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80.
+  varType: string
+  defaultValue: {$spec.getDefaultType()}
+- name: {$namePrefix + '_count' |tierprefixed: $tier}
+  description: The number of the guest accelerator cards exposed to this instance.
+  varType: string
+  defaultValue: {$spec.getDefaultCount() ?: 0}
+{/template}
+
+
 {template networkPropertiesSchema kind="text"}
 {@param nameSuffix: string}
 {@param spec: NetworkInterfacesSpec}
