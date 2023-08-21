@@ -6,6 +6,12 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
 
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
+{let $passwordMetadata}
+  {call blocks.passwordMetadata}
+    {param specList: $spec.getPasswordsList() /}
+  {/call}
+{/let}
+
 provider "google" {lb}
   project = var.project_id
 {rb}
@@ -16,6 +22,10 @@ locals {lb}
     subnetwork  = element(var.sub_networks, i)
     external_ip = element(var.external_ips, i)
     {rb}
+  {rb}
+{\n}
+  metadata = {lb}
+    {$passwordMetadata |indent: 4}
   {rb}
 {rb}
 {\n}
@@ -31,6 +41,8 @@ resource "google_compute_instance" "instance" {lb}
       image = var.source_image
     {rb}
   {rb}
+{\n}
+  metadata = local.metadata
 {\n}
   dynamic "network_interface" {lb}
     for_each = local.network_interfaces_map
@@ -62,5 +74,9 @@ resource "google_compute_instance" "instance" {lb}
 
 {call blocks.firewallResources}
   {param specList: $spec.getFirewallRulesList()/}
+{/call}
+
+{call blocks.passwordResources}
+  {param specList: $spec.getPasswordsList() /}
 {/call}
 {/template}

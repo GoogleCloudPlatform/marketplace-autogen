@@ -102,3 +102,35 @@ variable "accelerator_count" {lb}
   default     = "{$spec.getDefaultCount() ?: 0}"
 {rb}
 {/template}
+
+{template passwordResources kind="text"}
+  {@param specList: list<PasswordSpec>}
+
+  {for $spec, $index in $specList}
+    {\n}
+    {call passwordResource}
+      {param spec: $spec /}
+      {param index: $index /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordResource kind="text"}
+{@param spec: PasswordSpec}
+{@param index: int}
+resource "random_password" "password_{$index}" {lb}
+  length = {$spec.getLength()}
+  special = {$spec.getAllowSpecialChars()}
+{rb}
+{/template}
+
+{template passwordMetadata kind="text"}
+  {@param specList: list<PasswordSpec>}
+
+  {for $spec, $index in $specList}
+    {$spec.getMetadataKey()}=random_password.password_{$index}.result{nil}
+    {if $index != $specList.length - 1}
+      {\n}
+    {/if}
+  {/for}
+{/template}
