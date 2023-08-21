@@ -42,6 +42,10 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {\n}
+{if $spec.getIpForwarding()}
+  can_ip_forward = {not $spec.getIpForwarding().getDefaultOff()}
+{\n}
+{/if}
   metadata = local.metadata
 {\n}
   dynamic "network_interface" {lb}

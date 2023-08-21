@@ -30,6 +30,8 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  can_ip_forward = false
+
   metadata = local.metadata
 
   dynamic "network_interface" {

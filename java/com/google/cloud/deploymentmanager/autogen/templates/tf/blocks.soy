@@ -72,7 +72,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
   type        = bool
-  default     = {if $spec.getDefaultOff()}false{else}true{/if}
+  default     = {not $spec.getDefaultOff()}
 {rb}
 {/template}
 
