@@ -4,6 +4,7 @@
 {namespace blocks}
 
 
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
@@ -90,13 +91,13 @@ variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
 {template acceleratorVariables kind="text"}
 {@param spec: AcceleratorSpec}
 variable "accelerator_type" {lb}
-  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  description = "{constants.ACCELERATOR_TYPE_VAR_DESC}"
   type        = string
   default     = "{$spec.getDefaultType()}"
 {rb}
 {\n}
 variable "accelerator_count" {lb}
-  description = "The number of the guest accelerator cards exposed to this instance."
+  description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
   default     = "{$spec.getDefaultCount() ?: 0}"
 {rb}

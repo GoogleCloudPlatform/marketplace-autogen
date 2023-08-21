@@ -110,6 +110,7 @@ public class Autogen {
           "singlevm/metadata.yaml.soy",
           "singlevm/metadata.display.yaml.soy",
           "blocks.soy",
+          "constants.soy",
           "util.soy",
           "metadata_blocks.soy",
           "metadata_display_blocks.soy");

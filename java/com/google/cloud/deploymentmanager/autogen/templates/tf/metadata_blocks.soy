@@ -1,12 +1,13 @@
 {namespace metadata.blocks}
 
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
 {template projectIdPropertySchema kind="text"}
 - name: project_id
-  description: The ID of the project in which to provision resources.
+  description: {constants.PROJECT_ID_VAR_DESC}
   varType: string
   required: true
 {/template}
@@ -14,7 +15,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 
 {template deploymentNamePropertySchema kind="text"}
 - name: goog_cm_deployment_name
-  description: The name of the deployment and VM instance.
+  description: {constants.DEPLOYMENT_NAME_VAR_DESC}
   varType: string
   required: true
 {/template}
@@ -24,12 +25,12 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param spec: DiskSpec}
 {@param? tier: VmTierSpec}
 - name: {'boot_disk_size' |tierprefixed: $tier}
-  description: The boot disk size for the VM instance in GBs
+  description: {constants.BOOT_DISK_SIZE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
 
 - name: {'boot_disk_type' |tierprefixed: $tier}
-  description: The boot disk type for the VM instance.
+  description: {constants.BOOT_DISK_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDiskType()!.getDefaultType()}
 {/template}
@@ -39,7 +40,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param name: string}
 {@param? zoneSpec: ZoneSpec}
 - name: {$name}
-  description: The zone for the solution to be deployed.
+  description: {constants.ZONE_VAR_DESC}
   varType: string
   {if $zoneSpec and $zoneSpec.getDefaultZone()}
   defaultValue: {$zoneSpec.getDefaultZone()}
@@ -52,7 +53,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param imagesList: list<ImageSpec>}
 {@param? tier: VmTierSpec}
 - name: {$name |tierprefixed: $tier}
-  description: The image name for the disk for the VM instance.
+  description: {constants.SOURCE_IMAGE_VAR_DESC}
   varType: string
   defaultValue: projects/{$imagesList[0].getProject()}/global/images/{$imagesList[0].getName()}
 {/template}
@@ -63,7 +64,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param spec: MachineTypeSpec}
 {@param? tier: VmTierSpec}
 - name: {$name |tierprefixed: $tier}
-  description: The machine type to create, e.g. e2-small
+  description: {constants.MACHINE_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDefaultMachineType()!.getGceMachineType()}
 {/template}
@@ -74,11 +75,11 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param spec: AcceleratorSpec}
 {@param? tier: VmTierSpec}
 - name: {$namePrefix + '_type' |tierprefixed: $tier}
-  description: The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80.
+  description: {constants.ACCELERATOR_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDefaultType()}
 - name: {$namePrefix + '_count' |tierprefixed: $tier}
-  description: The number of the guest accelerator cards exposed to this instance.
+  description: {constants.ACCELERATOR_COUNT_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDefaultCount() ?: 0}
 {/template}
@@ -90,17 +91,17 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {@param? tier: VmTierSpec}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
 - name: {$networkPropName}
-  description: The network name to attach the VM instance.
+  description: {constants.NETWORKS_VAR_DESC}
   varType: list(string)
   defaultValue:
   - default
 - name: {'sub' + $nameSuffix |tierprefixed: $tier}
-  description: The sub network name to attach the VM instance.
+  description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
   defaultValue:
   - default
 - name: {'external_ips' |tierprefixed: $tier}
-  description: The external IPs assigned to the VM for public access.
+  description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
   defaultValue:
   - EPHEMERAL

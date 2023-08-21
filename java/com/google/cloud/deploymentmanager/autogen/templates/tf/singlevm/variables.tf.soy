@@ -1,30 +1,31 @@
 {namespace vm.single.variables}
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
 variable "project_id" {lb}
-  description = "The ID of the project in which to provision resources."
+  description = "{constants.PROJECT_ID_VAR_DESC}"
   type        = string
 {rb}
 {\n}
 {literal}// Marketplace requires this variable name to be declared{/literal}
 variable "goog_cm_deployment_name" {lb}
-  description = "The name of the deployment and VM instance."
+  description = "{constants.DEPLOYMENT_NAME_VAR_DESC}"
   type        = string
 {rb}
 {\n}
 variable "source_image" {lb}
-  description = "The image name for the disk for the VM instance."
+  description = "{constants.SOURCE_IMAGE_VAR_DESC}"
   type        = string
   default     = "{call util.imageUri}{param spec: $spec.getImagesList()[0]/}{/call}"
 {rb}
 {\n}
 variable "zone" {lb}
-  description = "The zone for the solution to be deployed."
+  description = "{constants.ZONE_VAR_DESC}"
   type        = string
   {if $spec.getZone()?.getDefaultZone()}
   default     = "{$spec.getZone().getDefaultZone()}"
@@ -32,37 +33,37 @@ variable "zone" {lb}
 {rb}
 {\n}
 variable "machine_type" {lb}
-  description = "The machine type to create, e.g. e2-small"
+  description = "{constants.MACHINE_TYPE_VAR_DESC}"
   type        = string
   default     = "{$spec.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"
 {rb}
 {\n}
 variable "boot_disk_type" {lb}
-  description = "The boot disk type for the VM instance."
+  description = "{constants.BOOT_DISK_TYPE_VAR_DESC}"
   type        = string
   default     = "{$spec.getBootDisk()!.getDiskType()!.getDefaultType()}"
 {rb}
 {\n}
 variable "boot_disk_size" {lb}
-  description = "The boot disk size for the VM instance in GBs"
+  description = "{constants.BOOT_DISK_SIZE_VAR_DESC}"
   type        = number
   default     = {$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 {\n}
 variable "networks" {lb}
-  description = "The network name to attach the VM instance."
+  description = "{constants.NETWORKS_VAR_DESC}"
   type        = list(string)
   default     = ["default"]
 {rb}
 {\n}
 variable "sub_networks" {lb}
-  description = "The sub network name to attach the VM instance."
+  description = "{constants.SUB_NETWORKS_VAR_DESC}"
   type        = list(string)
   default     = ["default"]
 {rb}
 {\n}
 variable "external_ips" {lb}
-  description = "The external IPs assigned to the VM for public access."
+  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
   type        = list(string)
   default     = ["EPHEMERAL"]
 {rb}
