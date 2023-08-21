@@ -1,0 +1,108 @@
+{namespace metadata.blocks}
+
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+
+{template projectIdPropertySchema kind="text"}
+- name: project_id
+  description: {constants.PROJECT_ID_VAR_DESC}
+  varType: string
+  required: true
+{/template}
+
+
+{template deploymentNamePropertySchema kind="text"}
+- name: goog_cm_deployment_name
+  description: {constants.DEPLOYMENT_NAME_VAR_DESC}
+  varType: string
+  required: true
+{/template}
+
+
+{template bootDiskPropertiesSchema kind="text"}
+{@param spec: DiskSpec}
+{@param? tier: VmTierSpec}
+- name: {'boot_disk_size' |tierprefixed: $tier}
+  description: {constants.BOOT_DISK_SIZE_VAR_DESC}
+  varType: string
+  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
+
+- name: {'boot_disk_type' |tierprefixed: $tier}
+  description: {constants.BOOT_DISK_TYPE_VAR_DESC}
+  varType: string
+  defaultValue: {$spec.getDiskType()!.getDefaultType()}
+{/template}
+
+
+{template zonePropertySchema kind="text"}
+{@param name: string}
+{@param? zoneSpec: ZoneSpec}
+- name: {$name}
+  description: {constants.ZONE_VAR_DESC}
+  varType: string
+  {if $zoneSpec and $zoneSpec.getDefaultZone()}
+  defaultValue: {$zoneSpec.getDefaultZone()}
+  {/if}
+{/template}
+
+
+{template imagePropertySchema kind="text"}
+{@param name: string}
+{@param imagesList: list<ImageSpec>}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  description: {constants.SOURCE_IMAGE_VAR_DESC}
+  varType: string
+  defaultValue: projects/{$imagesList[0].getProject()}/global/images/{$imagesList[0].getName()}
+{/template}
+
+
+{template machineTypePropertySchema kind="text"}
+{@param name: string}
+{@param spec: MachineTypeSpec}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  description: {constants.MACHINE_TYPE_VAR_DESC}
+  varType: string
+  defaultValue: {$spec.getDefaultMachineType()!.getGceMachineType()}
+{/template}
+
+
+{template acceleratorPropertiesSchema kind="text"}
+{@param namePrefix: string}
+{@param spec: AcceleratorSpec}
+{@param? tier: VmTierSpec}
+- name: {$namePrefix + '_type' |tierprefixed: $tier}
+  description: {constants.ACCELERATOR_TYPE_VAR_DESC}
+  varType: string
+  defaultValue: {$spec.getDefaultType()}
+- name: {$namePrefix + '_count' |tierprefixed: $tier}
+  description: {constants.ACCELERATOR_COUNT_VAR_DESC}
+  varType: string
+  defaultValue: {$spec.getDefaultCount() ?: 0}
+{/template}
+
+
+{template networkPropertiesSchema kind="text"}
+{@param nameSuffix: string}
+{@param spec: NetworkInterfacesSpec}
+{@param? tier: VmTierSpec}
+{let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
+- name: {$networkPropName}
+  description: {constants.NETWORKS_VAR_DESC}
+  varType: list(string)
+  defaultValue:
+  - default
+- name: {'sub' + $nameSuffix |tierprefixed: $tier}
+  description: {constants.SUB_NETWORKS_VAR_DESC}
+  varType: list(string)
+  defaultValue:
+  - default
+- name: {'external_ips' |tierprefixed: $tier}
+  description: {constants.EXTERNAL_IPS_VAR_DESC}
+  varType: list(string)
+  defaultValue:
+  - EPHEMERAL
+{/template}

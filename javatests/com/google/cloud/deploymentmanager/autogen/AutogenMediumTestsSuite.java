@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -33,6 +34,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -76,22 +78,48 @@ public class AutogenMediumTestsSuite {
       return stream(Files.fileTraverser().depthFirstPreOrder(ROOT))
           .filter(Files.isFile())
           .filter(f -> f.getName().matches("input.*\\.prototext"))
-          .map(Solution::new)
+          .flatMap(Solution::getSolutions)
           .collect(toList());
     }
-
-    Solution(File inputSpecFile) {
-      name = relativePathFunction(ROOT, inputSpecFile);
-      solutionFolder =
+    
+    static Stream<Solution> getSolutions(File inputSpecFile) {
+      File solutionFolder =
           new File(TESTDATA_PATH + relativePathFunction(ROOT, inputSpecFile.getParentFile()));
-      goldenFolder = new File(solutionFolder, "golden");
-      solutionPackage =
+      File dmGoldenFolder = new File(solutionFolder, "dm");
+      File terraformGoldenFolder = new File(solutionFolder, "tf");
+      if (!dmGoldenFolder.exists() && !terraformGoldenFolder.exists()) {
+        throw new IllegalStateException(
+            "No golden folder exists for either Deployment Manager or Terraform");
+      }
+
+      List<Solution> solutions = new ArrayList<>();
+      if (dmGoldenFolder.exists()) {
+        solutions.add(
+            new Solution(
+                inputSpecFile, solutionFolder, dmGoldenFolder, DeploymentTool.DEPLOYMENT_MANAGER));
+      }
+
+      if (terraformGoldenFolder.exists()) {
+        solutions.add(
+            new Solution(
+                inputSpecFile, solutionFolder, terraformGoldenFolder, DeploymentTool.TERRAFORM));
+      }
+
+      return solutions.stream();
+    }
+
+    Solution(File inputSpecFile, File solutionFolder, File goldenFolder, DeploymentTool tool) {
+      this.name = relativePathFunction(ROOT, inputSpecFile);
+      this.solutionFolder = solutionFolder;
+      this.goldenFolder = goldenFolder;
+      this.solutionPackage =
           Suppliers.memoize(
               () -> {
                 try {
                   DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
                   TextFormat.getParser()
                       .merge(Files.asCharSource(inputSpecFile, UTF_8).read(), input);
+                  input.setDeploymentTool(tool);
                   return AUTOGEN.generateDeploymentPackage(
                       input.build(), SharedSupportFilesStrategy.INCLUDED);
                 } catch (IOException e) {

@@ -16,6 +16,7 @@ package com.google.cloud.deploymentmanager.autogen.soy;
 
 import com.google.cloud.deploymentmanager.autogen.soy.TemplateRenderer.Module.SoyFiles;
 import com.google.common.io.Resources;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -35,10 +36,10 @@ import java.util.Set;
 import javax.inject.Qualifier;
 
 /**
- * Supports rendering of yaml jinja soy templates, which are jinja templates that generate yaml
- * files.
+ * Supports rendering of soy templates
  *
- * <p>This works around soy's limitation to enable easy crafting of yaml jinja soy templates by:
+ * <p>Uses a preprocessor to works around soy's limitation to enable easy crafting of yaml jinja soy
+ * templates by:
  *
  * <ul>
  *   <li>Preserving indentations and line breaks
@@ -69,18 +70,18 @@ public final class TemplateRenderer {
       }
 
       /** Adds the content of a file. */
-      public Builder add(String content, String filePath) {
+      private Builder add(String content, String filePath) {
         soyFileSetBuilder.add(Preprocessor.preprocess(content), filePath);
         return this;
       }
 
       /** Adds a resource file from the bundled resources. */
+      @CanIgnoreReturnValue
       public Builder addContentFromResource(String resourceName) {
         try {
           String content =
               Resources.toString(Resources.getResource(resourceName), StandardCharsets.UTF_8);
-          add(content, resourceName);
-          return this;
+          return add(content, resourceName);
         } catch (IOException ioe) {
           throw new RuntimeException(ioe);
         }

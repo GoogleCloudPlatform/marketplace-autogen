@@ -1,6 +1,6 @@
 # Marketplace Autogen
 
-* Marketplace Autogen* is a Java-based tool for generating fully functional [Deployment Manager](https://cloud.google.com/deployment-manager/docs/) templates from simplified YAML, JSON, or Prototext configuration files.
+*Marketplace Autogen* is a Java-based tool for generating fully functional [Deployment Manager](https://cloud.google.com/deployment-manager/docs/) templates from simplified YAML, JSON, or Prototext configuration files.
 
 It currently supports single- and multi-VM configurations.
 
@@ -43,6 +43,10 @@ To review these options at any time, provide `--help` as the argument for Autoge
 * `--exclude_shared_support_files` (optional)
 
   If this parameter is provided, Autogen will NOT include the shared support files used for deployment in this solution (look [here](./java/com/google/cloud/deploymentmanager/autogen/templates/dm/sharedsupport/common) for those files). By default, Autogen always includes these files, which is the recommended option.
+
+* `--dev_features` (optional)
+
+  If this flag is provided, Autogen can use in-development features such as support for Terraform.
 
 ### Example configurations
 

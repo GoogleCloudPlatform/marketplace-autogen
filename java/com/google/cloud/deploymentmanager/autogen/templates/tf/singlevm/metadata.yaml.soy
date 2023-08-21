@@ -1,0 +1,111 @@
+{namespace vm.single.metadata}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/metadata_blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+
+{template main kind="text"}
+{@param spec: SingleVmDeploymentPackageSpec}
+{@param solutionId: string}
+{@param? solutionInfo: SolutionMarketingInfo}
+{@param? templateVersion: string}
+
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    {if $solutionInfo}
+    title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 4}
+    {else}
+    title: {$solutionId + ' template' |yamlprimitive: 4}
+    {/if}
+    {if $templateVersion}
+    version: {$templateVersion |yamlprimitive: 4}
+    {else}
+    version: '1.0'
+    {/if}
+    actuationTool:
+      flavor: Terraform
+      version: '>= 0.13'
+  interfaces:
+    variables:
+    {let $projectIdProp kind="text"}
+      {call blocks.projectIdPropertySchema}
+      {/call}
+    {/let}
+    {$projectIdProp |indent: 4, true}{nil}
+
+    {let $deploymentNameProp kind="text"}
+      {call blocks.deploymentNamePropertySchema}
+      {/call}
+    {/let}
+    {$deploymentNameProp |indent: 4, true}{nil}
+
+    {let $imageProp kind="text"}
+      {call blocks.imagePropertySchema}
+        {param name: 'source_image'/}
+        {param imagesList: $spec.getImagesList() /}
+      {/call}
+    {/let}
+    {$imageProp |indent: 4, true}{nil}
+
+    {let $zoneProp kind="text"}
+      {call blocks.zonePropertySchema}
+        {param name: 'zone'/}
+        {param zoneSpec: $spec.getZone()/}
+      {/call}
+    {/let}
+    {$zoneProp |indent: 4, true}{nil}
+
+    {let $bootDiskProps kind="text"}
+      {call blocks.bootDiskPropertiesSchema}
+        {param spec: $spec.getBootDisk()! /}
+      {/call}
+    {/let}
+    {$bootDiskProps |indent: 4, true}{nil}
+
+    {let $machineTypeProp kind="text"}
+      {call blocks.machineTypePropertySchema}
+        {param name: 'machine_type' /}
+        {param spec: $spec.getMachineType()! /}
+      {/call}
+    {/let}
+    {$machineTypeProp |indent: 4, true}{nil}
+
+    {if solutionHasGpus($spec)}
+    {let $acceleratorProps kind="text"}
+      {call blocks.acceleratorPropertiesSchema}
+        {param namePrefix: 'accelerator' /}
+        {param spec: $spec.getAcceleratorsList()[0] /}
+      {/call}
+    {/let}
+    {$acceleratorProps |indent: 4, true}{nil}
+    {/if}
+
+    {let $networkProps kind="text"}
+      {call blocks.networkPropertiesSchema}
+        {param nameSuffix: 'network' /}
+        {param spec: $spec.getNetworkInterfaces()! /}
+      {/call}
+    {/let}
+    {$networkProps |indent: 4, true}{nil}
+
+    outputs:
+    - name: has_external_ip
+      description: Flag to indicate if the machine has an external IP
+    - name: instance_machine_type
+      description: Machine type for the compute instance
+    - name: instance_nat_ip
+      description: Machine type for the compute instance
+    - name: instance_network
+      description: Machine type for the compute instance
+    - name: instance_self_link
+      description: Self-link for the compute instance
+    - name: instance_zone
+      description: Zone for the compute instance
+{/template}

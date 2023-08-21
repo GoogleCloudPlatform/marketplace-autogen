@@ -63,9 +63,9 @@ import org.yaml.snakeyaml.representer.Representer;
 public class Autogen {
 
   private static final String BUNDLED_RESOURCE_PATH =
-      "com/google/cloud/deploymentmanager/autogen/templates/dm";
+      "com/google/cloud/deploymentmanager/autogen/templates";
   private static final String BUNDLED_SHARED_SUPPORT_RESOURCE_PATH =
-      BUNDLED_RESOURCE_PATH + "/sharedsupport";
+      BUNDLED_RESOURCE_PATH + "/dm/sharedsupport";
 
   private static final String MEDIA_RESOURCE_PREFIX = "@media/";
   private static final String RESOURCE_PATH_PREFIX = "resources/en-us/";
@@ -83,6 +83,37 @@ public class Autogen {
       "common/software_status_script.py.schema",
       "common/vm_instance.py",
       "common/vm_instance.py.schema");
+
+  private static final ImmutableList<String> DEPLOYMENT_MANAGER_SOY_FILES =
+      ImmutableList.of(
+          "singlevm/c2d_deployment_configuration.json.soy",
+          "singlevm/solution.jinja.soy",
+          "singlevm/solution.jinja.schema.soy",
+          "singlevm/solution.jinja.display.soy",
+          "singlevm/test_config.yaml.soy",
+          "multivm/c2d_deployment_configuration.json.soy",
+          "multivm/solution.jinja.soy",
+          "multivm/solution.jinja.schema.soy",
+          "multivm/solution.jinja.display.soy",
+          "multivm/test_config.yaml.soy",
+          "multivm/tier.jinja.soy",
+          "multivm/tier.jinja.schema.soy",
+          "display.soy",
+          "renders.soy",
+          "utilities.soy");
+
+  private static final ImmutableList<String> TERRAFORM_SOY_FILES =
+      ImmutableList.of(
+          "singlevm/main.tf.soy",
+          "singlevm/variables.tf.soy",
+          "singlevm/marketplace_test.tfvars.soy",
+          "singlevm/metadata.yaml.soy",
+          "singlevm/metadata.display.yaml.soy",
+          "blocks.soy",
+          "constants.soy",
+          "util.soy",
+          "metadata_blocks.soy",
+          "metadata_display_blocks.soy");
 
   private static final LoadingCache<String, String> sharedSupportFilesCache =
       CacheBuilder.newBuilder()
@@ -125,22 +156,11 @@ public class Autogen {
     @Singleton
     @TemplateFileSet
     TemplateRenderer.FileSet provideFileSet(TemplateRenderer.FileSet.Builder builder) {
+      DEPLOYMENT_MANAGER_SOY_FILES.forEach(
+          file -> builder.addContentFromResource(resource("dm/" + file)));
+      TERRAFORM_SOY_FILES.forEach(file -> builder.addContentFromResource(resource("tf/" + file)));
+
       return builder
-          .addContentFromResource(resource("singlevm/c2d_deployment_configuration.json.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.schema.soy"))
-          .addContentFromResource(resource("singlevm/solution.jinja.display.soy"))
-          .addContentFromResource(resource("singlevm/test_config.yaml.soy"))
-          .addContentFromResource(resource("multivm/c2d_deployment_configuration.json.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.schema.soy"))
-          .addContentFromResource(resource("multivm/solution.jinja.display.soy"))
-          .addContentFromResource(resource("multivm/test_config.yaml.soy"))
-          .addContentFromResource(resource("multivm/tier.jinja.soy"))
-          .addContentFromResource(resource("multivm/tier.jinja.schema.soy"))
-          .addContentFromResource(resource("display.soy"))
-          .addContentFromResource(resource("renders.soy"))
-          .addContentFromResource(resource("utilities.soy"))
           .addProtoDescriptors(
               DeploymentPackageAutogenSpecProtos.getDescriptor(),
               MarketingInfoProtos.getDescriptor())
@@ -214,6 +234,20 @@ public class Autogen {
   /** Builds the deployment package for {@link SingleVmDeploymentPackageSpec} */
   private SolutionPackage buildSingleVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
+    switch (input.getDeploymentTool()) {
+      case DEPLOYMENT_TOOL_UNSPECIFIED:
+      case DEPLOYMENT_MANAGER:
+        return buildDmSingleVm(input, sharedSupportFilesStrategy);
+      case TERRAFORM:
+        return buildTerraformSingleVm(input);
+      case UNRECOGNIZED:
+        throw new AssertionError("unrecognized deployment tool");
+    }
+    throw new AssertionError("unreachable");
+  }
+
+  private SolutionPackage buildDmSingleVm(
+      DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     String solutionId = input.getSolutionId();
     ImageInfo imageInfo = generateImages(input, builder);
@@ -261,9 +295,50 @@ public class Autogen {
     return builder.build();
   }
 
+  private SolutionPackage buildTerraformSingleVm(DeploymentPackageInput input) {
+    SolutionPackage.Builder builder = SolutionPackage.newBuilder();
+    ImageInfo imageInfo = ImageInfo.builder().build();
+    ImmutableMap<String, Object> params = makeSingleVmParams(input, imageInfo);
+
+    builder
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("main.tf")
+                .setContent(fileSet.newRenderer("vm.single.tf.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("variables.tf")
+                .setContent(
+                    fileSet.newRenderer("vm.single.variables.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("marketplace_test.tfvars")
+                .setContent(fileSet.newRenderer("vm.single.tfvars.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.yaml")
+                .setContent(
+                    fileSet.newRenderer("vm.single.metadata.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.display.yaml")
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.single.metadata.display.main")
+                        .setData(params)
+                        .render()));
+
+    return builder.build();
+  }
+
   /** Builds the deployment package for {@link MultiVmDeploymentPackageSpec} */
   private SolutionPackage buildMultiVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
+    if (input.getDeploymentTool().equals(DeploymentPackageInput.DeploymentTool.TERRAFORM)) {
+      throw new UnsupportedOperationException(
+          "Terraform Autogen doesn't currently support multi-vm deployment");
+    }
+
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     String solutionId = input.getSolutionId();
     ImageInfo imageInfo = generateImages(input, builder);

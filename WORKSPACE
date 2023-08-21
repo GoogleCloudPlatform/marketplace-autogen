@@ -59,6 +59,7 @@ maven_install(
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.code.gson:gson:2.8.5",
         "com.google.common.html.types:types:1.0.8",
+        "com.google.errorprone:error_prone_annotations:2.21.1",
         "com.google.guava:guava:31.1-jre",
         "com.google.inject:guice:5.1.0",
         "com.google.protobuf:protobuf-java-util:3.12.2",

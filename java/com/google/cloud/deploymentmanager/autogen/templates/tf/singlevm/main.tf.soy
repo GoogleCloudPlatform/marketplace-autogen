@@ -1,0 +1,66 @@
+{namespace vm.single.tf}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main kind="text"}
+{@param spec: SingleVmDeploymentPackageSpec}
+provider "google" {lb}
+  project = var.project_id
+{rb}
+{\n}
+locals {lb}
+  network_interfaces_map = {lb} for i, n in var.networks : n => {lb}
+    network     = n,
+    subnetwork  = element(var.sub_networks, i)
+    external_ip = element(var.external_ips, i)
+    {rb}
+  {rb}
+{rb}
+{\n}
+resource "google_compute_instance" "instance" {lb}
+  name = "${lb}var.goog_cm_deployment_name{rb}-vm"
+  machine_type = var.machine_type
+  zone = var.zone
+{\n}
+  boot_disk {lb}
+    initialize_params {lb}
+      size = var.boot_disk_size
+      type = var.boot_disk_type
+      image = var.source_image
+    {rb}
+  {rb}
+{\n}
+  dynamic "network_interface" {lb}
+    for_each = local.network_interfaces_map
+    content {lb}
+      network = network_interface.key
+      subnetwork = network_interface.value.subnetwork
+{\n}
+      dynamic "access_config" {lb}
+        for_each = network_interface.value.external_ip == "NONE" ? [] : [1]
+        content {lb}
+          nat_ip = network_interface.value.external_ip == "EPHEMERAL" ? null : network_interface.value.external_ip
+        {rb}
+      {rb}
+    {rb}
+  {rb}
+{if solutionHasGpus($spec)}
+{\n}
+  guest_accelerator {lb}
+    type = var.accelerator_type
+    count = var.accelerator_count
+  {rb}
+{\n}
+  scheduling {lb}
+    {literal}// GPUs do not support live migration{/literal}
+    on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
+  {rb}
+{/if}
+{rb}
+
+{call blocks.firewallResources}
+  {param specList: $spec.getFirewallRulesList()/}
+{/call}
+{/template}

@@ -33,6 +33,7 @@ final class AutogenSettings {
   private static final String OPTION_INPUT_TYPE = "input_type";
   private static final String OPTION_OUTPUT_TYPE = "output_type";
   private static final String OPTION_EXCLUDE_SHARED_SUPPORT_FILES = "exclude_shared_support_files";
+  private static final String OPTION_DEV_FEATURES = "dev_features";
 
   private static final String HELP_DESC = "Prints usage help";
   private static final String SINGLE_INPUT_DESC = "Input source, a filename or empty for stdin,"
@@ -46,6 +47,7 @@ final class AutogenSettings {
   private static final String OUTPUT_TYPE_DESC = "Output content type";
   private static final String EXCLUDE_SHARED_SUPPORT_FILES_DESC =
       "Whether to exclude symlinkable shared support files";
+  private static final String DEV_FEATURES_DESC = "Enables features in development";
 
   private boolean singleMode;
   private String input;
@@ -53,6 +55,7 @@ final class AutogenSettings {
   private InputType inputType;
   private OutputType outputType;
   private boolean excludeSharedSupportFiles;
+  private boolean devFeaturesEnabled;
 
   enum InputType {
     PROTOTEXT,
@@ -88,7 +91,8 @@ final class AutogenSettings {
         .addOption(null, OPTION_INPUT_TYPE, true, INPUT_TYPE_DESC)
         .addOption(null, OPTION_OUTPUT_TYPE, true, OUTPUT_TYPE_DESC)
         .addOption(
-            null, OPTION_EXCLUDE_SHARED_SUPPORT_FILES, false, EXCLUDE_SHARED_SUPPORT_FILES_DESC);
+            null, OPTION_EXCLUDE_SHARED_SUPPORT_FILES, false, EXCLUDE_SHARED_SUPPORT_FILES_DESC)
+        .addOption(null, OPTION_DEV_FEATURES, false, DEV_FEATURES_DESC);
   }
 
   private static void validateCliOptions(CommandLine cmd) {
@@ -136,6 +140,7 @@ final class AutogenSettings {
     settings.outputType =
         OutputType.valueOf(cmd.getOptionValue(OPTION_OUTPUT_TYPE, settings.outputType.name()));
     settings.excludeSharedSupportFiles = cmd.hasOption(OPTION_EXCLUDE_SHARED_SUPPORT_FILES);
+    settings.devFeaturesEnabled = cmd.hasOption(OPTION_DEV_FEATURES);
 
     return settings;
   }
@@ -167,6 +172,10 @@ final class AutogenSettings {
 
   public boolean shouldExcludeSharedSupportFiles() {
     return this.excludeSharedSupportFiles;
+  }
+
+  public boolean isDevFeaturesEnabled() {
+    return this.devFeaturesEnabled;
   }
 
   public boolean isSingleMode() {

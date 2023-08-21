@@ -1,0 +1,176 @@
+{namespace metadata.display.blocks}
+
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {AcceleratorSpec, DeployInputField, DeployInputSection, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+
+{template projectIdPropertyDisplay kind="text"}
+project_id:
+  name: project_id
+  title: Project Id
+  invisible: true
+{/template}
+
+
+{template deploymentNamePropertyDisplay kind="text"}
+goog_cm_deployment_name:
+  name: goog_cm_deployment_name
+  title: Goog Cm Deployment Name
+{/template}
+
+
+{template bootDiskPropertiesDisplay kind="text"}
+{@param spec: DiskSpec}
+{@param zonePropertyName: string}
+{@param? tier: VmTierSpec}
+{'boot_disk_size' |tierprefixed: $tier}:
+  name: {'boot_disk_size' |tierprefixed: $tier}
+  title: Boot disk size in GB
+  tooltip: Persistent disk performance is tied to the size of the persistent disk volume. You are charged for the actual amount of provisioned disk space.
+  {if $spec.getDiskSize()!.getMinSizeGb()}
+  min: {$spec.getDiskSize()!.getMinSizeGb()}
+  {/if}
+  max: 10000
+  section: boot_disk
+  xGoogleProperty:
+    type: ET_GCE_DISK_SIZE
+    gceDiskSize:
+      diskTypeVariable: {'boot_disk_type' |tierprefixed: $tier}
+{'boot_disk_type' |tierprefixed: $tier}:
+  name: {'boot_disk_type' |tierprefixed: $tier}
+  title: Boot disk type
+  section: boot_disk
+  xGoogleProperty:
+    type: ET_GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
+{/template}
+
+
+{template zonePropertyDisplay kind="text"}
+{@param name: string}
+{@param? zoneSpec: ZoneSpec}
+{$name}:
+  name: {$name}
+  title: Zone
+  xGoogleProperty:
+    type: ET_GCE_ZONE
+    {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
+      length($zoneSpec.getWhitelistedRegionsList()) > 0)}
+    gceZone:
+      {if length($zoneSpec.getWhitelistedZonesList()) > 0}
+      allowlistedZones:
+      {for $zone in $zoneSpec.getWhitelistedZonesList()}
+      - {$zone}
+      {/for}
+      {/if}
+      {if length($zoneSpec.getWhitelistedRegionsList()) > 0}
+      allowlistedRegions:
+      {for $region in $zoneSpec.getWhitelistedRegionsList()}
+      - {$region}
+      {/for}
+      {/if}
+    {/if}
+{/template}
+
+
+{template imagePropertyDisplay kind="text"}
+{@param name: string}
+{@param imagesList: list<ImageSpec>}
+{@param? tier: VmTierSpec}
+{$name |tierprefixed: $tier}:
+  name: {$name |tierprefixed: $tier}
+  title: Source Image
+  xGoogleProperty:
+    type: ET_GCE_DISK_IMAGE
+{/template}
+
+
+{template machineTypePropertyDisplay kind="text"}
+{@param name: string}
+{@param spec: MachineTypeSpec}
+{@param zonePropertyName: string}
+{@param? tier: VmTierSpec}
+{$name |tierprefixed: $tier}:
+  name: {$name |tierprefixed: $tier}
+  title: Machine type
+  xGoogleProperty:
+    type: ET_GCE_MACHINE_TYPE
+    zoneProperty: {$zonePropertyName}
+    {if $spec.getMinimum()}
+    gceMachineType:
+      {if $spec.getMinimum().getCpu()}
+      minCpu: {$spec.getMinimum().getCpu()}
+      {/if}
+      {if $spec.getMinimum().getRamGb()}
+      minRamGb: {$spec.getMinimum().getRamGb()}
+      {/if}
+    {/if}
+{/template}
+
+
+{template acceleratorPropertiesDisplay kind="text"}
+{@param namePrefix: string}
+{@param spec: AcceleratorSpec}
+{@param? tier: VmTierSpec}
+{$namePrefix + '_type' |tierprefixed: $tier}:
+  name: {$namePrefix + '_type' |tierprefixed: $tier}
+  title: Accelerator type
+  xGoogleProperty:
+    type: ET_GCE_GPU_TYPE
+    gceGpuType:
+      machineType: {'machine_type' |tierprefixed: $tier}
+      gpuType:
+        {for $gpuType in $spec.getTypesList()}
+        - {$gpuType}
+        {/for}
+{$namePrefix + '_count' |tierprefixed: $tier}:
+  name: {$namePrefix + '_count' |tierprefixed: $tier}
+  title: Accelerator count
+  xGoogleProperty:
+    type: ET_GCE_GPU_COUNT
+    gceGpuCount:
+      machineTypeVariable: {'machine_type' |tierprefixed: $tier}
+{/template}
+
+
+{template networkPropertiesDisplay kind="text"}
+{@param nameSuffix: string}
+{@param zonePropertyName: string}
+{@param spec: NetworkInterfacesSpec}
+{@param? tier: VmTierSpec}
+{let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
+{$networkPropName}:
+  name: {$networkPropName}
+  title: Network name
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_NETWORK
+    gceNetwork:
+      allowSharedVpcs: true
+      machineTypeVariable: machine_type
+{'sub' + $nameSuffix |tierprefixed: $tier}:
+  name: {'sub' + $nameSuffix |tierprefixed: $tier}
+  title: Subnetwork name
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_SUBNETWORK
+    zoneProperty: {$zonePropertyName}
+    gceSubnetwork:
+      networkVariable: {$networkPropName}
+{'external_ips' |tierprefixed: $tier}:
+  name: {'external_ips' |tierprefixed: $tier}
+  title: External IP
+  tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
+  minItems: {$spec.getMinCount()}
+  maxItems: {$spec.getMaxCount()}
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_EXTERNAL_IP
+    gceExternalIp:
+      networkVariable: {$networkPropName}
+      type: IP_EPHEMERAL
+{/template}
