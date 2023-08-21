@@ -85,6 +85,42 @@ spec:
             gceExternalIp:
               networkVariable: network
               type: IP_EPHEMERAL
+        enable_tcp_80:
+          name: enable_tcp_80
+          title: Allow HTTP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: network
+        tcp_80_source_ranges:
+          name: tcp_80_source_ranges
+          title: Allow HTTP traffic from the Internet
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewallRange:
+              firewallVariable: enable_tcp_80
+        enable_tcp_443:
+          name: enable_tcp_443
+          title: Allow HTTPS traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: network
+        tcp_443_source_ranges:
+          name: tcp_443_source_ranges
+          title: Allow HTTPS traffic from the Internet
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewallRange:
+              firewallVariable: enable_tcp_443
       sections:
       - name: boot_disk
         title: Boot Disk

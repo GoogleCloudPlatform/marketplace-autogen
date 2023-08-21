@@ -90,6 +90,15 @@ spec:
         {/let}
         {$networkDisplay |indent: 8, true}{nil}
 
+        {for $firewallRule in $spec.getFirewallRulesList()}
+        {let $firewallDisplay kind="text"}
+          {call blocks.firewallPropertiesDisplay}
+            {param spec: $firewallRule /}
+          {/call}
+        {/let}
+        {$firewallDisplay |indent: 8, true}{nil}
+        {/for}
+
       sections:
       - name: boot_disk
         title: Boot Disk

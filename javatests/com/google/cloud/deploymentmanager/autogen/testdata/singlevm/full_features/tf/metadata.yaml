@@ -64,6 +64,30 @@ spec:
       varType: list(string)
       defaultValue:
       - EPHEMERAL
+    - name: enable_tcp_80
+      description: Allow HTTP traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_80_source_ranges
+      description: Source IP ranges for HTTP traffic
+      varType: string
+      required: true
+    - name: enable_tcp_443
+      description: Allow HTTPS traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_443_source_ranges
+      description: Source IP ranges for HTTPS traffic
+      varType: string
+      required: true
+    - name: enable_icmp
+      description: Allow icmp traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: icmp_source_ranges
+      description: Source IP ranges for icmp traffic
+      varType: string
+      required: true
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

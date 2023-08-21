@@ -174,3 +174,40 @@ goog_cm_deployment_name:
       networkVariable: {$networkPropName}
       type: IP_EPHEMERAL
 {/template}
+
+{template firewallPropertiesDisplay kind="text"}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
+{let $firewallPropName kind="text"}
+  {call util.firewallRuleVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+{let $firewallSourceRangesPropName kind="text"}
+  {call util.firewallRuleSourceRangesVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+{$firewallPropName}:
+  name: {$firewallPropName}
+  title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_FIREWALL
+    gceFirewall:
+      networkVariable: {'network' |tierprefixed: $tierSpec}
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
+{$firewallSourceRangesPropName}:
+  name: {$firewallSourceRangesPropName}
+  title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+  placeholder: '0.0.0.0/0, 192.169.0.2/24'
+  section: networking
+  xGoogleProperty:
+    type: ET_GCE_FIREWALL
+    gceFirewallRange:
+      firewallVariable: {$firewallPropName |trim}
+{/if}
+{/template}

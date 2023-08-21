@@ -106,3 +106,29 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   defaultValue:
   - EPHEMERAL
 {/template}
+
+
+{template firewallPropertiesSchema kind="text"}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
+{let $firewallPropName kind="text"}
+  {call util.firewallRuleVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+{let $firewallSourceRangesPropName kind="text"}
+  {call util.firewallRuleSourceRangesVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+- name: {$firewallPropName}
+  description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+- name: {$firewallSourceRangesPropName}
+  description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
+  varType: string
+  required: true
+{/template}

@@ -95,6 +95,15 @@ spec:
     {/let}
     {$networkProps |indent: 4, true}{nil}
 
+    {for $firewallRule in $spec.getFirewallRulesList()}
+    {let $firewallProps kind="text"}
+      {call blocks.firewallPropertiesSchema}
+        {param spec: $firewallRule /}
+      {/call}
+    {/let}
+    {$firewallProps |indent: 4, true}{nil}
+    {/for}
+
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP
