@@ -35,19 +35,19 @@ spec:
   interfaces:
     variables:
     {let $projectIdProp kind="text"}
-      {call blocks.projectIdPropertySchema}
+      {call blocks.projectIdProperty}
       {/call}
     {/let}
     {$projectIdProp |indent: 4, true}{nil}
 
     {let $deploymentNameProp kind="text"}
-      {call blocks.deploymentNamePropertySchema}
+      {call blocks.deploymentNameProperty}
       {/call}
     {/let}
     {$deploymentNameProp |indent: 4, true}{nil}
 
     {let $imageProp kind="text"}
-      {call blocks.imagePropertySchema}
+      {call blocks.imageProperty}
         {param name: 'source_image'/}
         {param imagesList: $spec.getImagesList() /}
       {/call}
@@ -55,7 +55,7 @@ spec:
     {$imageProp |indent: 4, true}{nil}
 
     {let $zoneProp kind="text"}
-      {call blocks.zonePropertySchema}
+      {call blocks.zoneProperty}
         {param name: 'zone'/}
         {param zoneSpec: $spec.getZone()/}
       {/call}
@@ -63,14 +63,14 @@ spec:
     {$zoneProp |indent: 4, true}{nil}
 
     {let $bootDiskProps kind="text"}
-      {call blocks.bootDiskPropertiesSchema}
+      {call blocks.bootDiskProperties}
         {param spec: $spec.getBootDisk()! /}
       {/call}
     {/let}
     {$bootDiskProps |indent: 4, true}{nil}
 
     {let $machineTypeProp kind="text"}
-      {call blocks.machineTypePropertySchema}
+      {call blocks.machineTypeProperty}
         {param name: 'machine_type' /}
         {param spec: $spec.getMachineType()! /}
       {/call}
@@ -79,7 +79,7 @@ spec:
 
     {if solutionHasGpus($spec)}
     {let $acceleratorProps kind="text"}
-      {call blocks.acceleratorPropertiesSchema}
+      {call blocks.acceleratorProperties}
         {param namePrefix: 'accelerator' /}
         {param spec: $spec.getAcceleratorsList()[0] /}
       {/call}
@@ -88,7 +88,7 @@ spec:
     {/if}
 
     {let $networkProps kind="text"}
-      {call blocks.networkPropertiesSchema}
+      {call blocks.networkProperties}
         {param nameSuffix: 'network' /}
         {param spec: $spec.getNetworkInterfaces()! /}
       {/call}
@@ -97,7 +97,7 @@ spec:
 
     {for $firewallRule in $spec.getFirewallRulesList()}
     {let $firewallProps kind="text"}
-      {call blocks.firewallPropertiesSchema}
+      {call blocks.firewallProperties}
         {param spec: $firewallRule /}
       {/call}
     {/let}
@@ -106,7 +106,7 @@ spec:
 
     {if $spec.getIpForwarding()}
     {let $ipForwardingProp kind="text"}
-      {call blocks.ipForwardingPropertySchema}
+      {call blocks.ipForwardingProperty}
         {param name: 'ip_forward' /}
         {param spec: $spec.getIpForwarding() /}
       {/call}

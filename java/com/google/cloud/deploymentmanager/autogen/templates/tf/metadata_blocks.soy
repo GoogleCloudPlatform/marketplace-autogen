@@ -5,7 +5,7 @@ import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/u
 import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
-{template projectIdPropertySchema kind="text"}
+{template projectIdProperty kind="text"}
 - name: project_id
   description: {constants.PROJECT_ID_VAR_DESC}
   varType: string
@@ -13,7 +13,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template deploymentNamePropertySchema kind="text"}
+{template deploymentNameProperty kind="text"}
 - name: goog_cm_deployment_name
   description: {constants.DEPLOYMENT_NAME_VAR_DESC}
   varType: string
@@ -21,7 +21,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template bootDiskPropertiesSchema kind="text"}
+{template bootDiskProperties kind="text"}
 {@param spec: DiskSpec}
 {@param? tier: VmTierSpec}
 - name: {'boot_disk_size' |tierprefixed: $tier}
@@ -36,7 +36,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template zonePropertySchema kind="text"}
+{template zoneProperty kind="text"}
 {@param name: string}
 {@param? zoneSpec: ZoneSpec}
 - name: {$name}
@@ -48,7 +48,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template imagePropertySchema kind="text"}
+{template imageProperty kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
 {@param? tier: VmTierSpec}
@@ -59,7 +59,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template machineTypePropertySchema kind="text"}
+{template machineTypeProperty kind="text"}
 {@param name: string}
 {@param spec: MachineTypeSpec}
 {@param? tier: VmTierSpec}
@@ -70,7 +70,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template acceleratorPropertiesSchema kind="text"}
+{template acceleratorProperties kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
 {@param? tier: VmTierSpec}
@@ -85,7 +85,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template networkPropertiesSchema kind="text"}
+{template networkProperties kind="text"}
 {@param nameSuffix: string}
 {@param spec: NetworkInterfacesSpec}
 {@param? tier: VmTierSpec}
@@ -108,7 +108,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template firewallPropertiesSchema kind="text"}
+{template firewallProperties kind="text"}
 {@param spec: FirewallRuleSpec}
 {@param? tierSpec: VmTierSpec}
 {let $firewallPropName kind="text"}
@@ -134,7 +134,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template ipForwardingPropertySchema kind="text"}
+{template ipForwardingProperty kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
 {@param? tier: VmTierSpec}
