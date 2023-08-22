@@ -134,3 +134,68 @@ resource "random_password" "password_{$index}" {lb}
     {/if}
   {/for}
 {/template}
+
+{template deployInputVariables kind="text"}
+{@param spec: DeployInputSpec}
+{let $fields: listDeployInputFields($spec)/}
+{for $field in $fields}
+  {\n}
+  {call deployInputVariable}{param field: $field/}{/call}
+{/for}
+{/template}
+
+{template deployInputVariable kind="text"}
+{@param field: DeployInputField}
+variable "{$field.getName()}" {lb}
+{if $field.getDescription()}
+  description = "{$field.getDescription()}"
+{elseif $field.getTooltip()}
+  description = "{$field.getTooltip()}"
+{/if}
+{if $field.getBooleanCheckbox()}
+  type        = bool
+  default     = {$field.getBooleanCheckbox().getDefaultValue()}
+{elseif $field.getGroupedBooleanCheckbox()}
+  type        = bool
+  default     = {$field.getGroupedBooleanCheckbox().getDefaultValue()}
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox()/}
+  type        = number
+  {if $box.getDefaultValue()}
+  default     = {$box.getDefaultValue().getValue() ?: 0}
+  {/if}
+{elseif $field.getIntegerDropdown()}
+  {let $dropdown: $field.getIntegerDropdown()/}
+  type        = number
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  default     = {$dropdown.getValuesList()[$defaultIndex]}
+  {/if}
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox()/}
+  type        = string
+  {if $box.getDefaultValue()}
+  default     = "{$box.getDefaultValue() |yamlprimitive: 2}"
+  {/if}
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  type        = string
+  {if $box.getDefaultValue()}
+  default     = "{$box.getDefaultValue() |yamlprimitive: 2}"
+  {/if}
+{elseif $field.getStringDropdown()}
+  {let $dropdown: $field.getStringDropdown()/}
+  type        = string
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  default     = "{$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}"
+  {/if}
+{elseif $field.getZoneDropdown()}
+  {let $dropdown: $field.getZoneDropdown()/}
+  type        = string
+  {if $dropdown.getDefaultValue()}
+  default     = "{$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}"
+  {/if}
+{/if}
+{rb}
+{/template}

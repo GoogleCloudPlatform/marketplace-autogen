@@ -79,3 +79,8 @@ variable "tcp_443_source_ranges" {
   type        = string
   default     = ""
 }
+
+variable "localSsdsCount" {
+  type        = number
+  default     = 0
+}

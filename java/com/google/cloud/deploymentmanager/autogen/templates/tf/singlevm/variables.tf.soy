@@ -76,4 +76,8 @@ variable "external_ips" {lb}
     {param spec: $spec.getAcceleratorsList()[0]/}
   {/call}
 {/if}
+
+{if $spec.getDeployInput()}
+  {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
+{/if}
 {/template}

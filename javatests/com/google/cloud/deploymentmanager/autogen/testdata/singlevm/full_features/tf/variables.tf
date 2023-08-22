@@ -104,3 +104,72 @@ variable "accelerator_count" {
   type        = number
   default     = "1"
 }
+
+variable "domain" {
+  description = "Your Wordpress blog domain"
+  type        = string
+}
+
+variable "adminEmailAddress" {
+  description = "The e-mail address used to create the administrator account for WordPress."
+  type        = string
+}
+
+variable "optionalEmailAddress" {
+  type        = string
+  default     = "default_value@example.com"
+}
+
+variable "showConditionalRowAndAction" {
+  type        = bool
+  default     = true
+}
+
+variable "generateOptionalPassword" {
+  type        = bool
+  default     = true
+}
+
+variable "installPhpMyAdmin" {
+  type        = bool
+  default     = true
+}
+
+variable "imageCaching" {
+  type        = string
+  default     = "none"
+}
+
+variable "imageCompression" {
+  type        = bool
+  default     = false
+}
+
+variable "imageSizing" {
+  type        = bool
+  default     = true
+}
+
+variable "imageCacheSize" {
+  type        = number
+  default     = 50000
+}
+
+variable "cacheExpiration" {
+  type        = number
+  default     = 120
+}
+
+variable "thirdDiskName" {
+  type        = string
+  default     = "third-disk"
+}
+
+variable "extraLbZone0" {
+  type        = string
+  default     = "us-west1-a"
+}
+
+variable "extraLbZone1" {
+  type        = string
+}
