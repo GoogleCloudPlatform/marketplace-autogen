@@ -167,9 +167,102 @@ spec:
             gceIpForwarding:
               networkVariable: network
               notConfigurable: true
+        domain:
+          name: domain
+          title: Domain
+          subtext: Your Wordpress blog domain
+          tooltip: Register your own domain with <a href='http://domains.google'>Google</a>
+          placeholder: mydomain.com
+          regexValidation: '[a-zA-Z0-9-]+.[a-z]{2,}'
+          validation: A valid domain has to be entered
+        adminEmailAddress:
+          name: adminEmailAddress
+          title: Administrator e-mail address
+          tooltip: The e-mail address used to create the administrator account for WordPress.
+          placeholder: user@example.com
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        optionalEmailAddress:
+          name: optionalEmailAddress
+          title: Optional e-mail address
+          placeholder: user@example.com
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        showConditionalRowAndAction:
+          name: showConditionalRowAndAction
+          title: Show conditional row
+        generateOptionalPassword:
+          name: generateOptionalPassword
+          title: Generate optional password
+        installPhpMyAdmin:
+          name: installPhpMyAdmin
+          title: Install phpMyAdmin
+          section: PHPMYADMIN
+        imageCaching:
+          name: imageCaching
+          title: Image caching
+          section: CONTENT_SETTINGS
+          enumValueLabels:
+          - label: Not cached
+            value: none
+          - label: Cached with redis
+            value: redis
+          - label: Cached with memcached
+            value: memcached
+        imageCompression:
+          name: imageCompression
+          title: Enable compression
+          section: CONTENT_SETTINGS
+        imageSizing:
+          name: imageSizing
+          title: Dynamic sizing
+          section: CONTENT_SETTINGS
+        imageCacheSize:
+          name: imageCacheSize
+          title: Image cache size
+          section: CONTENT_SETTINGS
+          min: 100
+          max: 99999
+          validation: Enter a number between 100 and 99999
+        cacheExpiration:
+          name: cacheExpiration
+          title: Cache expiration
+          section: CONTENT_SETTINGS
+          enumValueLabels:
+          - label: 1 hour
+            value: '60'
+          - label: 2 hours
+            value: '120'
+          - label: 4 hours
+            value: '240'
+          - label: 8 hours
+            value: '480'
+        thirdDiskName:
+          name: thirdDiskName
+          title: The third disk's device name
+          section: CONTENT_SETTINGS
+          regexValidation: '[A-Za-z][A-Za-z0-9\-_]+'
+        extraLbZone0:
+          name: extraLbZone0
+          title: Zone
+          section: LOAD_BALANCERS
+        extraLbZone1:
+          name: extraLbZone1
+          title: Zone
+          section: LOAD_BALANCERS
       sections:
+      - name: PHPMYADMIN
+        title: phpMyAdmin
+        tooltip: phpMyAdmin makes administer your Wordpress installation much easier.
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
       - name: networking
         title: Networking
+      - name: CONTENT_SETTINGS
+        title: Advanced content settings
+        subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
+      - name: LOAD_BALANCERS
+        title: Additional zones for load balancers

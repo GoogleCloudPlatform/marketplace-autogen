@@ -91,6 +91,73 @@ spec:
     - name: ip_forward
       varType: bool
       defaultValue: false
+    - name: domain
+      description: Your Wordpress blog domain
+      required: true
+      varType: string
+    - name: adminEmailAddress
+      description: ''
+      required: true
+      varType: string
+    - name: optionalEmailAddress
+      description: ''
+      required: false
+      varType: string
+      defaultValue: default_value@example.com
+    - name: showConditionalRowAndAction
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: generateOptionalPassword
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: installPhpMyAdmin
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: imageCaching
+      description: ''
+      required: false
+      varType: string
+      defaultValue: none
+    - name: imageCompression
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: false
+    - name: imageSizing
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: imageCacheSize
+      description: ''
+      required: true
+      varType: integer
+      defaultValue: 50000
+    - name: cacheExpiration
+      description: ''
+      required: true
+      varType: integer
+      defaultValue: 120
+    - name: thirdDiskName
+      description: ''
+      required: true
+      varType: string
+      defaultValue: third-disk
+    - name: extraLbZone0
+      description: ''
+      required: false
+      varType: string
+      defaultValue: us-west1-a
+    - name: extraLbZone1
+      description: ''
+      required: false
+      varType: string
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

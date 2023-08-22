@@ -71,6 +71,11 @@ spec:
       description: Source IP ranges for HTTPS traffic
       varType: string
       required: true
+    - name: localSsdsCount
+      description: ''
+      required: false
+      varType: integer
+      defaultValue: 0
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

@@ -114,6 +114,15 @@ spec:
     {$ipForwardingProp |indent: 4, true}{nil}
     {/if}
 
+    {if $spec.getDeployInput()}
+    {let $deployInputProps kind="text"}
+      {call blocks.deployInputProperties}
+        {param inputSpec: $spec.getDeployInput() /}
+      {/call}
+    {/let}
+    {$deployInputProps |indent: 4, true}{nil}
+    {/if}
+
     outputs:
     - name: has_external_ip
       description: Flag to indicate if the machine has an external IP

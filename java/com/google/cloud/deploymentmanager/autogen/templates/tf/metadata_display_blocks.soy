@@ -208,7 +208,7 @@ goog_cm_deployment_name:
   xGoogleProperty:
     type: ET_GCE_FIREWALL
     gceFirewallRange:
-      firewallVariable: {$firewallPropName |trim}
+      firewallVariable: {$firewallPropName}
 {/if}
 {/template}
 
@@ -227,4 +227,139 @@ goog_cm_deployment_name:
     gceIpForwarding:
       networkVariable: {'network' |tierprefixed: $tier}
       notConfigurable: {$spec.getNotConfigurable()}
+{/template}
+
+
+{template deployInputPropertiesDisplay kind="text"}
+{@param spec: DeployInputSpec}
+// TODO: support tiers section for multi-VMs
+{for $section in $spec.getSectionsList()}
+{for $field in $section.getFieldsList()}
+{let $fieldDisplay kind="text"}
+  {call deployInputFieldDisplay}
+    {param section: $section /}
+    {param field: $field /}
+  {/call}
+{/let}
+{$fieldDisplay}{nil}
+{/for}
+{/for}
+{/template}
+
+
+{template deployInputFieldDisplay visibility="private" kind="text"}
+{@param section: DeployInputSection}
+{@param field: DeployInputField}
+{@param? tierList: list<VmTierSpec>}
+{$field.getName()}:
+  name: {$field.getName() |yamlprimitive: 2}
+  {if $field.getTitle()}
+  title: {$field.getTitle() |yamlprimitive: 2}
+  {/if}
+  {if $field.getDescription()}
+  subtext: {$field.getDescription() |yamlprimitive: 2}
+  {/if}
+  {if $field.getTooltip()}
+  tooltip: {$field.getTooltip() |yamlprimitive: 2}
+  {/if}
+  // TODO: Add `level` once it is supported by Blueprints UI Metadata
+  {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
+      $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
+  section: {$section.getName() |yamlprimitive: 2}
+  // TODO: Support tier section for multi-VMs
+  {/if}
+
+{if $field.getGroupedBooleanCheckbox()}
+  // TODO: support boolean groups once Blueprints UI Metadata supports them
+
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox() /}
+  {if $box.getPlaceholder()}
+  placeholder: {$box.getPlaceholder() |yamlprimitive: 2}
+  {/if}
+  {if $box.getValidation()?.getMin()}
+  min: {$box.getValidation()!.getMin()!.getValue() ?: 0}
+  {/if}
+  {if $box.getValidation()?.getMax()}
+  max: {$box.getValidation()!.getMax()!.getValue() ?: 0}
+  {/if}
+  {if $box.getValidation()?.getDescription()}
+  validation: {$box.getValidation()!.getDescription() |yamlprimitive: 2}
+  {/if}
+
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox() /}
+  {if $box.getPlaceholder()}
+  placeholder: {$box.getPlaceholder() |yamlprimitive: 2}
+  {/if}
+  {if $box.getValidation()?.getRegex()}
+  regexValidation: {$box.getValidation().getRegex() |yamlprimitive: 2}
+  {/if}
+  {if $box.getValidation()?.getDescription()}
+  validation: {$box.getValidation()!.getDescription() |yamlprimitive: 2}
+  {/if}
+
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  {if $box.getPlaceholder()}
+  placeholder: {$box.getPlaceholder() |yamlprimitive: 2}
+  {/if}
+  {if $box.getValidation()?.getRegex()}
+  regexValidation: {$box.getValidation().getRegex() |yamlprimitive: 2}
+  {/if}
+  {if $box?.getValidation()?.getDescription()}
+  validation: {$box.getValidation()!.getDescription() |yamlprimitive: 2}
+  {/if}
+  xGoogleProperty:
+    type: ET_EMAIL_ADDRESS
+{/if}
+
+{let $valueLabels: fieldValueLabelMap($field) /}
+{if $valueLabels}
+  enumValueLabels:
+  {for $key in $valueLabels.keys()}
+  - label: {$valueLabels.get($key) |yamlprimitive: 2}
+    value: {$key |yamlprimitive: 4}
+    {/for}
+{/if}
+{/template}
+
+
+// Deploy input custom sections utilities
+
+{template topSections kind="text"}
+{@param? spec: DeployInputSpec}
+{call customSectionsHelper}
+  {param spec: $spec/}
+  {param placement: DeployInputSection.Placement.CUSTOM_TOP/}
+{/call}{nil}
+{/template}
+
+
+{template bottomSections kind="text"}
+{@param? spec: DeployInputSpec}
+{call customSectionsHelper}
+  {param spec: $spec/}
+  {param placement: DeployInputSection.Placement.CUSTOM_BOTTOM/}
+{/call}{nil}
+{/template}
+
+
+{template customSectionsHelper visibility="private" kind="text"}
+{@param? spec: DeployInputSpec}
+{@param placement: DeployInputSection.Placement}
+{if $spec}
+{for $section in $spec.getSectionsList()}
+{if $section.getPlacement() == $placement}
+- name: {$section.getName() |yamlprimitive: 2}
+  title: {$section.getTitle() |yamlprimitive: 2}
+  {if $section.getTooltip()}
+  tooltip: {$section.getTooltip() |yamlprimitive: 2}
+  {/if}
+  {if $section.getDescription()}
+  subtext: {$section.getDescription() |yamlprimitive: 2}
+  {/if}
+{/if}
+{/for}
+{/if}
 {/template}

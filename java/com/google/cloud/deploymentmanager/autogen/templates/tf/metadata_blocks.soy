@@ -142,3 +142,70 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}
+
+
+{template deployInputProperties kind="text"}
+{@param inputSpec: DeployInputSpec}
+{@param? tierSpec: VmTierSpec}
+// TODO: support tiers section for multi-VMs
+{let $fields: listDeployInputFields($inputSpec)/}
+{for $field in $fields}
+{let $fieldProp kind="text"}
+  {call deployInputField}{param field: $field /}{/call}
+{/let}
+{$fieldProp}{nil}
+{/for}
+{/template}
+
+
+{template deployInputField visibility="private" kind="text"}
+{@param field: DeployInputField}
+- name: {$field.getName() |yamlprimitive: 2}
+  description: {$field.getDescription() |yamlprimitive: 2}
+  required: {$field.getRequired()}
+{if $field.getBooleanCheckbox()}
+  varType: bool
+  defaultValue: {$field.getBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
+{elseif $field.getGroupedBooleanCheckbox()}
+  varType: bool
+  defaultValue: {$field.getGroupedBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox() /}
+  varType: integer
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue().getValue() ?: 0}
+  {/if}
+{elseif $field.getIntegerDropdown()}
+  {let $dropdown: $field.getIntegerDropdown()/}
+  varType: integer
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  defaultValue: {$dropdown.getValuesList()[$defaultIndex]}
+  {/if}
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox() /}
+  varType: string
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {/if}
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  varType: string
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {/if}
+{elseif $field.getStringDropdown()}
+  {let $dropdown: $field.getStringDropdown()/}
+  varType: string
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  defaultValue: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
+  {/if}
+{elseif $field.getZoneDropdown()}
+  {let $dropdown: $field.getZoneDropdown()/}
+  varType: string
+  {if $dropdown.getDefaultValue()}
+  defaultValue: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
+  {/if}
+{/if}
+{/template}

@@ -121,6 +121,11 @@ spec:
             type: ET_GCE_FIREWALL
             gceFirewallRange:
               firewallVariable: enable_tcp_443
+        localSsdsCount:
+          name: localSsdsCount
+          title: Local SSDs
+          min: 0
+          max: 3
       sections:
       - name: boot_disk
         title: Boot Disk

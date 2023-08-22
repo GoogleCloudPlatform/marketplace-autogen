@@ -109,10 +109,31 @@ spec:
         {$ipForwardingDisplay |indent: 8, true}{nil}
         {/if}
 
+        {if $spec.getDeployInput()}
+        {let $deployInputDisplay kind="text"}
+          {call blocks.deployInputPropertiesDisplay}
+            {param spec: $spec.getDeployInput() /}
+          {/call}
+        {/let}
+        {$deployInputDisplay |indent: 8, true}{nil}
+        {/if}
+
       sections:
+      {let $deploymentInputTopSections kind="text"}
+        {call blocks.topSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputTopSections |indent: 6, true}{nil}
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
       - name: networking
         title: Networking
+      {let $deploymentInputBottomSections kind="text"}
+        {call blocks.bottomSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputBottomSections |indent: 6, true}{nil}
 {/template}
