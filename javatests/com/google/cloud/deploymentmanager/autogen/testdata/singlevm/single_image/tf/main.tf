@@ -11,7 +11,7 @@ locals {
   }
 
   metadata = {
-    bitnami-base-password=random_password.password_0.result
+    bitnami-base-password = random_password.password_0.result
   }
 }
 

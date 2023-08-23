@@ -128,7 +128,7 @@ resource "random_password" "password_{$index}" {lb}
   {@param specList: list<PasswordSpec>}
 
   {for $spec, $index in $specList}
-    {$spec.getMetadataKey()}=random_password.password_{$index}.result{nil}
+    {$spec.getMetadataKey()} = random_password.password_{$index}.result{nil}
     {if $index != $specList.length - 1}
       {\n}
     {/if}
@@ -198,4 +198,31 @@ variable "{$field.getName()}" {lb}
   {/if}
 {/if}
 {rb}
+{/template}
+
+/**
+ *  Produces metadata for a list of GceMetadataItems.
+ *  Format: {key1} = {value1}
+ *          {key2} = {value2}
+ *  Ex: admin_email = foo@google.com
+ */
+{template gceMetadata kind="text"}
+{@param specList: list<GceMetadataItem>}
+{@param? deployInput: DeployInputSpec}
+{for $metadata, $index in $specList}
+{$metadata.getKey()} = {nil}
+
+  {if $metadata.getValue()}
+  {$metadata.getValue()}{nil}
+
+  {elseif $metadata.getValueFromDeployInputField()}
+  {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
+  {$field.getName()}{nil}
+
+  {/if /* $metadata.value */}
+
+  {if $index != $specList.length - 1}
+    {\n}
+  {/if}
+{/for}
 {/template}

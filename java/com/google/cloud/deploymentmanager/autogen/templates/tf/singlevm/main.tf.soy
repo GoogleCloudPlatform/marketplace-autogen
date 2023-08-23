@@ -11,6 +11,12 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
     {param specList: $spec.getPasswordsList() /}
   {/call}
 {/let}
+{let $gceMetadata}
+  {call blocks.gceMetadata}
+    {param specList: $spec.getGceMetadataItemsList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/let}
 
 provider "google" {lb}
   project = var.project_id
@@ -25,7 +31,12 @@ locals {lb}
   {rb}
 {\n}
   metadata = {lb}
+  {if $passwordMetadata}
     {$passwordMetadata |indent: 4}
+  {/if}
+  {if $gceMetadata}
+    {$gceMetadata |indent: 4}
+  {/if}
   {rb}
 {rb}
 {\n}

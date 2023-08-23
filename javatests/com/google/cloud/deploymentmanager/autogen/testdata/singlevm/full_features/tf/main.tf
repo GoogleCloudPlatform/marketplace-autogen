@@ -11,9 +11,20 @@ locals {
   }
 
   metadata = {
-    bitnami-base-password=random_password.password_0.result
-    bitnami-db-password=random_password.password_1.result
-    optional-password=random_password.password_2.result
+    bitnami-base-password = random_password.password_0.result
+    bitnami-db-password = random_password.password_1.result
+    optional-password = random_password.password_2.result
+    admin-username = admin@local
+    user-username = user@local
+    some-other-domain-metadata = domain
+    install-phpmyadmin = installPhpMyAdmin
+    image-caching = imageCaching
+    image-compression = imageCompression
+    image-sizing = imageSizing
+    image-cache-size = imageCacheSize
+    cache-expiration-minutes = cacheExpiration
+    extra-lb-zone0 = extraLbZone0
+    extra-lb-zone1 = extraLbZone1
   }
 }
 
