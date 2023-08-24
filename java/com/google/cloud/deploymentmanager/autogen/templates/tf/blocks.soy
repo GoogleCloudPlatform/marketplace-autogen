@@ -175,26 +175,26 @@ variable "{$field.getName()}" {lb}
   {let $box: $field.getStringBox()/}
   type        = string
   {if $box.getDefaultValue()}
-  default     = "{$box.getDefaultValue() |yamlprimitive: 2}"
+  default     = "{$box.getDefaultValue()}"
   {/if}
 {elseif $field.getEmailBox()}
   {let $box: $field.getEmailBox()/}
   type        = string
   {if $box.getDefaultValue()}
-  default     = "{$box.getDefaultValue() |yamlprimitive: 2}"
+  default     = "{$box.getDefaultValue()}"
   {/if}
 {elseif $field.getStringDropdown()}
   {let $dropdown: $field.getStringDropdown()/}
   type        = string
   {if $dropdown.getDefaultValueIndex()}
   {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
-  default     = "{$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}"
+  default     = "{$dropdown.getValuesList()[$defaultIndex]}"
   {/if}
 {elseif $field.getZoneDropdown()}
   {let $dropdown: $field.getZoneDropdown()/}
   type        = string
   {if $dropdown.getDefaultValue()}
-  default     = "{$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}"
+  default     = "{$dropdown.getDefaultValue().getValue() ?: ''}"
   {/if}
 {/if}
 {rb}
@@ -213,11 +213,11 @@ variable "{$field.getName()}" {lb}
 {$metadata.getKey()} = {nil}
 
   {if $metadata.getValue()}
-  {$metadata.getValue()}{nil}
+  "{$metadata.getValue()}"{nil}
 
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
-  {$field.getName()}{nil}
+  var.{$field.getName()}{nil}
 
   {/if /* $metadata.value */}
 
