@@ -11,9 +11,9 @@ locals {
   }
 
   metadata = {
-    bitnami-base-password = random_password.password_0.result
-    bitnami-db-password = random_password.password_1.result
-    optional-password = random_password.password_2.result
+    bitnami-base-password = random_password.admin.result
+    bitnami-db-password = random_password.mysql_root.result
+    optional-password = random_password.this_is_optional.result
     admin-username = "admin@local"
     user-username = "user@local"
     some-other-domain-metadata = var.domain
@@ -112,17 +112,17 @@ resource "google_compute_firewall" icmp {
   source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
 }
 
-resource "random_password" "password_0" {
+resource "random_password" "admin" {
   length = 8
   special = false
 }
 
-resource "random_password" "password_1" {
+resource "random_password" "mysql_root" {
   length = 8
   special = false
 }
 
-resource "random_password" "password_2" {
+resource "random_password" "this_is_optional" {
   length = 8
   special = false
 }

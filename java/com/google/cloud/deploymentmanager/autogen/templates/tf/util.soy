@@ -1,6 +1,6 @@
 {namespace util}
 
-import {FirewallRuleSpec, ImageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {FirewallRuleSpec, ImageSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces Terraform variable name for firewall boolean
@@ -133,3 +133,41 @@ Source IP ranges for {$firewallTitle} traffic{nil}
 {@param spec: ImageSpec}
 projects/{$spec.getProject()}/global/images/{$spec.getName()}{nil}
 {/template}
+
+/**
+ * Produces a sanitized part of a Terraform identifier from the display label of a password.
+ *
+ * Removes whitespace and converts display label to lower case.
+ *
+ * See: https://developer.hashicorp.com/terraform/language/syntax/configuration#identifiers
+ * for restrictions in indentifiers. We may need to revisit this function to omit special
+ * characters that are not valid in identifiers.
+ *
+ */
+{template sanitizePasswordLabel kind="text"}
+{@param spec: PasswordSpec}
+{$spec.getDisplayLabel()!.replaceAll(" ", "_") |lowercased}{nil}
+{/template}
+
+/**
+ * Produces the description for a password output.
+ *
+ * Format: Password for {displayLabel}
+ * Ex: Password for Wordpress Admin
+ */
+{template passwordOutputDescription kind="text"}
+{@param spec: PasswordSpec}
+Password for {$spec.getDisplayLabel()!}.{nil}
+{/template}
+
+
+/**
+ * Produces the description for a username (of a password) output
+ * Format: Username for {displayLabel} password
+ * Ex: Username for Wordpress Admin password
+ */
+{template usernameOutputDescription kind="text"}
+{@param spec: PasswordSpec}
+Username for {$spec.getDisplayLabel()!} password.{nil}
+{/template}
+

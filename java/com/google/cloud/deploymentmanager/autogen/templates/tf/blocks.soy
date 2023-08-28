@@ -110,15 +110,18 @@ variable "accelerator_count" {lb}
     {\n}
     {call passwordResource}
       {param spec: $spec /}
-      {param index: $index /}
     {/call}
   {/for}
 {/template}
 
 {template passwordResource kind="text"}
 {@param spec: PasswordSpec}
-{@param index: int}
-resource "random_password" "password_{$index}" {lb}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $spec /}
+  {/call}
+{/let}
+resource "random_password" "{$sanitizedPasswordLabel}" {lb}
   length = {$spec.getLength()}
   special = {$spec.getAllowSpecialChars()}
 {rb}
@@ -128,7 +131,13 @@ resource "random_password" "password_{$index}" {lb}
   {@param specList: list<PasswordSpec>}
 
   {for $spec, $index in $specList}
-    {$spec.getMetadataKey()} = random_password.password_{$index}.result{nil}
+    {let $sanitizedPasswordLabel}
+      {call util.sanitizePasswordLabel}
+        {param spec: $spec /}
+      {/call}
+    {/let}
+
+    {$spec.getMetadataKey()} = random_password.{$sanitizedPasswordLabel}.result{nil}
     {if $index != $specList.length - 1}
       {\n}
     {/if}
@@ -225,4 +234,58 @@ variable "{$field.getName()}" {lb}
     {\n}
   {/if}
 {/for}
+{/template}
+
+{template passwordOutputs kind="text"}
+  {@param specList: list<PasswordSpec>}
+  {@param? deployInput: DeployInputSpec}
+
+  {for $spec, $index in $specList}
+    {\n}
+    {call passwordOutput}
+      {param password: $spec /}
+      {param deployInput: $deployInput /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordOutput kind="text"}
+{@param password: PasswordSpec}
+{@param? deployInput: DeployInputSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+
+{if $password.getUsername()}
+output "{$sanitizedPasswordLabel}_user" {lb}
+  description = "{$usernameDescription}"
+  value       = "{$password.getUsername()}"
+{rb}
+{\n}
+{elseif $password.getUsernameFromDeployInputField()}
+{let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
+output "{$sanitizedPasswordLabel}_user" {lb}
+  description = "{$usernameDescription}"
+  value       = var.{$field.getName()}
+{rb}
+{\n}
+{/if}
+
+output "{$sanitizedPasswordLabel}_password" {lb}
+  description = "{$passwordDescription}"
+  value       = random_password.{$sanitizedPasswordLabel}.result
+  sensitive   = true
+{rb}
 {/template}

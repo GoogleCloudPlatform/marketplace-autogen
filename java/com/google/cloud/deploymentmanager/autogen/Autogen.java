@@ -107,6 +107,7 @@ public class Autogen {
           "singlevm/main.tf.soy",
           "singlevm/variables.tf.soy",
           "singlevm/marketplace_test.tfvars.soy",
+          "singlevm/outputs.tf.soy",
           "singlevm/metadata.yaml.soy",
           "singlevm/metadata.display.yaml.soy",
           "blocks.soy",
@@ -314,6 +315,10 @@ public class Autogen {
             SolutionPackage.File.newBuilder()
                 .setPath("marketplace_test.tfvars")
                 .setContent(fileSet.newRenderer("vm.single.tfvars.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("outputs.tf")
+                .setContent(fileSet.newRenderer("vm.single.outputs.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("metadata.yaml")

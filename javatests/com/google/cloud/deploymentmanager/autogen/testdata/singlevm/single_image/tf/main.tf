@@ -11,7 +11,7 @@ locals {
   }
 
   metadata = {
-    bitnami-base-password = random_password.password_0.result
+    bitnami-base-password = random_password.admin.result
   }
 }
 
@@ -74,7 +74,7 @@ resource "google_compute_firewall" tcp_443 {
   source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
 }
 
-resource "random_password" "password_0" {
+resource "random_password" "admin" {
   length = 8
   special = false
 }

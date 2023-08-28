@@ -1,0 +1,42 @@
+{namespace vm.single.outputs}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main kind="text"}
+{@param spec: SingleVmDeploymentPackageSpec}
+locals {lb}
+  network_interface = google_compute_instance.instance.network_interface[0]
+{rb}
+
+{call blocks.passwordOutputs}
+  {param specList: $spec.getPasswordsList() /}
+  {param deployInput: $spec.getDeployInput() /}
+{/call}
+{\n}
+output "instance_self_link" {lb}
+  description = "{constants.INSTANCE_SELF_LINK_OUT_DESC}"
+  value       = google_compute_instance.instance.self_link
+{rb}
+{\n}
+output "instance_zone" {lb}
+  description = "{constants.INSTANCE_SELF_LINK_OUT_DESC}"
+  value       = var.zone
+{rb}
+{\n}
+output "instance_machine_type" {lb}
+  description = "{constants.INSTANCE_MACHINE_TYPE_OUT_DESC}"
+  value       = var.machine_type
+{rb}
+{\n}
+output "instance_nat_ip" {lb}
+  description = "{constants.INSTANCE_NAT_IP_OUT_DESC}"
+  value       = length(local.network_interface.access_config) > 0 ? local.network_interface.access_config[0].nat_ip : null
+{rb}
+{\n}
+output "instance_network" {lb}
+  description = "{constants.INSTANCE_NETWORK_OUT_DESC}"
+  value       = local.network_interface
+{rb}
+{/template}
