@@ -1,0 +1,169 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    title: 'WordPress: Apache & PHP Template'
+    version: '1.00'
+    actuationTool:
+      flavor: Terraform
+      version: '>= 0.13'
+  interfaces:
+    variables:
+    - name: project_id
+      description: The ID of the project in which to provision resources.
+      varType: string
+      required: true
+    - name: goog_cm_deployment_name
+      description: The name of the deployment and VM instance.
+      varType: string
+      required: true
+    - name: source_image
+      description: The image name for the disk for the VM instance.
+      varType: string
+      defaultValue: projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
+    - name: zone
+      description: The zone for the solution to be deployed.
+      varType: string
+    - name: boot_disk_size
+      description: The boot disk size for the VM instance in GBs
+      varType: string
+      defaultValue: 10
+    - name: boot_disk_type
+      description: The boot disk type for the VM instance.
+      varType: string
+      defaultValue: pd-standard
+    - name: machine_type
+      description: The machine type to create, e.g. e2-small
+      varType: string
+      defaultValue: f1-micro
+    - name: accelerator_type
+      description: The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80.
+      varType: string
+      defaultValue: nvidia-tesla-k80
+    - name: accelerator_count
+      description: The number of the guest accelerator cards exposed to this instance.
+      varType: string
+      defaultValue: 1
+    - name: network
+      description: The network name to attach the VM instance.
+      varType: list(string)
+      defaultValue:
+      - default
+    - name: subnetwork
+      description: The sub network name to attach the VM instance.
+      varType: list(string)
+      defaultValue:
+      - default
+    - name: external_ips
+      description: The external IPs assigned to the VM for public access.
+      varType: list(string)
+      defaultValue:
+      - EPHEMERAL
+    - name: enable_tcp_80
+      description: Allow HTTP traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_80_source_ranges
+      description: Source IP ranges for HTTP traffic
+      varType: string
+      required: true
+    - name: enable_tcp_443
+      description: Allow HTTPS traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_443_source_ranges
+      description: Source IP ranges for HTTPS traffic
+      varType: string
+      required: true
+    - name: enable_icmp
+      description: Allow icmp traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: icmp_source_ranges
+      description: Source IP ranges for icmp traffic
+      varType: string
+      required: true
+    - name: domain
+      description: Your Wordpress blog domain
+      required: true
+      varType: string
+    - name: adminEmailAddress
+      description: ''
+      required: true
+      varType: string
+    - name: optionalEmailAddress
+      description: ''
+      required: false
+      varType: string
+      defaultValue: default_value@example.com
+    - name: showConditionalRowAndAction
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: generateOptionalPassword
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: installPhpMyAdmin
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: imageCaching
+      description: ''
+      required: false
+      varType: string
+      defaultValue: none
+    - name: imageCompression
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: false
+    - name: imageSizing
+      description: ''
+      required: false
+      varType: bool
+      defaultValue: true
+    - name: imageCacheSize
+      description: ''
+      required: true
+      varType: integer
+      defaultValue: 50000
+    - name: cacheExpiration
+      description: ''
+      required: true
+      varType: integer
+      defaultValue: 120
+    - name: thirdDiskName
+      description: ''
+      required: true
+      varType: string
+      defaultValue: third-disk
+    - name: extraLbZone0
+      description: ''
+      required: false
+      varType: string
+      defaultValue: us-west1-a
+    - name: extraLbZone1
+      description: ''
+      required: false
+      varType: string
+    outputs:
+    - name: has_external_ip
+      description: Flag to indicate if the machine has an external IP
+    - name: instance_machine_type
+      description: Machine type for the compute instance
+    - name: instance_nat_ip
+      description: Machine type for the compute instance
+    - name: instance_network
+      description: Machine type for the compute instance
+    - name: instance_self_link
+      description: Self-link for the compute instance
+    - name: instance_zone
+      description: Zone for the compute instance
