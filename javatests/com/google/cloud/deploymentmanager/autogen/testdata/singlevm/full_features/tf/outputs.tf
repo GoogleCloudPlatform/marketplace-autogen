@@ -1,5 +1,17 @@
 locals {
   network_interface = google_compute_instance.instance.network_interface[0]
+  instance_nat_ip   = length(local.network_interface.access_config) > 0 ? local.network_interface.access_config[0].nat_ip : null
+  instance_ip       = coalesce(local.instance_nat_ip, local.network_interface.network_ip)
+}
+
+output "site_url" {
+  description = "Site Url"
+  value       = "http://${local.instance_ip}/"
+}
+
+output "admin_url" {
+  description = "Admin Url"
+  value       = "http://${local.instance_ip}/wp-admin/"
 }
 
 output "admin_user" {
@@ -52,10 +64,10 @@ output "instance_machine_type" {
 
 output "instance_nat_ip" {
   description = "External IP of the compute instance."
-  value       = length(local.network_interface.access_config) > 0 ? local.network_interface.access_config[0].nat_ip : null
+  value       = local.instance_nat_ip
 }
 
 output "instance_network" {
   description = "Machine type for the compute instance."
-  value       = local.network_interface
+  value       = var.networks[0]
 }

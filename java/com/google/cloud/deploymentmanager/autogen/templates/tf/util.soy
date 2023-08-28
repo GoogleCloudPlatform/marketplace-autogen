@@ -1,6 +1,6 @@
 {namespace util}
 
-import {FirewallRuleSpec, ImageSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces Terraform variable name for firewall boolean
@@ -169,5 +169,28 @@ Password for {$spec.getDisplayLabel()!}.{nil}
 {template usernameOutputDescription kind="text"}
 {@param spec: PasswordSpec}
 Username for {$spec.getDisplayLabel()!} password.{nil}
+{/template}
+
+/**
+ * Produces the URL expression for an InstanceUrlSpec.
+ *
+ * Ex: https://${local.instance_ip}/adminpage
+ * where instance_ip is a local variable
+ */
+{template makeUrlExpression kind="text"}
+{@param spec: InstanceUrlSpec}
+{let $scheme kind="text"}
+  {switch $spec.getScheme()}
+    {case InstanceUrlSpec.Scheme.HTTP}
+      http{nil}
+    {case InstanceUrlSpec.Scheme.HTTPS}
+      https{nil}
+  {/switch}
+{/let}
+{let $port: $spec.getPort() ? ':' + $spec.getPort() : ''/}
+{let $path: $spec.getPath() ? $spec.getPath() : ''/}
+{let $query: $spec.getQuery() ? '?' + $spec.getQuery() : ''/}
+{let $fragment: $spec.getFragment() ? '#' + $spec.getFragment() : ''/}
+{$scheme}://${lb}local.instance_ip{rb}{$port}/{$path}{$query}{$fragment}{nil}
 {/template}
 
