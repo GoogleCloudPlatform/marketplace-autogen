@@ -2,7 +2,7 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
 {template projectIdProperty kind="text"}
@@ -208,4 +208,40 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   defaultValue: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
   {/if}
 {/if}
+{/template}
+
+
+{template passwordOutputs kind="text"}
+{@param specList: list<PasswordSpec>}
+{for $spec, $index in $specList}
+  {call passwordOutput}
+    {param password: $spec /}
+  {/call}
+{/for}
+{/template}
+
+
+{template passwordOutput kind="text"}
+{@param password: PasswordSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{if $password.getUsername() or $password.getUsernameFromDeployInputField()}
+- name: {$sanitizedPasswordLabel}_user
+  description: {$usernameDescription}
+{/if}
+- name: {$sanitizedPasswordLabel}_password
+  description: {$passwordDescription}
 {/template}

@@ -1,6 +1,7 @@
 {namespace vm.single.metadata}
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/metadata_blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
@@ -124,16 +125,28 @@ spec:
     {/if}
 
     outputs:
-    - name: has_external_ip
-      description: Flag to indicate if the machine has an external IP
     - name: instance_machine_type
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_MACHINE_TYPE_OUT_DESC}
     - name: instance_nat_ip
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_NAT_IP_OUT_DESC}
     - name: instance_network
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_NETWORK_OUT_DESC}
     - name: instance_self_link
-      description: Self-link for the compute instance
+      description: {constants.INSTANCE_SELF_LINK_OUT_DESC}
     - name: instance_zone
-      description: Zone for the compute instance
+      description: {constants.INSTANCE_ZONE_OUT_DESC}
+    {if $spec.getSiteUrl()}
+    - name: site_url
+      description: {constants.SITE_URL_OUT_DESC}
+    {/if}
+    {if $spec.getAdminUrl()}
+    - name: admin_url
+      description: {constants.ADMIN_URL_OUT_DESC}
+    {/if}
+    {let $passwordOutputs}
+      {call blocks.passwordOutputs}
+        {param specList: $spec.getPasswordsList() /}
+      {/call}
+    {/let}
+    {$passwordOutputs |indent: 4, true}{nil}
 {/template}

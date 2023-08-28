@@ -159,15 +159,29 @@ spec:
       required: false
       varType: string
     outputs:
-    - name: has_external_ip
-      description: Flag to indicate if the machine has an external IP
     - name: instance_machine_type
-      description: Machine type for the compute instance
+      description: Machine type for the compute instance.
     - name: instance_nat_ip
-      description: Machine type for the compute instance
+      description: External IP of the compute instance.
     - name: instance_network
-      description: Machine type for the compute instance
+      description: Machine type for the compute instance.
     - name: instance_self_link
-      description: Self-link for the compute instance
+      description: Self-link for the compute instance.
     - name: instance_zone
-      description: Zone for the compute instance
+      description: Zone for the compute instance.
+    - name: site_url
+      description: Site Url
+    - name: admin_url
+      description: Admin Url
+    - name: admin_user
+      description: Username for Admin password.
+    - name: admin_password
+      description: Password for Admin.
+    - name: mysql_root_user
+      description: Username for MySQL root password.
+    - name: mysql_root_password
+      description: Password for MySQL root.
+    - name: this_is_optional_user
+      description: Username for This is optional password.
+    - name: this_is_optional_password
+      description: Password for This is optional.
