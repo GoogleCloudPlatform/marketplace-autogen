@@ -103,6 +103,19 @@ variable "accelerator_count" {lb}
 {rb}
 {/template}
 
+{template localSsds kind="text"}
+  {@param localSsdSpec: LocalSsdSpec}
+  {@param? deployInput: DeployInputSpec}
+  {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
+  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?: 0)/}
+  {for $i in range(0, $count)}
+  scratch_disk {lb}
+    interface = "SCSI"
+  {rb}
+  {\n}
+  {/for}
+{/template}
+
 {template passwordResources kind="text"}
   {@param specList: list<PasswordSpec>}
 

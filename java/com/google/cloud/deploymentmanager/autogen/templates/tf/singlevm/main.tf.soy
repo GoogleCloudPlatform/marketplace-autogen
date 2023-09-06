@@ -53,6 +53,12 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {\n}
+{if $spec.getLocalSsds()}
+  {call blocks.localSsds}
+    {param localSsdSpec: $spec.getLocalSsds() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
 {if $spec.getIpForwarding()}
   can_ip_forward = {not $spec.getIpForwarding().getDefaultOff()}
 {\n}

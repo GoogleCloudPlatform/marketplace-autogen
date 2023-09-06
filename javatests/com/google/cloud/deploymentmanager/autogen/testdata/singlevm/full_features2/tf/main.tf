@@ -41,6 +41,18 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  scratch_disk {
+    interface = "SCSI"
+  }
+
   metadata = local.metadata
 
   dynamic "network_interface" {
