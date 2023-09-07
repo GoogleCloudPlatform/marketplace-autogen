@@ -38,6 +38,42 @@ variable "boot_disk_size" {
   default     = 10
 }
 
+variable "disk1_type" {
+  description = "The super-extra-great disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk1_size" {
+  description = "The super-extra-great disk size in GB"
+  type        = number
+  default     = 1000
+}
+
+variable "disk2_type" {
+  description = "The less great disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk2_size" {
+  description = "The less great disk size in GB"
+  type        = number
+  default     = 500
+}
+
+variable "disk3_type" {
+  description = "The third disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk3_size" {
+  description = "The third disk size in GB"
+  type        = number
+  default     = 10
+}
+
 variable "networks" {
   description = "The network name to attach the VM instance."
   type        = list(string)

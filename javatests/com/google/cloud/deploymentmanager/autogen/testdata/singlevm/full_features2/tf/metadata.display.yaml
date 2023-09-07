@@ -165,6 +165,57 @@ spec:
             type: ET_GCE_FIREWALL
             gceFirewallRange:
               firewallVariable: enable_icmp
+        disk1_size:
+          name: disk1_size
+          title: Disk1 size
+          min: 20
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk1_type
+        disk1_type:
+          name: disk1_type
+          title: Disk1 type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        disk2_size:
+          name: disk2_size
+          title: Disk2 size
+          min: 15
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk2_type
+        disk2_type:
+          name: disk2_type
+          title: Disk2 type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        disk3_size:
+          name: disk3_size
+          title: Disk3 size
+          min: 10
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk3_type
+        disk3_type:
+          name: disk3_type
+          title: Disk3 type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
         domain:
           name: domain
           title: Domain
@@ -257,6 +308,9 @@ spec:
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
+      - name: additional_disks
+        title: Additional Disks
+        tooltip: The additional disks will be attached to the instance.
       - name: networking
         title: Networking
       - name: CONTENT_SETTINGS

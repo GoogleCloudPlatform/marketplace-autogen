@@ -28,6 +28,30 @@ locals {
   }
 }
 
+resource "google_compute_disk" "disk1" {
+  name = "${var.goog_cm_deployment_name}-vm-disk-one"
+  type = var.disk1_type
+  zone = var.zone
+  size = var.disk1_size
+  description = "The super-extra-great disk"
+}
+
+resource "google_compute_disk" "disk2" {
+  name = "${var.goog_cm_deployment_name}-vm-disk-xyz"
+  type = var.disk2_type
+  zone = var.zone
+  size = var.disk2_size
+  description = "The less great disk"
+}
+
+resource "google_compute_disk" "disk3" {
+  name = "${var.goog_cm_deployment_name}-vm-third-disk"
+  type = var.disk3_type
+  zone = var.zone
+  size = var.disk3_size
+  description = "The third disk"
+}
+
 resource "google_compute_instance" "instance" {
   name = "${var.goog_cm_deployment_name}-vm"
   machine_type = var.machine_type
@@ -39,6 +63,21 @@ resource "google_compute_instance" "instance" {
       type = var.boot_disk_type
       image = var.source_image
     }
+  }
+
+  attached_disk {
+    source      = google_compute_disk.disk1.id
+    device_name = google_compute_disk.disk1.name
+  }
+
+  attached_disk {
+    source      = google_compute_disk.disk2.id
+    device_name = google_compute_disk.disk2.name
+  }
+
+  attached_disk {
+    source      = google_compute_disk.disk3.id
+    device_name = google_compute_disk.disk3.name
   }
 
   scratch_disk {

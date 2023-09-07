@@ -1,6 +1,6 @@
 {namespace util}
 
-import {FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces Terraform variable name for firewall boolean
@@ -194,3 +194,7 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {$scheme}://${lb}local.instance_ip{rb}{$port}/{$path}{$query}{$fragment}{nil}
 {/template}
 
+{template diskSizeDescription kind="text"}
+{@param spec: DiskSpec}
+  {$spec.getDisplayLabel()} size in GB{nil}
+{/template}

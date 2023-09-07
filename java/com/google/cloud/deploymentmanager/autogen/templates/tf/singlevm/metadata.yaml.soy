@@ -115,6 +115,15 @@ spec:
     {$ipForwardingProp |indent: 4, true}{nil}
     {/if}
 
+    {if $spec.getAdditionalDisksList()}
+    {let $additionalDisksProperties kind="text"}
+      {call blocks.additionalDisksProperties}
+        {param diskSpecs: $spec.getAdditionalDisksList() /}
+      {/call}
+    {/let}
+    {$additionalDisksProperties |indent: 4, true}{nil}
+    {/if}
+
     {if $spec.getDeployInput()}
     {let $deployInputProps kind="text"}
       {call blocks.deployInputProperties}

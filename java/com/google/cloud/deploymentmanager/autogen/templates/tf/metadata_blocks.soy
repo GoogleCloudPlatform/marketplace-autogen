@@ -143,6 +143,33 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   defaultValue: {not $spec.getDefaultOff()}
 {/template}
 
+{template additionalDisksProperties kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDisksProperty}
+      {param spec: $spec /}
+      {param index: $index /}
+    {/call}
+  {/for}
+{/template}
+
+{template additionalDisksProperty kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{let $diskSizeDescription}
+  {call util.diskSizeDescription}
+    {param spec: $spec /}
+  {/call}
+{/let}
+- name: disk{$index+1}_size
+  description: {$diskSizeDescription}
+  varType: number
+  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
+- name: disk{$index+1}_type
+  description: {$spec.getDisplayLabel()}
+  varType: string
+  defaultValue: {$spec.getDiskType()!.getDefaultType()}
+{/template}
 
 {template deployInputProperties kind="text"}
 {@param inputSpec: DeployInputSpec}

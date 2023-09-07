@@ -103,6 +103,91 @@ variable "accelerator_count" {lb}
 {rb}
 {/template}
 
+{template additionalDiskVariables kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+{@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDiskVariable}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template additionalDiskVariable kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+{let $diskSizeDescription}
+  {call util.diskSizeDescription}
+    {param spec: $spec /}
+  {/call}
+{/let}
+variable "disk{$index+1}_type" {lb}
+  description = "{$spec.getDisplayLabel()}"
+  type        = string
+  default     = "{$spec.getDiskType()!.getDefaultType()}"
+{rb}
+{\n}
+variable "disk{$index+1}_size" {lb}
+  description = "{$diskSizeDescription}"
+  type        = number
+  default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
+{rb}
+{/template}
+
+{template additionalDiskResources kind="text"}
+  {@param diskSpecs: list<DiskSpec>}
+  {@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDiskResource}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template additionalDiskResource kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+{let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
+$spec.getDeviceNameSuffix()!.getName() :
+(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?: "") /}
+resource "google_compute_disk" "disk{$index + 1}" {lb}
+  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceName}"
+  type = var.disk{$index + 1}_type
+  zone = var.zone
+  size = var.disk{$index + 1}_size
+  description = "{$spec.getDisplayLabel()}"
+{rb}
+{/template}
+
+{template attachDisks kind="text"}
+  {@param diskSpecs: list<DiskSpec>}
+  {@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call attachDisk}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template attachDisk kind="text"}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+  attached_disk {lb}
+    source      = google_compute_disk.disk{$index + 1}.id
+    device_name = google_compute_disk.disk{$index + 1}.name
+  {rb}
+{/template}
+
 {template localSsds kind="text"}
   {@param localSsdSpec: LocalSsdSpec}
   {@param? deployInput: DeployInputSpec}

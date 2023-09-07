@@ -109,6 +109,16 @@ spec:
         {$ipForwardingDisplay |indent: 8, true}{nil}
         {/if}
 
+        {if $spec.getAdditionalDisksList()}
+        {let $additionalDisksDisplay kind="text"}
+          {call blocks.additionalDisksPropertiesDisplay}
+            {param diskSpecs: $spec.getAdditionalDisksList() /}
+            {param zonePropertyName: 'zone' /}
+          {/call}
+        {/let}
+        {$additionalDisksDisplay |indent: 8, true}{nil}
+        {/if}
+
         {if $spec.getDeployInput()}
         {let $deployInputDisplay kind="text"}
           {call blocks.deployInputPropertiesDisplay}
@@ -128,6 +138,9 @@ spec:
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
+      - name: additional_disks
+        title: Additional Disks
+        tooltip: The additional disks will be attached to the instance.
       - name: networking
         title: Networking
       {let $deploymentInputBottomSections kind="text"}

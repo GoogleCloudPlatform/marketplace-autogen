@@ -130,5 +130,8 @@ spec:
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
+      - name: additional_disks
+        title: Additional Disks
+        tooltip: The additional disks will be attached to the instance.
       - name: networking
         title: Networking

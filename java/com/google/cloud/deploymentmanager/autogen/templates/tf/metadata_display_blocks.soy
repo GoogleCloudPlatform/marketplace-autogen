@@ -229,6 +229,40 @@ goog_cm_deployment_name:
       notConfigurable: {$spec.getNotConfigurable()}
 {/template}
 
+{template additionalDisksPropertiesDisplay kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+{@param zonePropertyName: string}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDisksPropertyDisplay}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param zonePropertyName: $zonePropertyName /}
+    {/call}
+  {/for}
+{/template}
+
+{template additionalDisksPropertyDisplay kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param zonePropertyName: string}
+disk{$index+1}_size:
+  name: disk{$index+1}_size
+  title: Disk{$index+1} size
+  min: {$spec.getDiskSize()!.getMinSizeGb()}
+  max: 10000
+  section: additional_disks
+  xGoogleProperty:
+    type: ET_GCE_DISK_SIZE
+    gceDiskSize:
+      diskTypeVariable: disk{$index+1}_type
+disk{$index+1}_type:
+  name: disk{$index+1}_type
+  title: Disk{$index+1} type
+  section: additional_disks
+  xGoogleProperty:
+    type: ET_GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
+{/template}
 
 {template deployInputPropertiesDisplay kind="text"}
 {@param spec: DeployInputSpec}

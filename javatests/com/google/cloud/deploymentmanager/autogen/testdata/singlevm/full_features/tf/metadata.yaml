@@ -91,6 +91,30 @@ spec:
     - name: ip_forward
       varType: bool
       defaultValue: false
+    - name: disk1_size
+      description: The super-extra-great disk size in GB
+      varType: number
+      defaultValue: 1000
+    - name: disk1_type
+      description: The super-extra-great disk
+      varType: string
+      defaultValue: pd-standard
+    - name: disk2_size
+      description: The less great disk size in GB
+      varType: number
+      defaultValue: 500
+    - name: disk2_type
+      description: The less great disk
+      varType: string
+      defaultValue: pd-standard
+    - name: disk3_size
+      description: The third disk size in GB
+      varType: number
+      defaultValue: 10
+    - name: disk3_type
+      description: The third disk
+      varType: string
+      defaultValue: pd-standard
     - name: domain
       description: Your Wordpress blog domain
       required: true

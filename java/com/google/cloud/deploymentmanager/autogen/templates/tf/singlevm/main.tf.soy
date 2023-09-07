@@ -40,6 +40,12 @@ locals {lb}
   {rb}
 {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.additionalDiskResources}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
 resource "google_compute_instance" "instance" {lb}
   name = "${lb}var.goog_cm_deployment_name{rb}-vm"
   machine_type = var.machine_type
@@ -53,6 +59,12 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.attachDisks}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
 {if $spec.getLocalSsds()}
   {call blocks.localSsds}
     {param localSsdSpec: $spec.getLocalSsds() /}
