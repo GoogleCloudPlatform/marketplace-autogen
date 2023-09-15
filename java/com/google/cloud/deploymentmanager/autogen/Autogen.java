@@ -18,6 +18,7 @@ import com.google.auto.value.AutoValue;
 import com.google.cloud.deploymentmanager.autogen.Autogen.Module.TemplateFileSet;
 import com.google.cloud.deploymentmanager.autogen.SoyFunctions.TierTemplateName;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpecProtos;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.Image;
@@ -235,7 +236,7 @@ public class Autogen {
   /** Builds the deployment package for {@link SingleVmDeploymentPackageSpec} */
   private SolutionPackage buildSingleVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
-    switch (input.getDeploymentTool()) {
+    switch (input.getSpec().getDeploymentTool()) {
       case DEPLOYMENT_TOOL_UNSPECIFIED:
       case DEPLOYMENT_MANAGER:
         return buildDmSingleVm(input, sharedSupportFilesStrategy);
@@ -339,7 +340,7 @@ public class Autogen {
   /** Builds the deployment package for {@link MultiVmDeploymentPackageSpec} */
   private SolutionPackage buildMultiVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
-    if (input.getDeploymentTool().equals(DeploymentPackageInput.DeploymentTool.TERRAFORM)) {
+    if (input.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)) {
       throw new UnsupportedOperationException(
           "Terraform Autogen doesn't currently support multi-vm deployment");
     }

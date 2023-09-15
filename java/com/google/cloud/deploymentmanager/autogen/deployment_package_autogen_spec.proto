@@ -38,6 +38,15 @@ message DeploymentPackageAutogenSpec {
   }
   // Human readable version of the deployment package.
   string version = 3;
+  // The deployment tool for which Autogen generates output. If unspecified,
+  // generates Deployment Manager template.
+  enum DeploymentTool {
+    DEPLOYMENT_TOOL_UNSPECIFIED = 0;
+    DEPLOYMENT_MANAGER = 1;
+    // Warning: Terraform Autogen is still in development.
+    TERRAFORM = 2;
+  }
+  DeploymentTool deployment_tool = 4;
 }
 
 // Specifies a solution that deploys a single VM.
