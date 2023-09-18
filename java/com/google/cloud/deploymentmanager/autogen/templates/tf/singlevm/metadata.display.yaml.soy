@@ -90,10 +90,63 @@ spec:
         {/let}
         {$networkDisplay |indent: 8, true}{nil}
 
+        {for $firewallRule in $spec.getFirewallRulesList()}
+        {let $firewallDisplay kind="text"}
+          {call blocks.firewallPropertiesDisplay}
+            {param spec: $firewallRule /}
+          {/call}
+        {/let}
+        {$firewallDisplay |indent: 8, true}{nil}
+        {/for}
+
+        {if $spec.getIpForwarding()}
+        {let $ipForwardingDisplay kind="text"}
+          {call blocks.ipForwardingPropertyDisplay}
+            {param name: 'ip_forward' /}
+            {param spec: $spec.getIpForwarding() /}
+          {/call}
+        {/let}
+        {$ipForwardingDisplay |indent: 8, true}{nil}
+        {/if}
+
+        {if $spec.getAdditionalDisksList()}
+        {let $additionalDisksDisplay kind="text"}
+          {call blocks.additionalDisksPropertiesDisplay}
+            {param diskSpecs: $spec.getAdditionalDisksList() /}
+            {param zonePropertyName: 'zone' /}
+          {/call}
+        {/let}
+        {$additionalDisksDisplay |indent: 8, true}{nil}
+        {/if}
+
+        {if $spec.getDeployInput()}
+        {let $deployInputDisplay kind="text"}
+          {call blocks.deployInputPropertiesDisplay}
+            {param spec: $spec.getDeployInput() /}
+          {/call}
+        {/let}
+        {$deployInputDisplay |indent: 8, true}{nil}
+        {/if}
+
       sections:
+      {let $deploymentInputTopSections kind="text"}
+        {call blocks.topSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputTopSections |indent: 6, true}{nil}
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
+      - name: additional_disks
+        title: Additional Disks
+        tooltip: The additional disks will be attached to the instance.
       - name: networking
         title: Networking
+      {let $deploymentInputBottomSections kind="text"}
+        {call blocks.bottomSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputBottomSections |indent: 6, true}{nil}
 {/template}

@@ -50,6 +50,12 @@ variable "boot_disk_size" {lb}
   default     = {$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.additionalDiskVariables}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
 variable "networks" {lb}
   description = "{constants.NETWORKS_VAR_DESC}"
   type        = list(string)
@@ -75,5 +81,9 @@ variable "external_ips" {lb}
   {call blocks.acceleratorVariables}
     {param spec: $spec.getAcceleratorsList()[0]/}
   {/call}
+{/if}
+
+{if $spec.getDeployInput()}
+  {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
 {/if}
 {/template}

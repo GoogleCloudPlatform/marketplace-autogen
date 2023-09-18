@@ -6,7 +6,7 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, InstanceUrlSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces a google_compute_firewall resource for each FirewallRuleSpec
@@ -72,7 +72,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
   type        = bool
-  default     = {if $spec.getDefaultOff()}false{else}true{/if}
+  default     = {not $spec.getDefaultOff()}
 {rb}
 {/template}
 
@@ -100,5 +100,290 @@ variable "accelerator_count" {lb}
   description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
   default     = "{$spec.getDefaultCount() ?: 0}"
+{rb}
+{/template}
+
+{template additionalDiskVariables kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+{@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDiskVariable}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template additionalDiskVariable kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+{let $diskSizeDescription}
+  {call util.diskSizeDescription}
+    {param spec: $spec /}
+  {/call}
+{/let}
+variable "disk{$index+1}_type" {lb}
+  description = "{$spec.getDisplayLabel()}"
+  type        = string
+  default     = "{$spec.getDiskType()!.getDefaultType()}"
+{rb}
+{\n}
+variable "disk{$index+1}_size" {lb}
+  description = "{$diskSizeDescription}"
+  type        = number
+  default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
+{rb}
+{/template}
+
+{template additionalDiskResources kind="text"}
+  {@param diskSpecs: list<DiskSpec>}
+  {@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDiskResource}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template additionalDiskResource kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+{let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
+$spec.getDeviceNameSuffix()!.getName() :
+(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?: "") /}
+resource "google_compute_disk" "disk{$index + 1}" {lb}
+  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceName}"
+  type = var.disk{$index + 1}_type
+  zone = var.zone
+  size = var.disk{$index + 1}_size
+  description = "{$spec.getDisplayLabel()}"
+{rb}
+{/template}
+
+{template attachDisks kind="text"}
+  {@param diskSpecs: list<DiskSpec>}
+  {@param? deployInput: DeployInputSpec}
+  {for $spec, $index in $diskSpecs}
+    {call attachDisk}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+    {\n}
+  {/for}
+{/template}
+
+{template attachDisk kind="text"}
+{@param index: number}
+{@param? deployInput: DeployInputSpec}
+  attached_disk {lb}
+    source      = google_compute_disk.disk{$index + 1}.id
+    device_name = google_compute_disk.disk{$index + 1}.name
+  {rb}
+{/template}
+
+{template localSsds kind="text"}
+  {@param localSsdSpec: LocalSsdSpec}
+  {@param? deployInput: DeployInputSpec}
+  {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
+  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?: 0)/}
+  {for $i in range(0, $count)}
+  scratch_disk {lb}
+    interface = "SCSI"
+  {rb}
+  {\n}
+  {/for}
+{/template}
+
+{template passwordResources kind="text"}
+  {@param specList: list<PasswordSpec>}
+
+  {for $spec, $index in $specList}
+    {\n}
+    {call passwordResource}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordResource kind="text"}
+{@param spec: PasswordSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $spec /}
+  {/call}
+{/let}
+resource "random_password" "{$sanitizedPasswordLabel}" {lb}
+  length = {$spec.getLength()}
+  special = {$spec.getAllowSpecialChars()}
+{rb}
+{/template}
+
+{template passwordMetadata kind="text"}
+  {@param specList: list<PasswordSpec>}
+
+  {for $spec, $index in $specList}
+    {let $sanitizedPasswordLabel}
+      {call util.sanitizePasswordLabel}
+        {param spec: $spec /}
+      {/call}
+    {/let}
+
+    {$spec.getMetadataKey()} = random_password.{$sanitizedPasswordLabel}.result{nil}
+    {if $index != $specList.length - 1}
+      {\n}
+    {/if}
+  {/for}
+{/template}
+
+{template deployInputVariables kind="text"}
+{@param spec: DeployInputSpec}
+{let $fields: listDeployInputFields($spec)/}
+{for $field in $fields}
+  {\n}
+  {call deployInputVariable}{param field: $field/}{/call}
+{/for}
+{/template}
+
+{template deployInputVariable kind="text"}
+{@param field: DeployInputField}
+variable "{$field.getName()}" {lb}
+{if $field.getDescription()}
+  description = "{$field.getDescription()}"
+{elseif $field.getTooltip()}
+  description = "{$field.getTooltip()}"
+{/if}
+{if $field.getBooleanCheckbox()}
+  type        = bool
+  default     = {$field.getBooleanCheckbox().getDefaultValue()}
+{elseif $field.getGroupedBooleanCheckbox()}
+  type        = bool
+  default     = {$field.getGroupedBooleanCheckbox().getDefaultValue()}
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox()/}
+  type        = number
+  {if $box.getDefaultValue()}
+  default     = {$box.getDefaultValue().getValue() ?: 0}
+  {/if}
+{elseif $field.getIntegerDropdown()}
+  {let $dropdown: $field.getIntegerDropdown()/}
+  type        = number
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  default     = {$dropdown.getValuesList()[$defaultIndex]}
+  {/if}
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox()/}
+  type        = string
+  {if $box.getDefaultValue()}
+  default     = "{$box.getDefaultValue()}"
+  {/if}
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  type        = string
+  {if $box.getDefaultValue()}
+  default     = "{$box.getDefaultValue()}"
+  {/if}
+{elseif $field.getStringDropdown()}
+  {let $dropdown: $field.getStringDropdown()/}
+  type        = string
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  default     = "{$dropdown.getValuesList()[$defaultIndex]}"
+  {/if}
+{elseif $field.getZoneDropdown()}
+  {let $dropdown: $field.getZoneDropdown()/}
+  type        = string
+  {if $dropdown.getDefaultValue()}
+  default     = "{$dropdown.getDefaultValue().getValue() ?: ''}"
+  {/if}
+{/if}
+{rb}
+{/template}
+
+/**
+ *  Produces metadata for a list of GceMetadataItems.
+ *  Format: {key1} = {value1}
+ *          {key2} = {value2}
+ *  Ex: admin_email = foo@google.com
+ */
+{template gceMetadata kind="text"}
+{@param specList: list<GceMetadataItem>}
+{@param? deployInput: DeployInputSpec}
+{for $metadata, $index in $specList}
+{$metadata.getKey()} = {nil}
+
+  {if $metadata.getValue()}
+  "{$metadata.getValue()}"{nil}
+
+  {elseif $metadata.getValueFromDeployInputField()}
+  {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
+  var.{$field.getName()}{nil}
+
+  {/if /* $metadata.value */}
+
+  {if $index != $specList.length - 1}
+    {\n}
+  {/if}
+{/for}
+{/template}
+
+{template passwordOutputs kind="text"}
+  {@param specList: list<PasswordSpec>}
+  {@param? deployInput: DeployInputSpec}
+
+  {for $spec, $index in $specList}
+    {\n}
+    {call passwordOutput}
+      {param password: $spec /}
+      {param deployInput: $deployInput /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordOutput kind="text"}
+{@param password: PasswordSpec}
+{@param? deployInput: DeployInputSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+
+{if $password.getUsername()}
+output "{$sanitizedPasswordLabel}_user" {lb}
+  description = "{$usernameDescription}"
+  value       = "{$password.getUsername()}"
+{rb}
+{\n}
+{elseif $password.getUsernameFromDeployInputField()}
+{let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
+output "{$sanitizedPasswordLabel}_user" {lb}
+  description = "{$usernameDescription}"
+  value       = var.{$field.getName()}
+{rb}
+{\n}
+{/if}
+
+output "{$sanitizedPasswordLabel}_password" {lb}
+  description = "{$passwordDescription}"
+  value       = random_password.{$sanitizedPasswordLabel}.result
+  sensitive   = true
 {rb}
 {/template}

@@ -2,10 +2,10 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
-{template projectIdPropertySchema kind="text"}
+{template projectIdProperty kind="text"}
 - name: project_id
   description: {constants.PROJECT_ID_VAR_DESC}
   varType: string
@@ -13,7 +13,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template deploymentNamePropertySchema kind="text"}
+{template deploymentNameProperty kind="text"}
 - name: goog_cm_deployment_name
   description: {constants.DEPLOYMENT_NAME_VAR_DESC}
   varType: string
@@ -21,7 +21,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template bootDiskPropertiesSchema kind="text"}
+{template bootDiskProperties kind="text"}
 {@param spec: DiskSpec}
 {@param? tier: VmTierSpec}
 - name: {'boot_disk_size' |tierprefixed: $tier}
@@ -36,7 +36,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template zonePropertySchema kind="text"}
+{template zoneProperty kind="text"}
 {@param name: string}
 {@param? zoneSpec: ZoneSpec}
 - name: {$name}
@@ -48,7 +48,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template imagePropertySchema kind="text"}
+{template imageProperty kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
 {@param? tier: VmTierSpec}
@@ -59,7 +59,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template machineTypePropertySchema kind="text"}
+{template machineTypeProperty kind="text"}
 {@param name: string}
 {@param spec: MachineTypeSpec}
 {@param? tier: VmTierSpec}
@@ -70,7 +70,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template acceleratorPropertiesSchema kind="text"}
+{template acceleratorProperties kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
 {@param? tier: VmTierSpec}
@@ -85,7 +85,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/template}
 
 
-{template networkPropertiesSchema kind="text"}
+{template networkProperties kind="text"}
 {@param nameSuffix: string}
 {@param spec: NetworkInterfacesSpec}
 {@param? tier: VmTierSpec}
@@ -105,4 +105,170 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   varType: list(string)
   defaultValue:
   - EPHEMERAL
+{/template}
+
+
+{template firewallProperties kind="text"}
+{@param spec: FirewallRuleSpec}
+{@param? tierSpec: VmTierSpec}
+{let $firewallPropName kind="text"}
+  {call util.firewallRuleVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+{let $firewallSourceRangesPropName kind="text"}
+  {call util.firewallRuleSourceRangesVarName}
+    {param spec: $spec /}
+    // TODO: support tiers for multi-VM
+  {/call}
+{/let}
+- name: {$firewallPropName}
+  description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+- name: {$firewallSourceRangesPropName}
+  description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
+  varType: string
+  required: true
+{/template}
+
+
+{template ipForwardingProperty kind="text"}
+{@param name: string}
+{@param spec: IpForwardingSpec}
+{@param? tier: VmTierSpec}
+- name: {$name |tierprefixed: $tier}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+{/template}
+
+{template additionalDisksProperties kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDisksProperty}
+      {param spec: $spec /}
+      {param index: $index /}
+    {/call}
+  {/for}
+{/template}
+
+{template additionalDisksProperty kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{let $diskSizeDescription}
+  {call util.diskSizeDescription}
+    {param spec: $spec /}
+  {/call}
+{/let}
+- name: disk{$index+1}_size
+  description: {$diskSizeDescription}
+  varType: number
+  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
+- name: disk{$index+1}_type
+  description: {$spec.getDisplayLabel()}
+  varType: string
+  defaultValue: {$spec.getDiskType()!.getDefaultType()}
+{/template}
+
+{template deployInputProperties kind="text"}
+{@param inputSpec: DeployInputSpec}
+{@param? tierSpec: VmTierSpec}
+// TODO: support tiers section for multi-VMs
+{let $fields: listDeployInputFields($inputSpec)/}
+{for $field in $fields}
+{let $fieldProp kind="text"}
+  {call deployInputField}{param field: $field /}{/call}
+{/let}
+{$fieldProp}{nil}
+{/for}
+{/template}
+
+
+{template deployInputField visibility="private" kind="text"}
+{@param field: DeployInputField}
+- name: {$field.getName() |yamlprimitive: 2}
+  description: {$field.getDescription() |yamlprimitive: 2}
+  required: {$field.getRequired()}
+{if $field.getBooleanCheckbox()}
+  varType: bool
+  defaultValue: {$field.getBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
+{elseif $field.getGroupedBooleanCheckbox()}
+  varType: bool
+  defaultValue: {$field.getGroupedBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
+{elseif $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox() /}
+  varType: integer
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue().getValue() ?: 0}
+  {/if}
+{elseif $field.getIntegerDropdown()}
+  {let $dropdown: $field.getIntegerDropdown()/}
+  varType: integer
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  defaultValue: {$dropdown.getValuesList()[$defaultIndex]}
+  {/if}
+{elseif $field.getStringBox()}
+  {let $box: $field.getStringBox() /}
+  varType: string
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {/if}
+{elseif $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  varType: string
+  {if $box.getDefaultValue()}
+  defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {/if}
+{elseif $field.getStringDropdown()}
+  {let $dropdown: $field.getStringDropdown()/}
+  varType: string
+  {if $dropdown.getDefaultValueIndex()}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  defaultValue: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
+  {/if}
+{elseif $field.getZoneDropdown()}
+  {let $dropdown: $field.getZoneDropdown()/}
+  varType: string
+  {if $dropdown.getDefaultValue()}
+  defaultValue: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
+  {/if}
+{/if}
+{/template}
+
+
+{template passwordOutputs kind="text"}
+{@param specList: list<PasswordSpec>}
+{for $spec, $index in $specList}
+  {call passwordOutput}
+    {param password: $spec /}
+  {/call}
+{/for}
+{/template}
+
+
+{template passwordOutput kind="text"}
+{@param password: PasswordSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{if $password.getUsername() or $password.getUsernameFromDeployInputField()}
+- name: {$sanitizedPasswordLabel}_user
+  description: {$usernameDescription}
+{/if}
+- name: {$sanitizedPasswordLabel}_password
+  description: {$passwordDescription}
 {/template}

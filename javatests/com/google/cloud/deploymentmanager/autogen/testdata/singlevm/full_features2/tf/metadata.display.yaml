@@ -69,11 +69,19 @@ spec:
           title: Zone
           xGoogleProperty:
             type: ET_GCE_ZONE
+            gceZone:
+              allowlistedZones:
+              - us-central1-a
+              - europe-west1-a
+              - asia-northeast1-b
+              allowlistedRegions:
+              - us-east4
+              - southamerica-east1
         network:
           name: network
           title: Network name
-          minItems: 1
-          maxItems: 1
+          minItems: 2
+          maxItems: 7
           section: networking
           xGoogleProperty:
             type: ET_GCE_NETWORK
@@ -83,8 +91,8 @@ spec:
         subnetwork:
           name: subnetwork
           title: Subnetwork name
-          minItems: 1
-          maxItems: 1
+          minItems: 2
+          maxItems: 7
           section: networking
           xGoogleProperty:
             type: ET_GCE_SUBNETWORK
@@ -95,8 +103,8 @@ spec:
           name: external_ips
           title: External IP
           tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
-          minItems: 1
-          maxItems: 1
+          minItems: 2
+          maxItems: 7
           section: networking
           xGoogleProperty:
             type: ET_GCE_EXTERNAL_IP
@@ -157,16 +165,6 @@ spec:
             type: ET_GCE_FIREWALL
             gceFirewallRange:
               firewallVariable: enable_icmp
-        ip_forward:
-          name: ip_forward
-          title: IP forwarding
-          tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
-          section: networking
-          xGoogleProperty:
-            type: ET_GCE_IP_FORWARDING
-            gceIpForwarding:
-              networkVariable: network
-              notConfigurable: true
         disk1_size:
           name: disk1_size
           title: Disk1 size

@@ -55,16 +55,43 @@ spec:
       varType: list(string)
       defaultValue:
       - EPHEMERAL
+    - name: enable_tcp_80
+      description: Allow HTTP traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_80_source_ranges
+      description: Source IP ranges for HTTP traffic
+      varType: string
+      required: true
+    - name: enable_tcp_443
+      description: Allow HTTPS traffic from the Internet
+      varType: bool
+      defaultValue: true
+    - name: tcp_443_source_ranges
+      description: Source IP ranges for HTTPS traffic
+      varType: string
+      required: true
+    - name: localSsdsCount
+      description: ''
+      required: false
+      varType: integer
+      defaultValue: 0
     outputs:
-    - name: has_external_ip
-      description: Flag to indicate if the machine has an external IP
     - name: instance_machine_type
-      description: Machine type for the compute instance
+      description: Machine type for the compute instance.
     - name: instance_nat_ip
-      description: Machine type for the compute instance
+      description: External IP of the compute instance.
     - name: instance_network
-      description: Machine type for the compute instance
+      description: Machine type for the compute instance.
     - name: instance_self_link
-      description: Self-link for the compute instance
+      description: Self-link for the compute instance.
     - name: instance_zone
-      description: Zone for the compute instance
+      description: Zone for the compute instance.
+    - name: site_url
+      description: Site Url
+    - name: admin_url
+      description: Admin Url
+    - name: admin_user
+      description: Username for Admin password.
+    - name: admin_password
+      description: Password for Admin.

@@ -28,7 +28,6 @@ spec:
     - name: zone
       description: The zone for the solution to be deployed.
       varType: string
-      defaultValue: us-west1-b
     - name: boot_disk_size
       description: The boot disk size for the VM instance in GBs
       varType: string
@@ -88,9 +87,6 @@ spec:
       description: Source IP ranges for icmp traffic
       varType: string
       required: true
-    - name: ip_forward
-      varType: bool
-      defaultValue: false
     - name: disk1_size
       description: The super-extra-great disk size in GB
       varType: number

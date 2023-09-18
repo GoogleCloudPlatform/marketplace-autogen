@@ -9,6 +9,10 @@ locals {
     external_ip = element(var.external_ips, i)
     }
   }
+
+  metadata = {
+    bitnami-base-password = random_password.admin.result
+  }
 }
 
 resource "google_compute_instance" "instance" {
@@ -23,6 +27,8 @@ resource "google_compute_instance" "instance" {
       image = var.source_image
     }
   }
+
+  metadata = local.metadata
 
   dynamic "network_interface" {
     for_each = local.network_interfaces_map
@@ -66,4 +72,9 @@ resource "google_compute_firewall" tcp_443 {
   }
 
   source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
+}
+
+resource "random_password" "admin" {
+  length = 8
+  special = false
 }

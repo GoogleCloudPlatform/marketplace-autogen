@@ -186,6 +186,8 @@ option java_outer_classname = "AutogenProtos";
 //               booleanCheckbox: {}
 // ==)
 message DeploymentPackageInput {
+  reserved 9;
+
   // The partner ID. Required.
   string partner_id = 1;
   // The solution ID. Required.
@@ -202,16 +204,6 @@ message DeploymentPackageInput {
   Image icon = 7;
   // Image to use as the architecture diagram. Optional.
   Image architecture_diagram = 8;
-  // The deployment tool for which Autogen generates output. If unspecified,
-  // generates Deployment Manager template.
-  enum DeploymentTool {
-    DEPLOYMENT_TOOL_UNSPECIFIED = 0;
-    DEPLOYMENT_MANAGER = 1;
-    // Warning: Terraform Autogen is still in development.
-    TERRAFORM = 2;
-  }
-  // The deployment tool for Autogen.
-  DeploymentTool deployment_tool = 9;
 }
 
 // Describes an image to be generated into the deployment package, or

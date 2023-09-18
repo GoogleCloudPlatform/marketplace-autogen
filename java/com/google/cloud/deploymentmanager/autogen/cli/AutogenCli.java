@@ -18,6 +18,7 @@ import com.google.cloud.deploymentmanager.autogen.Autogen;
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchInput;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Supplier;
@@ -41,7 +42,7 @@ public final class AutogenCli {
       DeploymentPackageInput solution, AutogenSettings settings) {
     SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
             ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
-    if (solution.getDeploymentTool().equals(DeploymentPackageInput.DeploymentTool.TERRAFORM)
+    if (solution.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)
         && !settings.isDevFeaturesEnabled()) {
       throw new IllegalArgumentException(
           "Terraform deployment tool cannot be used without enabling --dev_features. WARNING:"

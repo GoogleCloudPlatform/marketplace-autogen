@@ -1,6 +1,7 @@
 {namespace vm.single.metadata}
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/metadata_blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
@@ -35,19 +36,19 @@ spec:
   interfaces:
     variables:
     {let $projectIdProp kind="text"}
-      {call blocks.projectIdPropertySchema}
+      {call blocks.projectIdProperty}
       {/call}
     {/let}
     {$projectIdProp |indent: 4, true}{nil}
 
     {let $deploymentNameProp kind="text"}
-      {call blocks.deploymentNamePropertySchema}
+      {call blocks.deploymentNameProperty}
       {/call}
     {/let}
     {$deploymentNameProp |indent: 4, true}{nil}
 
     {let $imageProp kind="text"}
-      {call blocks.imagePropertySchema}
+      {call blocks.imageProperty}
         {param name: 'source_image'/}
         {param imagesList: $spec.getImagesList() /}
       {/call}
@@ -55,7 +56,7 @@ spec:
     {$imageProp |indent: 4, true}{nil}
 
     {let $zoneProp kind="text"}
-      {call blocks.zonePropertySchema}
+      {call blocks.zoneProperty}
         {param name: 'zone'/}
         {param zoneSpec: $spec.getZone()/}
       {/call}
@@ -63,14 +64,14 @@ spec:
     {$zoneProp |indent: 4, true}{nil}
 
     {let $bootDiskProps kind="text"}
-      {call blocks.bootDiskPropertiesSchema}
+      {call blocks.bootDiskProperties}
         {param spec: $spec.getBootDisk()! /}
       {/call}
     {/let}
     {$bootDiskProps |indent: 4, true}{nil}
 
     {let $machineTypeProp kind="text"}
-      {call blocks.machineTypePropertySchema}
+      {call blocks.machineTypeProperty}
         {param name: 'machine_type' /}
         {param spec: $spec.getMachineType()! /}
       {/call}
@@ -79,7 +80,7 @@ spec:
 
     {if solutionHasGpus($spec)}
     {let $acceleratorProps kind="text"}
-      {call blocks.acceleratorPropertiesSchema}
+      {call blocks.acceleratorProperties}
         {param namePrefix: 'accelerator' /}
         {param spec: $spec.getAcceleratorsList()[0] /}
       {/call}
@@ -88,24 +89,73 @@ spec:
     {/if}
 
     {let $networkProps kind="text"}
-      {call blocks.networkPropertiesSchema}
+      {call blocks.networkProperties}
         {param nameSuffix: 'network' /}
         {param spec: $spec.getNetworkInterfaces()! /}
       {/call}
     {/let}
     {$networkProps |indent: 4, true}{nil}
 
+    {for $firewallRule in $spec.getFirewallRulesList()}
+    {let $firewallProps kind="text"}
+      {call blocks.firewallProperties}
+        {param spec: $firewallRule /}
+      {/call}
+    {/let}
+    {$firewallProps |indent: 4, true}{nil}
+    {/for}
+
+    {if $spec.getIpForwarding()}
+    {let $ipForwardingProp kind="text"}
+      {call blocks.ipForwardingProperty}
+        {param name: 'ip_forward' /}
+        {param spec: $spec.getIpForwarding() /}
+      {/call}
+    {/let}
+    {$ipForwardingProp |indent: 4, true}{nil}
+    {/if}
+
+    {if $spec.getAdditionalDisksList()}
+    {let $additionalDisksProperties kind="text"}
+      {call blocks.additionalDisksProperties}
+        {param diskSpecs: $spec.getAdditionalDisksList() /}
+      {/call}
+    {/let}
+    {$additionalDisksProperties |indent: 4, true}{nil}
+    {/if}
+
+    {if $spec.getDeployInput()}
+    {let $deployInputProps kind="text"}
+      {call blocks.deployInputProperties}
+        {param inputSpec: $spec.getDeployInput() /}
+      {/call}
+    {/let}
+    {$deployInputProps |indent: 4, true}{nil}
+    {/if}
+
     outputs:
-    - name: has_external_ip
-      description: Flag to indicate if the machine has an external IP
     - name: instance_machine_type
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_MACHINE_TYPE_OUT_DESC}
     - name: instance_nat_ip
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_NAT_IP_OUT_DESC}
     - name: instance_network
-      description: Machine type for the compute instance
+      description: {constants.INSTANCE_NETWORK_OUT_DESC}
     - name: instance_self_link
-      description: Self-link for the compute instance
+      description: {constants.INSTANCE_SELF_LINK_OUT_DESC}
     - name: instance_zone
-      description: Zone for the compute instance
+      description: {constants.INSTANCE_ZONE_OUT_DESC}
+    {if $spec.getSiteUrl()}
+    - name: site_url
+      description: {constants.SITE_URL_OUT_DESC}
+    {/if}
+    {if $spec.getAdminUrl()}
+    - name: admin_url
+      description: {constants.ADMIN_URL_OUT_DESC}
+    {/if}
+    {let $passwordOutputs}
+      {call blocks.passwordOutputs}
+        {param specList: $spec.getPasswordsList() /}
+      {/call}
+    {/let}
+    {$passwordOutputs |indent: 4, true}{nil}
 {/template}

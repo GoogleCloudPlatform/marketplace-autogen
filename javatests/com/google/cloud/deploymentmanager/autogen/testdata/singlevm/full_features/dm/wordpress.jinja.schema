@@ -99,6 +99,12 @@ properties:
         networkProperty: network
         notConfigurable: False
         allowStaticIps: True
+  ipForward:
+    type: string
+    enum:
+      - 'On'
+      - 'Off'
+    default: 'Off'
   bootDiskType:
     type: string
     default: pd-standard

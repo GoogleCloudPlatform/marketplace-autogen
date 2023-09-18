@@ -5,8 +5,17 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
 {template main}
 {@param spec: SingleVmDeploymentPackageSpec}
 {let $defaultMap: getTestConfigDefaultValues($spec)/}
-goog_cm_deployment_name="test-deployment"{\n}
+
+goog_cm_deployment_name = "test-deployment"{\n}
+
 {for $entry in $defaultMap.entries()}
-{$entry.key}="{$entry.value}"{\n}
+{$entry.key} = "{$entry.value}"{\n}
 {/for}
+
+{let $testDefaultedFields: $spec.getDeployInput() ? findInputsWithTestDefaultValues($spec.getDeployInput()) : [] /}
+
+{for $field in $testDefaultedFields}
+{$field.getName()} = "{findInputTestDefaultValue($field)}"{\n}
+{/for}
+
 {/template}

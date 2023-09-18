@@ -6,6 +6,18 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
 
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
+{let $passwordMetadata}
+  {call blocks.passwordMetadata}
+    {param specList: $spec.getPasswordsList() /}
+  {/call}
+{/let}
+{let $gceMetadata}
+  {call blocks.gceMetadata}
+    {param specList: $spec.getGceMetadataItemsList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/let}
+
 provider "google" {lb}
   project = var.project_id
 {rb}
@@ -17,8 +29,23 @@ locals {lb}
     external_ip = element(var.external_ips, i)
     {rb}
   {rb}
+{\n}
+  metadata = {lb}
+  {if $passwordMetadata}
+    {$passwordMetadata |indent: 4}
+  {/if}
+  {if $gceMetadata}
+    {$gceMetadata |indent: 4}
+  {/if}
+  {rb}
 {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.additionalDiskResources}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
 resource "google_compute_instance" "instance" {lb}
   name = "${lb}var.goog_cm_deployment_name{rb}-vm"
   machine_type = var.machine_type
@@ -31,6 +58,24 @@ resource "google_compute_instance" "instance" {lb}
       image = var.source_image
     {rb}
   {rb}
+{\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.attachDisks}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
+{if $spec.getLocalSsds()}
+  {call blocks.localSsds}
+    {param localSsdSpec: $spec.getLocalSsds() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
+{if $spec.getIpForwarding()}
+  can_ip_forward = {not $spec.getIpForwarding().getDefaultOff()}
+{\n}
+{/if}
+  metadata = local.metadata
 {\n}
   dynamic "network_interface" {lb}
     for_each = local.network_interfaces_map
@@ -62,5 +107,9 @@ resource "google_compute_instance" "instance" {lb}
 
 {call blocks.firewallResources}
   {param specList: $spec.getFirewallRulesList()/}
+{/call}
+
+{call blocks.passwordResources}
+  {param specList: $spec.getPasswordsList() /}
 {/call}
 {/template}

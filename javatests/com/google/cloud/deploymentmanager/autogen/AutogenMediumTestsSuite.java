@@ -19,8 +19,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
-import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -119,7 +119,7 @@ public class AutogenMediumTestsSuite {
                   DeploymentPackageInput.Builder input = DeploymentPackageInput.newBuilder();
                   TextFormat.getParser()
                       .merge(Files.asCharSource(inputSpecFile, UTF_8).read(), input);
-                  input.setDeploymentTool(tool);
+                  input.getSpecBuilder().setDeploymentTool(tool);
                   return AUTOGEN.generateDeploymentPackage(
                       input.build(), SharedSupportFilesStrategy.INCLUDED);
                 } catch (IOException e) {

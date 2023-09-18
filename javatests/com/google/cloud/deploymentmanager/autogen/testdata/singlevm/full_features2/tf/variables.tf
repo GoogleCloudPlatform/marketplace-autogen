@@ -18,7 +18,6 @@ variable "source_image" {
 variable "zone" {
   description = "The zone for the solution to be deployed."
   type        = string
-  default     = "us-west1-b"
 }
 
 variable "machine_type" {
