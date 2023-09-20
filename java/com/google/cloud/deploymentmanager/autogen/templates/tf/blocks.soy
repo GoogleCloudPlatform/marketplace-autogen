@@ -334,6 +334,46 @@ variable "{$field.getName()}" {lb}
 {/for}
 {/template}
 
+{template passwordOutputsReadme kind="text"}
+  {@param specList: list<PasswordSpec>}
+  {@param? deployInput: DeployInputSpec}
+
+  {for $spec, $index in $specList}
+    {call passwordOutputReadme}
+      {param password: $spec /}
+      {param deployInput: $deployInput /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordOutputReadme kind="text"}
+{@param password: PasswordSpec}
+{@param? deployInput: DeployInputSpec}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+
+{if $password.getUsername()}
+| {$sanitizedPasswordLabel}_user | {$usernameDescription} |
+{elseif $password.getUsernameFromDeployInputField()}
+{let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
+| {$sanitizedPasswordLabel}_user | {$usernameDescription} |
+{/if}
+| {$sanitizedPasswordLabel}_password | {$passwordDescription} |
+{/template}
+
 {template passwordOutputs kind="text"}
   {@param specList: list<PasswordSpec>}
   {@param? deployInput: DeployInputSpec}

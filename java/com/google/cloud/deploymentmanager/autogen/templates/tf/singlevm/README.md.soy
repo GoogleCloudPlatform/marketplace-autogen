@@ -1,0 +1,68 @@
+{namespace vm.single.readme}
+
+import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+
+{template main kind="text"}
+{@param spec: SingleVmDeploymentPackageSpec}
+# Google Cloud Marketplace Terraform Module
+{\n}
+This module deploys a product from Google Cloud Marketplace.
+{\n}
+## Usage
+Perform the following commands on the root folder:
+{\n}
+- `terraform init` to get the plugins
+- `terraform plan` to see the infrastructure plan
+- `terraform apply` to apply the infrastructure build
+- `terraform destroy` to destroy the built infrastructure
+{\n}
+## Inputs
+
+{\n}
+## Outputs
+
+{\n}
+| Name | Description |
+|------|-------------|
+{if $spec.getSiteUrl()}
+| site_url | {constants.SITE_URL_OUT_DESC} |
+{/if}
+{if $spec.getAdminUrl()}
+| admin_url | {constants.ADMIN_URL_OUT_DESC} |
+{/if}
+{call blocks.passwordOutputsReadme}
+  {param specList: $spec.getPasswordsList() /}
+  {param deployInput: $spec.getDeployInput() /}
+{/call}
+| instance_self_link | {constants.INSTANCE_SELF_LINK_OUT_DESC} |
+| instance_zone | {constants.INSTANCE_SELF_LINK_OUT_DESC} |
+| instance_machine_type | {constants.INSTANCE_MACHINE_TYPE_OUT_DESC} |
+| instance_nat_ip | {constants.INSTANCE_NAT_IP_OUT_DESC} |
+| instance_network | {constants.INSTANCE_NETWORK_OUT_DESC} |
+
+
+{\n}
+
+## Requirements
+### Terraform plugins
+{literal}- [Terraform](https://developer.hashicorp.com/terraform/downloads){/literal}
+{\n}
+
+### Configure a Service Account
+In order to execute this module you must have a Service Account with the following project roles:
+{\n}
+- roles/compute.admin
+- roles/iam.serviceAccountUser
+- roles/compute.networkAdmin
+{\n}
+`roles/compute.networkAdmin` is required on the host project if a shared VPC is used.
+{\n}
+
+### Enable API
+In order to operate with the Service Account you must activate the following APIs on the project where the Service Account was created:
+{\n}
+- Compute Engine API - compute.googleapis.com
+{/template}
