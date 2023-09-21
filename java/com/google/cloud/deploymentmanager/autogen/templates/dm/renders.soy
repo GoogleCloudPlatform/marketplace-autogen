@@ -390,7 +390,7 @@ sourceTags:
   {%- endfor %}
 
   {else}
-  {let $vmIndex: $tierVmNames.getVmIndex() ?: 0/}
+  {let $vmIndex: $tierVmNames.getVmIndex() ?? 0/}
   {if $vmIndex >= 0}
   value: {$vmPrefix}-{$vmIndex}
   {else}
@@ -563,7 +563,7 @@ serviceAccounts:
 
 {$namePrefix + 'Count' |tierprefixed: $tier}:
   type: integer
-  default: {$spec.getDefaultCount() ?: 0}
+  default: {$spec.getDefaultCount() ?? 0}
   {if $spec.getMinCount() > 0}
   minimum: {$spec.getMinCount()}
   {/if}
@@ -728,19 +728,19 @@ serviceAccounts:
   {let $box: $field.getIntegerBox()/}
   type: integer
   {if $box.getDefaultValue()}
-  default: {$box.getDefaultValue().getValue() ?: 0}
+  default: {$box.getDefaultValue().getValue() ?? 0}
   {/if}
   {if $box.getValidation()!.getMin()}
-  minimum: {$box.getValidation()!.getMin().getValue() ?: 0}
+  minimum: {$box.getValidation()!.getMin().getValue() ?? 0}
   {/if}
   {if $box.getValidation()!.getMax()}
-  maximum: {$box.getValidation()!.getMax().getValue() ?: 0}
+  maximum: {$box.getValidation()!.getMax().getValue() ?? 0}
   {/if}
 {elseif $field.getIntegerDropdown()}
   {let $dropdown: $field.getIntegerDropdown()/}
   type: integer
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default: {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
   enum:
@@ -771,7 +771,7 @@ serviceAccounts:
   {let $dropdown: $field.getStringDropdown()/}
   type: string
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
   {/if}
   enum:
@@ -782,7 +782,7 @@ serviceAccounts:
   {let $dropdown: $field.getZoneDropdown()/}
   type: string
   {if $dropdown.getDefaultValue()}
-  default: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
+  default: {$dropdown.getDefaultValue().getValue() ?? '' |yamlprimitive: 2}
   {/if}
   x-googleProperty:
     type: GCE_ZONE

@@ -81,7 +81,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 - name: {$namePrefix + '_count' |tierprefixed: $tier}
   description: {constants.ACCELERATOR_COUNT_VAR_DESC}
   varType: string
-  defaultValue: {$spec.getDefaultCount() ?: 0}
+  defaultValue: {$spec.getDefaultCount() ?? 0}
 {/template}
 
 
@@ -200,13 +200,13 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   {let $box: $field.getIntegerBox() /}
   varType: integer
   {if $box.getDefaultValue()}
-  defaultValue: {$box.getDefaultValue().getValue() ?: 0}
+  defaultValue: {$box.getDefaultValue().getValue() ?? 0}
   {/if}
 {elseif $field.getIntegerDropdown()}
   {let $dropdown: $field.getIntegerDropdown()/}
   varType: integer
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0 /}
   defaultValue: {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
 {elseif $field.getStringBox()}
@@ -225,14 +225,14 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   {let $dropdown: $field.getStringDropdown()/}
   varType: string
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0 /}
   defaultValue: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
   {/if}
 {elseif $field.getZoneDropdown()}
   {let $dropdown: $field.getZoneDropdown()/}
   varType: string
   {if $dropdown.getDefaultValue()}
-  defaultValue: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
+  defaultValue: {$dropdown.getDefaultValue().getValue() ?? '' |yamlprimitive: 2}
   {/if}
 {/if}
 {/template}

@@ -312,10 +312,10 @@ disk{$index+1}_type:
   placeholder: {$box.getPlaceholder() |yamlprimitive: 2}
   {/if}
   {if $box.getValidation()?.getMin()}
-  min: {$box.getValidation()!.getMin()!.getValue() ?: 0}
+  min: {$box.getValidation()!.getMin()!.getValue() ?? 0}
   {/if}
   {if $box.getValidation()?.getMax()}
-  max: {$box.getValidation()!.getMax()!.getValue() ?: 0}
+  max: {$box.getValidation()!.getMax()!.getValue() ?? 0}
   {/if}
   {if $box.getValidation()?.getDescription()}
   validation: {$box.getValidation()!.getDescription() |yamlprimitive: 2}

@@ -99,7 +99,7 @@ variable "accelerator_type" {lb}
 variable "accelerator_count" {lb}
   description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
-  default     = "{$spec.getDefaultCount() ?: 0}"
+  default     = "{$spec.getDefaultCount() ?? 0}"
 {rb}
 {/template}
 
@@ -157,7 +157,7 @@ variable "disk{$index+1}_size" {lb}
 {@param? deployInput: DeployInputSpec}
 {let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
 $spec.getDeviceNameSuffix()!.getName() :
-(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?: "") /}
+(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?? "") /}
 resource "google_compute_disk" "disk{$index + 1}" {lb}
   name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceName}"
   type = var.disk{$index + 1}_type
@@ -192,7 +192,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
   {@param localSsdSpec: LocalSsdSpec}
   {@param? deployInput: DeployInputSpec}
   {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
-  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?: 0)/}
+  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?? 0)/}
   {for $i in range(0, $count)}
   scratch_disk {lb}
     interface = "SCSI"
@@ -269,13 +269,13 @@ variable "{$field.getName()}" {lb}
   {let $box: $field.getIntegerBox()/}
   type        = number
   {if $box.getDefaultValue()}
-  default     = {$box.getDefaultValue().getValue() ?: 0}
+  default     = {$box.getDefaultValue().getValue() ?? 0}
   {/if}
 {elseif $field.getIntegerDropdown()}
   {let $dropdown: $field.getIntegerDropdown()/}
   type        = number
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default     = {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
 {elseif $field.getStringBox()}
@@ -294,14 +294,14 @@ variable "{$field.getName()}" {lb}
   {let $dropdown: $field.getStringDropdown()/}
   type        = string
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default     = "{$dropdown.getValuesList()[$defaultIndex]}"
   {/if}
 {elseif $field.getZoneDropdown()}
   {let $dropdown: $field.getZoneDropdown()/}
   type        = string
   {if $dropdown.getDefaultValue()}
-  default     = "{$dropdown.getDefaultValue().getValue() ?: ''}"
+  default     = "{$dropdown.getDefaultValue().getValue() ?? ''}"
   {/if}
 {/if}
 {rb}

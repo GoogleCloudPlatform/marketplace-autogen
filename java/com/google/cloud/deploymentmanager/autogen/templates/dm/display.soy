@@ -243,7 +243,7 @@ Open {$firewallTitle} traffic{nil}
   {let $instanceCount kind="text"}
     properties().{'instanceCount' |tierprefixed: $tier}"]{nil}
   {/let}
-  {let $vmIndex: $spec.getIndex() ?: 0/}
+  {let $vmIndex: $spec.getIndex() ?? 0/}
   {if $vmIndex >= 0}
     outputs()["{$prefix}" + {$vmIndex}]{nil}
   {else}
