@@ -23,6 +23,8 @@ resource "google_compute_instance" "instance" {
   tags = ["${var.goog_cm_deployment_name}-deployment"]
 
   boot_disk {
+    device_name = "wordpress-vm-tmpl-boot-disk"
+
     initialize_params {
       size = var.boot_disk_size
       type = var.boot_disk_type
