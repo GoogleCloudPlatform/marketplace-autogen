@@ -83,7 +83,7 @@ variable "networks" {
 variable "sub_networks" {
   description = "The sub network name to attach the VM instance."
   type        = list(string)
-  default     = ["default"]
+  default     = []
 }
 
 variable "external_ips" {

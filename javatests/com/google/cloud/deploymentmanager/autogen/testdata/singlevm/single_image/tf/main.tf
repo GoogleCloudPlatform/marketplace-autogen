@@ -5,8 +5,8 @@ provider "google" {
 locals {
   network_interfaces_map = { for i, n in var.networks : n => {
     network     = n,
-    subnetwork  = element(var.sub_networks, i)
-    external_ip = element(var.external_ips, i)
+    subnetwork  = length(var.sub_networks) > i ? element(var.sub_networks, i) : null
+    external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     }
   }
 
