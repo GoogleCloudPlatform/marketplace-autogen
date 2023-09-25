@@ -40,6 +40,8 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
   {rb}
 {\n}
   source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
+{\n}
+  target_tags = ["{call util.deploymentTag /}"]
 {rb}
 {/template}
 

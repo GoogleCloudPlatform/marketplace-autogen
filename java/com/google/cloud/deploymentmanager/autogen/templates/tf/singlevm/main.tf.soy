@@ -51,6 +51,8 @@ resource "google_compute_instance" "instance" {lb}
   machine_type = var.machine_type
   zone = var.zone
 {\n}
+  tags = ["{call util.deploymentTag /}"]
+{\n}
   boot_disk {lb}
     initialize_params {lb}
       size = var.boot_disk_size

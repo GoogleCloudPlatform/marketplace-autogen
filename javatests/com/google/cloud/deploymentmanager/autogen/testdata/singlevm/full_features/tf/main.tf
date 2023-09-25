@@ -57,6 +57,8 @@ resource "google_compute_instance" "instance" {
   machine_type = var.machine_type
   zone = var.zone
 
+  tags = ["${var.goog_cm_deployment_name}-deployment"]
+
   boot_disk {
     initialize_params {
       size = var.boot_disk_size
@@ -134,6 +136,8 @@ resource "google_compute_firewall" tcp_80 {
   }
 
   source_ranges =  compact([for range in split(",", var.tcp_80_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.goog_cm_deployment_name}-deployment"]
 }
 
 resource "google_compute_firewall" tcp_443 {
@@ -148,6 +152,8 @@ resource "google_compute_firewall" tcp_443 {
   }
 
   source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.goog_cm_deployment_name}-deployment"]
 }
 
 resource "google_compute_firewall" icmp {
@@ -161,6 +167,8 @@ resource "google_compute_firewall" icmp {
   }
 
   source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.goog_cm_deployment_name}-deployment"]
 }
 
 resource "random_password" "admin" {
