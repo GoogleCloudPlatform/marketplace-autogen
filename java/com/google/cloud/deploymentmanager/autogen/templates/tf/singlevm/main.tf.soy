@@ -18,6 +18,11 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
     {param deployInput: $spec.getDeployInput() /}
   {/call}
 {/let}
+{let $stackdriverMetadata}
+  {call blocks.stackdriverMetadata}
+    {param stackdriver: $spec.getStackdriver() /}
+  {/call}
+{/let}
 
 provider "google" {lb}
   project = var.project_id
@@ -37,6 +42,9 @@ locals {lb}
   {/if}
   {if $gceMetadata}
     {$gceMetadata |indent: 4}
+  {/if}
+  {if $stackdriverMetadata}
+    {$stackdriverMetadata |indent: 4}
   {/if}
   {rb}
 {rb}

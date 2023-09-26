@@ -86,4 +86,6 @@ variable "external_ips" {lb}
 {if $spec.getDeployInput()}
   {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
 {/if}
+
+{call blocks.stackdriverVariables}{param stackdriver: $spec.getStackdriver() /}{/call}
 {/template}

@@ -209,3 +209,15 @@ variable "extraLbZone0" {
 variable "extraLbZone1" {
   type        = string
 }
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = true
+}
+
+variable "enable_cloud_monitoring" {
+  description = "Enables Cloud Monitoring."
+  type        = bool
+  default     = false
+}

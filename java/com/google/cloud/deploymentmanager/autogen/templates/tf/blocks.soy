@@ -336,6 +336,42 @@ variable "{$field.getName()}" {lb}
 {/for}
 {/template}
 
+{template stackdriverMetadata kind="text"}
+{@param? stackdriver: StackdriverSpec}
+google-logging-enable = {nil}
+{if $stackdriver?.getLogging()}
+var.enable_cloud_logging ? "1" : "0"
+{else}
+"0"
+{/if}
+google-monitoring-enable = {nil}
+{if $stackdriver?.getMonitoring()}
+var.enable_cloud_monitoring ? "1" : "0"{nil}
+{else}
+"0"{nil}
+{/if}
+{/template}
+
+{template stackdriverVariables kind="text"}
+{@param? stackdriver: StackdriverSpec}
+{if $stackdriver?.getLogging()}
+{\n}
+variable "enable_cloud_logging" {lb}
+  description = "{constants.ENABLE_CLOUD_LOGGING_VAR_DESC}"
+  type        = bool
+  default     = {$stackdriver?.getLogging()!.getDefaultOn()}
+{rb}
+{/if}
+{if $stackdriver?.getMonitoring()}
+{\n}
+variable "enable_cloud_monitoring" {lb}
+  description = "{constants.ENABLE_CLOUD_MONITORING_VAR_DESC}"
+  type        = bool
+  default     = {$stackdriver?.getMonitoring()!.getDefaultOn()}
+{rb}
+{/if}
+{/template}
+
 {template passwordOutputsReadme kind="text"}
   {@param specList: list<PasswordSpec>}
   {@param? deployInput: DeployInputSpec}

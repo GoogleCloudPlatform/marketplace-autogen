@@ -12,6 +12,8 @@ locals {
 
   metadata = {
     bitnami-base-password = random_password.admin.result
+    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
+    google-monitoring-enable = "0"
   }
 }
 

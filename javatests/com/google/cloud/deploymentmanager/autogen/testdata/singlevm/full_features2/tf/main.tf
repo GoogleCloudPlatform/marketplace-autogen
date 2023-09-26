@@ -25,6 +25,8 @@ locals {
     cache-expiration-minutes = var.cacheExpiration
     extra-lb-zone0 = var.extraLbZone0
     extra-lb-zone1 = var.extraLbZone1
+    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
+    google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
   }
 }
 

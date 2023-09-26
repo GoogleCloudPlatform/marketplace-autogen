@@ -84,3 +84,9 @@ variable "localSsdsCount" {
   type        = number
   default     = 0
 }
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = false
+}
