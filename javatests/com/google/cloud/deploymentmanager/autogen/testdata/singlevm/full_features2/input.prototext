@@ -114,7 +114,7 @@ spec {
           default_size_gb: 1000
           min_size_gb: 20
         }
-        display_label: "The super-extra-great disk"
+        display_label: "The \"super-extra-great\" disk"
       },
       {
         device_name_suffix {
@@ -303,6 +303,10 @@ spec {
       key: "user-username"
       value: "user@local"
     }
+    gce_metadata_items: {
+      key: "json_string"
+      value: "{\"foo\": \"bar\"}"
+    }
     gce_metadata_items {
       key: "some-other-domain-metadata"
       value_from_deploy_input_field: "domain"
@@ -345,7 +349,7 @@ spec {
         fields {
           name: "domain"
           title: "Domain"
-          description: "Your Wordpress blog domain"
+          description: "Your Wordpress \"blog\" domain"
           tooltip: "Register your own domain with <a href='http://domains.google'>Google</a>"
           required: true
           string_box {
@@ -360,7 +364,7 @@ spec {
         fields {
           name: "adminEmailAddress"
           title: "Administrator e-mail address"
-          tooltip: "The e-mail address used to create the administrator account for WordPress."
+          tooltip: "The e-mail address used to create the \"administrator account\" for WordPress."
           required: true
           email_box {
             validation {

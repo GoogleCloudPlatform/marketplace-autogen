@@ -16,6 +16,7 @@ locals {
     optional-password = random_password.this_is_optional.result
     admin-username = "admin@local"
     user-username = "user@local"
+    json_string = "{\"foo\": \"bar\"}"
     some-other-domain-metadata = var.domain
     install-phpmyadmin = var.installPhpMyAdmin
     image-caching = var.imageCaching
@@ -35,7 +36,7 @@ resource "google_compute_disk" "disk1" {
   type = var.disk1_type
   zone = var.zone
   size = var.disk1_size
-  description = "The super-extra-great disk"
+  description = "The \"super-extra-great\" disk"
 }
 
 resource "google_compute_disk" "disk2" {

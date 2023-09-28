@@ -39,13 +39,13 @@ variable "boot_disk_size" {
 }
 
 variable "disk1_type" {
-  description = "The super-extra-great disk"
+  description = "The \"super-extra-great\" disk"
   type        = string
   default     = "pd-standard"
 }
 
 variable "disk1_size" {
-  description = "The super-extra-great disk size in GB"
+  description = "The \"super-extra-great\" disk size in GB"
   type        = number
   default     = 1000
 }
@@ -141,12 +141,12 @@ variable "accelerator_count" {
 }
 
 variable "domain" {
-  description = "Your Wordpress blog domain"
+  description = "Your Wordpress \"blog\" domain"
   type        = string
 }
 
 variable "adminEmailAddress" {
-  description = "The e-mail address used to create the administrator account for WordPress."
+  description = "The e-mail address used to create the \"administrator account\" for WordPress."
   type        = string
 }
 

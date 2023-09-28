@@ -88,11 +88,11 @@ spec:
       varType: string
       required: true
     - name: disk1_size
-      description: The super-extra-great disk size in GB
+      description: The "super-extra-great" disk size in GB
       varType: number
       defaultValue: 1000
     - name: disk1_type
-      description: The super-extra-great disk
+      description: The "super-extra-great" disk
       varType: string
       defaultValue: pd-standard
     - name: disk2_size
@@ -112,7 +112,7 @@ spec:
       varType: string
       defaultValue: pd-standard
     - name: domain
-      description: Your Wordpress blog domain
+      description: Your Wordpress "blog" domain
       required: true
       varType: string
     - name: adminEmailAddress

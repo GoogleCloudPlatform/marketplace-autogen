@@ -219,7 +219,7 @@ spec:
         domain:
           name: domain
           title: Domain
-          subtext: Your Wordpress blog domain
+          subtext: Your Wordpress "blog" domain
           tooltip: Register your own domain with <a href='http://domains.google'>Google</a>
           placeholder: mydomain.com
           regexValidation: '[a-zA-Z0-9-]+.[a-z]{2,}'
@@ -227,7 +227,7 @@ spec:
         adminEmailAddress:
           name: adminEmailAddress
           title: Administrator e-mail address
-          tooltip: The e-mail address used to create the administrator account for WordPress.
+          tooltip: The e-mail address used to create the "administrator account" for WordPress.
           placeholder: user@example.com
           validation: Please enter a valid email address
           xGoogleProperty:

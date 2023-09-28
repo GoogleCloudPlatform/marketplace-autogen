@@ -128,13 +128,13 @@ variable "accelerator_count" {lb}
   {/call}
 {/let}
 variable "disk{$index+1}_type" {lb}
-  description = "{$spec.getDisplayLabel()}"
+  description = "{$spec.getDisplayLabel() |doublequoted}"
   type        = string
   default     = "{$spec.getDiskType()!.getDefaultType()}"
 {rb}
 {\n}
 variable "disk{$index+1}_size" {lb}
-  description = "{$diskSizeDescription}"
+  description = "{$diskSizeDescription |doublequoted}"
   type        = number
   default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
 {rb}
@@ -165,7 +165,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size
-  description = "{$spec.getDisplayLabel()}"
+  description = "{$spec.getDisplayLabel() |doublequoted}"
 {rb}
 {/template}
 
@@ -257,9 +257,9 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 {@param field: DeployInputField}
 variable "{$field.getName()}" {lb}
 {if $field.getDescription()}
-  description = "{$field.getDescription()}"
+  description = "{$field.getDescription() |doublequoted}"
 {elseif $field.getTooltip()}
-  description = "{$field.getTooltip()}"
+  description = "{$field.getTooltip() |doublequoted}"
 {/if}
 {if $field.getBooleanCheckbox()}
   type        = bool
@@ -322,7 +322,7 @@ variable "{$field.getName()}" {lb}
 {$metadata.getKey()} = {nil}
 
   {if $metadata.getValue()}
-  "{$metadata.getValue()}"{nil}
+  "{$metadata.getValue() |doublequoted}"{nil}
 
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
@@ -446,21 +446,21 @@ variable "enable_cloud_monitoring" {lb}
 
 {if $password.getUsername()}
 output "{$sanitizedPasswordLabel}_user" {lb}
-  description = "{$usernameDescription}"
+  description = "{$usernameDescription |doublequoted}"
   value       = "{$password.getUsername()}"
 {rb}
 {\n}
 {elseif $password.getUsernameFromDeployInputField()}
 {let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
 output "{$sanitizedPasswordLabel}_user" {lb}
-  description = "{$usernameDescription}"
+  description = "{$usernameDescription |doublequoted}"
   value       = var.{$field.getName()}
 {rb}
 {\n}
 {/if}
 
 output "{$sanitizedPasswordLabel}_password" {lb}
-  description = "{$passwordDescription}"
+  description = "{$passwordDescription |doublequoted}"
   value       = random_password.{$sanitizedPasswordLabel}.result
   sensitive   = true
 {rb}
