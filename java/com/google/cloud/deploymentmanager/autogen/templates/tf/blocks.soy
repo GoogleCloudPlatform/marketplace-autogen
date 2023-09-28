@@ -326,7 +326,12 @@ variable "{$field.getName()}" {lb}
 
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
+  // Convert boolean "true" -> "True" for regression purposes
+  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  title(var.{$field.getName()}){nil}
+  {else}
   var.{$field.getName()}{nil}
+  {/if}
 
   {/if /* $metadata.value */}
 

@@ -18,10 +18,10 @@ locals {
     user-username = "user@local"
     json_string = "{\"foo\": \"bar\"}"
     some-other-domain-metadata = var.domain
-    install-phpmyadmin = var.installPhpMyAdmin
+    install-phpmyadmin = title(var.installPhpMyAdmin)
     image-caching = var.imageCaching
-    image-compression = var.imageCompression
-    image-sizing = var.imageSizing
+    image-compression = title(var.imageCompression)
+    image-sizing = title(var.imageSizing)
     image-cache-size = var.imageCacheSize
     cache-expiration-minutes = var.cacheExpiration
     extra-lb-zone0 = var.extraLbZone0
