@@ -12,10 +12,29 @@ goog_cm_deployment_name = "test-deployment"{\n}
 {$entry.key} = "{$entry.value}"{\n}
 {/for}
 
-{let $testDefaultedFields: $spec.getDeployInput() ? findInputsWithTestDefaultValues($spec.getDeployInput()) : [] /}
-
-{for $field in $testDefaultedFields}
-{$field.getName()} = "{findInputTestDefaultValue($field)}"{\n}
+{let $fields: $spec.getDeployInput() ? listDeployInputFields($spec.getDeployInput()) : []/}
+{for $field in $fields}
+// Set test values for deploy input fields with a specified test default value,
+// or missing a default value. This differs from the DM implementation because TF will
+// fail if a variable is missing a default value, while DM will use the falsy value of the type.
+{if $field.getStringBox()}
+  {let $box: $field.getStringBox()/}
+  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+{$field.getName()} = "{$box.getTestDefaultValue()}"{\n}
+  {/if}
+{/if}
+{if $field.getIntegerBox()}
+  {let $box: $field.getIntegerBox()/}
+  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+{$field.getName()} = {$box.getTestDefaultValue()?.getValue() ?? 0}{\n}
+  {/if}
+{/if}
+{if $field.getEmailBox()}
+  {let $box: $field.getEmailBox()/}
+  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+{$field.getName()} = "{$box.getTestDefaultValue()}"{\n}
+  {/if}
+{/if}
 {/for}
 
 {/template}
