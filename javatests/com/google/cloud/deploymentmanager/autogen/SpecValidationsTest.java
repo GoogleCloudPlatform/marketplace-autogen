@@ -438,6 +438,22 @@ public class SpecValidationsTest {
   }
 
   @Test
+  public void firewallRulesIcmpMustNotHavePort_single() {
+    expectIllegalArgumentException("ICMP firewall rule must not specify a port");
+    SingleVmDeploymentPackageSpec.Builder builder = newSingleSpecWithDefaults();
+    builder.addFirewallRules(firewallRuleIcmpWithPort());
+    validate(builder.build());
+  }
+
+  @Test
+  public void firewallRulesIcmpMustNotHavePort_multi() {
+    expectIllegalArgumentException("ICMP firewall rule must not specify a port");
+    MultiVmDeploymentPackageSpec.Builder builder = newMultiSpecWithDefaults();
+    builder.getTiersBuilder(0).addFirewallRules(firewallRuleIcmpWithPort());
+    validate(builder.build());
+  }
+
+  @Test
   public void validFirewallRules_single() {
     ImmutableList<FirewallRuleSpec> firewallRules =
         ImmutableList.of(
@@ -1832,6 +1848,14 @@ public class SpecValidationsTest {
         .build();
   }
 
+  private static FirewallRuleSpec firewallRuleIcmpWithPort() {
+    return FirewallRuleSpec.newBuilder()
+        .setProtocol(FirewallRuleSpec.Protocol.ICMP)
+        .setPort("8080")
+        .setAllowedSource(TrafficSource.PUBLIC)
+        .build();
+  }
+
   private static FirewallRuleSpec firewallRuleWithoutAllowedSource() {
     return FirewallRuleSpec.newBuilder()
         .setProtocol(FirewallRuleSpec.Protocol.TCP)
@@ -1858,7 +1882,6 @@ public class SpecValidationsTest {
   private static FirewallRuleSpec firewallRuleWithDeploymentSource() {
     return FirewallRuleSpec.newBuilder()
         .setProtocol(FirewallRuleSpec.Protocol.ICMP)
-        .setPort("443")
         .setAllowedSource(TrafficSource.DEPLOYMENT)
         .build();
   }

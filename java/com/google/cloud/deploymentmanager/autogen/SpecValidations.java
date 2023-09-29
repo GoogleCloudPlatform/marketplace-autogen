@@ -224,6 +224,9 @@ final class SpecValidations {
       checkArgument(
           rule.getProtocol() != FirewallRuleSpec.Protocol.PROTOCOL_UNSPECIFIED,
           "A firewall rule must have a valid protocol");
+      checkArgument(
+          !rule.getProtocol().equals(FirewallRuleSpec.Protocol.ICMP) || rule.getPort().isEmpty(),
+          "ICMP firewall rule must not specify a port");
     }
   }
 
