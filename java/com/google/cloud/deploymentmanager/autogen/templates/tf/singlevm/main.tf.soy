@@ -85,7 +85,7 @@ resource "google_compute_instance" "instance" {lb}
   {/call}
 {/if}
 {if $spec.getIpForwarding()}
-  can_ip_forward = {not $spec.getIpForwarding().getDefaultOff()}
+  can_ip_forward = var.ip_forward
 {\n}
 {/if}
   metadata = local.metadata

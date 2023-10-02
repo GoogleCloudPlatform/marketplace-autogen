@@ -98,7 +98,7 @@ resource "google_compute_instance" "instance" {
     interface = "SCSI"
   }
 
-  can_ip_forward = false
+  can_ip_forward = var.ip_forward
 
   metadata = local.metadata
 

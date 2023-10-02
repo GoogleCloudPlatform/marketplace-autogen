@@ -74,6 +74,15 @@ variable "external_ips" {lb}
   default     = ["EPHEMERAL"]
 {rb}
 
+
+{if $spec.getIpForwarding()}
+{\n}
+  {call blocks.ipForwardingVariable}
+    {param name: "ip_forward" /}
+    {param ipForwarding: $spec.getIpForwarding() /}
+  {/call}
+{/if}
+
 {call blocks.firewallVariables}{param specList: $spec.getFirewallRulesList()/}{/call}
 
 {if solutionHasGpus($spec)}

@@ -485,3 +485,17 @@ output "{$sanitizedPasswordLabel}_password" {lb}
     ]
   {rb}
 {/template}
+
+
+/**
+ * Produces a variable for enabling/disabling IP Forwarding.
+ */
+{template ipForwardingVariable kind="text"}
+{@param name: string}
+{@param ipForwarding: IpForwardingSpec}
+variable "ip_forward" {lb}
+  description = "{constants.IP_FORWARD_VAR_DESC}"
+  type        = bool
+  default     = {not $ipForwarding!.getDefaultOff()}
+{rb}
+{/template}

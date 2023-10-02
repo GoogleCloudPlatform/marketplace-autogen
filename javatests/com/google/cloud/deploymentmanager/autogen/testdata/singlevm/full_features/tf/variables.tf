@@ -93,6 +93,12 @@ variable "external_ips" {
   default     = ["EPHEMERAL"]
 }
 
+variable "ip_forward" {
+  description = "Whether to allow sending and receiving of packets with non-matching source or destination IPs."
+  type        = bool
+  default     = false
+}
+
 variable "enable_tcp_80" {
   description = "Allow HTTP traffic from the Internet"
   type        = bool
