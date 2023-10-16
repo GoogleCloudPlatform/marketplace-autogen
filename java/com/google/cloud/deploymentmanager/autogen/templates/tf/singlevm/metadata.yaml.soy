@@ -33,6 +33,14 @@ spec:
     actuationTool:
       flavor: Terraform
       version: '>= 0.13'
+    {if $solutionInfo}
+      {let $softwareGroups kind="text"}
+        {call blocks.softwareGroups}
+          {param solutionInfo: $solutionInfo /}
+        {/call}
+      {/let}
+      {$softwareGroups |indent: 4, true}{nil}
+    {/if}
   interfaces:
     variables:
     {let $projectIdProp kind="text"}

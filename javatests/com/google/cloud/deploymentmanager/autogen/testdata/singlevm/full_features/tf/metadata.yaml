@@ -11,6 +11,28 @@ spec:
     actuationTool:
       flavor: Terraform
       version: '>= 0.13'
+    softwareGroups:
+    - type: SG_OS
+      software:
+      - title: Debian
+        version: 8
+    - software:
+      - title: Apache
+        version: 2.4.23
+      - title: MySQL
+        version: 5.7.13
+      - title: OpenSSL
+        version: 1.0.2h
+      - title: PHP
+        version: 7.0.9
+      - title: phpMyAdmin
+        version: 4.6.3
+      - title: SQLite
+        version: 3.7.15.1
+      - title: Varnish
+        version: 4.1.0
+      - title: WordPress
+        version: 4.5.3
   interfaces:
     variables:
     - name: project_id

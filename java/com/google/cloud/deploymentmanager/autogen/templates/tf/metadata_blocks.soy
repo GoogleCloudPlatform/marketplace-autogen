@@ -3,6 +3,7 @@
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 
 
 {template projectIdProperty kind="text"}
@@ -271,4 +272,33 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/if}
 - name: {$sanitizedPasswordLabel}_password
   description: {$passwordDescription}
+{/template}
+
+
+{template softwareGroups kind="text"}
+{@param solutionInfo: SolutionMarketingInfo}
+{if $solutionInfo?.getPackagedSoftwareGroupsList()}
+softwareGroups:
+{for $softwareGroup in $solutionInfo.getPackagedSoftwareGroupsList()}
+{switch $softwareGroup.getType()}
+{case 1}
+- type: SG_OS
+  software:
+{default}
+- software:
+{/switch}
+{for $component in $softwareGroup.getComponentsList()}
+  - title: {$component.getName()}
+    {if $component.getVersion()}
+    version: {$component.getVersion()}
+    {/if}
+    {if $component.getUrl()}
+    url: {$component.getUrl()}
+    {/if}
+    {if $component.getLicenseUrl()}
+    licenseUrl: {$component.getLicenseUrl()}
+    {/if}
+{/for}
+{/for}
+{/if}
 {/template}
