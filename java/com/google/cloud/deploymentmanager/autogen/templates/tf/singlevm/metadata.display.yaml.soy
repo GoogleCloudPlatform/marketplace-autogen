@@ -138,9 +138,16 @@ spec:
       - name: boot_disk
         title: Boot Disk
         tooltip: Each instance requires a disk to boot from.
+      {if length($spec.getAdditionalDisksList()) == 1}
+      - name: additional_disks
+        title: Additional Disk
+        tooltip: The additional disk will be attached to the instance.
+      {/if}
+      {if length($spec.getAdditionalDisksList()) > 1}
       - name: additional_disks
         title: Additional Disks
         tooltip: The additional disks will be attached to the instance.
+      {/if}
       - name: networking
         title: Networking
       {let $deploymentInputBottomSections kind="text"}
