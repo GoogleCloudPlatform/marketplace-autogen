@@ -9,8 +9,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template main kind="text"}
 {@param solutionId: string}
 {@param spec: MultiVmDeploymentPackageSpec}
-{@param? solutionInfo: SolutionMarketingInfo}
-{@param? templateVersion: string}
+{@param? solutionInfo: SolutionMarketingInfo|null}
+{@param? templateVersion: string|null}
 
 imports:
   {for $tier in $spec.getTiersList()}

@@ -107,7 +107,7 @@ variable "accelerator_count" {lb}
 
 {template additionalDiskVariables kind="text"}
 {@param diskSpecs: list<DiskSpec>}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskVariable}
       {param spec: $spec /}
@@ -121,7 +121,7 @@ variable "accelerator_count" {lb}
 {template additionalDiskVariable kind="text"}
 {@param spec: DiskSpec}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
@@ -142,7 +142,7 @@ variable "disk{$index+1}_size" {lb}
 
 {template additionalDiskResources kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskResource}
       {param spec: $spec /}
@@ -156,7 +156,7 @@ variable "disk{$index+1}_size" {lb}
 {template additionalDiskResource kind="text"}
 {@param spec: DiskSpec}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
 $spec.getDeviceNameSuffix()!.getName() :
 (findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?? "") /}
@@ -171,7 +171,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisks kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call attachDisk}
       {param index: $index /}
@@ -183,7 +183,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisk kind="text"}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
   attached_disk {lb}
     source      = google_compute_disk.disk{$index + 1}.id
     device_name = google_compute_disk.disk{$index + 1}.name
@@ -192,7 +192,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template localSsds kind="text"}
   {@param localSsdSpec: LocalSsdSpec}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
   {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?? 0)/}
   {for $i in range(0, $count)}
@@ -317,7 +317,7 @@ variable "{$field.getName()}" {lb}
  */
 {template gceMetadata kind="text"}
 {@param specList: list<GceMetadataItem>}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {for $metadata, $index in $specList}
 {$metadata.getKey()} = {nil}
 
@@ -342,7 +342,7 @@ variable "{$field.getName()}" {lb}
 {/template}
 
 {template stackdriverMetadata kind="text"}
-{@param? stackdriver: StackdriverSpec}
+{@param? stackdriver: StackdriverSpec|null}
 google-logging-enable = {nil}
 {if $stackdriver?.getLogging()}
 var.enable_cloud_logging ? "1" : "0"
@@ -358,7 +358,7 @@ var.enable_cloud_monitoring ? "1" : "0"{nil}
 {/template}
 
 {template stackdriverVariables kind="text"}
-{@param? stackdriver: StackdriverSpec}
+{@param? stackdriver: StackdriverSpec|null}
 {if $stackdriver?.getLogging()}
 {\n}
 variable "enable_cloud_logging" {lb}
@@ -379,7 +379,7 @@ variable "enable_cloud_monitoring" {lb}
 
 {template passwordOutputsReadme kind="text"}
   {@param specList: list<PasswordSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
 
   {for $spec, $index in $specList}
     {call passwordOutputReadme}
@@ -391,7 +391,7 @@ variable "enable_cloud_monitoring" {lb}
 
 {template passwordOutputReadme kind="text"}
 {@param password: PasswordSpec}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $sanitizedPasswordLabel}
   {call util.sanitizePasswordLabel}
     {param spec: $password /}
@@ -419,7 +419,7 @@ variable "enable_cloud_monitoring" {lb}
 
 {template passwordOutputs kind="text"}
   {@param specList: list<PasswordSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
 
   {for $spec, $index in $specList}
     {\n}
@@ -432,7 +432,7 @@ variable "enable_cloud_monitoring" {lb}
 
 {template passwordOutput kind="text"}
 {@param password: PasswordSpec}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $sanitizedPasswordLabel}
   {call util.sanitizePasswordLabel}
     {param spec: $password /}

@@ -9,8 +9,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
 {@param solutionId: string}
-{@param? solutionInfo: SolutionMarketingInfo}
-{@param? templateVersion: string}
+{@param? solutionInfo: SolutionMarketingInfo|null}
+{@param? templateVersion: string|null}
 
 apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: BlueprintMetadata

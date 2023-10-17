@@ -22,7 +22,7 @@ goog_cm_deployment_name:
 {template bootDiskPropertiesDisplay kind="text"}
 {@param spec: DiskSpec}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {'boot_disk_size' |tierprefixed: $tier}:
   name: {'boot_disk_size' |tierprefixed: $tier}
   title: Boot disk size in GB
@@ -48,7 +48,7 @@ goog_cm_deployment_name:
 
 {template zonePropertyDisplay kind="text"}
 {@param name: string}
-{@param? zoneSpec: ZoneSpec}
+{@param? zoneSpec: ZoneSpec|null}
 {$name}:
   name: {$name}
   title: Zone
@@ -76,7 +76,7 @@ goog_cm_deployment_name:
 {template imagePropertyDisplay kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Source Image
@@ -89,7 +89,7 @@ goog_cm_deployment_name:
 {@param name: string}
 {@param spec: MachineTypeSpec}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Machine type
@@ -111,7 +111,7 @@ goog_cm_deployment_name:
 {template acceleratorPropertiesDisplay kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$namePrefix + '_type' |tierprefixed: $tier}:
   name: {$namePrefix + '_type' |tierprefixed: $tier}
   title: Accelerator type
@@ -137,7 +137,7 @@ goog_cm_deployment_name:
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
 {@param spec: NetworkInterfacesSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
 {$networkPropName}:
   name: {$networkPropName}
@@ -177,7 +177,7 @@ goog_cm_deployment_name:
 
 {template firewallPropertiesDisplay kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
@@ -216,7 +216,7 @@ goog_cm_deployment_name:
 {template ipForwardingPropertyDisplay kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: IP forwarding
@@ -284,7 +284,7 @@ disk{$index+1}_type:
 {template deployInputFieldDisplay visibility="private" kind="text"}
 {@param section: DeployInputSection}
 {@param field: DeployInputField}
-{@param? tierList: list<VmTierSpec>}
+{@param? tierList: list<VmTierSpec>|null}
 {$field.getName()}:
   name: {$field.getName() |yamlprimitive: 2}
   {if $field.getTitle()}
@@ -362,7 +362,7 @@ disk{$index+1}_type:
 // Deploy input custom sections utilities
 
 {template topSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {call customSectionsHelper}
   {param spec: $spec/}
   {param placement: DeployInputSection.Placement.CUSTOM_TOP/}
@@ -371,7 +371,7 @@ disk{$index+1}_type:
 
 
 {template bottomSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {call customSectionsHelper}
   {param spec: $spec/}
   {param placement: DeployInputSection.Placement.CUSTOM_BOTTOM/}
@@ -380,7 +380,7 @@ disk{$index+1}_type:
 
 
 {template customSectionsHelper visibility="private" kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {@param placement: DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.getSectionsList()}

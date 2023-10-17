@@ -24,7 +24,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template bootDiskProperties kind="text"}
 {@param spec: DiskSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {'boot_disk_size' |tierprefixed: $tier}
   description: {constants.BOOT_DISK_SIZE_VAR_DESC}
   varType: string
@@ -39,7 +39,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template zoneProperty kind="text"}
 {@param name: string}
-{@param? zoneSpec: ZoneSpec}
+{@param? zoneSpec: ZoneSpec|null}
 - name: {$name}
   description: {constants.ZONE_VAR_DESC}
   varType: string
@@ -52,7 +52,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template imageProperty kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   description: {constants.SOURCE_IMAGE_VAR_DESC}
   varType: string
@@ -63,7 +63,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template machineTypeProperty kind="text"}
 {@param name: string}
 {@param spec: MachineTypeSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   description: {constants.MACHINE_TYPE_VAR_DESC}
   varType: string
@@ -74,7 +74,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template acceleratorProperties kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$namePrefix + '_type' |tierprefixed: $tier}
   description: {constants.ACCELERATOR_TYPE_VAR_DESC}
   varType: string
@@ -89,7 +89,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template networkProperties kind="text"}
 {@param nameSuffix: string}
 {@param spec: NetworkInterfacesSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
 - name: {$networkPropName}
   description: {constants.NETWORKS_VAR_DESC}
@@ -111,7 +111,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template firewallProperties kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
@@ -138,7 +138,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template ipForwardingProperty kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
@@ -174,7 +174,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template deployInputProperties kind="text"}
 {@param inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 // TODO: support tiers section for multi-VMs
 {let $fields: listDeployInputFields($inputSpec)/}
 {for $field in $fields}

@@ -6,7 +6,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 /** Constructs all firewall resources. */
 {template firewallResources kind="text"}
 {@param specList: list<FirewallRuleSpec>}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {for $spec in $specList}
 {call firewallResource}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/for}
@@ -16,7 +16,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 /** Constructs a firewall resource. */
 {template firewallResource kind="text" /* visibility="private" */}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 /* Note that prop names don't take into account the tier. */
 {let $propName kind="text"}
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: null/}{/call}
@@ -62,7 +62,7 @@ sourceRanges: ["0.0.0.0/0"]
  */
 {template firewallRuleSource kind="text"}
   {@param spec: FirewallRuleSpec}
-  {@param? tierSpec: VmTierSpec}
+  {@param? tierSpec: VmTierSpec|null}
   {switch $spec.getAllowedSource()}
     {case FirewallRuleSpec.TrafficSource.PUBLIC}
       {call firewallRuleSpecPublicSource data="all"/}
@@ -76,7 +76,7 @@ sourceRanges: ["0.0.0.0/0"]
 
 /** Source for firewall rule with source Traffic.Tier */
 {template firewallRuleSpecTierSource kind="text"}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {if $tierSpec}
 sourceTags:
   - {call utilities.tierTag data="all"} {param spec: $tierSpec /}{/call}{nil}
@@ -86,7 +86,7 @@ sourceTags:
 
 /** Source for firewall rule with source Traffic.Deployment */
 {template firewallRuleSpecDeploymentSource kind="text"}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {if $tierSpec}
 sourceTags:
   - {{ env["deployment"] }}-deployment{nil}
@@ -97,7 +97,7 @@ sourceTags:
 /** Creates Firewall check box and range input field for a Firewall rule spec */
 {template firewallProps kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call utilities.firewallRulePropName}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}
 {/let}
@@ -224,18 +224,18 @@ sourceTags:
 
 /** Constructs waiter resources. */
 {template startupScriptAndWaiterResources kind="text"}
-{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec}
-{@param? startupSpec: GceStartupScriptSpec}
-{@param? enableJinjaVarName: string}
+{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec|null}
+{@param? startupSpec: GceStartupScriptSpec|null}
+{@param? enableJinjaVarName: string|null}
 /*
  * Only one of the following should be specified:
  * - No dependencies
  * - dependsOnList
  * - Both dependsOnTierSpec and dependsOnTierInstanceCountJinjaVarName
  */
-{@param? dependsOnList: list<string>}
-{@param? dependsOnTierSpec: VmTierSpec}
-{@param? dependsOnTierInstanceCountJinjaVarName: string}
+{@param? dependsOnList: list<string>|null}
+{@param? dependsOnTierSpec: VmTierSpec|null}
+{@param? dependsOnTierInstanceCountJinjaVarName: string|null}
 {if $waiterSpec}
 
 {if $enableJinjaVarName}
@@ -298,8 +298,8 @@ sourceTags:
 
 
 {template startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
-{@param? startupSpec: GceStartupScriptSpec}
-{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: GceStartupScriptSpec|null}
+{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec|null}
 {if $startupSpec?.getBashScriptContent() and not $waiterSpec?.getScript()}
 - key: startup-script
   value: |-
@@ -314,8 +314,8 @@ sourceTags:
  * that are included conditionally (depending on waiter being enabled or not).
  */
 {template startupScriptAndWaiterMetadataItemsConditional kind="text"}
-{@param? startupSpec: GceStartupScriptSpec}
-{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec}
+{@param? startupSpec: GceStartupScriptSpec|null}
+{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec|null}
 {@param statusWaiterEnabled: bool}
 
 {if $statusWaiterEnabled}
@@ -367,8 +367,8 @@ sourceTags:
 /** List all metadata items for GceMetadataItem specs. */
 {template gceMetadataItems kind="text"}
 {@param specList: list<GceMetadataItem>}
-{@param? tierSpecList: list<VmTierSpec>}
-{@param? deployInput: DeployInputSpec}
+{@param? tierSpecList: list<VmTierSpec>|null}
+{@param? deployInput: DeployInputSpec|null}
 {for $metadata in $specList}
 - key: {$metadata.getKey() |yamlprimitive: 2}
 
@@ -441,7 +441,7 @@ enableStackdriverMonitoring:
 
 /** Renders Stackdriver's metadata items. */
 {template stackdriverMetadataItems kind="text"}
-{@param? stackdriver: StackdriverSpec}
+{@param? stackdriver: StackdriverSpec|null}
 {if $stackdriver?.getLogging()}
 - key: google-logging-enable
   value: {{ enableStackdriverLogging }}
@@ -456,7 +456,7 @@ enableStackdriverMonitoring:
 /** Defines serviceAccounts section of a VM. */
 {template serviceAccountsSection kind="text"}
 {@param gcpAuthScopesList: list<GcpAuthScopeSpec>}
-{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec}
+{@param? waiterSpec: ApplicationStatusSpec.WaiterSpec|null}
 serviceAccounts:
   - email: default
     scopes:
@@ -480,7 +480,7 @@ serviceAccounts:
 
 {template zonePropertySchema kind="text"}
 {@param name: string}
-{@param? zoneSpec: ZoneSpec}
+{@param? zoneSpec: ZoneSpec|null}
 {$name}:
   type: string
   {if $zoneSpec and $zoneSpec.getDefaultZone()}
@@ -510,7 +510,7 @@ serviceAccounts:
 {template imagePropertySchema kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   type: string
   enum:
@@ -526,7 +526,7 @@ serviceAccounts:
 {template machineTypePropertySchema kind="text"}
 {@param name: string}
 {@param spec: MachineTypeSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   type: string
   default: {$spec.getDefaultMachineType()!.getGceMachineType()}
@@ -548,7 +548,7 @@ serviceAccounts:
 {template acceleratorPropertiesSchema kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$namePrefix + 'Type' |tierprefixed: $tier}:
   type: string
   default: {$spec.getDefaultType()}
@@ -578,7 +578,7 @@ serviceAccounts:
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
 {@param spec: NetworkInterfacesSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier)/}
 {$networkPropName}:
   type: array
@@ -622,7 +622,7 @@ serviceAccounts:
 {template ipForwardingPropertySchema kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   type: string
   enum:
@@ -635,7 +635,7 @@ serviceAccounts:
 {template bootDiskPropertiesSchema kind="text"}
 {@param spec: DiskSpec}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {'bootDiskType' |tierprefixed: $tier}:
   type: string
   default: {$spec.getDiskType()!.getDefaultType()}
@@ -660,7 +660,7 @@ serviceAccounts:
 {@param spec: DiskSpec}
 {@param diskIndex: int}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {diskTypePropertyName($diskIndex, $tier)}:
   type: string
   default: {$spec.getDiskType()!.getDefaultType()}
@@ -684,7 +684,7 @@ serviceAccounts:
 {template tierInstanceAcountPropertySchema kind="text"}
 {@param name: string}
 {@param spec: VmTierSpec.TierInstanceCount}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   type: integer
   default: {$spec.getDefaultValue()}
@@ -702,7 +702,7 @@ serviceAccounts:
 
 {template deployInputPropertiesSchema kind="text"}
 {@param inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $fields: $tierSpec ?
   listDeployInputFields($inputSpec, $tierSpec)
   : listDeployInputFields($inputSpec)/}
@@ -791,8 +791,8 @@ serviceAccounts:
 
 
 {template deployInputRequiredSchema kind="text"}
-{@param? inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? inputSpec: DeployInputSpec|null}
+{@param? tierSpec: VmTierSpec|null}
 {if $inputSpec}
 {let $fields: $tierSpec ?
   listDeployInputFields($inputSpec, $tierSpec)
@@ -841,7 +841,7 @@ localSSDs: {{ properties["{deployInputFieldName($field)}"] }}{nil}
 {template additionalDiskSection kind="text"}
 {@param additionalDisksList: list<DiskSpec>}
 {@param deployInputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {@param instanceName: string}
 {for $disk, $index in $additionalDisksList}
 {let $deviceNameSuffix kind="text"}
