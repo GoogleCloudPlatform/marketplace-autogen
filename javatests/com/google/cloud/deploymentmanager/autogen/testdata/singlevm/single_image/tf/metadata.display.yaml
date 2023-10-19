@@ -19,7 +19,7 @@ spec:
           title: Goog Cm Deployment Name
         source_image:
           name: source_image
-          title: Source Image
+          title: Image version
           xGoogleProperty:
             type: ET_GCE_DISK_IMAGE
         machine_type:
@@ -27,6 +27,13 @@ spec:
           title: Machine type
           xGoogleProperty:
             type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+        boot_disk_type:
+          name: boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
             zoneProperty: zone
         boot_disk_size:
           name: boot_disk_size
@@ -39,13 +46,6 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: boot_disk_type
-        boot_disk_type:
-          name: boot_disk_type
-          title: Boot disk type
-          section: boot_disk
-          xGoogleProperty:
-            type: ET_GCE_DISK_TYPE
-            zoneProperty: zone
         zone:
           name: zone
           title: Zone
@@ -76,7 +76,7 @@ spec:
         external_ips:
           name: external_ips
           title: External IP
-          tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
           minItems: 1
           maxItems: 1
           section: networking
@@ -85,6 +85,7 @@ spec:
             gceExternalIp:
               networkVariable: network
               type: IP_EPHEMERAL
+              allowStaticIps: True
         enable_tcp_80:
           name: enable_tcp_80
           title: Allow HTTP traffic from the Internet

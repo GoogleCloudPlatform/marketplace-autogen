@@ -50,23 +50,27 @@ spec:
     - name: zone
       description: The zone for the solution to be deployed.
       varType: string
-    - name: boot_disk_size
-      description: The boot disk size for the VM instance in GBs
-      varType: string
-      defaultValue: 10
     - name: boot_disk_type
       description: The boot disk type for the VM instance.
       varType: string
       defaultValue: pd-standard
+      required: true
+    - name: boot_disk_size
+      description: The boot disk size for the VM instance in GBs
+      varType: string
+      defaultValue: 10
+      required: true
     - name: machine_type
       description: The machine type to create, e.g. e2-small
       varType: string
       defaultValue: f1-micro
+      required: true
     - name: network
       description: The network name to attach the VM instance.
       varType: list(string)
       defaultValue:
       - default
+      required: true
     - name: subnetwork
       description: The sub network name to attach the VM instance.
       varType: list(string)

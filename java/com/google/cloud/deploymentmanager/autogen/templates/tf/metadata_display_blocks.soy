@@ -23,6 +23,13 @@ goog_cm_deployment_name:
 {@param spec: DiskSpec}
 {@param zonePropertyName: string}
 {@param? tier: VmTierSpec|null}
+{'boot_disk_type' |tierprefixed: $tier}:
+  name: {'boot_disk_type' |tierprefixed: $tier}
+  title: Boot disk type
+  section: boot_disk
+  xGoogleProperty:
+    type: ET_GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
 {'boot_disk_size' |tierprefixed: $tier}:
   name: {'boot_disk_size' |tierprefixed: $tier}
   title: Boot disk size in GB
@@ -36,22 +43,19 @@ goog_cm_deployment_name:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
       diskTypeVariable: {'boot_disk_type' |tierprefixed: $tier}
-{'boot_disk_type' |tierprefixed: $tier}:
-  name: {'boot_disk_type' |tierprefixed: $tier}
-  title: Boot disk type
-  section: boot_disk
-  xGoogleProperty:
-    type: ET_GCE_DISK_TYPE
-    zoneProperty: {$zonePropertyName}
 {/template}
 
 
 {template zonePropertyDisplay kind="text"}
 {@param name: string}
+{@param solutionHasGpus: bool}
 {@param? zoneSpec: ZoneSpec|null}
 {$name}:
   name: {$name}
   title: Zone
+  {if $solutionHasGpus}
+  subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+  {/if}
   xGoogleProperty:
     type: ET_GCE_ZONE
     {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
@@ -79,7 +83,7 @@ goog_cm_deployment_name:
 {@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
-  title: Source Image
+  title: Image version
   xGoogleProperty:
     type: ET_GCE_DISK_IMAGE
 {/template}
@@ -114,7 +118,7 @@ goog_cm_deployment_name:
 {@param? tier: VmTierSpec|null}
 {$namePrefix + '_type' |tierprefixed: $tier}:
   name: {$namePrefix + '_type' |tierprefixed: $tier}
-  title: Accelerator type
+  title: GPUs
   xGoogleProperty:
     type: ET_GCE_GPU_TYPE
     gceGpuType:
@@ -164,7 +168,7 @@ goog_cm_deployment_name:
 {'external_ips' |tierprefixed: $tier}:
   name: {'external_ips' |tierprefixed: $tier}
   title: External IP
-  tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
+  tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
   section: networking
@@ -173,6 +177,7 @@ goog_cm_deployment_name:
     gceExternalIp:
       networkVariable: {$networkPropName}
       type: IP_EPHEMERAL
+      allowStaticIps: True
 {/template}
 
 {template firewallPropertiesDisplay kind="text"}
