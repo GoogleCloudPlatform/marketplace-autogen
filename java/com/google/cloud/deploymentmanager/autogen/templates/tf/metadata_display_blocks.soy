@@ -33,7 +33,6 @@ goog_cm_deployment_name:
 {'boot_disk_size' |tierprefixed: $tier}:
   name: {'boot_disk_size' |tierprefixed: $tier}
   title: Boot disk size in GB
-  tooltip: Persistent disk performance is tied to the size of the persistent disk volume. You are charged for the actual amount of provisioned disk space.
   {if $spec.getDiskSize()!.getMinSizeGb()}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   {/if}

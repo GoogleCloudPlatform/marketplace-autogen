@@ -57,7 +57,6 @@ spec:
         boot_disk_size:
           name: boot_disk_size
           title: Boot disk size in GB
-          tooltip: Persistent disk performance is tied to the size of the persistent disk volume. You are charged for the actual amount of provisioned disk space.
           min: 10
           max: 10000
           section: boot_disk
