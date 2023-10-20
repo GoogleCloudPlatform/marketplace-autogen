@@ -58,7 +58,7 @@ spec:
       required: true
     - name: boot_disk_size
       description: The boot disk size for the VM instance in GBs
-      varType: string
+      varType: integer
       defaultValue: 10
       required: true
     - name: machine_type

@@ -58,7 +58,7 @@ spec:
       required: true
     - name: boot_disk_size
       description: The boot disk size for the VM instance in GBs
-      varType: string
+      varType: integer
       defaultValue: 10
       required: true
     - name: machine_type
@@ -72,7 +72,7 @@ spec:
       defaultValue: nvidia-tesla-k80
     - name: accelerator_count
       description: The number of the guest accelerator cards exposed to this instance.
-      varType: string
+      varType: integer
       defaultValue: 1
     - name: network
       description: The network name to attach the VM instance.

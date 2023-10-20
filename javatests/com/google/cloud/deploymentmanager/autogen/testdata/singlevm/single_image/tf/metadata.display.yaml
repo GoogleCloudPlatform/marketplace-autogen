@@ -21,6 +21,9 @@ spec:
         source_image:
           name: source_image
           title: Image version
+          enumValueLabels:
+            - label: Wordpress 4.5
+              value: projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64
           xGoogleProperty:
             type: ET_GCE_DISK_IMAGE
         machine_type:

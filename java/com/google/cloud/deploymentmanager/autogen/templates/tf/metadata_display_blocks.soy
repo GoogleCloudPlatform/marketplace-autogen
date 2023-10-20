@@ -83,6 +83,18 @@ goog_cm_deployment_name:
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Image version
+  enumValueLabels:
+  {for $image, $index in $imagesList}
+  {let $label kind="text"}
+    {if $image.getLabel()}
+      {$image.getLabel()}{nil}
+    {else}
+      {$image.getName()}{nil}
+    {/if}
+  {/let}
+    - label: {$label}
+      value: projects/{$image.getProject()}/global/images/{$image.getName()}
+  {/for}
   xGoogleProperty:
     type: ET_GCE_DISK_IMAGE
 {/template}
@@ -128,7 +140,6 @@ goog_cm_deployment_name:
         {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
-  title: Accelerator count
   xGoogleProperty:
     type: ET_GCE_GPU_COUNT
     gceGpuCount:

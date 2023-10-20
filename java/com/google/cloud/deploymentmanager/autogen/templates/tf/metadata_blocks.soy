@@ -32,7 +32,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   required: true
 - name: {'boot_disk_size' |tierprefixed: $tier}
   description: {constants.BOOT_DISK_SIZE_VAR_DESC}
-  varType: string
+  varType: integer
   defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
   required: true
 {/template}
@@ -84,7 +84,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   defaultValue: {$spec.getDefaultType()}
 - name: {$namePrefix + '_count' |tierprefixed: $tier}
   description: {constants.ACCELERATOR_COUNT_VAR_DESC}
-  varType: string
+  varType: integer
   defaultValue: {$spec.getDefaultCount() ?? 0}
 {/template}
 
