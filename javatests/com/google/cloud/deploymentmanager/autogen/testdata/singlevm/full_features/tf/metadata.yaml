@@ -85,8 +85,6 @@ spec:
     - name: subnetwork
       description: The sub network name to attach the VM instance.
       varType: list(string)
-      defaultValue:
-      - default
     - name: external_ips
       description: The external IPs assigned to the VM for public access.
       varType: list(string)
