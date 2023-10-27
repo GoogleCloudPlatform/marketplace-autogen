@@ -237,6 +237,7 @@ goog_cm_deployment_name:
   title: IP forwarding
   tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
   section: networking
+  level: 1
   xGoogleProperty:
     type: ET_GCE_IP_FORWARDING
     gceIpForwarding:
@@ -311,7 +312,9 @@ disk{$index+1}_type:
   {if $field.getTooltip()}
   tooltip: {$field.getTooltip() |yamlprimitive: 2}
   {/if}
-  // TODO: Add `level` once it is supported by Blueprints UI Metadata
+  {if $field.getLevel()}
+  level: {$field.getLevel()}
+  {/if}
   {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
       $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
   section: {$section.getName() |yamlprimitive: 2}

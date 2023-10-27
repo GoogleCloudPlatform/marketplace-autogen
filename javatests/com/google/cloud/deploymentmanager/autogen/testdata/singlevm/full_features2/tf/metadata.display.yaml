@@ -260,6 +260,7 @@ spec:
         imageCaching:
           name: imageCaching
           title: Image caching
+          level: 1
           section: CONTENT_SETTINGS
           enumValueLabels:
           - label: Not cached
@@ -271,14 +272,17 @@ spec:
         imageCompression:
           name: imageCompression
           title: Enable compression
+          level: 1
           section: CONTENT_SETTINGS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
+          level: 1
           section: CONTENT_SETTINGS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size
+          level: 1
           section: CONTENT_SETTINGS
           min: 100
           max: 99999
@@ -286,6 +290,7 @@ spec:
         cacheExpiration:
           name: cacheExpiration
           title: Cache expiration
+          level: 1
           section: CONTENT_SETTINGS
           enumValueLabels:
           - label: 1 hour
@@ -304,10 +309,12 @@ spec:
         extraLbZone0:
           name: extraLbZone0
           title: Zone
+          level: 1
           section: LOAD_BALANCERS
         extraLbZone1:
           name: extraLbZone1
           title: Zone
+          level: 1
           section: LOAD_BALANCERS
       sections:
       - name: PHPMYADMIN
