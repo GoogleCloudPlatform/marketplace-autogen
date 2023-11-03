@@ -140,6 +140,9 @@ goog_cm_deployment_name:
         {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
+  {if $spec.getMinCount() > 0}
+  min: {$spec.getMinCount()}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_GPU_COUNT
     gceGpuCount:
@@ -216,12 +219,12 @@ goog_cm_deployment_name:
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {$firewallSourceRangesPropName}:
   name: {$firewallSourceRangesPropName}
-  title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  title: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
   placeholder: '0.0.0.0/0, 192.169.0.2/24'
   section: networking
   xGoogleProperty:
-    type: ET_GCE_FIREWALL
+    type: ET_GCE_FIREWALL_RANGE
     gceFirewallRange:
       firewallVariable: {$firewallPropName}
 {/if}

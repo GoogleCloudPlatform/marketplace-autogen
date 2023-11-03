@@ -121,12 +121,12 @@ spec:
               networkVariable: network
         tcp_80_source_ranges:
           name: tcp_80_source_ranges
-          title: Allow HTTP traffic from the Internet
+          title: Source IP ranges for HTTP traffic
           tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
           placeholder: '0.0.0.0/0, 192.169.0.2/24'
           section: networking
           xGoogleProperty:
-            type: ET_GCE_FIREWALL
+            type: ET_GCE_FIREWALL_RANGE
             gceFirewallRange:
               firewallVariable: enable_tcp_80
         enable_tcp_443:
@@ -139,12 +139,12 @@ spec:
               networkVariable: network
         tcp_443_source_ranges:
           name: tcp_443_source_ranges
-          title: Allow HTTPS traffic from the Internet
+          title: Source IP ranges for HTTPS traffic
           tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
           placeholder: '0.0.0.0/0, 192.169.0.2/24'
           section: networking
           xGoogleProperty:
-            type: ET_GCE_FIREWALL
+            type: ET_GCE_FIREWALL_RANGE
             gceFirewallRange:
               firewallVariable: enable_tcp_443
         enable_icmp:
@@ -157,12 +157,12 @@ spec:
               networkVariable: network
         icmp_source_ranges:
           name: icmp_source_ranges
-          title: Allow icmp traffic from the Internet
+          title: Source IP ranges for icmp traffic
           tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
           placeholder: '0.0.0.0/0, 192.169.0.2/24'
           section: networking
           xGoogleProperty:
-            type: ET_GCE_FIREWALL
+            type: ET_GCE_FIREWALL_RANGE
             gceFirewallRange:
               firewallVariable: enable_icmp
         ip_forward:
