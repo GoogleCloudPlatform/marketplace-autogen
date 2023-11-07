@@ -333,3 +333,22 @@ spec:
         subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
       - name: LOAD_BALANCERS
         title: Additional zones for load balancers
+    runtime:
+      suggestedActions:
+      - heading: Log on now
+        description: Use the Admin URL above. <a href='http://wordpress.com'>Learn more</a>
+      - heading: Change your password
+        description: |
+          First, SSH into your VM.
+          Second, run the following command
+        snippet: |-
+          $ which wordpress-admin
+          $ wordpress-admin change-password
+      - heading: Custom conditional action item
+        description: This action is displayed only when the checkbox for displaying conditional row and action was selected
+      - heading: Custom conditional action item - displayed on negation
+        description: This action is displayed only when the checkbox for displaying conditional row and action wasn't selected
+      - heading: External IP action
+        description: Some action
+      - heading: Internal IP action
+        description: Some action
