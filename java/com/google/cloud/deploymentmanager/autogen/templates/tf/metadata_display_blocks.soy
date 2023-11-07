@@ -369,13 +369,19 @@ disk{$index+1}_type:
     type: ET_EMAIL_ADDRESS
 {/if}
 
-{let $valueLabels: fieldValueLabelMap($field) /}
-{if $valueLabels}
+{let $valueLabels: fieldValueLabelMap($field) ?? map() /}
+{let $stringDropdownValuesList: $field.getStringDropdown()?.getValuesList() ?? [] /}
+{let $integerDropdownValuesList: $field.getIntegerDropdown()?.getValuesList() ?? [] /}
+{let $combinedDropdownValuesList: $stringDropdownValuesList.concat($integerDropdownValuesList) /}
+{let $valueMap: map([record(key: $x + '', value: $x + '') for $x in $combinedDropdownValuesList]) /}
+{let $combinedValueLabels: $valueMap.concat($valueLabels) /}
+
+{if $combinedValueLabels.size > 0}
   enumValueLabels:
-  {for $key in $valueLabels.keys()}
-  - label: {$valueLabels.get($key) |yamlprimitive: 2}
+  {for $key in $combinedValueLabels.keys()}
+  - label: {$combinedValueLabels.get($key) |yamlprimitive: 2}
     value: {$key |yamlprimitive: 4}
-    {/for}
+  {/for}
 {/if}
 {/template}
 
