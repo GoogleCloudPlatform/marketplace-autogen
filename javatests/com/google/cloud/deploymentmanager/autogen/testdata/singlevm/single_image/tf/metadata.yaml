@@ -16,24 +16,24 @@ spec:
     - type: SG_OS
       software:
       - title: Debian
-        version: 8
+        version: "8"
     - software:
       - title: Apache
-        version: 2.4.23
+        version: "2.4.23"
       - title: MySQL
-        version: 5.7.13
+        version: "5.7.13"
       - title: OpenSSL
-        version: 1.0.2h
+        version: "1.0.2h"
       - title: PHP
-        version: 7.0.9
+        version: "7.0.9"
       - title: phpMyAdmin
-        version: 4.6.3
+        version: "4.6.3"
       - title: SQLite
-        version: 3.7.15.1
+        version: "3.7.15.1"
       - title: Varnish
-        version: 4.1.0
+        version: "4.1.0"
       - title: WordPress
-        version: 4.5.3
+        version: "4.5.3"
   interfaces:
     variables:
     - name: project_id
@@ -51,27 +51,24 @@ spec:
     - name: zone
       description: The zone for the solution to be deployed.
       varType: string
+      required: true
     - name: boot_disk_type
       description: The boot disk type for the VM instance.
       varType: string
       defaultValue: pd-standard
-      required: true
     - name: boot_disk_size
       description: The boot disk size for the VM instance in GBs
       varType: integer
       defaultValue: 10
-      required: true
     - name: machine_type
       description: The machine type to create, e.g. e2-small
       varType: string
       defaultValue: f1-micro
-      required: true
     - name: network
       description: The network name to attach the VM instance.
       varType: list(string)
       defaultValue:
       - default
-      required: true
     - name: subnetwork
       description: The sub network name to attach the VM instance.
       varType: list(string)
@@ -87,7 +84,7 @@ spec:
     - name: tcp_80_source_ranges
       description: Source IP ranges for HTTP traffic
       varType: string
-      required: true
+      defaultValue: ""
     - name: enable_tcp_443
       description: Allow HTTPS traffic from the Internet
       varType: bool
@@ -95,10 +92,8 @@ spec:
     - name: tcp_443_source_ranges
       description: Source IP ranges for HTTPS traffic
       varType: string
-      required: true
+      defaultValue: ""
     - name: localSsdsCount
-      description: ''
-      required: false
       varType: integer
       defaultValue: 0
     outputs:

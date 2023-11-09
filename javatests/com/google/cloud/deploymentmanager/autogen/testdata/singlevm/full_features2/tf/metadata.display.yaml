@@ -157,7 +157,7 @@ spec:
               firewallVariable: enable_tcp_443
         enable_icmp:
           name: enable_icmp
-          title: Allow icmp traffic from the Internet
+          title: Allow ICMP traffic from the Internet
           section: networking
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -165,7 +165,7 @@ spec:
               networkVariable: network
         icmp_source_ranges:
           name: icmp_source_ranges
-          title: Source IP ranges for icmp traffic
+          title: Source IP ranges for ICMP traffic
           tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
           placeholder: '0.0.0.0/0, 192.169.0.2/24'
           section: networking

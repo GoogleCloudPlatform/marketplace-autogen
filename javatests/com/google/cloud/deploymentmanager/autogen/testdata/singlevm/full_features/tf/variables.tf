@@ -124,13 +124,13 @@ variable "tcp_443_source_ranges" {
 }
 
 variable "enable_icmp" {
-  description = "Allow icmp traffic from the Internet"
+  description = "Allow ICMP traffic from the Internet"
   type        = bool
   default     = true
 }
 
 variable "icmp_source_ranges" {
-  description = "Source IP ranges for icmp traffic"
+  description = "Source IP ranges for ICMP traffic"
   type        = string
   default     = ""
 }

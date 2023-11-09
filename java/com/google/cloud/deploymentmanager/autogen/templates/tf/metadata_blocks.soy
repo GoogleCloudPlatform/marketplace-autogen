@@ -29,12 +29,10 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.BOOT_DISK_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDiskType()!.getDefaultType()}
-  required: true
 - name: {'boot_disk_size' |tierprefixed: $tier}
   description: {constants.BOOT_DISK_SIZE_VAR_DESC}
   varType: integer
   defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
-  required: true
 {/template}
 
 
@@ -46,6 +44,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   varType: string
   {if $zoneSpec and $zoneSpec.getDefaultZone()}
   defaultValue: {$zoneSpec.getDefaultZone()}
+  {else}
   required: true
   {/if}
 {/template}
@@ -70,7 +69,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.MACHINE_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDefaultMachineType()!.getGceMachineType()}
-  required: true
 {/template}
 
 
@@ -99,7 +97,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   varType: list(string)
   defaultValue:
   - default
-  required: true
 - name: {'sub' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
@@ -133,7 +130,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$firewallSourceRangesPropName}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   varType: string
-  required: true
+  defaultValue: ""
 {/template}
 
 
@@ -142,6 +139,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {@param spec: IpForwardingSpec}
 {@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
+  description: {constants.IP_FORWARD_VAR_DESC}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}
@@ -191,8 +189,9 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template deployInputField visibility="private" kind="text"}
 {@param field: DeployInputField}
 - name: {$field.getName() |yamlprimitive: 2}
+  {if $field.getDescription()}
   description: {$field.getDescription() |yamlprimitive: 2}
-  required: {$field.getRequired()}
+  {/if}
 {if $field.getBooleanCheckbox()}
   varType: bool
   defaultValue: {$field.getBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
@@ -217,12 +216,19 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   varType: string
   {if $box.getDefaultValue()}
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {else}
+  required: true
   {/if}
 {elseif $field.getEmailBox()}
   {let $box: $field.getEmailBox()/}
   varType: string
   {if $box.getDefaultValue()}
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {else}
+  required: true
+  {/if}
+  {if $box.getValidation()?.getDescription()}
+  description: {$box.getValidation().getDescription() |yamlprimitive: 2}
   {/if}
 {elseif $field.getStringDropdown()}
   {let $dropdown: $field.getStringDropdown()/}
@@ -236,6 +242,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   varType: string
   {if $dropdown.getDefaultValue()}
   defaultValue: {$dropdown.getDefaultValue().getValue() ?? '' |yamlprimitive: 2}
+  {else}
+  required: true
   {/if}
 {/if}
 {/template}
@@ -292,7 +300,7 @@ softwareGroups:
 {for $component in $softwareGroup.getComponentsList()}
   - title: {$component.getName()}
     {if $component.getVersion()}
-    version: {$component.getVersion()}
+    version: "{$component.getVersion()}"
     {/if}
     {if $component.getUrl()}
     url: {$component.getUrl()}

@@ -16,24 +16,24 @@ spec:
     - type: SG_OS
       software:
       - title: Debian
-        version: 8
+        version: "8"
     - software:
       - title: Apache
-        version: 2.4.23
+        version: "2.4.23"
       - title: MySQL
-        version: 5.7.13
+        version: "5.7.13"
       - title: OpenSSL
-        version: 1.0.2h
+        version: "1.0.2h"
       - title: PHP
-        version: 7.0.9
+        version: "7.0.9"
       - title: phpMyAdmin
-        version: 4.6.3
+        version: "4.6.3"
       - title: SQLite
-        version: 3.7.15.1
+        version: "3.7.15.1"
       - title: Varnish
-        version: 4.1.0
+        version: "4.1.0"
       - title: WordPress
-        version: 4.5.3
+        version: "4.5.3"
   interfaces:
     variables:
     - name: project_id
@@ -52,22 +52,18 @@ spec:
       description: The zone for the solution to be deployed.
       varType: string
       defaultValue: us-west1-b
-      required: true
     - name: boot_disk_type
       description: The boot disk type for the VM instance.
       varType: string
       defaultValue: pd-standard
-      required: true
     - name: boot_disk_size
       description: The boot disk size for the VM instance in GBs
       varType: integer
       defaultValue: 10
-      required: true
     - name: machine_type
       description: The machine type to create, e.g. e2-small
       varType: string
       defaultValue: f1-micro
-      required: true
     - name: accelerator_type
       description: The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80.
       varType: string
@@ -81,7 +77,6 @@ spec:
       varType: list(string)
       defaultValue:
       - default
-      required: true
     - name: subnetwork
       description: The sub network name to attach the VM instance.
       varType: list(string)
@@ -97,7 +92,7 @@ spec:
     - name: tcp_80_source_ranges
       description: Source IP ranges for HTTP traffic
       varType: string
-      required: true
+      defaultValue: ""
     - name: enable_tcp_443
       description: Allow HTTPS traffic from the Internet
       varType: bool
@@ -105,16 +100,17 @@ spec:
     - name: tcp_443_source_ranges
       description: Source IP ranges for HTTPS traffic
       varType: string
-      required: true
+      defaultValue: ""
     - name: enable_icmp
-      description: Allow icmp traffic from the Internet
+      description: Allow ICMP traffic from the Internet
       varType: bool
       defaultValue: true
     - name: icmp_source_ranges
-      description: Source IP ranges for icmp traffic
+      description: Source IP ranges for ICMP traffic
       varType: string
-      required: true
+      defaultValue: ""
     - name: ip_forward
+      description: Whether to allow sending and receiving of packets with non-matching source or destination IPs.
       varType: bool
       defaultValue: false
     - name: disk1_size
@@ -143,71 +139,49 @@ spec:
       defaultValue: pd-standard
     - name: domain
       description: Your Wordpress blog domain
-      required: true
       varType: string
+      required: true
     - name: adminEmailAddress
-      description: ''
-      required: true
       varType: string
+      required: true
+      description: Please enter a valid email address
     - name: optionalEmailAddress
-      description: ''
-      required: false
       varType: string
       defaultValue: default_value@example.com
+      description: Please enter a valid email address
     - name: showConditionalRowAndAction
-      description: ''
-      required: false
       varType: bool
       defaultValue: true
     - name: generateOptionalPassword
-      description: ''
-      required: false
       varType: bool
       defaultValue: true
     - name: installPhpMyAdmin
-      description: ''
-      required: false
       varType: bool
       defaultValue: true
     - name: imageCaching
-      description: ''
-      required: false
       varType: string
       defaultValue: none
     - name: imageCompression
-      description: ''
-      required: false
       varType: bool
       defaultValue: false
     - name: imageSizing
-      description: ''
-      required: false
       varType: bool
       defaultValue: true
     - name: imageCacheSize
-      description: ''
-      required: true
       varType: integer
       defaultValue: 50000
     - name: cacheExpiration
-      description: ''
-      required: true
       varType: integer
       defaultValue: 120
     - name: thirdDiskName
-      description: ''
-      required: true
       varType: string
       defaultValue: third-disk
     - name: extraLbZone0
-      description: ''
-      required: false
       varType: string
       defaultValue: us-west1-a
     - name: extraLbZone1
-      description: ''
-      required: false
       varType: string
+      required: true
     outputs:
     - name: instance_machine_type
       description: Machine type for the compute instance.

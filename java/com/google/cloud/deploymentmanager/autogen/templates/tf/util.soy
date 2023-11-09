@@ -30,6 +30,18 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
   {/switch}
 {/template}
 
+{template firewallRuleProtocolUpperCase kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {switch $spec.getProtocol()}
+    {case FirewallRuleSpec.Protocol.TCP}
+      TCP{nil}
+    {case FirewallRuleSpec.Protocol.UDP}
+      UDP{nil}
+    {case FirewallRuleSpec.Protocol.ICMP}
+      ICMP{nil}
+  {/switch}
+{/template}
 /**
  * Produces Terraform variable name for firewall sources range
  * Format: {protocol}_{port}_source_ranges or {protocol}_source_ranges
@@ -92,7 +104,7 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
     UDP port {$spec.getPort()}{nil}
 {/switch}
 {else}
-  {call firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
+  {call firewallRuleProtocolUpperCase}{param spec: $spec /}{/call}{nil}
 {/if}
 {/template}
 
