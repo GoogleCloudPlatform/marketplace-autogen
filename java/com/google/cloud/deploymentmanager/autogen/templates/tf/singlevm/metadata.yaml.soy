@@ -29,7 +29,7 @@ spec:
     {if $templateVersion}
     version: {$templateVersion |yamlprimitive: 4}
     {else}
-    version: '1.0'
+    version: "1.0"
     {/if}
     actuationTool:
       flavor: Terraform
@@ -99,7 +99,7 @@ spec:
 
     {let $networkProps kind="text"}
       {call blocks.networkProperties}
-        {param nameSuffix: 'network' /}
+        {param nameSuffix: 'networks' /}
         {param spec: $spec.getNetworkInterfaces()! /}
       {/call}
     {/let}
@@ -141,6 +141,13 @@ spec:
     {/let}
     {$deployInputProps |indent: 4, true}{nil}
     {/if}
+
+    {let $stackdriver kind="text"}
+      {call blocks.stackdriver}
+        {param stackdriver: $spec.getStackdriver() /}
+      {/call}
+    {/let}
+    {$stackdriver |indent: 4, true}{nil}
 
     outputs:
     - name: instance_machine_type

@@ -54,8 +54,8 @@ spec:
           title: Zone
           xGoogleProperty:
             type: ET_GCE_ZONE
-        network:
-          name: network
+        networks:
+          name: networks
           title: Network name
           minItems: 1
           maxItems: 1
@@ -65,8 +65,8 @@ spec:
             gceNetwork:
               allowSharedVpcs: true
               machineTypeVariable: machine_type
-        subnetwork:
-          name: subnetwork
+        sub_networks:
+          name: subnetworks
           title: Subnetwork name
           minItems: 1
           maxItems: 1
@@ -75,7 +75,7 @@ spec:
             type: ET_GCE_SUBNETWORK
             zoneProperty: zone
             gceSubnetwork:
-              networkVariable: network
+              networkVariable: networks
         external_ips:
           name: external_ips
           title: External IP
@@ -86,7 +86,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_EXTERNAL_IP
             gceExternalIp:
-              networkVariable: network
+              networkVariable: networks
               type: IP_EPHEMERAL
               allowStaticIps: True
         enable_tcp_80:
@@ -96,7 +96,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_FIREWALL
             gceFirewall:
-              networkVariable: network
+              networkVariable: networks
         tcp_80_source_ranges:
           name: tcp_80_source_ranges
           title: Source IP ranges for HTTP traffic
@@ -114,7 +114,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_FIREWALL
             gceFirewall:
-              networkVariable: network
+              networkVariable: networks
         tcp_443_source_ranges:
           name: tcp_443_source_ranges
           title: Source IP ranges for HTTPS traffic
@@ -130,6 +130,12 @@ spec:
           title: Local SSDs
           min: 0
           max: 3
+        enable_cloud_logging:
+          name: enable_cloud_logging
+          title: Enable Cloud Logging
+        enable_cloud_monitoring:
+          name: enable_cloud_monitoring
+          title: Enable Cloud Monitoring
       sections:
       - name: boot_disk
         title: Boot Disk

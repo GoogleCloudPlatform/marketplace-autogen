@@ -97,7 +97,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   varType: list(string)
   defaultValue:
   - default
-- name: {'sub' + $nameSuffix |tierprefixed: $tier}
+- name: {'sub_' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
 - name: {'external_ips' |tierprefixed: $tier}
@@ -311,4 +311,24 @@ softwareGroups:
 {/for}
 {/for}
 {/if}
+{/template}
+
+{template stackdriver kind="text"}
+{@param? stackdriver: StackdriverSpec|null}
+- name: enable_cloud_logging
+  description: {constants.ENABLE_CLOUD_LOGGING_VAR_DESC}
+  varType: bool
+  {if $stackdriver?.getLogging()}
+  defaultValue: {$stackdriver.getLogging().getDefaultOn()}
+  {else}
+  defaultValue: true
+  {/if}
+- name: enable_cloud_monitoring
+  description: {constants.ENABLE_CLOUD_MONITORING_VAR_DESC}
+  varType: bool
+  {if $stackdriver?.getMonitoring()}
+  defaultValue: {$stackdriver.getMonitoring().getDefaultOn()}
+  {else}
+  defaultValue: true
+  {/if}
 {/template}

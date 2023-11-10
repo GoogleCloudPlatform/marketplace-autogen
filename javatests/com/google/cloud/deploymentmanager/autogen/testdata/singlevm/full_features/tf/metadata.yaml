@@ -72,12 +72,12 @@ spec:
       description: The number of the guest accelerator cards exposed to this instance.
       varType: integer
       defaultValue: 1
-    - name: network
+    - name: networks
       description: The network name to attach the VM instance.
       varType: list(string)
       defaultValue:
       - default
-    - name: subnetwork
+    - name: sub_networks
       description: The sub network name to attach the VM instance.
       varType: list(string)
     - name: external_ips
@@ -182,6 +182,14 @@ spec:
     - name: extraLbZone1
       varType: string
       required: true
+    - name: enable_cloud_logging
+      description: Enables Cloud Logging.
+      varType: bool
+      defaultValue: true
+    - name: enable_cloud_monitoring
+      description: Enables Cloud Monitoring.
+      varType: bool
+      defaultValue: false
     outputs:
     - name: instance_machine_type
       description: Machine type for the compute instance.

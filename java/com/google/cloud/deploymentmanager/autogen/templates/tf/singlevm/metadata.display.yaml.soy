@@ -85,7 +85,7 @@ spec:
 
         {let $networkDisplay kind="text"}
           {call blocks.networkPropertiesDisplay}
-            {param nameSuffix: 'network' /}
+            {param nameSuffix: 'networks' /}
             {param zonePropertyName: 'zone' /}
             {param spec: $spec.getNetworkInterfaces()! /}
           {/call}
@@ -129,6 +129,12 @@ spec:
         {/let}
         {$deployInputDisplay |indent: 8, true}{nil}
         {/if}
+
+        {let $stackdriverDisplay kind="text"}
+          {call blocks.stackdriverPropertyDisplay}
+          {/call}
+        {/let}
+        {$stackdriverDisplay |indent: 8, true}{nil}
 
       sections:
       {let $deploymentInputTopSections kind="text"}

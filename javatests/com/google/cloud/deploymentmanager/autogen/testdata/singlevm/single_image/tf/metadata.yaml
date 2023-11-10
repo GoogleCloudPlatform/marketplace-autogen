@@ -8,7 +8,7 @@ metadata:
 spec:
   info:
     title: WordPress Template
-    version: '1.0'
+    version: "1.0"
     actuationTool:
       flavor: Terraform
       version: '>= 0.13'
@@ -64,12 +64,12 @@ spec:
       description: The machine type to create, e.g. e2-small
       varType: string
       defaultValue: f1-micro
-    - name: network
+    - name: networks
       description: The network name to attach the VM instance.
       varType: list(string)
       defaultValue:
       - default
-    - name: subnetwork
+    - name: sub_networks
       description: The sub network name to attach the VM instance.
       varType: list(string)
     - name: external_ips
@@ -96,6 +96,14 @@ spec:
     - name: localSsdsCount
       varType: integer
       defaultValue: 0
+    - name: enable_cloud_logging
+      description: Enables Cloud Logging.
+      varType: bool
+      defaultValue: false
+    - name: enable_cloud_monitoring
+      description: Enables Cloud Monitoring.
+      varType: bool
+      defaultValue: true
     outputs:
     - name: instance_machine_type
       description: Machine type for the compute instance.

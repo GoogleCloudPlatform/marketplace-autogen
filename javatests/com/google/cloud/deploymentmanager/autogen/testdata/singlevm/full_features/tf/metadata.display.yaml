@@ -46,7 +46,7 @@ spec:
             gceGpuType:
               machineType: machine_type
               gpuType:
-                - nvidia-tesla-k80
+              - nvidia-tesla-k80
         accelerator_count:
           name: accelerator_count
           xGoogleProperty:
@@ -76,8 +76,8 @@ spec:
           subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
           xGoogleProperty:
             type: ET_GCE_ZONE
-        network:
-          name: network
+        networks:
+          name: networks
           title: Network name
           minItems: 1
           maxItems: 1
@@ -87,8 +87,8 @@ spec:
             gceNetwork:
               allowSharedVpcs: true
               machineTypeVariable: machine_type
-        subnetwork:
-          name: subnetwork
+        sub_networks:
+          name: subnetworks
           title: Subnetwork name
           minItems: 1
           maxItems: 1
@@ -97,7 +97,7 @@ spec:
             type: ET_GCE_SUBNETWORK
             zoneProperty: zone
             gceSubnetwork:
-              networkVariable: network
+              networkVariable: networks
         external_ips:
           name: external_ips
           title: External IP
@@ -108,7 +108,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_EXTERNAL_IP
             gceExternalIp:
-              networkVariable: network
+              networkVariable: networks
               type: IP_EPHEMERAL
               allowStaticIps: True
         enable_tcp_80:
@@ -118,7 +118,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_FIREWALL
             gceFirewall:
-              networkVariable: network
+              networkVariable: networks
         tcp_80_source_ranges:
           name: tcp_80_source_ranges
           title: Source IP ranges for HTTP traffic
@@ -136,7 +136,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_FIREWALL
             gceFirewall:
-              networkVariable: network
+              networkVariable: networks
         tcp_443_source_ranges:
           name: tcp_443_source_ranges
           title: Source IP ranges for HTTPS traffic
@@ -154,7 +154,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_FIREWALL
             gceFirewall:
-              networkVariable: network
+              networkVariable: networks
         icmp_source_ranges:
           name: icmp_source_ranges
           title: Source IP ranges for ICMP traffic
@@ -174,7 +174,7 @@ spec:
           xGoogleProperty:
             type: ET_GCE_IP_FORWARDING
             gceIpForwarding:
-              networkVariable: network
+              networkVariable: networks
               notConfigurable: true
         disk1_size:
           name: disk1_size
@@ -319,6 +319,12 @@ spec:
           title: Zone
           level: 1
           section: LOAD_BALANCERS
+        enable_cloud_logging:
+          name: enable_cloud_logging
+          title: Enable Cloud Logging
+        enable_cloud_monitoring:
+          name: enable_cloud_monitoring
+          title: Enable Cloud Monitoring
       sections:
       - name: PHPMYADMIN
         title: phpMyAdmin

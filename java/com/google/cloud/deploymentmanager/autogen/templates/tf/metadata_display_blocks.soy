@@ -18,6 +18,14 @@ goog_cm_deployment_name:
   title: Goog Cm Deployment Name
 {/template}
 
+{template stackdriverPropertyDisplay kind="text"}
+enable_cloud_logging:
+  name: enable_cloud_logging
+  title: Enable Cloud Logging
+enable_cloud_monitoring:
+  name: enable_cloud_monitoring
+  title: Enable Cloud Monitoring
+{/template}
 
 {template bootDiskPropertiesDisplay kind="text"}
 {@param spec: DiskSpec}
@@ -135,9 +143,9 @@ goog_cm_deployment_name:
     gceGpuType:
       machineType: {'machine_type' |tierprefixed: $tier}
       gpuType:
-        {for $gpuType in $spec.getTypesList()}
-        - {$gpuType}
-        {/for}
+      {for $gpuType in $spec.getTypesList()}
+      - {$gpuType}
+      {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
   {if $spec.getMinCount() > 0}
@@ -167,7 +175,7 @@ goog_cm_deployment_name:
     gceNetwork:
       allowSharedVpcs: true
       machineTypeVariable: machine_type
-{'sub' + $nameSuffix |tierprefixed: $tier}:
+{'sub_' + $nameSuffix |tierprefixed: $tier}:
   name: {'sub' + $nameSuffix |tierprefixed: $tier}
   title: Subnetwork name
   minItems: {$spec.getMinCount()}
@@ -215,7 +223,7 @@ goog_cm_deployment_name:
   xGoogleProperty:
     type: ET_GCE_FIREWALL
     gceFirewall:
-      networkVariable: {'network' |tierprefixed: $tierSpec}
+      networkVariable: {'networks' |tierprefixed: $tierSpec}
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {$firewallSourceRangesPropName}:
   name: {$firewallSourceRangesPropName}
@@ -244,7 +252,7 @@ goog_cm_deployment_name:
   xGoogleProperty:
     type: ET_GCE_IP_FORWARDING
     gceIpForwarding:
-      networkVariable: {'network' |tierprefixed: $tier}
+      networkVariable: {'networks' |tierprefixed: $tier}
       notConfigurable: {$spec.getNotConfigurable()}
 {/template}
 
