@@ -15,8 +15,8 @@ kind: BlueprintMetadata
 metadata:
   name: marketplace-tools-display
   annotations:
+    autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
-    autogenSpecType: "SINGLE_VM"
 spec:
   info:
     {if $solutionInfo}
@@ -24,6 +24,7 @@ spec:
     {else}
     title: {$solutionId + ' template' |yamlprimitive: 4}
     {/if}
+    source: {lb}{rb}
   ui:
     input:
       variables:
@@ -142,39 +143,39 @@ spec:
           {param spec: $spec.getDeployInput()/}
         {/call}
       {/let}
-      {$deploymentInputTopSections |indent: 6, true}{nil}
-      - name: boot_disk
-        title: Boot Disk
-        tooltip: Each instance requires a disk to boot from.
+      {$deploymentInputTopSections |indent: 8, true}{nil}
+        - name: boot_disk
+          title: Boot Disk
+          tooltip: Each instance requires a disk to boot from.
       {if length($spec.getAdditionalDisksList()) == 1}
-      - name: additional_disks
-        title: Additional Disk
-        tooltip: The additional disk will be attached to the instance.
+        - name: additional_disks
+          title: Additional Disk
+          tooltip: The additional disk will be attached to the instance.
       {/if}
       {if length($spec.getAdditionalDisksList()) > 1}
-      - name: additional_disks
-        title: Additional Disks
-        tooltip: The additional disks will be attached to the instance.
+        - name: additional_disks
+          title: Additional Disks
+          tooltip: The additional disks will be attached to the instance.
       {/if}
-      - name: networking
-        title: Networking
+        - name: networking
+          title: Networking
       {let $deploymentInputBottomSections kind="text"}
         {call blocks.bottomSections}
           {param spec: $spec.getDeployInput()/}
         {/call}
       {/let}
-      {$deploymentInputBottomSections |indent: 6, true}{nil}
+      {$deploymentInputBottomSections |indent: 8, true}{nil}
     {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
     {if $actionItems.length > 0}
     runtime:
       suggestedActions:
       {for $action in $actionItems}
-      - heading: {$action.getHeading() |yamlprimitive: 8}
+        - heading: {$action.getHeading() |yamlprimitive: 10}
         {if $action.getDescription()}
-        description: {$action.getDescription() |yamlprimitive: 8}
+          description: {$action.getDescription() |yamlprimitive: 10}
         {/if}
         {if $action.getSnippet()}
-        snippet: {$action.getSnippet() |yamlprimitive: 8}
+          snippet: {$action.getSnippet() |yamlprimitive: 10}
         {/if}
         // TODO(b/309686695): Include "showIf" once template expressions are supported for TF
       {/for}

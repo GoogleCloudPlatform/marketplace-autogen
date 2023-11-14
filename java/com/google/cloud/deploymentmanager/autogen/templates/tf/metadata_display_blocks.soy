@@ -144,7 +144,7 @@ enable_cloud_monitoring:
       machineType: {'machine_type' |tierprefixed: $tier}
       gpuType:
       {for $gpuType in $spec.getTypesList()}
-      - {$gpuType}
+        - {$gpuType}
       {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
@@ -387,8 +387,8 @@ disk{$index+1}_type:
 {if $combinedValueLabels.size > 0}
   enumValueLabels:
   {for $key in $combinedValueLabels.keys()}
-  - label: {$combinedValueLabels.get($key) |yamlprimitive: 2}
-    value: {$key |yamlprimitive: 4}
+    - label: {$combinedValueLabels.get($key) |yamlprimitive: 2}
+      value: {$key |yamlprimitive: 4}
   {/for}
 {/if}
 {/template}

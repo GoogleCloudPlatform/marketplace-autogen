@@ -96,7 +96,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.NETWORKS_VAR_DESC}
   varType: list(string)
   defaultValue:
-  - default
+    - default
 - name: {'sub_' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
@@ -104,7 +104,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
   defaultValue:
-  - EPHEMERAL
+    - EPHEMERAL
 {/template}
 
 
@@ -191,6 +191,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$field.getName() |yamlprimitive: 2}
   {if $field.getDescription()}
   description: {$field.getDescription() |yamlprimitive: 2}
+  {elseif $field.getTooltip()}
+  description: {$field.getTooltip() |yamlprimitive: 2}
   {/if}
 {if $field.getBooleanCheckbox()}
   varType: bool
@@ -292,24 +294,24 @@ softwareGroups:
 {for $softwareGroup in $solutionInfo.getPackagedSoftwareGroupsList()}
 {switch $softwareGroup.getType()}
 {case 1}
-- type: SG_OS
-  software:
+  - type: SG_OS
+    software:
 {default}
-- software:
+  - software:
 {/switch}
 {for $component in $softwareGroup.getComponentsList()}
-  - title: {$component.getName()}
-    {if $component.getVersion()}
-    version: "{$component.getVersion()}"
-    {/if}
-    {if $component.getUrl()}
-    url: {$component.getUrl()}
-    {/if}
-    {if $component.getLicenseUrl()}
-    licenseUrl: {$component.getLicenseUrl()}
-    {/if}
-{/for}
-{/for}
+      - title: {$component.getName()}
+        {if $component.getVersion()}
+        version: "{$component.getVersion()}"
+        {/if}
+        {if $component.getUrl()}
+        url: {$component.getUrl()}
+        {/if}
+        {if $component.getLicenseUrl()}
+        licenseUrl: {$component.getLicenseUrl()}
+        {/if}
+    {/for}
+  {/for}
 {/if}
 {/template}
 

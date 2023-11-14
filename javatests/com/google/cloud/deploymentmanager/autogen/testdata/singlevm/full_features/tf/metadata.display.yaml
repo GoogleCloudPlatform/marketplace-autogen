@@ -3,11 +3,12 @@ kind: BlueprintMetadata
 metadata:
   name: marketplace-tools-display
   annotations:
+    autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
-    autogenSpecType: "SINGLE_VM"
 spec:
   info:
     title: 'WordPress: Apache & PHP Template'
+    source: {}
   ui:
     input:
       variables:
@@ -46,7 +47,7 @@ spec:
             gceGpuType:
               machineType: machine_type
               gpuType:
-              - nvidia-tesla-k80
+                - nvidia-tesla-k80
         accelerator_count:
           name: accelerator_count
           xGoogleProperty:
@@ -266,12 +267,12 @@ spec:
           level: 1
           section: CONTENT_SETTINGS
           enumValueLabels:
-          - label: Not cached
-            value: none
-          - label: Cached with redis
-            value: redis
-          - label: Cached with memcached
-            value: memcached
+            - label: Not cached
+              value: none
+            - label: Cached with redis
+              value: redis
+            - label: Cached with memcached
+              value: memcached
         imageCompression:
           name: imageCompression
           title: Enable compression
@@ -296,14 +297,14 @@ spec:
           level: 1
           section: CONTENT_SETTINGS
           enumValueLabels:
-          - label: 1 hour
-            value: '60'
-          - label: 2 hours
-            value: '120'
-          - label: 4 hours
-            value: '240'
-          - label: 8 hours
-            value: '480'
+            - label: 1 hour
+              value: '60'
+            - label: 2 hours
+              value: '120'
+            - label: 4 hours
+              value: '240'
+            - label: 8 hours
+              value: '480'
         thirdDiskName:
           name: thirdDiskName
           title: The third disk's device name
@@ -326,40 +327,40 @@ spec:
           name: enable_cloud_monitoring
           title: Enable Cloud Monitoring
       sections:
-      - name: PHPMYADMIN
-        title: phpMyAdmin
-        tooltip: phpMyAdmin makes administer your Wordpress installation much easier.
-      - name: boot_disk
-        title: Boot Disk
-        tooltip: Each instance requires a disk to boot from.
-      - name: additional_disks
-        title: Additional Disks
-        tooltip: The additional disks will be attached to the instance.
-      - name: networking
-        title: Networking
-      - name: CONTENT_SETTINGS
-        title: Advanced content settings
-        subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
-      - name: LOAD_BALANCERS
-        title: Additional zones for load balancers
+        - name: PHPMYADMIN
+          title: phpMyAdmin
+          tooltip: phpMyAdmin makes administer your Wordpress installation much easier.
+        - name: boot_disk
+          title: Boot Disk
+          tooltip: Each instance requires a disk to boot from.
+        - name: additional_disks
+          title: Additional Disks
+          tooltip: The additional disks will be attached to the instance.
+        - name: networking
+          title: Networking
+        - name: CONTENT_SETTINGS
+          title: Advanced content settings
+          subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
+        - name: LOAD_BALANCERS
+          title: Additional zones for load balancers
     runtime:
       suggestedActions:
-      - heading: Log on now
-        description: Use the Admin URL above. <a href='http://wordpress.com'>Learn more</a>
-      - heading: Change your password
-        description: |
-          First, SSH into your VM.
-          Second, run the following command
-        snippet: |-
-          $ which wordpress-admin
-          $ wordpress-admin change-password
-      - heading: Custom conditional action item
-        description: This action is displayed only when the checkbox for displaying conditional row and action was selected
-      - heading: Custom conditional action item - displayed on negation
-        description: This action is displayed only when the checkbox for displaying conditional row and action wasn't selected
-      - heading: Custom multiple conditional action item
-        description: This action is displayed only when the checkbox for multiple displaying conditional row and action was selected
-      - heading: External IP action
-        description: Some action
-      - heading: Internal IP action
-        description: Some action
+        - heading: Log on now
+          description: Use the Admin URL above. <a href='http://wordpress.com'>Learn more</a>
+        - heading: Change your password
+          description: |
+            First, SSH into your VM.
+            Second, run the following command
+          snippet: |-
+            $ which wordpress-admin
+            $ wordpress-admin change-password
+        - heading: Custom conditional action item
+          description: This action is displayed only when the checkbox for displaying conditional row and action was selected
+        - heading: Custom conditional action item - displayed on negation
+          description: This action is displayed only when the checkbox for displaying conditional row and action wasn't selected
+        - heading: Custom multiple conditional action item
+          description: This action is displayed only when the checkbox for multiple displaying conditional row and action was selected
+        - heading: External IP action
+          description: Some action
+        - heading: Internal IP action
+          description: Some action

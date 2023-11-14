@@ -3,11 +3,12 @@ kind: BlueprintMetadata
 metadata:
   name: marketplace-tools-display
   annotations:
+    autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
-    autogenSpecType: "SINGLE_VM"
 spec:
   info:
     title: WordPress Template
+    source: {}
   ui:
     input:
       variables:
@@ -137,8 +138,8 @@ spec:
           name: enable_cloud_monitoring
           title: Enable Cloud Monitoring
       sections:
-      - name: boot_disk
-        title: Boot Disk
-        tooltip: Each instance requires a disk to boot from.
-      - name: networking
-        title: Networking
+        - name: boot_disk
+          title: Boot Disk
+          tooltip: Each instance requires a disk to boot from.
+        - name: networking
+          title: Networking
