@@ -134,12 +134,14 @@ spec:
         enable_cloud_logging:
           name: enable_cloud_logging
           title: Enable Cloud Logging
-        enable_cloud_monitoring:
-          name: enable_cloud_monitoring
-          title: Enable Cloud Monitoring
+          tooltip: 'Cloud Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+          section: google_cloud_operations
       sections:
         - name: boot_disk
           title: Boot Disk
           tooltip: Each instance requires a disk to boot from.
         - name: networking
           title: Networking
+        - name: google_cloud_operations
+          title: Google Cloud Operations
+          subtext: Monitoring and management for services, containers, applications, and infrastructure
