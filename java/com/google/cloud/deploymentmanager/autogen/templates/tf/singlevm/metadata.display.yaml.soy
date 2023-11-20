@@ -19,11 +19,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
 spec:
   info:
-    {if $solutionInfo}
-    title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 4}
-    {else}
-    title: {$solutionId + ' template' |yamlprimitive: 4}
-    {/if}
+    title: Google Cloud Marketplace Terraform Module
     source: {lb}{rb}
   ui:
     input:
