@@ -119,7 +119,7 @@ spec:
             gceExternalIp:
               networkVariable: networks
               type: IP_EPHEMERAL
-              allowStaticIps: True
+              allowStaticIPs: true
         enable_tcp_80:
           name: enable_tcp_80
           title: Allow HTTP traffic from the Internet
