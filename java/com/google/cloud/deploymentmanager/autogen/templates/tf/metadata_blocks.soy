@@ -2,7 +2,7 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 
 
@@ -140,6 +140,28 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   description: {constants.IP_FORWARD_VAR_DESC}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+{/template}
+
+{template gcpAuthScopesProperties kind="text"}
+{@param specs: list<GcpAuthScopeSpec>}
+  {for $spec, $index in $specs}
+    {call gcpAuthScopesProperty}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template gcpAuthScopesProperty kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{let $name kind="text"}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+- name: {$name}
+  description: Allow {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call} on the VM
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}

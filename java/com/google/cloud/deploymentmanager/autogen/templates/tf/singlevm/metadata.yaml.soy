@@ -127,6 +127,15 @@ spec:
     {$ipForwardingProp |indent: 6, true}{nil}
     {/if}
 
+    {if $spec.getGcpAuthScopesList()}
+    {let $gcpAuthScopesProps kind="text"}
+      {call blocks.gcpAuthScopesProperties}
+        {param specs: $spec.getGcpAuthScopesList() /}
+      {/call}
+    {/let}
+    {$gcpAuthScopesProps |indent: 6, true}{nil}
+    {/if}
+
     {if $spec.getAdditionalDisksList()}
     {let $additionalDisksProperties kind="text"}
       {call blocks.additionalDisksProperties}

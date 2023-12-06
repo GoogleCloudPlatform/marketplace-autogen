@@ -177,6 +177,14 @@ spec:
             gceIpForwarding:
               networkVariable: networks
               notConfigurable: true
+        enable_compute_api:
+          name: enable_compute_api
+          title: Allow read write access to Google Compute Engine APIs on the VM
+          section: API_ACCESS
+        enable_compute_readonly_api:
+          name: enable_compute_readonly_api
+          title: Allow read access to Google Compute Engine APIs on the VM
+          section: API_ACCESS
         disk1_size:
           name: disk1_size
           title: Disk1 size
@@ -342,6 +350,9 @@ spec:
           tooltip: The additional disks will be attached to the instance.
         - name: networking
           title: Networking
+        - name: API_ACCESS
+          title: API Access
+          tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
         - name: CONTENT_SETTINGS
           title: Advanced content settings
           subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>

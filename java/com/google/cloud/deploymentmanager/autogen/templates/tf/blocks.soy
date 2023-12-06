@@ -377,6 +377,35 @@ variable "enable_cloud_monitoring" {lb}
 {/if}
 {/template}
 
+{template gcpAuthScopeVariables kind="text"}
+{@param specs: list<GcpAuthScopeSpec>}
+  {for $spec, $index in $specs}
+    {\n}
+    {call gcpAuthScopeVariable}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template gcpAuthScopeVariable kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{let $name}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+{let $description}
+  {call util.authScopeDescription}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+variable "{$name}" {lb}
+  description = "Allow {$description} on the VM"
+  type        = bool
+  default     = {not $spec!.getDefaultOff()}
+{rb}
+{/template}
+
 {template passwordOutputsReadme kind="text"}
   {@param specList: list<PasswordSpec>}
   {@param? deployInput: DeployInputSpec|null}
@@ -475,14 +504,24 @@ output "{$sanitizedPasswordLabel}_password" {lb}
  * Produces the serviceAccount block for a google_compute_instance.
  */
 {template serviceAccount kind="text"}
+{@param gcpAuthScopesList: list<GcpAuthScopeSpec>}
   service_account {lb}
     email = "default"
-    scopes = [
+    scopes = compact([
       "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring.write"
-    ]
+      {for $spec in $gcpAuthScopesList}
+      {let $propertyName}
+        {call util.gcpAuthScopePropertyName}
+          {param scope: $spec.getScope() /}
+        {/call}
+      {/let}
+      {let $url kind="text"}{call util.gcpAuthScopeUrl}{param spec: $spec/}{/call}{/let}
+      ,var.{$propertyName} == true ? "{$url}" : null
+      {/for}
+    ])
   {rb}
 {/template}
 

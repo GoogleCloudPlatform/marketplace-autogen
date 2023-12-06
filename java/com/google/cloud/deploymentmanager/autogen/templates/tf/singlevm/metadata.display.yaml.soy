@@ -108,6 +108,15 @@ spec:
         {$ipForwardingDisplay |indent: 8, true}{nil}
         {/if}
 
+        {for $gcpAuthScopeSpec in $spec.getGcpAuthScopesList()}
+        {let $gcpAuthScopesDisplay kind="text"}
+          {call blocks.gcpAuthScopesPropertyDisplay}
+            {param scope: $gcpAuthScopeSpec.getScope() /}
+          {/call}
+        {/let}
+        {$gcpAuthScopesDisplay |indent:8, true}{nil}
+        {/for}
+
         {if $spec.getAdditionalDisksList()}
         {let $additionalDisksDisplay kind="text"}
           {call blocks.additionalDisksPropertiesDisplay}
@@ -158,6 +167,11 @@ spec:
       {/if}
         - name: networking
           title: Networking
+      {if length($spec.getGcpAuthScopesList()) > 0}
+        - name: API_ACCESS
+          title: API Access
+          tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
+        {/if}
       {let $deploymentInputBottomSections kind="text"}
         {call blocks.bottomSections}
           {param spec: $spec.getDeployInput()/}

@@ -227,3 +227,15 @@ variable "enable_cloud_monitoring" {
   type        = bool
   default     = false
 }
+
+variable "enable_compute_api" {
+  description = "Allow read write access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = false
+}
+
+variable "enable_compute_readonly_api" {
+  description = "Allow read access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = true
+}

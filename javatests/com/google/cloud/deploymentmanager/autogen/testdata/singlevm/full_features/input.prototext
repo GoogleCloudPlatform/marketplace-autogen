@@ -196,6 +196,14 @@ spec {
     gce_startup_script {
       bash_script_content: "echo SUCCESS > /var/log/startup-log.txt"
     }
+    gcp_auth_scopes {
+      scope: COMPUTE
+      default_off: true
+    }
+    gcp_auth_scopes {
+      scope: COMPUTE_READONLY
+      default_off: false
+    }
     post_deploy {
       action_items {
         heading: "Log on now"

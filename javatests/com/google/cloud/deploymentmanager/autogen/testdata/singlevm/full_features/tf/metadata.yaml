@@ -116,6 +116,14 @@ spec:
         description: Whether to allow sending and receiving of packets with non-matching source or destination IPs.
         varType: bool
         defaultValue: false
+      - name: enable_compute_api
+        description: Allow read write access to Google Compute Engine APIs on the VM
+        varType: bool
+        defaultValue: false
+      - name: enable_compute_readonly_api
+        description: Allow read access to Google Compute Engine APIs on the VM
+        varType: bool
+        defaultValue: true
       - name: disk1_size
         description: The super-extra-great disk size in GB
         varType: number

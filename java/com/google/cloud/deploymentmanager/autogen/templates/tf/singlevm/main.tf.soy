@@ -117,7 +117,9 @@ resource "google_compute_instance" "instance" {lb}
   {rb}
 {/if}
 {\n}
-  {call blocks.serviceAccount /}
+  {call blocks.serviceAccount}
+    {param gcpAuthScopesList: $spec.getGcpAuthScopesList() /}
+  {/call}
 {rb}
 
 {call blocks.firewallResources}

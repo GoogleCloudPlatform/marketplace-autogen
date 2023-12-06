@@ -97,4 +97,6 @@ variable "external_ips" {lb}
 {/if}
 
 {call blocks.stackdriverVariables}{param stackdriver: $spec.getStackdriver() /}{/call}
+
+{call blocks.gcpAuthScopeVariables}{param specs: $spec.getGcpAuthScopesList() /}{/call}
 {/template}
