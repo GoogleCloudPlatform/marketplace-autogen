@@ -105,6 +105,7 @@ public class Autogen {
 
   private static final ImmutableList<String> TERRAFORM_SOY_FILES =
       ImmutableList.of(
+          "singlevm/README.md.soy",
           "singlevm/main.tf.soy",
           "singlevm/variables.tf.soy",
           "singlevm/marketplace_test.tfvars.soy",
@@ -303,6 +304,10 @@ public class Autogen {
     ImmutableMap<String, Object> params = makeSingleVmParams(input, imageInfo);
 
     builder
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("README.md")
+                .setContent(fileSet.newRenderer("vm.single.readme.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("main.tf")

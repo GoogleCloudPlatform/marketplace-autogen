@@ -100,7 +100,7 @@ outputs:
 //----------------------------------------
 
 {template startupScript /* visibility="private" */ kind="text"}
-{@param? additionalContent: string}
+{@param? additionalContent: string|null}
 {let $shebang: '{{ "#! /bin/bash" }}'/}
 {$shebang}
 wget "http://metadata"

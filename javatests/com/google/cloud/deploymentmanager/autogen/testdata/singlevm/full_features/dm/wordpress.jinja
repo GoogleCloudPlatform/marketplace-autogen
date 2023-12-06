@@ -25,6 +25,8 @@
 {% set enableStackdriverLogging = "1" if properties["enableStackdriverLogging"] else "0" %}
 {# Convert boolean type to integer. Stackdriver metadata items need value 0 or 1. #}
 {% set enableStackdriverMonitoring = "1" if properties["enableStackdriverMonitoring"] else "0" %}
+{% set enableComputeApi = properties["enableComputeApi"] %}
+{% set enableComputeReadonlyApi = properties["enableComputeReadonlyApi"] %}
 
 resources:
   - name: {{ name }}
@@ -85,6 +87,12 @@ resources:
             - 'https://www.googleapis.com/auth/devstorage.read_only'
             - 'https://www.googleapis.com/auth/logging.write'
             - 'https://www.googleapis.com/auth/monitoring.write'
+            {% if enableComputeApi %}
+            - 'https://www.googleapis.com/auth/compute'
+            {% endif %}
+            {% if enableComputeReadonlyApi %}
+            - 'https://www.googleapis.com/auth/compute.readonly'
+            {% endif %}
             - 'https://www.googleapis.com/auth/cloudruntimeconfig'
       metadata:
         items:

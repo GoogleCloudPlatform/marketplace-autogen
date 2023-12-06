@@ -105,6 +105,12 @@ properties:
       - 'On'
       - 'Off'
     default: 'Off'
+  enableComputeApi:
+    type: boolean
+    default: False
+  enableComputeReadonlyApi:
+    type: boolean
+    default: True
   bootDiskType:
     type: string
     default: pd-standard

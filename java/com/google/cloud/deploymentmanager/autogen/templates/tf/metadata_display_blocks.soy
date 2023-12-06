@@ -1,7 +1,7 @@
 {namespace metadata.display.blocks}
 
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSection, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSection, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
 {template projectIdPropertyDisplay kind="text"}
@@ -18,15 +18,47 @@ goog_cm_deployment_name:
   title: Goog Cm Deployment Name
 {/template}
 
+{template stackdriverPropertyDisplay kind="text"}
+{@param stackdriver: StackdriverSpec}
+{if $stackdriver?.getLogging()}
+enable_cloud_logging:
+  name: enable_cloud_logging
+  title: Enable Cloud Logging
+  tooltip: 'Cloud Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+  section: google_cloud_operations
+{/if}
+{if $stackdriver?.getMonitoring()}
+enable_cloud_monitoring:
+  name: enable_cloud_monitoring
+  title: Enable Cloud Monitoring
+  tooltip: 'Cloud Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+  section: google_cloud_operations
+{/if}
+{/template}
+
+{template stackdriverBottomSections kind="text"}
+{@param stackdriver: StackdriverSpec}
+{if $stackdriver?.getLogging() or $stackdriver?.getMonitoring()}
+- name: google_cloud_operations
+  title: Google Cloud Operations
+  subtext: Monitoring and management for services, containers, applications, and infrastructure
+{/if}
+{/template}
 
 {template bootDiskPropertiesDisplay kind="text"}
 {@param spec: DiskSpec}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
+{'boot_disk_type' |tierprefixed: $tier}:
+  name: {'boot_disk_type' |tierprefixed: $tier}
+  title: Boot disk type
+  section: boot_disk
+  xGoogleProperty:
+    type: ET_GCE_DISK_TYPE
+    zoneProperty: {$zonePropertyName}
 {'boot_disk_size' |tierprefixed: $tier}:
   name: {'boot_disk_size' |tierprefixed: $tier}
   title: Boot disk size in GB
-  tooltip: Persistent disk performance is tied to the size of the persistent disk volume. You are charged for the actual amount of provisioned disk space.
   {if $spec.getDiskSize()!.getMinSizeGb()}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   {/if}
@@ -36,22 +68,19 @@ goog_cm_deployment_name:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
       diskTypeVariable: {'boot_disk_type' |tierprefixed: $tier}
-{'boot_disk_type' |tierprefixed: $tier}:
-  name: {'boot_disk_type' |tierprefixed: $tier}
-  title: Boot disk type
-  section: boot_disk
-  xGoogleProperty:
-    type: ET_GCE_DISK_TYPE
-    zoneProperty: {$zonePropertyName}
 {/template}
 
 
 {template zonePropertyDisplay kind="text"}
 {@param name: string}
-{@param? zoneSpec: ZoneSpec}
+{@param solutionHasGpus: bool}
+{@param? zoneSpec: ZoneSpec|null}
 {$name}:
   name: {$name}
   title: Zone
+  {if $solutionHasGpus}
+  subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+  {/if}
   xGoogleProperty:
     type: ET_GCE_ZONE
     {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
@@ -76,10 +105,22 @@ goog_cm_deployment_name:
 {template imagePropertyDisplay kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
-  title: Source Image
+  title: Image version
+  enumValueLabels:
+  {for $image, $index in $imagesList}
+  {let $label kind="text"}
+    {if $image.getLabel()}
+      {$image.getLabel()}{nil}
+    {else}
+      {$image.getName()}{nil}
+    {/if}
+  {/let}
+    - label: {$label}
+      value: projects/{$image.getProject()}/global/images/{$image.getName()}
+  {/for}
   xGoogleProperty:
     type: ET_GCE_DISK_IMAGE
 {/template}
@@ -89,7 +130,7 @@ goog_cm_deployment_name:
 {@param name: string}
 {@param spec: MachineTypeSpec}
 {@param zonePropertyName: string}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Machine type
@@ -111,21 +152,23 @@ goog_cm_deployment_name:
 {template acceleratorPropertiesDisplay kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$namePrefix + '_type' |tierprefixed: $tier}:
   name: {$namePrefix + '_type' |tierprefixed: $tier}
-  title: Accelerator type
+  title: GPUs
   xGoogleProperty:
     type: ET_GCE_GPU_TYPE
     gceGpuType:
       machineType: {'machine_type' |tierprefixed: $tier}
       gpuType:
-        {for $gpuType in $spec.getTypesList()}
+      {for $gpuType in $spec.getTypesList()}
         - {$gpuType}
-        {/for}
+      {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
-  title: Accelerator count
+  {if $spec.getMinCount() > 0}
+  min: {$spec.getMinCount()}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_GPU_COUNT
     gceGpuCount:
@@ -137,7 +180,7 @@ goog_cm_deployment_name:
 {@param nameSuffix: string}
 {@param zonePropertyName: string}
 {@param spec: NetworkInterfacesSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
 {$networkPropName}:
   name: {$networkPropName}
@@ -150,7 +193,7 @@ goog_cm_deployment_name:
     gceNetwork:
       allowSharedVpcs: true
       machineTypeVariable: machine_type
-{'sub' + $nameSuffix |tierprefixed: $tier}:
+{'sub_' + $nameSuffix |tierprefixed: $tier}:
   name: {'sub' + $nameSuffix |tierprefixed: $tier}
   title: Subnetwork name
   minItems: {$spec.getMinCount()}
@@ -164,7 +207,7 @@ goog_cm_deployment_name:
 {'external_ips' |tierprefixed: $tier}:
   name: {'external_ips' |tierprefixed: $tier}
   title: External IP
-  tooltip: An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access.
+  tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
   section: networking
@@ -173,11 +216,12 @@ goog_cm_deployment_name:
     gceExternalIp:
       networkVariable: {$networkPropName}
       type: IP_EPHEMERAL
+      allowStaticIps: true
 {/template}
 
 {template firewallPropertiesDisplay kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
@@ -197,16 +241,16 @@ goog_cm_deployment_name:
   xGoogleProperty:
     type: ET_GCE_FIREWALL
     gceFirewall:
-      networkVariable: {'network' |tierprefixed: $tierSpec}
+      networkVariable: {'networks' |tierprefixed: $tierSpec}
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {$firewallSourceRangesPropName}:
   name: {$firewallSourceRangesPropName}
-  title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  title: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
   placeholder: '0.0.0.0/0, 192.169.0.2/24'
   section: networking
   xGoogleProperty:
-    type: ET_GCE_FIREWALL
+    type: ET_GCE_FIREWALL_RANGE
     gceFirewallRange:
       firewallVariable: {$firewallPropName}
 {/if}
@@ -216,16 +260,17 @@ goog_cm_deployment_name:
 {template ipForwardingPropertyDisplay kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: IP forwarding
   tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
   section: networking
+  level: 1
   xGoogleProperty:
     type: ET_GCE_IP_FORWARDING
     gceIpForwarding:
-      networkVariable: {'network' |tierprefixed: $tier}
+      networkVariable: {'networks' |tierprefixed: $tier}
       notConfigurable: {$spec.getNotConfigurable()}
 {/template}
 
@@ -284,7 +329,7 @@ disk{$index+1}_type:
 {template deployInputFieldDisplay visibility="private" kind="text"}
 {@param section: DeployInputSection}
 {@param field: DeployInputField}
-{@param? tierList: list<VmTierSpec>}
+{@param? tierList: list<VmTierSpec>|null}
 {$field.getName()}:
   name: {$field.getName() |yamlprimitive: 2}
   {if $field.getTitle()}
@@ -296,7 +341,9 @@ disk{$index+1}_type:
   {if $field.getTooltip()}
   tooltip: {$field.getTooltip() |yamlprimitive: 2}
   {/if}
-  // TODO: Add `level` once it is supported by Blueprints UI Metadata
+  {if $field.getLevel()}
+  level: {$field.getLevel()}
+  {/if}
   {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
       $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
   section: {$section.getName() |yamlprimitive: 2}
@@ -312,10 +359,10 @@ disk{$index+1}_type:
   placeholder: {$box.getPlaceholder() |yamlprimitive: 2}
   {/if}
   {if $box.getValidation()?.getMin()}
-  min: {$box.getValidation()!.getMin()!.getValue() ?: 0}
+  min: {$box.getValidation()!.getMin()!.getValue() ?? 0}
   {/if}
   {if $box.getValidation()?.getMax()}
-  max: {$box.getValidation()!.getMax()!.getValue() ?: 0}
+  max: {$box.getValidation()!.getMax()!.getValue() ?? 0}
   {/if}
   {if $box.getValidation()?.getDescription()}
   validation: {$box.getValidation()!.getDescription() |yamlprimitive: 2}
@@ -348,13 +395,19 @@ disk{$index+1}_type:
     type: ET_EMAIL_ADDRESS
 {/if}
 
-{let $valueLabels: fieldValueLabelMap($field) /}
-{if $valueLabels}
+{let $valueLabels: fieldValueLabelMap($field) ?? map() /}
+{let $stringDropdownValuesList: $field.getStringDropdown()?.getValuesList() ?? [] /}
+{let $integerDropdownValuesList: $field.getIntegerDropdown()?.getValuesList() ?? [] /}
+{let $combinedDropdownValuesList: $stringDropdownValuesList.concat($integerDropdownValuesList) /}
+{let $valueMap: map([record(key: $x + '', value: $x + '') for $x in $combinedDropdownValuesList]) /}
+{let $combinedValueLabels: $valueMap.concat($valueLabels) /}
+
+{if $combinedValueLabels.size > 0}
   enumValueLabels:
-  {for $key in $valueLabels.keys()}
-  - label: {$valueLabels.get($key) |yamlprimitive: 2}
-    value: {$key |yamlprimitive: 4}
-    {/for}
+  {for $key in $combinedValueLabels.keys()}
+    - label: {$combinedValueLabels.get($key) |yamlprimitive: 2}
+      value: {$key |yamlprimitive: 4}
+  {/for}
 {/if}
 {/template}
 
@@ -362,7 +415,7 @@ disk{$index+1}_type:
 // Deploy input custom sections utilities
 
 {template topSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {call customSectionsHelper}
   {param spec: $spec/}
   {param placement: DeployInputSection.Placement.CUSTOM_TOP/}
@@ -371,7 +424,7 @@ disk{$index+1}_type:
 
 
 {template bottomSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {call customSectionsHelper}
   {param spec: $spec/}
   {param placement: DeployInputSection.Placement.CUSTOM_BOTTOM/}
@@ -380,7 +433,7 @@ disk{$index+1}_type:
 
 
 {template customSectionsHelper visibility="private" kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {@param placement: DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.getSectionsList()}
@@ -396,4 +449,23 @@ disk{$index+1}_type:
 {/if}
 {/for}
 {/if}
+{/template}
+
+{template gcpAuthScopesPropertyDisplay kind="text"}
+{@param scope: GcpAuthScopeSpec.Scope}
+{let $name kind="text"}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $scope/}
+  {/call}
+{/let}
+{$name}:
+  name: {$name}
+  title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
+  section: API_ACCESS
+  // TODO: support boolean groups once Blueprints UI Metadata supports them
+{/template}
+
+{template tierSectionName kind="text"}
+{@param spec: VmTierSpec}
+{$spec.getName() |uppercased}_TIER{nil}
 {/template}

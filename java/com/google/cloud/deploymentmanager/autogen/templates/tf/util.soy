@@ -1,6 +1,6 @@
 {namespace util}
 
-import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces Terraform variable name for firewall boolean
@@ -30,6 +30,18 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
   {/switch}
 {/template}
 
+{template firewallRuleProtocolUpperCase kind="text"}
+  {@param spec: FirewallRuleSpec}
+
+  {switch $spec.getProtocol()}
+    {case FirewallRuleSpec.Protocol.TCP}
+      TCP{nil}
+    {case FirewallRuleSpec.Protocol.UDP}
+      UDP{nil}
+    {case FirewallRuleSpec.Protocol.ICMP}
+      ICMP{nil}
+  {/switch}
+{/template}
 /**
  * Produces Terraform variable name for firewall sources range
  * Format: {protocol}_{port}_source_ranges or {protocol}_source_ranges
@@ -92,7 +104,7 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
     UDP port {$spec.getPort()}{nil}
 {/switch}
 {else}
-  {call firewallRuleProtocol}{param spec: $spec /}{/call}{nil}
+  {call firewallRuleProtocolUpperCase}{param spec: $spec /}{/call}{nil}
 {/if}
 {/template}
 
@@ -197,4 +209,70 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {template diskSizeDescription kind="text"}
 {@param spec: DiskSpec}
   {$spec.getDisplayLabel()} size in GB{nil}
+{/template}
+
+/**
+ * Produces the DeploymentTag for an GCE Instance
+ * Format: {deployment}-deployment
+ */
+{template deploymentTag kind="text"}
+${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
+{/template}
+
+/** Produces the property name for an API scope. */
+{template gcpAuthScopePropertyName kind="text"}
+{@param scope: GcpAuthScopeSpec.Scope}
+{@param? tierSpec: VmTierSpec|null}
+{switch $scope}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    {'enable_cloud_readonly_api' |tierprefixed: $tierSpec}{nil}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    {'enable_cloud_api' |tierprefixed: $tierSpec}{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    {'enable_compute_readonly_api' |tierprefixed: $tierSpec}{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
+    {'enable_compute_api' |tierprefixed: $tierSpec}{nil}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    {'enable_source_read_write_api' |tierprefixed: $tierSpec}{nil}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    {'enable_projecthosting_api' |tierprefixed: $tierSpec}{nil}
+{/switch}
+{/template}
+
+/** Produces the description for an API scope. */
+{template authScopeDescription kind="text"}
+{@param scope: GcpAuthScopeSpec.Scope}
+{switch $scope}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    read only access to all of Google Cloud Platform APIs{nil}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    full access to all of Google Cloud Platform APIs{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    read access to Google Compute Engine APIs{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
+    read write access to Google Compute Engine APIs{nil}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    read write access to Google Cloud Source Repositories APIs{nil}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    project hosting access to (Deprecated) Google Code Project Hosting APIs{nil}
+{/switch}
+{/template}
+
+/** Produces the URL for an API scope. */
+{template gcpAuthScopeUrl kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{switch $spec.getScope()}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    https://www.googleapis.com/auth/cloud-platform.read-only{nil}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    https://www.googleapis.com/auth/cloud-platform{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    https://www.googleapis.com/auth/compute.readonly{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
+    https://www.googleapis.com/auth/compute{nil}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    https://www.googleapis.com/auth/source.read_write{nil}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    https://www.googleapis.com/auth/projecthosting{nil}
+{/switch}
 {/template}

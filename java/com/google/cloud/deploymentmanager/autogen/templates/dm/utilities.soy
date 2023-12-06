@@ -5,7 +5,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 /** Produces the property name for a firewall rule. */
 {template firewallRulePropName kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {switch $spec.getProtocol()}
   {case FirewallRuleSpec.Protocol.TCP}
     {'enableTcp' + $spec.getPort() |tierprefixed: $tierSpec}{nil}
@@ -19,7 +19,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 
 /** Produces the targetTag for a firewall rule. */
 {template firewallRuleTargetTag kind="text"}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {if not $tierSpec}
 {call deploymentTag data="all"/}{nil}
 {else}
@@ -31,7 +31,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 /** Produces the name for a firewall rule. */
 {template firewallRuleName kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {{ env["deployment"] }}{call firewallRuleNameSuffix data="all"/}{nil}
 {/template}
 
@@ -42,7 +42,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
  */
 {template firewallRuleNameSuffix kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
   {let $portSuffix kind="text"}
     {call firewallRulePortSuffix}
       {param spec: $spec /}
@@ -64,7 +64,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
  * tier spec).
  */
 {template firewallRuleTargetTagSuffix kind="text"}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {if not $tierSpec}
   -deployment{nil}
 {else}
@@ -127,7 +127,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 /** Produces the property name for firewall rule source ranges. */
 {template firewallRuleSourceRangesPropName kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {switch $spec.getProtocol()}
   {case FirewallRuleSpec.Protocol.TCP}
     {'tcp' + $spec.getPort() + 'SourceRanges' |tierprefixed: $tierSpec}{nil}
@@ -142,7 +142,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 /** Produces the property name for an API scope. */
 {template gcpAuthScopePropertyName kind="text"}
 {@param spec: GcpAuthScopeSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {switch $spec.getScope()}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     {'enableCloudReadonlyApi' |tierprefixed: $tierSpec}{nil}

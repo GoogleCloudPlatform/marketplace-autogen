@@ -65,7 +65,7 @@ variable "networks" {lb}
 variable "sub_networks" {lb}
   description = "{constants.SUB_NETWORKS_VAR_DESC}"
   type        = list(string)
-  default     = ["default"]
+  default     = []
 {rb}
 {\n}
 variable "external_ips" {lb}
@@ -73,6 +73,15 @@ variable "external_ips" {lb}
   type        = list(string)
   default     = ["EPHEMERAL"]
 {rb}
+
+
+{if $spec.getIpForwarding()}
+{\n}
+  {call blocks.ipForwardingVariable}
+    {param name: "ip_forward" /}
+    {param ipForwarding: $spec.getIpForwarding() /}
+  {/call}
+{/if}
 
 {call blocks.firewallVariables}{param specList: $spec.getFirewallRulesList()/}{/call}
 
@@ -86,4 +95,8 @@ variable "external_ips" {lb}
 {if $spec.getDeployInput()}
   {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
 {/if}
+
+{call blocks.stackdriverVariables}{param stackdriver: $spec.getStackdriver() /}{/call}
+
+{call blocks.gcpAuthScopeVariables}{param specs: $spec.getGcpAuthScopesList() /}{/call}
 {/template}

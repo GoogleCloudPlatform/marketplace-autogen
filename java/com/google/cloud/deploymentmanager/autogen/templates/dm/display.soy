@@ -5,7 +5,7 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 
 {template openPortAction kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallTitle kind="text"}{call utilities.firewallRuleTitle data="all"/}{/let}
 {let $protocol kind="text"}{call utilities.firewallRuleProtocol data="all"/}{/let}
 {let $heading kind="text"}
@@ -74,7 +74,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template firewallDisplayProperties kind="text"}
 {@param firewallsList: list<FirewallRuleSpec>}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $section kind="text"}
   {if $tierSpec}
     {call tierSectionName}{param spec: $tierSpec/}{/call}{nil}
@@ -96,7 +96,7 @@ Open {$firewallTitle} traffic{nil}
 {template firewallDisplayProperty kind="text"}
 {@param firewallSpec: FirewallRuleSpec}
 {@param section: string}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $propName kind="text"}
   {call utilities.firewallRulePropName}
     {param spec: $firewallSpec/}
@@ -144,7 +144,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template authScopeBoolGroupName kind="text"}
 {@param spec: GcpAuthScopeSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {if $tier}
 {call tierSectionName}{param spec: $tier/}{/call}_{nil}
 {/if}
@@ -186,7 +186,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template makeExternalUrlLink kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 // Specifies the right kinds so that HTML escapes are done correctly.
 // Note that we do not put the IP expression into the original URL to
 // prevent it from being incorrectly escaped.
@@ -205,7 +205,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template makeInternalUrl kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call vmOutputExpression}
@@ -220,7 +220,7 @@ Open {$firewallTitle} traffic{nil}
 
 {template makeExternalUrl kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $url kind="uri"}{call utilities.makeUrl}{param spec: $spec/}{param ip: '0.0.0.0'/}{/call}{/let}
 {let $output kind="text"}
   {call vmOutputExpression}
@@ -235,15 +235,15 @@ Open {$firewallTitle} traffic{nil}
 
 {template vmOutputExpression kind="text"}
 {@param baseOutputName: string}
-{@param? spec: TierVmInstance}
-{@param? tiersList: list<VmTierSpec>}
+{@param? spec: TierVmInstance|null}
+{@param? tiersList: list<VmTierSpec>|null}
 {if $spec}
   {let $tier: findVmTier($spec.getTier(), $tiersList)/}
   {let $prefix kind="text"}{$baseOutputName |tierprefixed: $tier}{nil}{/let}
   {let $instanceCount kind="text"}
     properties().{'instanceCount' |tierprefixed: $tier}"]{nil}
   {/let}
-  {let $vmIndex: $spec.getIndex() ?: 0/}
+  {let $vmIndex: $spec.getIndex() ?? 0/}
   {if $vmIndex >= 0}
     outputs()["{$prefix}" + {$vmIndex}]{nil}
   {else}
@@ -258,7 +258,7 @@ Open {$firewallTitle} traffic{nil}
 {template deployInputFieldDisplay kind="text"}
 {@param section: DeployInputSection}
 {@param field: DeployInputField}
-{@param? tierList: list<VmTierSpec>}
+{@param? tierList: list<VmTierSpec>|null}
 name: {deployInputFieldName($field) |yamlprimitive: 0}
 {if $field.getTitle()}
 title: {$field.getTitle() |yamlprimitive: 0}
@@ -347,7 +347,7 @@ enumLabels:
 
 
 {template topSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {let $output kind="text"}
   {call customSectionsHelper}
     {param spec: $spec/}
@@ -359,7 +359,7 @@ enumLabels:
 
 
 {template bottomSections kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {let $output kind="text"}
   {call customSectionsHelper}
     {param spec: $spec/}
@@ -371,7 +371,7 @@ enumLabels:
 
 
 {template customSectionsHelper kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {@param placement: DeployInputSection.Placement}
 {if $spec}
 {for $section in $spec.getSectionsList()}
@@ -391,7 +391,7 @@ enumLabels:
 
 
 {template customBooleanGroups kind="text"}
-{@param? spec: DeployInputSpec}
+{@param? spec: DeployInputSpec|null}
 {if $spec}
 {for $section in $spec.getSectionsList()}
 {for $field in $section.getFieldsList()}
@@ -419,8 +419,8 @@ enumLabels:
 
 
 {template authScopeBooleanGroups kind="text"}
-{@param? singleVmSpec: SingleVmDeploymentPackageSpec}
-{@param? multiVmSpec: MultiVmDeploymentPackageSpec}
+{@param? singleVmSpec: SingleVmDeploymentPackageSpec|null}
+{@param? multiVmSpec: MultiVmDeploymentPackageSpec|null}
 {if $singleVmSpec}
 {for $scope in $singleVmSpec.getGcpAuthScopesList()}
 - name: {call authScopeBoolGroupName}{param spec: $scope/}{/call}
@@ -441,7 +441,7 @@ enumLabels:
 
 {template siteUrlApplicationTableRow kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $content kind="text"}
   {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Site address'/}
@@ -453,7 +453,7 @@ enumLabels:
 
 {template adminUrlApplicationTableRow kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $content kind="text"}
   {call instanceUrlApplicationTableRow data="all"}
     {param label: 'Admin URL'/}
@@ -466,7 +466,7 @@ enumLabels:
 {template instanceUrlApplicationTableRow kind="text"}
 {@param label: string}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $externalUrl kind="text"}
   {call makeExternalUrlLink}{param spec: $spec/}{param tiersList: $tiersList /}{/call}
 {/let}
@@ -491,8 +491,8 @@ enumLabels:
 
 {template passwordApplicationTableRows kind="text"}
 {@param passwordsList: list<PasswordSpec>}
-{@param? deployInput: DeployInputSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? deployInput: DeployInputSpec|null}
+{@param? tiersList: list<VmTierSpec>|null}
 {for $password, $index in $passwordsList}
 {if $password.getUsername()}
 - label: {($password.getDisplayLabel() + ' user') |yamlprimitive: 2}
@@ -519,8 +519,8 @@ enumLabels:
 
 {template infoRowApplicationTableRow kind="text"}
 {@param infoRow: PostDeployInfo.InfoRow}
-{@param? deployInput: DeployInputSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? deployInput: DeployInputSpec|null}
+{@param? tiersList: list<VmTierSpec>|null}
 - label: {$infoRow.getLabel() |yamlprimitive: 8}
 {if $infoRow.getValue()}
   value: {$infoRow.getValue() |yamlprimitive: 8}
@@ -536,7 +536,7 @@ enumLabels:
 
 {template adminActionButton kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Log into the admin panel
 type: TYPE_URL
@@ -546,7 +546,7 @@ action: {$actionUrl |yamlprimitive: 0}
 
 {template siteActionButton kind="text"}
 {@param spec: InstanceUrlSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $actionUrl kind="text"}{call makeExternalUrl data="all"/}{/let}
 label: Visit the site
 type: TYPE_URL
@@ -555,8 +555,8 @@ action: {$actionUrl |yamlprimitive: 0}
 
 
 {template connectActionButton kind="text"}
-{@param? button: PostDeployInfo.ConnectToInstanceSpec}
-{@param? tiersList: list<VmTierSpec>}
+{@param? button: PostDeployInfo.ConnectToInstanceSpec|null}
+{@param? tiersList: list<VmTierSpec>|null}
 {let $output kind="text"}
   {call vmOutputExpression}
     {param baseOutputName: 'vmSelfLink'/}
@@ -573,7 +573,7 @@ action: '{{ {$output} }}'
 
 
 {template acceleratorProperty kind="text"}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {'acceleratorType' |tierprefixed: $tier}
   title: GPUs
 {if $tier}

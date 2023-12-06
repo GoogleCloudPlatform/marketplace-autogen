@@ -39,13 +39,13 @@ variable "boot_disk_size" {
 }
 
 variable "disk1_type" {
-  description = "The super-extra-great disk"
+  description = "The \"super-extra-great\" disk"
   type        = string
   default     = "pd-standard"
 }
 
 variable "disk1_size" {
-  description = "The super-extra-great disk size in GB"
+  description = "The \"super-extra-great\" disk size in GB"
   type        = number
   default     = 1000
 }
@@ -83,7 +83,7 @@ variable "networks" {
 variable "sub_networks" {
   description = "The sub network name to attach the VM instance."
   type        = list(string)
-  default     = ["default"]
+  default     = []
 }
 
 variable "external_ips" {
@@ -117,13 +117,13 @@ variable "tcp_443_source_ranges" {
 }
 
 variable "enable_icmp" {
-  description = "Allow icmp traffic from the Internet"
+  description = "Allow ICMP traffic from the Internet"
   type        = bool
   default     = true
 }
 
 variable "icmp_source_ranges" {
-  description = "Source IP ranges for icmp traffic"
+  description = "Source IP ranges for ICMP traffic"
   type        = string
   default     = ""
 }
@@ -141,12 +141,12 @@ variable "accelerator_count" {
 }
 
 variable "domain" {
-  description = "Your Wordpress blog domain"
+  description = "Your Wordpress \"blog\" domain"
   type        = string
 }
 
 variable "adminEmailAddress" {
-  description = "The e-mail address used to create the administrator account for WordPress."
+  description = "The e-mail address used to create the \"administrator account\" for WordPress."
   type        = string
 }
 
@@ -207,4 +207,16 @@ variable "extraLbZone0" {
 
 variable "extraLbZone1" {
   type        = string
+}
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = true
+}
+
+variable "enable_cloud_monitoring" {
+  description = "Enables Cloud Monitoring."
+  type        = bool
+  default     = false
 }

@@ -9,8 +9,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template main kind="text"}
 {@param solutionId: string}
 {@param spec: SingleVmDeploymentPackageSpec}
-{@param? solutionInfo: SolutionMarketingInfo}
-{@param? templateVersion: string}
+{@param? solutionInfo: SolutionMarketingInfo|null}
+{@param? templateVersion: string|null}
 
 {let $waiterSpec:
     ($spec.getApplicationStatus()?.getType() == ApplicationStatusSpec.StatusType.WAITER)

@@ -122,6 +122,14 @@ input:
       tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
       section: NETWORKING
       level: 1
+    - name: enableComputeApi
+      title: Allow read write access to Google Compute Engine APIs on the VM
+      section: API_ACCESS
+      boolean_group: COMPUTE_API_ACCESS
+    - name: enableComputeReadonlyApi
+      title: Allow read access to Google Compute Engine APIs on the VM
+      section: API_ACCESS
+      boolean_group: COMPUTE_READONLY_API_ACCESS
     - name: input_domain
       title: Domain
       subtext: Your Wordpress blog domain
@@ -207,6 +215,9 @@ input:
       tooltip: The additional disks will be attached to the instance.
     - name: NETWORKING
       title: Networking
+    - name: API_ACCESS
+      title: API Access
+      tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
     - name: CONTENT_SETTINGS
       title: Advanced content settings
       subtext: Controls advanced content caching. <a href='http://wordpress.com/help'>Learn more</a>
@@ -216,6 +227,10 @@ input:
       title: Stackdriver
       subtext: Monitoring and management for services, containers, applications, and infrastructure
   boolean_groups:
+    - name: COMPUTE_API_ACCESS
+      title: Compute API
+    - name: COMPUTE_READONLY_API_ACCESS
+      title: Compute Readonly API
     - name: IMAGE_CACHING_OPTIONS
       title: Image caching options
       tooltip: <a href='http://wordpress.com/help'>Learn more</a>

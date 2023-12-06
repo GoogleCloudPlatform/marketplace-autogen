@@ -9,9 +9,9 @@ import * as utilities from 'com/google/cloud/deploymentmanager/autogen/templates
 /** Generates solution.jinja.display file. */
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
-{@param? partnerId: string}
-{@param? partnerInfo: PartnerMarketingInfo}
-{@param? descriptionYaml: string}
+{@param? partnerId: string|null}
+{@param? partnerInfo: PartnerMarketingInfo|null}
+{@param? descriptionYaml: string|null}
 
 {let $partnerName kind="text"}
 {if $partnerInfo}

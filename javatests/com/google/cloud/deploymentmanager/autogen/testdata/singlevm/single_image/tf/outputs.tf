@@ -31,7 +31,7 @@ output "instance_self_link" {
 }
 
 output "instance_zone" {
-  description = "Self-link for the compute instance."
+  description = "Zone for the compute instance."
   value       = var.zone
 }
 

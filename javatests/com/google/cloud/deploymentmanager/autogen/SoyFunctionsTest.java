@@ -62,6 +62,7 @@ import com.google.inject.Inject;
 import com.google.template.soy.data.SoyList;
 import com.google.template.soy.data.SoyValue;
 import com.google.template.soy.data.SoyValueConverter;
+import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.shared.restricted.SoyJavaFunction;
 import java.util.Arrays;
 import java.util.List;
@@ -451,7 +452,7 @@ public class SoyFunctionsTest {
         .build();
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
-        .isEqualTo("!properties().input_enableXYZ");
+        .isEqualTo(StringData.forValue("!properties().input_enableXYZ"));
   }
 
   @Test
@@ -462,7 +463,7 @@ public class SoyFunctionsTest {
 
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
-        .isEqualTo("properties().externalIP == \"NONE\"");
+        .isEqualTo(StringData.forValue("properties().externalIP == \"NONE\""));
   }
 
   @Test
@@ -476,7 +477,9 @@ public class SoyFunctionsTest {
 
     assertFunctionCall(booleanExpressionDisplayCondition, expression)
         .hasResultThat()
-        .isEqualTo("!properties().input_enableXYZ and properties().externalIP != \"NONE\"");
+        .isEqualTo(
+            StringData.forValue(
+                "!properties().input_enableXYZ and properties().externalIP != \"NONE\""));
   }
 
   @Test
@@ -494,7 +497,7 @@ public class SoyFunctionsTest {
     );
     assertFunctionCall(booleanExpressionDisplayCondition, expression, tiersList)
         .hasResultThat()
-        .isEqualTo("properties().tier0_externalIP != \"NONE\"");
+        .isEqualTo(StringData.forValue("properties().tier0_externalIP != \"NONE\""));
   }
 
   @Test

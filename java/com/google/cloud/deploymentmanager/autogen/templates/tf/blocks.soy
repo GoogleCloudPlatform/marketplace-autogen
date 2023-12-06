@@ -40,6 +40,8 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
   {rb}
 {\n}
   source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
+{\n}
+  target_tags = ["{call util.deploymentTag /}"]
 {rb}
 {/template}
 
@@ -99,13 +101,13 @@ variable "accelerator_type" {lb}
 variable "accelerator_count" {lb}
   description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
-  default     = "{$spec.getDefaultCount() ?: 0}"
+  default     = "{$spec.getDefaultCount() ?? 0}"
 {rb}
 {/template}
 
 {template additionalDiskVariables kind="text"}
 {@param diskSpecs: list<DiskSpec>}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskVariable}
       {param spec: $spec /}
@@ -119,20 +121,20 @@ variable "accelerator_count" {lb}
 {template additionalDiskVariable kind="text"}
 {@param spec: DiskSpec}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
   {/call}
 {/let}
 variable "disk{$index+1}_type" {lb}
-  description = "{$spec.getDisplayLabel()}"
+  description = "{$spec.getDisplayLabel() |doublequoted}"
   type        = string
   default     = "{$spec.getDiskType()!.getDefaultType()}"
 {rb}
 {\n}
 variable "disk{$index+1}_size" {lb}
-  description = "{$diskSizeDescription}"
+  description = "{$diskSizeDescription |doublequoted}"
   type        = number
   default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
 {rb}
@@ -140,7 +142,7 @@ variable "disk{$index+1}_size" {lb}
 
 {template additionalDiskResources kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskResource}
       {param spec: $spec /}
@@ -154,22 +156,22 @@ variable "disk{$index+1}_size" {lb}
 {template additionalDiskResource kind="text"}
 {@param spec: DiskSpec}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
 $spec.getDeviceNameSuffix()!.getName() :
-(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?: "") /}
+(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?? "") /}
 resource "google_compute_disk" "disk{$index + 1}" {lb}
   name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceName}"
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size
-  description = "{$spec.getDisplayLabel()}"
+  description = "{$spec.getDisplayLabel() |doublequoted}"
 {rb}
 {/template}
 
 {template attachDisks kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {for $spec, $index in $diskSpecs}
     {call attachDisk}
       {param index: $index /}
@@ -181,7 +183,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisk kind="text"}
 {@param index: number}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
   attached_disk {lb}
     source      = google_compute_disk.disk{$index + 1}.id
     device_name = google_compute_disk.disk{$index + 1}.name
@@ -190,9 +192,9 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template localSsds kind="text"}
   {@param localSsdSpec: LocalSsdSpec}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
   {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
-  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?: 0)/}
+  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?? 0)/}
   {for $i in range(0, $count)}
   scratch_disk {lb}
     interface = "SCSI"
@@ -255,9 +257,9 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 {@param field: DeployInputField}
 variable "{$field.getName()}" {lb}
 {if $field.getDescription()}
-  description = "{$field.getDescription()}"
+  description = "{$field.getDescription() |doublequoted}"
 {elseif $field.getTooltip()}
-  description = "{$field.getTooltip()}"
+  description = "{$field.getTooltip() |doublequoted}"
 {/if}
 {if $field.getBooleanCheckbox()}
   type        = bool
@@ -269,13 +271,13 @@ variable "{$field.getName()}" {lb}
   {let $box: $field.getIntegerBox()/}
   type        = number
   {if $box.getDefaultValue()}
-  default     = {$box.getDefaultValue().getValue() ?: 0}
+  default     = {$box.getDefaultValue().getValue() ?? 0}
   {/if}
 {elseif $field.getIntegerDropdown()}
   {let $dropdown: $field.getIntegerDropdown()/}
   type        = number
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default     = {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
 {elseif $field.getStringBox()}
@@ -294,14 +296,14 @@ variable "{$field.getName()}" {lb}
   {let $dropdown: $field.getStringDropdown()/}
   type        = string
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0/}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
   default     = "{$dropdown.getValuesList()[$defaultIndex]}"
   {/if}
 {elseif $field.getZoneDropdown()}
   {let $dropdown: $field.getZoneDropdown()/}
   type        = string
   {if $dropdown.getDefaultValue()}
-  default     = "{$dropdown.getDefaultValue().getValue() ?: ''}"
+  default     = "{$dropdown.getDefaultValue().getValue() ?? ''}"
   {/if}
 {/if}
 {rb}
@@ -315,16 +317,21 @@ variable "{$field.getName()}" {lb}
  */
 {template gceMetadata kind="text"}
 {@param specList: list<GceMetadataItem>}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {for $metadata, $index in $specList}
 {$metadata.getKey()} = {nil}
 
   {if $metadata.getValue()}
-  "{$metadata.getValue()}"{nil}
+  "{$metadata.getValue() |doublequoted}"{nil}
 
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
+  // Convert boolean "true" -> "True" for regression purposes
+  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  title(var.{$field.getName()}){nil}
+  {else}
   var.{$field.getName()}{nil}
+  {/if}
 
   {/if /* $metadata.value */}
 
@@ -334,9 +341,114 @@ variable "{$field.getName()}" {lb}
 {/for}
 {/template}
 
+{template stackdriverMetadata kind="text"}
+{@param? stackdriver: StackdriverSpec|null}
+google-logging-enable = {nil}
+{if $stackdriver?.getLogging()}
+var.enable_cloud_logging ? "1" : "0"
+{else}
+"0"
+{/if}
+google-monitoring-enable = {nil}
+{if $stackdriver?.getMonitoring()}
+var.enable_cloud_monitoring ? "1" : "0"{nil}
+{else}
+"0"{nil}
+{/if}
+{/template}
+
+{template stackdriverVariables kind="text"}
+{@param? stackdriver: StackdriverSpec|null}
+{if $stackdriver?.getLogging()}
+{\n}
+variable "enable_cloud_logging" {lb}
+  description = "{constants.ENABLE_CLOUD_LOGGING_VAR_DESC}"
+  type        = bool
+  default     = {$stackdriver?.getLogging()!.getDefaultOn()}
+{rb}
+{/if}
+{if $stackdriver?.getMonitoring()}
+{\n}
+variable "enable_cloud_monitoring" {lb}
+  description = "{constants.ENABLE_CLOUD_MONITORING_VAR_DESC}"
+  type        = bool
+  default     = {$stackdriver?.getMonitoring()!.getDefaultOn()}
+{rb}
+{/if}
+{/template}
+
+{template gcpAuthScopeVariables kind="text"}
+{@param specs: list<GcpAuthScopeSpec>}
+  {for $spec, $index in $specs}
+    {\n}
+    {call gcpAuthScopeVariable}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template gcpAuthScopeVariable kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{let $name}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+{let $description}
+  {call util.authScopeDescription}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+variable "{$name}" {lb}
+  description = "Allow {$description} on the VM"
+  type        = bool
+  default     = {not $spec!.getDefaultOff()}
+{rb}
+{/template}
+
+{template passwordOutputsReadme kind="text"}
+  {@param specList: list<PasswordSpec>}
+  {@param? deployInput: DeployInputSpec|null}
+
+  {for $spec, $index in $specList}
+    {call passwordOutputReadme}
+      {param password: $spec /}
+      {param deployInput: $deployInput /}
+    {/call}
+  {/for}
+{/template}
+
+{template passwordOutputReadme kind="text"}
+{@param password: PasswordSpec}
+{@param? deployInput: DeployInputSpec|null}
+{let $sanitizedPasswordLabel}
+  {call util.sanitizePasswordLabel}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $passwordDescription}
+  {call util.passwordOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+{let $usernameDescription}
+  {call util.usernameOutputDescription}
+    {param spec: $password /}
+  {/call}
+{/let}
+
+{if $password.getUsername()}
+| {$sanitizedPasswordLabel}_user | {$usernameDescription} |
+{elseif $password.getUsernameFromDeployInputField()}
+{let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
+| {$sanitizedPasswordLabel}_user | {$usernameDescription} |
+{/if}
+| {$sanitizedPasswordLabel}_password | {$passwordDescription} |
+{/template}
+
 {template passwordOutputs kind="text"}
   {@param specList: list<PasswordSpec>}
-  {@param? deployInput: DeployInputSpec}
+  {@param? deployInput: DeployInputSpec|null}
 
   {for $spec, $index in $specList}
     {\n}
@@ -349,7 +461,7 @@ variable "{$field.getName()}" {lb}
 
 {template passwordOutput kind="text"}
 {@param password: PasswordSpec}
-{@param? deployInput: DeployInputSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $sanitizedPasswordLabel}
   {call util.sanitizePasswordLabel}
     {param spec: $password /}
@@ -368,22 +480,61 @@ variable "{$field.getName()}" {lb}
 
 {if $password.getUsername()}
 output "{$sanitizedPasswordLabel}_user" {lb}
-  description = "{$usernameDescription}"
+  description = "{$usernameDescription |doublequoted}"
   value       = "{$password.getUsername()}"
 {rb}
 {\n}
 {elseif $password.getUsernameFromDeployInputField()}
 {let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
 output "{$sanitizedPasswordLabel}_user" {lb}
-  description = "{$usernameDescription}"
+  description = "{$usernameDescription |doublequoted}"
   value       = var.{$field.getName()}
 {rb}
 {\n}
 {/if}
 
 output "{$sanitizedPasswordLabel}_password" {lb}
-  description = "{$passwordDescription}"
+  description = "{$passwordDescription |doublequoted}"
   value       = random_password.{$sanitizedPasswordLabel}.result
   sensitive   = true
+{rb}
+{/template}
+
+/**
+ * Produces the serviceAccount block for a google_compute_instance.
+ */
+{template serviceAccount kind="text"}
+{@param gcpAuthScopesList: list<GcpAuthScopeSpec>}
+  service_account {lb}
+    email = "default"
+    scopes = compact([
+      "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
+      {for $spec in $gcpAuthScopesList}
+      {let $propertyName}
+        {call util.gcpAuthScopePropertyName}
+          {param scope: $spec.getScope() /}
+        {/call}
+      {/let}
+      {let $url kind="text"}{call util.gcpAuthScopeUrl}{param spec: $spec/}{/call}{/let}
+      ,var.{$propertyName} == true ? "{$url}" : null
+      {/for}
+    ])
+  {rb}
+{/template}
+
+
+/**
+ * Produces a variable for enabling/disabling IP Forwarding.
+ */
+{template ipForwardingVariable kind="text"}
+{@param name: string}
+{@param ipForwarding: IpForwardingSpec}
+variable "ip_forward" {lb}
+  description = "{constants.IP_FORWARD_VAR_DESC}"
+  type        = bool
+  default     = {not $ipForwarding!.getDefaultOff()}
 {rb}
 {/template}

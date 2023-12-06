@@ -6,6 +6,7 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
 
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
+{@param solutionId: string}
 {let $passwordMetadata}
   {call blocks.passwordMetadata}
     {param specList: $spec.getPasswordsList() /}
@@ -17,6 +18,11 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
     {param deployInput: $spec.getDeployInput() /}
   {/call}
 {/let}
+{let $stackdriverMetadata}
+  {call blocks.stackdriverMetadata}
+    {param stackdriver: $spec.getStackdriver() /}
+  {/call}
+{/let}
 
 provider "google" {lb}
   project = var.project_id
@@ -25,8 +31,8 @@ provider "google" {lb}
 locals {lb}
   network_interfaces_map = {lb} for i, n in var.networks : n => {lb}
     network     = n,
-    subnetwork  = element(var.sub_networks, i)
-    external_ip = element(var.external_ips, i)
+    subnetwork  = length(var.sub_networks) > i ? element(var.sub_networks, i) : null
+    external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     {rb}
   {rb}
 {\n}
@@ -36,6 +42,9 @@ locals {lb}
   {/if}
   {if $gceMetadata}
     {$gceMetadata |indent: 4}
+  {/if}
+  {if $stackdriverMetadata}
+    {$stackdriverMetadata |indent: 4}
   {/if}
   {rb}
 {rb}
@@ -51,7 +60,11 @@ resource "google_compute_instance" "instance" {lb}
   machine_type = var.machine_type
   zone = var.zone
 {\n}
+  tags = ["{call util.deploymentTag /}"]
+{\n}
   boot_disk {lb}
+    device_name = "{$solutionId}-vm-tmpl-boot-disk"
+{\n}
     initialize_params {lb}
       size = var.boot_disk_size
       type = var.boot_disk_type
@@ -72,7 +85,7 @@ resource "google_compute_instance" "instance" {lb}
   {/call}
 {/if}
 {if $spec.getIpForwarding()}
-  can_ip_forward = {not $spec.getIpForwarding().getDefaultOff()}
+  can_ip_forward = var.ip_forward
 {\n}
 {/if}
   metadata = local.metadata
@@ -103,6 +116,10 @@ resource "google_compute_instance" "instance" {lb}
     on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
   {rb}
 {/if}
+{\n}
+  {call blocks.serviceAccount}
+    {param gcpAuthScopesList: $spec.getGcpAuthScopesList() /}
+  {/call}
 {rb}
 
 {call blocks.firewallResources}

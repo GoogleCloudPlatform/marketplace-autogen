@@ -9,14 +9,15 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
 {@param solutionId: string}
-{@param? solutionInfo: SolutionMarketingInfo}
-{@param? templateVersion: string}
+{@param? solutionInfo: SolutionMarketingInfo|null}
+{@param? templateVersion: string|null}
 
 apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: BlueprintMetadata
 metadata:
   name: marketplace-tools
   annotations:
+    autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
 spec:
   info:
@@ -25,27 +26,38 @@ spec:
     {else}
     title: {$solutionId + ' template' |yamlprimitive: 4}
     {/if}
+    source: {lb}{rb}
     {if $templateVersion}
     version: {$templateVersion |yamlprimitive: 4}
     {else}
-    version: '1.0'
+    version: "1.0"
     {/if}
     actuationTool:
       flavor: Terraform
-      version: '>= 0.13'
+      version: ">= 1.2"
+    description: {lb}{rb}
+    {if $solutionInfo}
+      {let $softwareGroups kind="text"}
+        {call blocks.softwareGroups}
+          {param solutionInfo: $solutionInfo /}
+        {/call}
+      {/let}
+      {$softwareGroups |indent: 4, true}{nil}
+    {/if}
+  content: {lb}{rb}
   interfaces:
     variables:
     {let $projectIdProp kind="text"}
       {call blocks.projectIdProperty}
       {/call}
     {/let}
-    {$projectIdProp |indent: 4, true}{nil}
+    {$projectIdProp |indent: 6, true}{nil}
 
     {let $deploymentNameProp kind="text"}
       {call blocks.deploymentNameProperty}
       {/call}
     {/let}
-    {$deploymentNameProp |indent: 4, true}{nil}
+    {$deploymentNameProp |indent: 6, true}{nil}
 
     {let $imageProp kind="text"}
       {call blocks.imageProperty}
@@ -53,7 +65,7 @@ spec:
         {param imagesList: $spec.getImagesList() /}
       {/call}
     {/let}
-    {$imageProp |indent: 4, true}{nil}
+    {$imageProp |indent: 6, true}{nil}
 
     {let $zoneProp kind="text"}
       {call blocks.zoneProperty}
@@ -61,14 +73,14 @@ spec:
         {param zoneSpec: $spec.getZone()/}
       {/call}
     {/let}
-    {$zoneProp |indent: 4, true}{nil}
+    {$zoneProp |indent: 6, true}{nil}
 
     {let $bootDiskProps kind="text"}
       {call blocks.bootDiskProperties}
         {param spec: $spec.getBootDisk()! /}
       {/call}
     {/let}
-    {$bootDiskProps |indent: 4, true}{nil}
+    {$bootDiskProps |indent: 6, true}{nil}
 
     {let $machineTypeProp kind="text"}
       {call blocks.machineTypeProperty}
@@ -76,7 +88,7 @@ spec:
         {param spec: $spec.getMachineType()! /}
       {/call}
     {/let}
-    {$machineTypeProp |indent: 4, true}{nil}
+    {$machineTypeProp |indent: 6, true}{nil}
 
     {if solutionHasGpus($spec)}
     {let $acceleratorProps kind="text"}
@@ -85,16 +97,16 @@ spec:
         {param spec: $spec.getAcceleratorsList()[0] /}
       {/call}
     {/let}
-    {$acceleratorProps |indent: 4, true}{nil}
+    {$acceleratorProps |indent: 6, true}{nil}
     {/if}
 
     {let $networkProps kind="text"}
       {call blocks.networkProperties}
-        {param nameSuffix: 'network' /}
+        {param nameSuffix: 'networks' /}
         {param spec: $spec.getNetworkInterfaces()! /}
       {/call}
     {/let}
-    {$networkProps |indent: 4, true}{nil}
+    {$networkProps |indent: 6, true}{nil}
 
     {for $firewallRule in $spec.getFirewallRulesList()}
     {let $firewallProps kind="text"}
@@ -102,7 +114,7 @@ spec:
         {param spec: $firewallRule /}
       {/call}
     {/let}
-    {$firewallProps |indent: 4, true}{nil}
+    {$firewallProps |indent: 6, true}{nil}
     {/for}
 
     {if $spec.getIpForwarding()}
@@ -112,7 +124,16 @@ spec:
         {param spec: $spec.getIpForwarding() /}
       {/call}
     {/let}
-    {$ipForwardingProp |indent: 4, true}{nil}
+    {$ipForwardingProp |indent: 6, true}{nil}
+    {/if}
+
+    {if $spec.getGcpAuthScopesList()}
+    {let $gcpAuthScopesProps kind="text"}
+      {call blocks.gcpAuthScopesProperties}
+        {param specs: $spec.getGcpAuthScopesList() /}
+      {/call}
+    {/let}
+    {$gcpAuthScopesProps |indent: 6, true}{nil}
     {/if}
 
     {if $spec.getAdditionalDisksList()}
@@ -121,7 +142,7 @@ spec:
         {param diskSpecs: $spec.getAdditionalDisksList() /}
       {/call}
     {/let}
-    {$additionalDisksProperties |indent: 4, true}{nil}
+    {$additionalDisksProperties |indent: 6, true}{nil}
     {/if}
 
     {if $spec.getDeployInput()}
@@ -130,32 +151,39 @@ spec:
         {param inputSpec: $spec.getDeployInput() /}
       {/call}
     {/let}
-    {$deployInputProps |indent: 4, true}{nil}
+    {$deployInputProps |indent: 6, true}{nil}
     {/if}
 
+    {let $stackdriver kind="text"}
+      {call blocks.stackdriver}
+        {param stackdriver: $spec.getStackdriver() /}
+      {/call}
+    {/let}
+    {$stackdriver |indent: 6, true}{nil}
+
     outputs:
-    - name: instance_machine_type
-      description: {constants.INSTANCE_MACHINE_TYPE_OUT_DESC}
-    - name: instance_nat_ip
-      description: {constants.INSTANCE_NAT_IP_OUT_DESC}
-    - name: instance_network
-      description: {constants.INSTANCE_NETWORK_OUT_DESC}
-    - name: instance_self_link
-      description: {constants.INSTANCE_SELF_LINK_OUT_DESC}
-    - name: instance_zone
-      description: {constants.INSTANCE_ZONE_OUT_DESC}
+      - name: instance_machine_type
+        description: {constants.INSTANCE_MACHINE_TYPE_OUT_DESC}
+      - name: instance_nat_ip
+        description: {constants.INSTANCE_NAT_IP_OUT_DESC}
+      - name: instance_network
+        description: {constants.INSTANCE_NETWORK_OUT_DESC}
+      - name: instance_self_link
+        description: {constants.INSTANCE_SELF_LINK_OUT_DESC}
+      - name: instance_zone
+        description: {constants.INSTANCE_ZONE_OUT_DESC}
     {if $spec.getSiteUrl()}
-    - name: site_url
-      description: {constants.SITE_URL_OUT_DESC}
+      - name: site_url
+        description: {constants.SITE_URL_OUT_DESC}
     {/if}
     {if $spec.getAdminUrl()}
-    - name: admin_url
-      description: {constants.ADMIN_URL_OUT_DESC}
+      - name: admin_url
+        description: {constants.ADMIN_URL_OUT_DESC}
     {/if}
     {let $passwordOutputs}
       {call blocks.passwordOutputs}
         {param specList: $spec.getPasswordsList() /}
       {/call}
     {/let}
-    {$passwordOutputs |indent: 4, true}{nil}
+    {$passwordOutputs |indent: 6, true}{nil}
 {/template}

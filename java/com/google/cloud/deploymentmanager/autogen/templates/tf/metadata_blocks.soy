@@ -2,7 +2,8 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 
 
 {template projectIdProperty kind="text"}
@@ -23,27 +24,28 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 
 {template bootDiskProperties kind="text"}
 {@param spec: DiskSpec}
-{@param? tier: VmTierSpec}
-- name: {'boot_disk_size' |tierprefixed: $tier}
-  description: {constants.BOOT_DISK_SIZE_VAR_DESC}
-  varType: string
-  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
-
+{@param? tier: VmTierSpec|null}
 - name: {'boot_disk_type' |tierprefixed: $tier}
   description: {constants.BOOT_DISK_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDiskType()!.getDefaultType()}
+- name: {'boot_disk_size' |tierprefixed: $tier}
+  description: {constants.BOOT_DISK_SIZE_VAR_DESC}
+  varType: integer
+  defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
 {/template}
 
 
 {template zoneProperty kind="text"}
 {@param name: string}
-{@param? zoneSpec: ZoneSpec}
+{@param? zoneSpec: ZoneSpec|null}
 - name: {$name}
   description: {constants.ZONE_VAR_DESC}
   varType: string
   {if $zoneSpec and $zoneSpec.getDefaultZone()}
   defaultValue: {$zoneSpec.getDefaultZone()}
+  {else}
+  required: true
   {/if}
 {/template}
 
@@ -51,7 +53,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {template imageProperty kind="text"}
 {@param name: string}
 {@param imagesList: list<ImageSpec>}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   description: {constants.SOURCE_IMAGE_VAR_DESC}
   varType: string
@@ -62,7 +64,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {template machineTypeProperty kind="text"}
 {@param name: string}
 {@param spec: MachineTypeSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
   description: {constants.MACHINE_TYPE_VAR_DESC}
   varType: string
@@ -73,44 +75,42 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {template acceleratorProperties kind="text"}
 {@param namePrefix: string}
 {@param spec: AcceleratorSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$namePrefix + '_type' |tierprefixed: $tier}
   description: {constants.ACCELERATOR_TYPE_VAR_DESC}
   varType: string
   defaultValue: {$spec.getDefaultType()}
 - name: {$namePrefix + '_count' |tierprefixed: $tier}
   description: {constants.ACCELERATOR_COUNT_VAR_DESC}
-  varType: string
-  defaultValue: {$spec.getDefaultCount() ?: 0}
+  varType: integer
+  defaultValue: {$spec.getDefaultCount() ?? 0}
 {/template}
 
 
 {template networkProperties kind="text"}
 {@param nameSuffix: string}
 {@param spec: NetworkInterfacesSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 {let $networkPropName: tierPrefixed($nameSuffix, $tier) /}
 - name: {$networkPropName}
   description: {constants.NETWORKS_VAR_DESC}
   varType: list(string)
   defaultValue:
-  - default
-- name: {'sub' + $nameSuffix |tierprefixed: $tier}
+    - default
+- name: {'sub_' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
-  defaultValue:
-  - default
 - name: {'external_ips' |tierprefixed: $tier}
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
   defaultValue:
-  - EPHEMERAL
+    - EPHEMERAL
 {/template}
 
 
 {template firewallProperties kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
@@ -130,15 +130,38 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 - name: {$firewallSourceRangesPropName}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   varType: string
-  required: true
+  defaultValue: ""
 {/template}
 
 
 {template ipForwardingProperty kind="text"}
 {@param name: string}
 {@param spec: IpForwardingSpec}
-{@param? tier: VmTierSpec}
+{@param? tier: VmTierSpec|null}
 - name: {$name |tierprefixed: $tier}
+  description: {constants.IP_FORWARD_VAR_DESC}
+  varType: bool
+  defaultValue: {not $spec.getDefaultOff()}
+{/template}
+
+{template gcpAuthScopesProperties kind="text"}
+{@param specs: list<GcpAuthScopeSpec>}
+  {for $spec, $index in $specs}
+    {call gcpAuthScopesProperty}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template gcpAuthScopesProperty kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{let $name kind="text"}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+- name: {$name}
+  description: Allow {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call} on the VM
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}
@@ -173,7 +196,7 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 
 {template deployInputProperties kind="text"}
 {@param inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec}
+{@param? tierSpec: VmTierSpec|null}
 // TODO: support tiers section for multi-VMs
 {let $fields: listDeployInputFields($inputSpec)/}
 {for $field in $fields}
@@ -188,8 +211,11 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {template deployInputField visibility="private" kind="text"}
 {@param field: DeployInputField}
 - name: {$field.getName() |yamlprimitive: 2}
+  {if $field.getDescription()}
   description: {$field.getDescription() |yamlprimitive: 2}
-  required: {$field.getRequired()}
+  {elseif $field.getTooltip()}
+  description: {$field.getTooltip() |yamlprimitive: 2}
+  {/if}
 {if $field.getBooleanCheckbox()}
   varType: bool
   defaultValue: {$field.getBooleanCheckbox().getDefaultValue() |yamlprimitive: 2}
@@ -200,13 +226,13 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   {let $box: $field.getIntegerBox() /}
   varType: integer
   {if $box.getDefaultValue()}
-  defaultValue: {$box.getDefaultValue().getValue() ?: 0}
+  defaultValue: {$box.getDefaultValue().getValue() ?? 0}
   {/if}
 {elseif $field.getIntegerDropdown()}
   {let $dropdown: $field.getIntegerDropdown()/}
   varType: integer
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0 /}
   defaultValue: {$dropdown.getValuesList()[$defaultIndex]}
   {/if}
 {elseif $field.getStringBox()}
@@ -214,25 +240,34 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
   varType: string
   {if $box.getDefaultValue()}
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {else}
+  required: true
   {/if}
 {elseif $field.getEmailBox()}
   {let $box: $field.getEmailBox()/}
   varType: string
   {if $box.getDefaultValue()}
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
+  {else}
+  required: true
+  {/if}
+  {if $box.getValidation()?.getDescription()}
+  description: {$box.getValidation().getDescription() |yamlprimitive: 2}
   {/if}
 {elseif $field.getStringDropdown()}
   {let $dropdown: $field.getStringDropdown()/}
   varType: string
   {if $dropdown.getDefaultValueIndex()}
-  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?: 0 /}
+  {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0 /}
   defaultValue: {$dropdown.getValuesList()[$defaultIndex] |yamlprimitive: 2}
   {/if}
 {elseif $field.getZoneDropdown()}
   {let $dropdown: $field.getZoneDropdown()/}
   varType: string
   {if $dropdown.getDefaultValue()}
-  defaultValue: {$dropdown.getDefaultValue().getValue() ?: '' |yamlprimitive: 2}
+  defaultValue: {$dropdown.getDefaultValue().getValue() ?? '' |yamlprimitive: 2}
+  {else}
+  required: true
   {/if}
 {/if}
 {/template}
@@ -271,4 +306,53 @@ import {AcceleratorSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRu
 {/if}
 - name: {$sanitizedPasswordLabel}_password
   description: {$passwordDescription}
+{/template}
+
+
+{template softwareGroups kind="text"}
+{@param solutionInfo: SolutionMarketingInfo}
+{if $solutionInfo?.getPackagedSoftwareGroupsList()}
+softwareGroups:
+{for $softwareGroup in $solutionInfo.getPackagedSoftwareGroupsList()}
+{switch $softwareGroup.getType()}
+{case 1}
+  - type: SG_OS
+    software:
+{default}
+  - software:
+{/switch}
+{for $component in $softwareGroup.getComponentsList()}
+      - title: {$component.getName()}
+        {if $component.getVersion()}
+        version: "{$component.getVersion()}"
+        {/if}
+        {if $component.getUrl()}
+        url: {$component.getUrl()}
+        {/if}
+        {if $component.getLicenseUrl()}
+        licenseUrl: {$component.getLicenseUrl()}
+        {/if}
+    {/for}
+  {/for}
+{/if}
+{/template}
+
+{template stackdriver kind="text"}
+{@param? stackdriver: StackdriverSpec|null}
+- name: enable_cloud_logging
+  description: {constants.ENABLE_CLOUD_LOGGING_VAR_DESC}
+  varType: bool
+  {if $stackdriver?.getLogging()}
+  defaultValue: {$stackdriver.getLogging().getDefaultOn()}
+  {else}
+  defaultValue: true
+  {/if}
+- name: enable_cloud_monitoring
+  description: {constants.ENABLE_CLOUD_MONITORING_VAR_DESC}
+  varType: bool
+  {if $stackdriver?.getMonitoring()}
+  defaultValue: {$stackdriver.getMonitoring().getDefaultOn()}
+  {else}
+  defaultValue: true
+  {/if}
 {/template}

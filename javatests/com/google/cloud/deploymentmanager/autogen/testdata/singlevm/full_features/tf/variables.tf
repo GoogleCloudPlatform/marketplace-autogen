@@ -84,13 +84,19 @@ variable "networks" {
 variable "sub_networks" {
   description = "The sub network name to attach the VM instance."
   type        = list(string)
-  default     = ["default"]
+  default     = []
 }
 
 variable "external_ips" {
   description = "The external IPs assigned to the VM for public access."
   type        = list(string)
   default     = ["EPHEMERAL"]
+}
+
+variable "ip_forward" {
+  description = "Whether to allow sending and receiving of packets with non-matching source or destination IPs."
+  type        = bool
+  default     = false
 }
 
 variable "enable_tcp_80" {
@@ -118,13 +124,13 @@ variable "tcp_443_source_ranges" {
 }
 
 variable "enable_icmp" {
-  description = "Allow icmp traffic from the Internet"
+  description = "Allow ICMP traffic from the Internet"
   type        = bool
   default     = true
 }
 
 variable "icmp_source_ranges" {
-  description = "Source IP ranges for icmp traffic"
+  description = "Source IP ranges for ICMP traffic"
   type        = string
   default     = ""
 }
@@ -208,4 +214,28 @@ variable "extraLbZone0" {
 
 variable "extraLbZone1" {
   type        = string
+}
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = true
+}
+
+variable "enable_cloud_monitoring" {
+  description = "Enables Cloud Monitoring."
+  type        = bool
+  default     = false
+}
+
+variable "enable_compute_api" {
+  description = "Allow read write access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = false
+}
+
+variable "enable_compute_readonly_api" {
+  description = "Allow read access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = true
 }

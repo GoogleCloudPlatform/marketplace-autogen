@@ -66,10 +66,10 @@ input:
       title: Boot disk size in GB
       section: BOOT_DISK
     - name: disk1_type
-      title: The super-extra-great disk type
+      title: The "super-extra-great" disk type
       section: ADDITIONAL_DISKS
     - name: disk1_sizeGb
-      title: The super-extra-great disk size in GB
+      title: The "super-extra-great" disk size in GB
       section: ADDITIONAL_DISKS
     - name: disk2_type
       title: The less great disk type
@@ -119,13 +119,13 @@ input:
       section: NETWORKING
     - name: input_domain
       title: Domain
-      subtext: Your Wordpress blog domain
+      subtext: Your Wordpress "blog" domain
       tooltip: Register your own domain with <a href='http://domains.google'>Google</a>
       validation: A valid domain has to be entered
       placeholder: mydomain.com
     - name: input_adminEmailAddress
       title: Administrator e-mail address
-      tooltip: The e-mail address used to create the administrator account for WordPress.
+      tooltip: The e-mail address used to create the "administrator account" for WordPress.
       validation: Please enter a valid email address
       placeholder: user@example.com
     - name: input_optionalEmailAddress

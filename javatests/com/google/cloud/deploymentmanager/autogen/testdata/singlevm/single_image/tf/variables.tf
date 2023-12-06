@@ -47,7 +47,7 @@ variable "networks" {
 variable "sub_networks" {
   description = "The sub network name to attach the VM instance."
   type        = list(string)
-  default     = ["default"]
+  default     = []
 }
 
 variable "external_ips" {
@@ -83,4 +83,10 @@ variable "tcp_443_source_ranges" {
 variable "localSsdsCount" {
   type        = number
   default     = 0
+}
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = false
 }

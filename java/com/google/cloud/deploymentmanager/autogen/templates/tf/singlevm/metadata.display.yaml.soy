@@ -7,22 +7,20 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
 {@param solutionId: string}
-{@param? solutionInfo: SolutionMarketingInfo}
-{@param? templateVersion: string}
+{@param? solutionInfo: SolutionMarketingInfo|null}
+{@param? templateVersion: string|null}
 
 apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: BlueprintMetadata
 metadata:
   name: marketplace-tools-display
   annotations:
+    autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
 spec:
   info:
-    {if $solutionInfo}
-    title: {$solutionInfo.getName() + ' Template' |yamlprimitive: 4}
-    {else}
-    title: {$solutionId + ' template' |yamlprimitive: 4}
-    {/if}
+    title: Google Cloud Marketplace Terraform Module
+    source: {lb}{rb}
   ui:
     input:
       variables:
@@ -76,6 +74,7 @@ spec:
         {let $zoneDisplay kind="text"}
           {call blocks.zonePropertyDisplay}
             {param name: 'zone'/}
+            {param solutionHasGpus: solutionHasGpus($spec) /}
             {param zoneSpec: $spec.getZone() /}
           {/call}
         {/let}
@@ -83,7 +82,7 @@ spec:
 
         {let $networkDisplay kind="text"}
           {call blocks.networkPropertiesDisplay}
-            {param nameSuffix: 'network' /}
+            {param nameSuffix: 'networks' /}
             {param zonePropertyName: 'zone' /}
             {param spec: $spec.getNetworkInterfaces()! /}
           {/call}
@@ -109,6 +108,15 @@ spec:
         {$ipForwardingDisplay |indent: 8, true}{nil}
         {/if}
 
+        {for $gcpAuthScopeSpec in $spec.getGcpAuthScopesList()}
+        {let $gcpAuthScopesDisplay kind="text"}
+          {call blocks.gcpAuthScopesPropertyDisplay}
+            {param scope: $gcpAuthScopeSpec.getScope() /}
+          {/call}
+        {/let}
+        {$gcpAuthScopesDisplay |indent:8, true}{nil}
+        {/for}
+
         {if $spec.getAdditionalDisksList()}
         {let $additionalDisksDisplay kind="text"}
           {call blocks.additionalDisksPropertiesDisplay}
@@ -128,25 +136,69 @@ spec:
         {$deployInputDisplay |indent: 8, true}{nil}
         {/if}
 
+        {if $spec.getStackdriver()}
+        {let $stackdriverDisplay kind="text"}
+          {call blocks.stackdriverPropertyDisplay}
+            {param stackdriver: $spec.getStackdriver()/}
+          {/call}
+        {/let}
+        {$stackdriverDisplay |indent: 8, true}{nil}
+        {/if}
+
       sections:
       {let $deploymentInputTopSections kind="text"}
         {call blocks.topSections}
           {param spec: $spec.getDeployInput()/}
         {/call}
       {/let}
-      {$deploymentInputTopSections |indent: 6, true}{nil}
-      - name: boot_disk
-        title: Boot Disk
-        tooltip: Each instance requires a disk to boot from.
-      - name: additional_disks
-        title: Additional Disks
-        tooltip: The additional disks will be attached to the instance.
-      - name: networking
-        title: Networking
+      {$deploymentInputTopSections |indent: 8, true}{nil}
+        - name: boot_disk
+          title: Boot Disk
+          tooltip: Each instance requires a disk to boot from.
+      {if length($spec.getAdditionalDisksList()) == 1}
+        - name: additional_disks
+          title: Additional Disk
+          tooltip: The additional disk will be attached to the instance.
+      {/if}
+      {if length($spec.getAdditionalDisksList()) > 1}
+        - name: additional_disks
+          title: Additional Disks
+          tooltip: The additional disks will be attached to the instance.
+      {/if}
+        - name: networking
+          title: Networking
+      {if length($spec.getGcpAuthScopesList()) > 0}
+        - name: API_ACCESS
+          title: API Access
+          tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
+        {/if}
       {let $deploymentInputBottomSections kind="text"}
         {call blocks.bottomSections}
           {param spec: $spec.getDeployInput()/}
         {/call}
       {/let}
-      {$deploymentInputBottomSections |indent: 6, true}{nil}
+      {$deploymentInputBottomSections |indent: 8, true}{nil}
+      {if $spec.getStackdriver()}
+      {let $stackdriverBottomSections kind="text"}
+        {call blocks.stackdriverBottomSections}
+          {param stackdriver: $spec.getStackdriver()/}
+        {/call}
+      {/let}
+      {$stackdriverBottomSections |indent: 8, true}{nil}
+      {/if}
+    {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
+    {if $actionItems.length > 0}
+    runtime:
+      suggestedActions:
+      {for $action in $actionItems}
+        - heading: {$action.getHeading() |yamlprimitive: 10}
+        {if $action.getDescription()}
+          description: {$action.getDescription() |yamlprimitive: 10}
+        {/if}
+        {if $action.getSnippet()}
+          snippet: {$action.getSnippet() |yamlprimitive: 10}
+        {/if}
+        // TODO(b/309686695): Include "showIf" once template expressions are supported for TF
+      {/for}
+    {/if}
 {/template}
