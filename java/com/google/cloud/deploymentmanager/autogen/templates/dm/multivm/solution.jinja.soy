@@ -166,7 +166,7 @@ outputs:
   - name: {$tierHasExternalIP}
     value: $(ref.{$urlTier.getName()}-tier.hasExternalIP)
   {/if}
-  {if $spec.getAdminUrl() and (not $spec.getSiteUrl() or $spec.getSiteUrl().getTierVm()!.getTier() != $spec.getAdminUrl().getTierVm()!.getTier())}
+  {if $spec.getAdminUrl() && (not $spec.getSiteUrl() || $spec.getSiteUrl().getTierVm()!.getTier() != $spec.getAdminUrl().getTierVm()!.getTier())}
   {let $urlTier: findVmTier($spec.getAdminUrl().getTierVm()!.getTier()!, $spec.getTiersList())/}
   {let $tierHasExternalIP: tierPrefixed('hasExternalIP', $urlTier)/}
   - name: {$tierHasExternalIP}

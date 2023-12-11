@@ -39,12 +39,12 @@ Open {$firewallTitle} traffic{nil}
     gcloud --project={{ outputs().project }} compute firewall-rules
     create "{{ outputs().deployment }}{call utilities.firewallRuleNameSuffix}{param spec: $spec/}{param tierSpec: $tierSpec/}{/call}"
     --network {{ outputs().{$tierMainNetwork} }}
-    {if $spec.getPort() and $spec.getPort().length > 0}
+    {if $spec.getPort() && $spec.getPort().length > 0}
     --allow {$protocol |lowercased}:{$spec.getPort()}
     {else}
     --allow {$protocol |lowercased}
     {/if}
-    {if $tierSpec and $spec.getAllowedSource() != FirewallRuleSpec.TrafficSource.PUBLIC}
+    {if $tierSpec && $spec.getAllowedSource() != FirewallRuleSpec.TrafficSource.PUBLIC}
     {let $sourceTag kind="text"}
       {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.TIER}
         "{{ outputs().deployment }}-{$tierSpec.getName()}-tier"{nil}
@@ -279,7 +279,7 @@ validation: {$field.getEmailBox().getValidation().getDescription() |yamlprimitiv
 {if $field.getLevel()}
 level: {$field.getLevel()}
 {/if}
-{if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
+{if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP ||
     $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
 section: {$section.getName() |yamlprimitive: 0}
 {elseif $section.getPlacement() == DeployInputSection.Placement.TIER}
@@ -338,7 +338,7 @@ enumLabels:
 
 {template stackdriverBottomSections kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.getLogging() or $stackdriver?.getMonitoring()}
+{if $stackdriver?.getLogging() || $stackdriver?.getMonitoring()}
 - name: STACKDRIVER
   title: Stackdriver
   subtext: Monitoring and management for services, containers, applications, and infrastructure
@@ -395,7 +395,7 @@ enumLabels:
 {if $spec}
 {for $section in $spec.getSectionsList()}
 {for $field in $section.getFieldsList()}
-{if $field.getGroupedBooleanCheckbox() and $field.getGroupedBooleanCheckbox().getDisplayGroup()}
+{if $field.getGroupedBooleanCheckbox() && $field.getGroupedBooleanCheckbox().getDisplayGroup()}
 {let $group: $field.getGroupedBooleanCheckbox().getDisplayGroup()/}
 - name: {$group.getName() |yamlprimitive: 2}
   title: {$group.getTitle() |yamlprimitive: 2}

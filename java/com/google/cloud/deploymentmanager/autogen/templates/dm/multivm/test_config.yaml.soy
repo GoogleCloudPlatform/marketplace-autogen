@@ -18,7 +18,7 @@ resources:
 
   {let $testDefaultedFields: $spec.getDeployInput() ? findInputsWithTestDefaultValues($spec.getDeployInput()) : [] /}
   {let $defaultMap: getTestConfigDefaultValues($spec)/}
-  {if $testDefaultedFields.length > 0 or $defaultMap.keys().length > 0}
+  {if $testDefaultedFields.length > 0 || $defaultMap.keys().length > 0}
   properties:
   {for $field in $testDefaultedFields}
     {deployInputFieldName($field) |yamlprimitive: 4}: {findInputTestDefaultValue($field) |yamlprimitive: 4}
