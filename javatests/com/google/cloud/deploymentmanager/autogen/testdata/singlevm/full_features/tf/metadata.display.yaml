@@ -181,10 +181,12 @@ spec:
           name: enable_compute_api
           title: Allow read write access to Google Compute Engine APIs on the VM
           section: API_ACCESS
+          boolean_group: COMPUTE_API_ACCESS
         enable_compute_readonly_api:
           name: enable_compute_readonly_api
           title: Allow read access to Google Compute Engine APIs on the VM
           section: API_ACCESS
+          boolean_group: COMPUTE_READONLY_API_ACCESS
         disk1_size:
           name: disk1_size
           title: Disk1 size
@@ -286,11 +288,13 @@ spec:
           title: Enable compression
           level: 1
           section: CONTENT_SETTINGS
+          boolean_group: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
           section: CONTENT_SETTINGS
+          boolean_group: IMAGE_CACHING_OPTIONS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size
@@ -361,6 +365,15 @@ spec:
         - name: google_cloud_operations
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
+      boolean_groups:
+        - name: COMPUTE_API_ACCESS
+          title: Compute API
+        - name: COMPUTE_READONLY_API_ACCESS
+          title: Compute Readonly API
+        - name: IMAGE_CACHING_OPTIONS
+          title: Image caching options
+          tooltip: <a href='http://wordpress.com/help'>Learn more</a>
+          subtext: Advanced image caching options. Don't touch unless you know.
     runtime:
       suggestedActions:
         - heading: Log on now

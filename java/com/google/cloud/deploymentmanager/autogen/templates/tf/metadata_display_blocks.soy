@@ -1,7 +1,7 @@
 {namespace metadata.display.blocks}
 
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, DeployInputField, DeployInputSection, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, DeployInputField, DeployInputSection, DeployInputSpec, DiskSpec, FirewallRuleSpec, ImageSpec, IpForwardingSpec, MachineTypeSpec, NetworkInterfacesSpec, StackdriverSpec, VmTierSpec, ZoneSpec, GcpAuthScopeSpec, SingleVmDeploymentPackageSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 
 {template projectIdPropertyDisplay kind="text"}
@@ -351,7 +351,8 @@ disk{$index+1}_type:
   {/if}
 
 {if $field.getGroupedBooleanCheckbox()}
-  // TODO: support boolean groups once Blueprints UI Metadata supports them
+  {let $displayGroup: findDisplayGroup($field, $section)/}
+  boolean_group: {$displayGroup.getName() |yamlprimitive: 2}
 
 {elseif $field.getIntegerBox()}
   {let $box: $field.getIntegerBox() /}
@@ -462,10 +463,91 @@ disk{$index+1}_type:
   name: {$name}
   title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
   section: API_ACCESS
-  // TODO: support boolean groups once Blueprints UI Metadata supports them
+  boolean_group: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
 {/template}
 
 {template tierSectionName kind="text"}
 {@param spec: VmTierSpec}
 {$spec.getName() |uppercased}_TIER{nil}
+{/template}
+
+{template authScopeBooleanGroups kind="text"}
+{@param? singleVmSpec: SingleVmDeploymentPackageSpec|null}
+{@param? multiVmSpec: MultiVmDeploymentPackageSpec|null}
+{if $singleVmSpec and $singleVmSpec.getGcpAuthScopesList()}
+{for $spec in $singleVmSpec.getGcpAuthScopesList()}
+- name: {call authScopeBoolGroupName}{param scope: $spec.getScope()/}{/call}
+  title: {call authScopeBoolGroupTitle}{param scope: $spec.getScope()/}{/call}
+{/for}
+
+{else}
+
+{for $tier in $multiVmSpec!.getTiersList()}
+{for $spec in $tier.getGcpAuthScopesList()}
+- name: {call authScopeBoolGroupName}{param scope: $spec.getScope()/}{param tier: $tier/}{/call}
+  title: {call authScopeBoolGroupTitle}{param scope: $spec.getScope()/}{/call}
+{/for}
+{/for}
+{/if}
+{/template}
+
+{template authScopeBoolGroupName kind="text"}
+{@param scope: GcpAuthScopeSpec.Scope}
+{@param? tier: VmTierSpec|null}
+{if $tier}
+{call tierSectionName}{param spec: $tier/}{/call}_{nil}
+{/if}
+{switch $scope}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    CLOUD_PLATFORM_READONLY_API_ACCESS{nil}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    CLOUD_PLATFORM_API_ACCESS{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    COMPUTE_READONLY_API_ACCESS{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
+    COMPUTE_API_ACCESS{nil}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    SOURCE_READ_WRITE_API_ACCESS{nil}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    PROJECT_HOSTING_API_ACCESS{nil}
+{/switch}
+{/template}
+
+{template authScopeBoolGroupTitle kind="text"}
+{@param scope: GcpAuthScopeSpec.Scope}
+{switch $scope}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
+    Google Cloud Platform Readonly API{nil}
+  {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
+    Google Cloud Platform API{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
+    Compute Readonly API{nil}
+  {case GcpAuthScopeSpec.Scope.COMPUTE}
+    Compute API{nil}
+  {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
+    Cloud Source Repositories Readwrite API{nil}
+  {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
+    (Deprecated) Code Project Hosting APIs{nil}
+{/switch}
+{/template}
+
+{template customBooleanGroups kind="text"}
+{@param? spec: DeployInputSpec|null}
+{if $spec}
+{for $section in $spec.getSectionsList()}
+{for $field in $section.getFieldsList()}
+{if $field.getGroupedBooleanCheckbox() && $field.getGroupedBooleanCheckbox().getDisplayGroup()}
+{let $group: $field.getGroupedBooleanCheckbox().getDisplayGroup()/}
+- name: {$group.getName() |yamlprimitive: 2}
+  title: {$group.getTitle() |yamlprimitive: 2}
+  {if $group.getTooltip()}
+  tooltip: {$group.getTooltip() |yamlprimitive: 2}
+  {/if}
+  {if $group.getDescription()}
+  subtext: {$group.getDescription() |yamlprimitive: 2}
+  {/if}
+{/if}
+{/for}
+{/for}
+{/if}
 {/template}
