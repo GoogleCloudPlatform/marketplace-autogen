@@ -7,21 +7,28 @@ imports:
     path: common/password.py
   - name: path_utils.jinja
     path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
   - name: vm_instance.py
     path: common/vm_instance.py
 
-info:
-  version: '1.0'
-  title: WordPress Template
-
 required:
+  - instanceCount
   - zone
   - machineType
   - network
   - bootDiskType
   - bootDiskSizeGb
+  - image
+  - generatedPassword0
+  - generatedPassword1
 
 properties:
+  instanceCount:
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 10
   zone:
     type: string
     x-googleProperty:
@@ -29,16 +36,37 @@ properties:
   image:
     type: string
     enum:
-      - 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
-    default: 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
     x-googleProperty:
       type: GCE_DISK_IMAGE
   machineType:
     type: string
-    default: f1-micro
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.690000057220459
+  acceleratorType:
+    type: string
+    default: nvidia-tesla-v100
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: machineType
+        gpuType:
+          - nvidia-tesla-k80
+          - nvidia-tesla-v100
+          - nvidia-tesla-p4-vws
+  acceleratorCount:
+    type: integer
+    default: 0
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: machineType
   network:
     type: array
     default: [default]
@@ -67,7 +95,7 @@ properties:
       type: GCE_EXTERNAL_IP
       gceExternalIp:
         networkProperty: network
-        notConfigurable: True
+        notConfigurable: False
         allowStaticIps: True
   bootDiskType:
     type: string
@@ -84,55 +112,29 @@ properties:
       type: GCE_DISK_SIZE
       gceDiskSize:
         diskTypeProperty: bootDiskType
-  enableTcp80:
+  enableTcp9000:
     type: boolean
     default: True
     x-googleProperty:
       type: GCE_FIREWALL
       gceFirewall:
         networkProperty: network
-  tcp80SourceRanges:
-    type: string
-    x-googleProperty:
-      type: GCE_FIREWALL_RANGE
-      gceFirewallRange:
-        firewallProperty: enableTcp80
-  enableTcp443:
+  enableUdp2333:
     type: boolean
     default: True
     x-googleProperty:
       type: GCE_FIREWALL
       gceFirewall:
         networkProperty: network
-  tcp443SourceRanges:
+  generatedPassword0:
     type: string
-    x-googleProperty:
-      type: GCE_FIREWALL_RANGE
-      gceFirewallRange:
-        firewallProperty: enableTcp443
-  input_localSsdsCount:
-    type: integer
-    default: 0
-    minimum: 0
-    maximum: 3
+  generatedPassword1:
+    type: string
+  generatedPassword2:
+    type: string
   enableStackdriverLogging:
     type: boolean
     default: False
-
-outputs:
-  deployment:
-    type: string
-  password0:
-    type: string
-  project:
-    type: string
-  vmId:
-    type: string
-  vmExternalIP:
-    type: string
-  vmInternalIP:
-    type: string
-  vmName:
-    type: string
-  vmSelfLink:
-    type: string
+  enableStackdriverMonitoring:
+    type: boolean
+    default: True

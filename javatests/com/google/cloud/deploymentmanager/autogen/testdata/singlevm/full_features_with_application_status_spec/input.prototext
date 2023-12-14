@@ -69,10 +69,6 @@ solution_info {
 spec {
   version: "1.00"
   single_vm {
-    zone {
-      whitelisted_zones: ["us-central1-a", "europe-west1-a", "asia-northeast1-b"]
-      whitelisted_regions: ["us-east4", "southamerica-east1"]
-    }
     images {
       project: "bitnami-launchpad"
       name: "bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"
@@ -114,7 +110,7 @@ spec {
           default_size_gb: 1000
           min_size_gb: 20
         }
-        display_label: "The \"super-extra-great\" disk"
+        display_label: "The super-extra-great disk"
       },
       {
         device_name_suffix {
@@ -148,6 +144,10 @@ spec {
     firewall_rules {
       protocol: ICMP
     }
+    ip_forwarding: {
+      default_off: true
+      not_configurable: true
+    }
     site_url {
       scheme: HTTP
     }
@@ -178,16 +178,31 @@ spec {
         }
       }
     }
+    application_status {
+      type: WAITER
+      waiter {
+        waiter_timeout_secs: 480
+        script {
+          check_timeout_secs: 420
+          check_script_content: "failed=$(/etc/init.d/bitnami status \\\n    | grep \"not running\" | cut -d\" \" -f1 | tr \"\\n\" \" \")\nif [ ! -z \"$failed\" ]; then\n  echo \"Processes failed to start: $failed\"\n  exit 1\nfi"
+        }
+      }
+    }
     network_interfaces {
-      min_count: 2
-      max_count: 7
       external_ip {
         not_configurable: false
       }
-      labels: ["Main", "Management", "Extra"]
     }
     gce_startup_script {
       bash_script_content: "echo SUCCESS > /var/log/startup-log.txt"
+    }
+    gcp_auth_scopes {
+      scope: COMPUTE
+      default_off: true
+    }
+    gcp_auth_scopes {
+      scope: COMPUTE_READONLY
+      default_off: false
     }
     post_deploy {
       action_items {
@@ -215,6 +230,18 @@ spec {
           boolean_deploy_input_field {
             name: "showConditionalRowAndAction",
             negated: true
+          }
+        }
+      }
+      action_items {
+        heading: "Custom multiple conditional action item"
+        description: "This action is displayed only when the checkbox for multiple displaying conditional row and action was selected"
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionalRowAndAction"
+          }
+          has_external_ip {
+            negated: false
           }
         }
       }
@@ -293,10 +320,6 @@ spec {
       key: "user-username"
       value: "user@local"
     }
-    gce_metadata_items: {
-      key: "json_string"
-      value: "{\"foo\": \"bar\"}"
-    }
     gce_metadata_items {
       key: "some-other-domain-metadata"
       value_from_deploy_input_field: "domain"
@@ -339,7 +362,7 @@ spec {
         fields {
           name: "domain"
           title: "Domain"
-          description: "Your Wordpress \"blog\" domain"
+          description: "Your Wordpress blog domain"
           tooltip: "Register your own domain with <a href='http://domains.google'>Google</a>"
           required: true
           string_box {
@@ -354,7 +377,7 @@ spec {
         fields {
           name: "adminEmailAddress"
           title: "Administrator e-mail address"
-          tooltip: "The e-mail address used to create the \"administrator account\" for WordPress."
+          tooltip: "The e-mail address used to create the administrator account for WordPress."
           required: true
           email_box {
             validation {
@@ -535,6 +558,9 @@ spec {
           zone_dropdown {}
         }
       }
+    }
+    zone {
+      default_zone: "us-west1-b"
     }
     stackdriver {
       logging {

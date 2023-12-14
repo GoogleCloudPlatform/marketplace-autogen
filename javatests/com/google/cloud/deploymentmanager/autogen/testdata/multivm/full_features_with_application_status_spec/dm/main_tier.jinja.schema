@@ -7,64 +7,52 @@ imports:
     path: common/password.py
   - name: path_utils.jinja
     path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
   - name: vm_instance.py
     path: common/vm_instance.py
 
-info:
-  version: '1.00'
-  title: 'WordPress: Apache & PHP Template'
-
 required:
+  - instanceCount
   - zone
   - machineType
   - network
   - bootDiskType
   - bootDiskSizeGb
+  - image
+  - generatedPassword0
+  - generatedPassword1
+  - tier2_instanceCount
   - input_domain
-  - input_adminEmailAddress
-  - input_imageCacheSize
-  - input_cacheExpiration
-  - input_thirdDiskName
+  - input_superExtraDiskName
 
 properties:
+  instanceCount:
+    type: integer
+    default: 3
+    minimum: 1
+    maximum: 10
   zone:
     type: string
-    default: us-west1-b
     x-googleProperty:
       type: GCE_ZONE
   image:
     type: string
     enum:
-      - 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
-      - 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-6-1-0-linux-debian-8-x86-64'
-      - 'projects/click-to-deploy-images/global/images/wordpress-453-1607261609-debian-8-jessie-v20160718'
-    default: 'projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180123'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
     x-googleProperty:
       type: GCE_DISK_IMAGE
   machineType:
     type: string
-    default: f1-micro
+    default: e2-standard-2
     x-googleProperty:
       type: GCE_MACHINE_TYPE
       zoneProperty: zone
       gceMachineType:
-        minRamGb: 0.5
-  acceleratorType:
-    type: string
-    default: nvidia-tesla-k80
-    x-googleProperty:
-      type: GCE_GPU_TYPE
-      gceGpuType:
-        machineTypeProperty: machineType
-        gpuType:
-          - nvidia-tesla-k80
-  acceleratorCount:
-    type: integer
-    default: 1
-    x-googleProperty:
-      type: GCE_GPU_COUNT
-      gceGpuCount:
-        machineTypeProperty: machineType
+        minCpu: 1
+        minRamGb: 1.7000000476837158
   network:
     type: array
     default: [default]
@@ -86,7 +74,7 @@ properties:
         networkProperty: network
   externalIP:
     type: array
-    default: [EPHEMERAL]
+    default: [NONE]
     minItems: 1
     maxItems: 1
     x-googleProperty:
@@ -95,16 +83,22 @@ properties:
         networkProperty: network
         notConfigurable: False
         allowStaticIps: True
-  ipForward:
-    type: string
-    enum:
-      - 'On'
-      - 'Off'
-    default: 'Off'
+  enableCloudReadonlyApi:
+    type: boolean
+    default: True
+  enableCloudApi:
+    type: boolean
+    default: True
+  enableComputeReadonlyApi:
+    type: boolean
+    default: True
   enableComputeApi:
     type: boolean
-    default: False
-  enableComputeReadonlyApi:
+    default: True
+  enableSourceReadWriteApi:
+    type: boolean
+    default: True
+  enableProjecthostingApi:
     type: boolean
     default: True
   bootDiskType:
@@ -122,43 +116,13 @@ properties:
       type: GCE_DISK_SIZE
       gceDiskSize:
         diskTypeProperty: bootDiskType
-  disk1_type:
+  main_disk1_type:
     type: string
     default: pd-standard
     x-googleProperty:
       type: GCE_DISK_TYPE
       zoneProperty: zone
-  disk1_sizeGb:
-    type: integer
-    default: 1000
-    minimum: 20
-    maximum: 10000
-    x-googleProperty:
-      type: GCE_DISK_SIZE
-      gceDiskSize:
-        diskTypeProperty: disk1_type
-  disk2_type:
-    type: string
-    default: pd-standard
-    x-googleProperty:
-      type: GCE_DISK_TYPE
-      zoneProperty: zone
-  disk2_sizeGb:
-    type: integer
-    default: 500
-    minimum: 15
-    maximum: 10000
-    x-googleProperty:
-      type: GCE_DISK_SIZE
-      gceDiskSize:
-        diskTypeProperty: disk2_type
-  disk3_type:
-    type: string
-    default: pd-standard
-    x-googleProperty:
-      type: GCE_DISK_TYPE
-      zoneProperty: zone
-  disk3_sizeGb:
+  main_disk1_sizeGb:
     type: integer
     default: 10
     minimum: 10
@@ -166,7 +130,37 @@ properties:
     x-googleProperty:
       type: GCE_DISK_SIZE
       gceDiskSize:
-        diskTypeProperty: disk3_type
+        diskTypeProperty: main_disk1_type
+  main_disk2_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk2_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk2_type
+  main_disk3_type:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  main_disk3_sizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: main_disk3_type
   enableTcp80:
     type: boolean
     default: True
@@ -200,33 +194,36 @@ properties:
       type: GCE_FIREWALL
       gceFirewall:
         networkProperty: network
-  icmpSourceRanges:
+  enableTcp7000-7001:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  enableUdp:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  udpSourceRanges:
     type: string
     x-googleProperty:
       type: GCE_FIREWALL_RANGE
       gceFirewallRange:
-        firewallProperty: enableIcmp
+        firewallProperty: enableUdp
   input_domain:
     type: string
+    default: google.com
     pattern: '[a-zA-Z0-9-]+.[a-z]{2,}'
-  input_adminEmailAddress:
-    type: string
-    x-googleProperty:
-      type: EMAIL_ADDRESS
-  input_optionalEmailAddress:
-    type: string
-    default: default_value@example.com
-    x-googleProperty:
-      type: EMAIL_ADDRESS
-  input_showConditionalRowAndAction:
-    type: boolean
-    default: True
   input_generateOptionalPassword:
     type: boolean
     default: True
-  input_installPhpMyAdmin:
-    type: boolean
-    default: True
+  input_superExtraDiskName:
+    type: string
+    default: the-super-extra-disk
   input_imageCaching:
     type: string
     default: none
@@ -240,23 +237,6 @@ properties:
   input_imageSizing:
     type: boolean
     default: True
-  input_imageCacheSize:
-    type: integer
-    default: 50000
-    minimum: 100
-    maximum: 99999
-  input_cacheExpiration:
-    type: integer
-    default: 120
-    enum:
-    - 60
-    - 120
-    - 240
-    - 480
-  input_thirdDiskName:
-    type: string
-    default: third-disk
-    pattern: '[A-Za-z][A-Za-z0-9\-_]+'
   input_extraLbZone0:
     type: string
     default: us-west1-a
@@ -266,31 +246,17 @@ properties:
     type: string
     x-googleProperty:
       type: GCE_ZONE
+  generatedPassword0:
+    type: string
+  generatedPassword1:
+    type: string
+  generatedPassword2:
+    type: string
+  tier2_instanceCount:
+    type: integer
   enableStackdriverLogging:
     type: boolean
-    default: True
+    default: False
   enableStackdriverMonitoring:
     type: boolean
-    default: False
-
-outputs:
-  deployment:
-    type: string
-  password0:
-    type: string
-  password1:
-    type: string
-  password2:
-    type: string
-  project:
-    type: string
-  vmId:
-    type: string
-  vmExternalIP:
-    type: string
-  vmInternalIP:
-    type: string
-  vmName:
-    type: string
-  vmSelfLink:
-    type: string
+    default: True

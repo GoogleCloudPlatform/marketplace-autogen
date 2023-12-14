@@ -1,0 +1,682 @@
+# proto-file: java/com/google/cloud/deploymentmanager/autogen/autogen.proto
+# proto-message: DeploymentPackageInput
+
+partner_id: "click-to-deploy-images"
+solution_id: "jenkins"
+partner_info {
+  name: "Google Click to Deploy"
+  description: "Popular open stacks on Google Compute Engine packaged by Google."
+  url: "https://cloud.google.com/solutions/#click-to-deploy"
+  short_description: "Popular open stacks on Google Compute Engine packaged by Google."
+}
+solution_info {
+  name: "Jenkins"
+  version: "2.46.3"
+  description: "Jenkins is an open-source continuous integration software tool that provides real-time feedback for isolated changes that are part of a larger project. It supports multiple SCM tools including CVS, Subversion and Git. It can execute Apache Ant and Apache Maven-based projects as well as arbitrary scripts."
+  url: "https://jenkins.io/"
+  tagline: "A continuous integration and delivery tool"
+  support_info: "Google does not offer support for this solution. However, community support is available on <a href=\"http://stackoverflow.com/questions/tagged/jenkins\">Stack Overflow</a> . Additional support is available on <a href=\"https://wiki.jenkins-ci.org/display/JENKINS/Asking+for+Help\">community forums</a>."
+  eula_url: "https://jenkins.io/license/"
+  documentations {
+    url: "https://jenkins.io/doc/book/getting-started/"
+    title: "Jenkins Documentation"
+    destinations: DESTINATION_SOLUTION_DETAILS
+    destinations: DESTINATION_POST_DEPLOY
+  }
+  packaged_software_groups {
+    type: SOFTWARE_GROUP_OS
+    components {
+      name: "Debian"
+      version: "9"
+    }
+  }
+  packaged_software_groups {
+    components {
+      name: "Apache"
+      version: "2.4.10"
+    }
+    components {
+      name: "Jenkins"
+      version: "2.46.3"
+    }
+    components {
+      name: "OpenJDK"
+      version: "1.8.0"
+    }
+  }
+}
+spec {
+  version: "1.00"
+  multi_vm {
+    tiers {
+      name: "main"
+      title: "Main Tier"
+      instance_count {
+        default_value: 3
+        range {
+          start_value: 1
+          end_value: 10
+        }
+        description: 'A custom description for instance count.'
+      }
+      images {
+        project: "click-to-deploy-images"
+        name: "jenkins-v20180130"
+      }
+      images {
+        project: "click-to-deploy-images"
+        name: "jenkins-v20180123"
+      }
+      machine_type {
+        default_machine_type {
+          gce_machine_type: "e2-standard-2"
+        }
+        minimum {
+          cpu: 1
+          ram_gb: 1.7
+        }
+      }
+      boot_disk {
+        disk_size {
+          default_size_gb: 10
+          min_size_gb: 10
+        }
+        disk_type {
+          default_type: "pd-standard"
+        }
+      }
+      additional_disks: [
+        {
+          disk_size {
+            default_size_gb: 10
+            min_size_gb: 10
+          }
+          device_name_suffix {
+            name: "super-disk"
+          }
+          display_label: "Very-extra disk"
+        },
+        {
+          display_label: "Extra disk"
+          device_name_suffix {
+            name: "extra-disk"
+          }
+          prevent_auto_deletion: true
+        },
+        {
+          display_label: "Super Extra disk"
+          device_name_suffix {
+            name_from_deploy_input_field: "superExtraDiskName"
+          }
+        }
+      ]
+      local_ssds {
+        count: 2
+      }
+      gcp_auth_scopes {
+        scope: CLOUD_PLATFORM_READONLY
+      }
+      gcp_auth_scopes {
+        scope: CLOUD_PLATFORM
+      }
+      gcp_auth_scopes {
+        scope: COMPUTE_READONLY
+      }
+      gcp_auth_scopes {
+        scope: COMPUTE
+      }
+      gcp_auth_scopes {
+        scope: SOURCE_READ_WRITE
+      }
+      gcp_auth_scopes {
+        scope: PROJECTHOSTING
+      }
+      gce_startup_script {
+        bash_script_content: "start_up.sh\necho done\necho SUCCESS"
+      }
+      application_status {
+        type: WAITER
+        waiter {
+          waiter_timeout_secs: 300
+        }
+      }
+      network_interfaces {
+        external_ip {
+          default_type: NONE
+        }
+      }
+      gce_metadata_items {
+        key: "fixed-key"
+        value: "fixed-value"
+      }
+      gce_metadata_items {
+        key: "tier2-addresses"
+        tier_vm_names {
+          tier: "tier2"
+          all_vms {
+            delimiter: "|"
+          }
+        }
+      }
+      gce_metadata_items {
+        key: "domain-name",
+        value_from_deploy_input_field: "domain"
+      }
+      gce_metadata_items {
+        key: "condition-to-generate-password",
+        value_from_deploy_input_field: "generateOptionalPassword"
+      }
+      gce_metadata_items {
+        key: "image-caching",
+        value_from_deploy_input_field: "imageCaching"
+      }
+      gce_metadata_items {
+        key: "image-compression",
+        value_from_deploy_input_field: "imageCompression"
+      }
+      gce_metadata_items {
+        key: "image-sizing",
+        value_from_deploy_input_field: "imageSizing"
+      }
+      gce_metadata_items {
+        key: "extra-lb-zone0",
+        value_from_deploy_input_field: "extraLbZone0"
+      }
+      gce_metadata_items {
+        key: "extra-lb-zone1",
+        value_from_deploy_input_field: "extraLbZone1"
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "80"
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "443"
+      }
+      firewall_rules {
+        protocol: ICMP
+        allowed_source: DEPLOYMENT
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "7000-7001"
+        allowed_source: TIER
+      }
+      firewall_rules {
+        protocol: UDP
+        allowed_source: PUBLIC
+      }
+    }
+    tiers {
+      name: "tier2"
+      title: "Secondary Tier"
+      instance_count {
+        default_value: 2
+        list {
+          values: 1
+          values: 2
+          values: 4
+        }
+      }
+      images {
+        project: "click-to-deploy-images"
+        name: "jenkins-v20180130"
+      }
+      machine_type {
+        default_machine_type {
+          gce_machine_type: "e2-standard-2"
+        }
+        minimum {
+          cpu: 1
+          ram_gb: 1.7
+        }
+      }
+      boot_disk {
+        disk_size {
+          default_size_gb: 10
+          min_size_gb: 10
+        }
+        disk_type {
+          default_type: "pd-standard"
+        }
+      }
+      gce_startup_script {
+        bash_script_content: "cd /tmp\necho STARTED >> /tmp/startup_log\ncd -"
+      }
+      local_ssds {
+        count_from_deploy_input_field: "tier2LocalSSDs"
+      }
+      application_status {
+        type: WAITER
+        waiter {
+          waiter_timeout_secs: 360
+          script {
+            check_script_content: "return 0" # dummy check - says it's ok at first try
+          }
+        }
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "9878"
+        allowed_source: TIER
+      }
+      firewall_rules {
+        protocol: UDP
+        port: "2555"
+        allowed_source: DEPLOYMENT
+      }
+      network_interfaces {
+        external_ip {
+          not_configurable: true
+        }
+      }
+      gce_metadata_items {
+        key: "main-0"
+        tier_vm_names {
+          tier: "main"
+          vm_index: 0
+        }
+      }
+      gce_metadata_items {
+        key: "main-1"
+        tier_vm_names {
+          tier: "main"
+          vm_index: -1
+        }
+      }
+      gce_metadata_items {
+        key: "domain-name",
+        value_from_deploy_input_field: "domain"
+      }
+      gce_metadata_items {
+        key: "show-conditionals"
+        value_from_deploy_input_field: "showConditionals"
+      }
+      gce_metadata_items {
+        key: "condition-to-generate-password",
+        value_from_deploy_input_field: "generateOptionalPassword"
+      }
+      gce_metadata_items {
+        key: "image-caching",
+        value_from_deploy_input_field: "imageCaching"
+      }
+      gce_metadata_items {
+        key: "image-compression",
+        value_from_deploy_input_field: "imageCompression"
+      }
+      gce_metadata_items {
+        key: "image-sizing",
+        value_from_deploy_input_field: "imageSizing"
+      }
+      gce_metadata_items {
+        key: "extra-lb-zone0",
+        value_from_deploy_input_field: "extraLbZone0"
+      }
+      gce_metadata_items {
+        key: "extra-lb-zone1",
+        value_from_deploy_input_field: "extraLbZone1"
+      }
+      accelerators {
+        types: ["nvidia-tesla-k80", "nvidia-tesla-p100"]
+        default_count: 2
+        min_count: 2
+      }
+    }
+    tiers {
+      name: "tier3"
+      title: "Third Tier"
+      instance_count {
+        default_value: 1
+        range {
+          start_value: 1
+          end_value: 10
+        }
+      }
+      images {
+        project: "click-to-deploy-images"
+        name: "jenkins-v20180130"
+      }
+      firewall_rules {
+        protocol: TCP
+        port: "9000"
+        allowed_source: TIER
+      }
+      firewall_rules {
+        protocol: UDP
+        port: "2333"
+        allowed_source: DEPLOYMENT
+      }
+      machine_type {
+        default_machine_type {
+          gce_machine_type: "e2-standard-2"
+        }
+        minimum {
+          cpu: 1
+          ram_gb: 1.69
+        }
+      }
+      boot_disk {
+        disk_size {
+          default_size_gb: 10
+          min_size_gb: 10
+        }
+        disk_type {
+          default_type: "pd-standard"
+        }
+      }
+      gce_startup_script {
+        bash_script_content: "cd /tmp\necho STARTED >> /tmp/startup_log\ncd -"
+      }
+      application_status {
+        type: WAITER
+        waiter {
+          waiter_timeout_secs: 300
+        }
+      }
+      accelerators {
+        types: ["nvidia-tesla-k80", "nvidia-tesla-v100", "nvidia-tesla-p4-vws"]
+        default_type: "nvidia-tesla-v100"
+      }
+    }
+    site_url {
+      scheme: HTTP
+      tier_vm {
+        tier: "main"
+      }
+    }
+    admin_url {
+      scheme: HTTP
+      tier_vm {
+        tier: "tier2"
+      }
+    }
+    passwords {
+      metadata_key: "admin-password"
+      length: 8
+      display_label: "Admin"
+      username_from_deploy_input_field: "domain"
+    }
+    passwords {
+      metadata_key: "ghost-db-password"
+      length: 8
+      username: "ghost"
+      display_label: "Ghost MySQL"
+    }
+    passwords {
+      metadata_key: "optional-password"
+      length: 8
+      username: "some-user"
+      display_label: "This is optional"
+      generate_if {
+        boolean_deploy_input_field {
+          name: "generateOptionalPassword"
+        }
+      }
+    }
+    post_deploy {
+      info_rows {
+        label: "Conditional Row"
+        value: "This row is presented conditionally. Unselect the checkbox to hide it."
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionals"
+          }
+        }
+      }
+      info_rows {
+        label: "Conditional Row - negation"
+        value: "This row is presented conditionally. Select the checkbox to hide it."
+        show_if {
+          boolean_deploy_input_field {
+            name: "showConditionals",
+            negated: true
+          }
+        }
+      }
+      info_rows {
+        label: "Value from boolean deploy input field"
+        value_from_deploy_input_field: "showConditionals"
+      }
+      info_rows {
+        label: "External IP row"
+        value: "Some value"
+        show_if {
+          has_external_ip {
+            tier: "tier2"
+          }
+        }
+      }
+      info_rows {
+        label: "Internal IP row"
+        value: "Some value"
+        show_if {
+          has_external_ip {
+            tier: "tier2"
+            negated: true
+          }
+        }
+      }
+      action_items {
+        heading: "Conditional step"
+        description: "This step is displayed conditionally. Unselect the checkbox to hide it."
+        snippet: "e^(i * pi) + 1 = 0"
+        show_if {
+          boolean_deploy_input_field: {
+            name: "showConditionals"
+          }
+        }
+      }
+      action_items {
+        heading: "Conditional step - negation"
+        description: "This step is displayed conditionally. Select the checkbox to hide it."
+        snippet: "a^2 + b^2 = c^2"
+        show_if {
+          boolean_deploy_input_field: {
+            name: "showConditionals",
+            negated: true
+          }
+        }
+      }
+      action_items {
+        heading: "External IP action"
+        description: "Some action"
+        show_if {
+          has_external_ip {
+            tier: "main"
+          }
+        }
+      }
+      action_items {
+        heading: "Internal IP action"
+        description: "Some action"
+        show_if {
+          has_external_ip {
+            tier: "main"
+            negated: true
+          }
+        }
+      }
+      connect_button {
+        tier_vm {
+          tier: "main"
+        }
+      }
+      connect_button_label: "My Own SSH Label"
+    }
+    deploy_input {
+      sections {
+        placement: MAIN
+        fields {
+          name: "domain"
+          title: "Domain"
+          description: "Your domain"
+          required: true
+          string_box {
+            validation {
+              description: "A valid domain has to be entered"
+              regex: "[a-zA-Z0-9-]+.[a-z]{2,}"
+            }
+            default_value: "google.com"
+            test_default_value: "test.google.com"
+            placeholder: "mydomain.com"
+          }
+        }
+        fields {
+          name: "adminEmailAddress"
+          title: "Administrator e-mail address"
+          tooltip: "The e-mail address used to create the administrator account for WordPress."
+          required: true
+          email_box {
+            validation {
+              description: "Please enter a valid email address"
+              regex: "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+$"
+            }
+            placeholder: "user@example.com"
+            default_value: "aX9-YD_8W.3@example.com"
+          }
+        }
+        fields {
+          name: "optionalEmailAddress"
+          title: "Optional e-mail address"
+          email_box {
+            test_default_value: "test_default_value@example.com"
+            placeholder: "user@example.com"
+          }
+        }
+        fields {
+          name: "showConditionals"
+          title: "Show conditional values"
+          required: true
+          boolean_checkbox {
+            default_value: true
+          }
+        }
+        fields {
+          name: "generateOptionalPassword"
+          title: "Generate optional password"
+          boolean_checkbox {
+            default_value: true
+          }
+        }
+        fields {
+          name: "tier2LocalSSDs"
+          title: "Tier 2 - local SSDs"
+          integer_box {
+            default_value {
+              value: 0
+            }
+            validation {
+              min {
+                value: 0
+              }
+              max {
+                value: 5
+              }
+            }
+          }
+        }
+        fields {
+          name: "superExtraDiskName"
+          title: "Super-extra disk name"
+          required: true
+          string_box {
+            default_value: "the-super-extra-disk"
+          }
+        }
+      }
+      sections {
+        placement: TIER
+        title: "Advanced content settings"
+        description: "Controls advanced content caching. <a href=\'http://wordpress.com/help\'>Learn more</a>"
+        fields {
+          name: "imageCaching"
+          title: "Image caching"
+          level: 1
+          string_dropdown {
+            values: "none"
+            values: "redis"
+            values: "memcached"
+            default_value_index {
+            }
+            value_labels {
+              key: "redis"
+              value: "Cached with redis"
+            }
+            value_labels {
+              key: "memcached"
+              value: "Cached with memcached"
+            }
+            value_labels {
+              key: "none"
+              value: "Not cached"
+            }
+          }
+        }
+        fields {
+          name: "imageCompression"
+          title: "Enable compression"
+          level: 1
+          grouped_boolean_checkbox {
+            display_group {
+              name: "IMAGE_CACHING_OPTIONS"
+              title: "Image caching options"
+              description: "Advanced image caching options. Don\'t touch unless you know."
+              tooltip: "<a href=\'http://wordpress.com/help\'>Learn more</a>"
+            }
+          }
+        }
+        fields {
+          name: "imageSizing"
+          title: "Dynamic sizing"
+          level: 1
+          grouped_boolean_checkbox {
+            default_value: true
+          }
+        }
+        tier: "main"
+      }
+      sections {
+        placement: CUSTOM_BOTTOM
+        name: "LOAD_BALANCERS"
+        title: "Additional zones for load balancers"
+        fields {
+          name: "extraLbZone0"
+          title: "Zone"
+          level: 1
+          zone_dropdown {
+            default_value {
+              value: "us-west1-a"
+            }
+          }
+        }
+        fields {
+          name: "extraLbZone1"
+          title: "Zone"
+          level: 1
+          zone_dropdown {
+          }
+        }
+      }
+    }
+    zone {
+      default_zone: "us-west1-b"
+      whitelisted_zones: ["us-east4-a"]
+      whitelisted_regions: ["europe-west1"]
+    }
+    stackdriver {
+      logging {
+        default_on: false
+      }
+      monitoring {
+        default_on: true
+      }
+    }
+  }
+}
+logo {
+  raw {
+    content_type: PNG
+    content: "\211PNG\r"
+  }
+}

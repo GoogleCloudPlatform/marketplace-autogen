@@ -107,16 +107,6 @@ spec {
       length: 8
       username: "user"
     }
-    application_status {
-      type: WAITER
-      waiter {
-        waiter_timeout_secs: 480
-        script {
-          check_timeout_secs: 420
-          check_script_content: "failed=$(/etc/init.d/bitnami status \\\n    | grep \"not running\" | cut -d\" \" -f1 | tr \"\\n\" \" \")\nif [ ! -z \"$failed\" ]; then\n  echo \"Processes failed to start: $failed\"\n  exit 1\nfi"
-        }
-      }
-    }
     external_ip {
       default_type: EPHEMERAL
       not_configurable: true

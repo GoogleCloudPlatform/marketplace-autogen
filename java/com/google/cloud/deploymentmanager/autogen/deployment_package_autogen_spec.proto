@@ -122,6 +122,7 @@ message SingleVmDeploymentPackageSpec {
 
   // Defines how to determine the application installation status in
   // post-deployment. This tells when the application is ready for consumption.
+  // This is not supported for Terraform Autogen.
   ApplicationStatusSpec application_status = 10;
 
   // Defines how the VM is accessible from the Internet.
@@ -264,6 +265,7 @@ message VmTierSpec {
 
   // Defines how to determine that VMs in this tier are ready to serve.
   // The entire deployment is ready to serve when all tiers are.
+  // This is not supported for Terraform Autogen.
   ApplicationStatusSpec application_status = 9;
 
   // Defines how the VMs are accessible from the Internet.
@@ -573,6 +575,7 @@ message GceStartupScriptSpec {
 
 // Specifies how to monitor application installation status in order to
 // detect when the application is ready or has failed.
+// This is not supported for Terraform Autogen.
 message ApplicationStatusSpec {
   // Defines how to monitor application installation status.
   enum StatusType {

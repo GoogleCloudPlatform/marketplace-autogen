@@ -433,6 +433,22 @@ public class Autogen {
     if (input.hasArchitectureDiagram()) {
       validate(input.getArchitectureDiagram());
     }
+    if (input.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)) {
+      validateTerraformAutogen(input.getSpec());
+    }
+  }
+
+  private void validateTerraformAutogen(DeploymentPackageAutogenSpec spec) {
+    if (spec.hasSingleVm()) {
+      Preconditions.checkArgument(
+          !spec.getSingleVm().hasApplicationStatus(),
+          "Terraform autogen does not support Application Status.");
+    } else if (spec.hasMultiVm()) {
+      for (VmTierSpec tier : spec.getMultiVm().getTiersList()) {
+        Preconditions.checkArgument(
+            !tier.hasApplicationStatus(), "Terraform autogen does not support Application Status.");
+      }
+    }
   }
 
   private void validate(Image image) {
