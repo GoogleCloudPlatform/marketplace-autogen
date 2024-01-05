@@ -100,6 +100,7 @@ final class SoyDirectives {
         new CharEscaperBuilder()
             .addEscape('\\', "\\\\")
             .addEscape('"', "\\\"")
+            .addEscape('\n', "\\n")
             .toEscaper();
 
     @Override

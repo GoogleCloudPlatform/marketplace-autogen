@@ -64,6 +64,7 @@ public class SoyDirectivesTest {
     assertOutput("abc", "abc", doublequoted);
     assertOutput("ab\\\\c", "ab\\c", doublequoted);
     assertOutput("ab\\\"c", "ab\"c", doublequoted);
+    assertOutput("a\\nb", "a\nb", doublequoted);
   }
 
   @Test
