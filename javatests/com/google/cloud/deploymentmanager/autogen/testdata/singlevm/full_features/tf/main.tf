@@ -3,12 +3,12 @@ provider "google" {
 }
 
 locals {
-  network_interfaces_map = { for i, n in var.networks : n => {
+  network_interfaces = [ for i, n in var.networks : {
     network     = n,
     subnetwork  = length(var.sub_networks) > i ? element(var.sub_networks, i) : null
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     }
-  }
+  ]
 
   metadata = {
     bitnami-base-password = random_password.admin.result
@@ -103,9 +103,9 @@ resource "google_compute_instance" "instance" {
   metadata = local.metadata
 
   dynamic "network_interface" {
-    for_each = local.network_interfaces_map
+    for_each = local.network_interfaces
     content {
-      network = network_interface.key
+      network = network_interface.value.network
       subnetwork = network_interface.value.subnetwork
 
       dynamic "access_config" {
