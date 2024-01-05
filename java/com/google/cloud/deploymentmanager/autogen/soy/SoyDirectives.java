@@ -69,6 +69,7 @@ final class SoyDirectives {
       soyDirectiveSetBinder.addBinding().to(Trim.class);
       soyDirectiveSetBinder.addBinding().to(Uppercased.class);
       soyDirectiveSetBinder.addBinding().to(YamlPrimitive.class);
+      soyDirectiveSetBinder.addBinding().to(Sanitize.class);
     }
   }
 
@@ -436,6 +437,29 @@ final class SoyDirectives {
     
     private static String indentLines(String value, int indent) {
       return value.replace("\n", "\n" + " ".repeat(indent));
+    }
+  }
+
+  /**
+   * Removes all characters that are not letters, spaces, or '-', '_'
+   *
+   * <p>This removes characters that are not supported as Terraform identifiers. See:
+   * https://developer.hashicorp.com/terraform/language/syntax/configuration#identifiers
+   */
+  @VisibleForTesting
+  @Singleton
+  static class Sanitize extends BaseDirective {
+    @Inject
+    Sanitize() {}
+
+    @Override
+    public String getName() {
+      return "|sanitize";
+    }
+
+    @Override
+    public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
+      return StringData.forValue(value.coerceToString().replaceAll("[^\\p{L}\\p{Z}_-]", ""));
     }
   }
 

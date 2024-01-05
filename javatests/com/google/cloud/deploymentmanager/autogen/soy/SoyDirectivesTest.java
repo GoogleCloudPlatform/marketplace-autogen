@@ -21,6 +21,7 @@ import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Indent;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Lowercased;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Quoted;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.ReplaceAll;
+import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Sanitize;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Trim;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Uppercased;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.YamlPrimitive;
@@ -46,6 +47,7 @@ public class SoyDirectivesTest {
   Trim trim;
   Uppercased uppercased;
   YamlPrimitive yamlPrimitive;
+  Sanitize sanitize;
 
   @Before
   public void createDirectives() {
@@ -57,6 +59,7 @@ public class SoyDirectivesTest {
     trim = new Trim();
     uppercased = new Uppercased();
     yamlPrimitive = new YamlPrimitive();
+    sanitize = new Sanitize();
   }
 
   @Test
@@ -133,6 +136,13 @@ public class SoyDirectivesTest {
     assertOutput("'''abc'''", "'abc'", yamlPrimitive, 0);
     assertOutput(
         "abc", SanitizedContents.constantHtml("abc"), yamlPrimitive, 0);
+  }
+
+  @Test
+  public void testSanitize() {
+    assertOutput("abc", "abc", sanitize);
+    assertOutput("abc", "a@\"b#'c", sanitize);
+    assertOutput("-_z ", "-_z ", sanitize);
   }
 
   private static void assertOutput(

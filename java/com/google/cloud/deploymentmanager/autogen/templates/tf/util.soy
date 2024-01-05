@@ -149,7 +149,7 @@ projects/{$spec.getProject()}/global/images/{$spec.getName()}{nil}
 /**
  * Produces a sanitized part of a Terraform identifier from the display label of a password.
  *
- * Removes whitespace and converts display label to lower case.
+ * Removes whitespace and unsupported special characters and converts display label to lower case.
  *
  * See: https://developer.hashicorp.com/terraform/language/syntax/configuration#identifiers
  * for restrictions in indentifiers. We may need to revisit this function to omit special
@@ -158,7 +158,7 @@ projects/{$spec.getProject()}/global/images/{$spec.getName()}{nil}
  */
 {template sanitizePasswordLabel kind="text"}
 {@param spec: PasswordSpec}
-{$spec.getDisplayLabel()!.replaceAll(" ", "_") |lowercased}{nil}
+{$spec.getDisplayLabel()!.replaceAll(" ", "_") |lowercased |sanitize}{nil}
 {/template}
 
 /**
