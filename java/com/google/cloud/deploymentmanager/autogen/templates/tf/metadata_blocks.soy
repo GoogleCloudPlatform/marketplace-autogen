@@ -104,7 +104,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
   defaultValue:
-    - EPHEMERAL
+    - {externalIpTypeName($spec.getExternalIp()!.getDefaultType())}
 {/template}
 
 

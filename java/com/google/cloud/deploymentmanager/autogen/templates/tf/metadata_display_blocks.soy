@@ -215,7 +215,7 @@ enable_cloud_monitoring:
     type: ET_GCE_EXTERNAL_IP
     gceExternalIp:
       networkVariable: {$networkPropName}
-      type: IP_EPHEMERAL
+      notConfigurable: {$spec.getExternalIp()!.getNotConfigurable()}
       allowStaticIps: true
 {/template}
 

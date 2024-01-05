@@ -88,7 +88,7 @@ spec:
             type: ET_GCE_EXTERNAL_IP
             gceExternalIp:
               networkVariable: networks
-              type: IP_EPHEMERAL
+              notConfigurable: true
               allowStaticIps: true
         enable_tcp_80:
           name: enable_tcp_80
