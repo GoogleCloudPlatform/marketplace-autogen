@@ -176,7 +176,7 @@ spec:
               firewallVariable: enable_icmp
         disk1_size:
           name: disk1_size
-          title: Disk1 size
+          title: The "super-extra-great" disk size in GB
           min: 20
           max: 10000
           section: additional_disks
@@ -186,14 +186,14 @@ spec:
               diskTypeVariable: disk1_type
         disk1_type:
           name: disk1_type
-          title: Disk1 type
+          title: The "super-extra-great" disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
         disk2_size:
           name: disk2_size
-          title: Disk2 size
+          title: The less great disk size in GB
           min: 15
           max: 10000
           section: additional_disks
@@ -203,14 +203,14 @@ spec:
               diskTypeVariable: disk2_type
         disk2_type:
           name: disk2_type
-          title: Disk2 type
+          title: The less great disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
         disk3_size:
           name: disk3_size
-          title: Disk3 size
+          title: The third disk size in GB
           min: 10
           max: 10000
           section: additional_disks
@@ -220,7 +220,7 @@ spec:
               diskTypeVariable: disk3_type
         disk3_type:
           name: disk3_type
-          title: Disk3 type
+          title: The third disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE

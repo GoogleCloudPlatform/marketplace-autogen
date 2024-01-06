@@ -292,7 +292,7 @@ enable_cloud_monitoring:
 {@param zonePropertyName: string}
 disk{$index+1}_size:
   name: disk{$index+1}_size
-  title: Disk{$index+1} size
+  title: {$spec.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   max: 10000
   section: additional_disks
@@ -302,7 +302,7 @@ disk{$index+1}_size:
       diskTypeVariable: disk{$index+1}_type
 disk{$index+1}_type:
   name: disk{$index+1}_type
-  title: Disk{$index+1} type
+  title: {$spec.getDisplayLabel() + ' type' |yamlprimitive: 2}
   section: additional_disks
   xGoogleProperty:
     type: ET_GCE_DISK_TYPE

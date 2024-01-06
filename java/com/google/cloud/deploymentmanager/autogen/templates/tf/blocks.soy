@@ -165,7 +165,6 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size
-  description = "{$spec.getDisplayLabel() |doublequoted}"
 {rb}
 {/template}
 

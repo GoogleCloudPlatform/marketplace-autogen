@@ -35,7 +35,6 @@ resource "google_compute_disk" "disk1" {
   type = var.disk1_type
   zone = var.zone
   size = var.disk1_size
-  description = "The super-extra-great disk"
 }
 
 resource "google_compute_disk" "disk2" {
@@ -43,7 +42,6 @@ resource "google_compute_disk" "disk2" {
   type = var.disk2_type
   zone = var.zone
   size = var.disk2_size
-  description = "The less great disk"
 }
 
 resource "google_compute_disk" "disk3" {
@@ -51,7 +49,6 @@ resource "google_compute_disk" "disk3" {
   type = var.disk3_type
   zone = var.zone
   size = var.disk3_size
-  description = "The third disk"
 }
 
 resource "google_compute_instance" "instance" {
