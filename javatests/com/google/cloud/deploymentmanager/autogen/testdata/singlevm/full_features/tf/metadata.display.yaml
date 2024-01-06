@@ -327,11 +327,15 @@ spec:
           title: Zone
           level: 1
           section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
         extraLbZone1:
           name: extraLbZone1
           title: Zone
           level: 1
           section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
         enable_cloud_logging:
           name: enable_cloud_logging
           title: Enable Cloud Logging

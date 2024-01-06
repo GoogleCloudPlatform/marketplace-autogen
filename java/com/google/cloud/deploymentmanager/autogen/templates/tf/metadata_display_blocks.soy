@@ -394,6 +394,11 @@ disk{$index+1}_type:
   {/if}
   xGoogleProperty:
     type: ET_EMAIL_ADDRESS
+
+{elseif $field.getZoneDropdown()}
+  {let $box: $field.getZoneDropdown()/}
+  xGoogleProperty:
+    type: ET_GCE_ZONE
 {/if}
 
 {let $valueLabels: fieldValueLabelMap($field) ?? map() /}
