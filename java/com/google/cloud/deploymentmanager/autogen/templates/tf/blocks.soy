@@ -157,11 +157,16 @@ variable "disk{$index+1}_size" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
-{let $deviceName: $spec.getDeviceNameSuffix()!.getName() != "" ?
-$spec.getDeviceNameSuffix()!.getName() :
-(findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput).getStringBox()!.getDefaultValue() ?? "") /}
+{let $deviceNameSuffix kind="text"}
+  {if $spec.getDeviceNameSuffix()!.getName()}
+    {$spec.getDeviceNameSuffix()!.getName()}{nil}
+  {elseif $spec.getDeviceNameSuffix()!.getNameFromDeployInputField()}
+    {let $field: findDeployInputField($spec.getDeviceNameSuffix()!.getNameFromDeployInputField(), $deployInput)/}
+    ${lb}var.{$field.getName()}{rb}{nil}
+  {/if}
+{/let}
 resource "google_compute_disk" "disk{$index + 1}" {lb}
-  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceName}"
+  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceNameSuffix}"
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size

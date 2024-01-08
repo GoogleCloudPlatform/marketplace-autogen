@@ -51,7 +51,7 @@ resource "google_compute_disk" "disk2" {
 }
 
 resource "google_compute_disk" "disk3" {
-  name = "${var.goog_cm_deployment_name}-vm-third-disk"
+  name = "${var.goog_cm_deployment_name}-vm-${var.thirdDiskName}"
   type = var.disk3_type
   zone = var.zone
   size = var.disk3_size
