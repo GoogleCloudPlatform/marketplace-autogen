@@ -23,18 +23,27 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
     {param stackdriver: $spec.getStackdriver() /}
   {/call}
 {/let}
-
+{let $diskMetadata}
+  {call blocks.diskMetadata}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+  {/call}
+{/let}
+{let $startupScriptMetadata}
+  {call blocks.startupScriptMetadata}
+    {param startupSpec: $spec.getGceStartupScript()/}
+  {/call}
+{/let}
 provider "google" {lb}
   project = var.project_id
 {rb}
 {\n}
 locals {lb}
-  network_interfaces_map = {lb} for i, n in var.networks : n => {lb}
+  network_interfaces = [ for i, n in var.networks : {lb}
     network     = n,
     subnetwork  = length(var.sub_networks) > i ? element(var.sub_networks, i) : null
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     {rb}
-  {rb}
+  ]
 {\n}
   metadata = {lb}
   {if $passwordMetadata}
@@ -45,6 +54,12 @@ locals {lb}
   {/if}
   {if $stackdriverMetadata}
     {$stackdriverMetadata |indent: 4}
+  {/if}
+  {if $diskMetadata}
+    {$diskMetadata |indent: 4}
+  {/if}
+  {if $startupScriptMetadata}
+    {$startupScriptMetadata |indent: 4}
   {/if}
   {rb}
 {rb}
@@ -91,9 +106,9 @@ resource "google_compute_instance" "instance" {lb}
   metadata = local.metadata
 {\n}
   dynamic "network_interface" {lb}
-    for_each = local.network_interfaces_map
+    for_each = local.network_interfaces
     content {lb}
-      network = network_interface.key
+      network = network_interface.value.network
       subnetwork = network_interface.value.subnetwork
 {\n}
       dynamic "access_config" {lb}

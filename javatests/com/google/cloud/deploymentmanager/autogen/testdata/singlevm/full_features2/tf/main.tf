@@ -3,12 +3,12 @@ provider "google" {
 }
 
 locals {
-  network_interfaces_map = { for i, n in var.networks : n => {
+  network_interfaces = [ for i, n in var.networks : {
     network     = n,
     subnetwork  = length(var.sub_networks) > i ? element(var.sub_networks, i) : null
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     }
-  }
+  ]
 
   metadata = {
     bitnami-base-password = random_password.admin.result
@@ -28,6 +28,11 @@ locals {
     extra-lb-zone1 = var.extraLbZone1
     google-logging-enable = var.enable_cloud_logging ? "1" : "0"
     google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+    ATTACHED_DISKS = join(",", [google_compute_disk.disk1.name, google_compute_disk.disk2.name, google_compute_disk.disk3.name])
+    startup-script = <<-EOT
+    #!/bin/bash
+    echo SUCCESS > /var/log/startup-log.txt
+    EOT
   }
 }
 
@@ -36,7 +41,6 @@ resource "google_compute_disk" "disk1" {
   type = var.disk1_type
   zone = var.zone
   size = var.disk1_size
-  description = "The \"super-extra-great\" disk"
 }
 
 resource "google_compute_disk" "disk2" {
@@ -44,15 +48,13 @@ resource "google_compute_disk" "disk2" {
   type = var.disk2_type
   zone = var.zone
   size = var.disk2_size
-  description = "The less great disk"
 }
 
 resource "google_compute_disk" "disk3" {
-  name = "${var.goog_cm_deployment_name}-vm-third-disk"
+  name = "${var.goog_cm_deployment_name}-vm-${var.thirdDiskName}"
   type = var.disk3_type
   zone = var.zone
   size = var.disk3_size
-  description = "The third disk"
 }
 
 resource "google_compute_instance" "instance" {
@@ -102,9 +104,9 @@ resource "google_compute_instance" "instance" {
   metadata = local.metadata
 
   dynamic "network_interface" {
-    for_each = local.network_interfaces_map
+    for_each = local.network_interfaces
     content {
-      network = network_interface.key
+      network = network_interface.value.network
       subnetwork = network_interface.value.subnetwork
 
       dynamic "access_config" {

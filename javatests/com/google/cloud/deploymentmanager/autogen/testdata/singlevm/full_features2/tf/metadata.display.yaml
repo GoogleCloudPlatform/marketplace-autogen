@@ -96,6 +96,10 @@ spec:
             gceNetwork:
               allowSharedVpcs: true
               machineTypeVariable: machine_type
+              labels:
+              - Main
+              - Management
+              - Extra
         sub_networks:
           name: subnetworks
           title: Subnetwork name
@@ -118,7 +122,7 @@ spec:
             type: ET_GCE_EXTERNAL_IP
             gceExternalIp:
               networkVariable: networks
-              type: IP_EPHEMERAL
+              notConfigurable: false
               allowStaticIps: true
         enable_tcp_80:
           name: enable_tcp_80
@@ -176,7 +180,7 @@ spec:
               firewallVariable: enable_icmp
         disk1_size:
           name: disk1_size
-          title: Disk1 size
+          title: The "super-extra-great" disk size in GB
           min: 20
           max: 10000
           section: additional_disks
@@ -186,14 +190,14 @@ spec:
               diskTypeVariable: disk1_type
         disk1_type:
           name: disk1_type
-          title: Disk1 type
+          title: The "super-extra-great" disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
         disk2_size:
           name: disk2_size
-          title: Disk2 size
+          title: The less great disk size in GB
           min: 15
           max: 10000
           section: additional_disks
@@ -203,14 +207,14 @@ spec:
               diskTypeVariable: disk2_type
         disk2_type:
           name: disk2_type
-          title: Disk2 type
+          title: The less great disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
         disk3_size:
           name: disk3_size
-          title: Disk3 size
+          title: The third disk size in GB
           min: 10
           max: 10000
           section: additional_disks
@@ -220,7 +224,7 @@ spec:
               diskTypeVariable: disk3_type
         disk3_type:
           name: disk3_type
-          title: Disk3 type
+          title: The third disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
@@ -275,11 +279,13 @@ spec:
           title: Enable compression
           level: 1
           section: CONTENT_SETTINGS
+          boolean_group: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
           section: CONTENT_SETTINGS
+          boolean_group: IMAGE_CACHING_OPTIONS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size
@@ -312,11 +318,15 @@ spec:
           title: Zone
           level: 1
           section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
         extraLbZone1:
           name: extraLbZone1
           title: Zone
           level: 1
           section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
         enable_cloud_logging:
           name: enable_cloud_logging
           title: Enable Cloud Logging
@@ -347,6 +357,11 @@ spec:
         - name: google_cloud_operations
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
+      boolean_groups:
+        - name: IMAGE_CACHING_OPTIONS
+          title: Image caching options
+          tooltip: <a href='http://wordpress.com/help'>Learn more</a>
+          subtext: Advanced image caching options. Don't touch unless you know.
     runtime:
       suggestedActions:
         - heading: Log on now

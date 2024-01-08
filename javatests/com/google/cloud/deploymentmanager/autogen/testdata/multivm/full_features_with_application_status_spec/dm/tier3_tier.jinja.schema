@@ -1,0 +1,140 @@
+imports:
+  - name: common.py
+    path: common/common.py
+  - name: default.py
+    path: common/default.py
+  - name: password.py
+    path: common/password.py
+  - name: path_utils.jinja
+    path: common/path_utils.jinja
+  - name: software_status.py
+    path: common/software_status.py
+  - name: vm_instance.py
+    path: common/vm_instance.py
+
+required:
+  - instanceCount
+  - zone
+  - machineType
+  - network
+  - bootDiskType
+  - bootDiskSizeGb
+  - image
+  - generatedPassword0
+  - generatedPassword1
+
+properties:
+  instanceCount:
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 10
+  zone:
+    type: string
+    x-googleProperty:
+      type: GCE_ZONE
+  image:
+    type: string
+    enum:
+      - 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    default: 'projects/click-to-deploy-images/global/images/jenkins-v20180130'
+    x-googleProperty:
+      type: GCE_DISK_IMAGE
+  machineType:
+    type: string
+    default: e2-standard-2
+    x-googleProperty:
+      type: GCE_MACHINE_TYPE
+      zoneProperty: zone
+      gceMachineType:
+        minCpu: 1
+        minRamGb: 1.690000057220459
+  acceleratorType:
+    type: string
+    default: nvidia-tesla-v100
+    x-googleProperty:
+      type: GCE_GPU_TYPE
+      gceGpuType:
+        machineTypeProperty: machineType
+        gpuType:
+          - nvidia-tesla-k80
+          - nvidia-tesla-v100
+          - nvidia-tesla-p4-vws
+  acceleratorCount:
+    type: integer
+    default: 0
+    x-googleProperty:
+      type: GCE_GPU_COUNT
+      gceGpuCount:
+        machineTypeProperty: machineType
+  network:
+    type: array
+    default: [default]
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_NETWORK
+      gceNetwork:
+        allowSharedVpcs: True
+        machineTypeProperty: machineType
+  subnetwork:
+    type: array
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_SUBNETWORK
+      zoneProperty: zone
+      gceSubnetwork:
+        networkProperty: network
+  externalIP:
+    type: array
+    default: [EPHEMERAL]
+    minItems: 1
+    maxItems: 1
+    x-googleProperty:
+      type: GCE_EXTERNAL_IP
+      gceExternalIp:
+        networkProperty: network
+        notConfigurable: False
+        allowStaticIps: True
+  bootDiskType:
+    type: string
+    default: pd-standard
+    x-googleProperty:
+      type: GCE_DISK_TYPE
+      zoneProperty: zone
+  bootDiskSizeGb:
+    type: integer
+    default: 10
+    minimum: 10
+    maximum: 10000
+    x-googleProperty:
+      type: GCE_DISK_SIZE
+      gceDiskSize:
+        diskTypeProperty: bootDiskType
+  enableTcp9000:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  enableUdp2333:
+    type: boolean
+    default: True
+    x-googleProperty:
+      type: GCE_FIREWALL
+      gceFirewall:
+        networkProperty: network
+  generatedPassword0:
+    type: string
+  generatedPassword1:
+    type: string
+  generatedPassword2:
+    type: string
+  enableStackdriverLogging:
+    type: boolean
+    default: False
+  enableStackdriverMonitoring:
+    type: boolean
+    default: True

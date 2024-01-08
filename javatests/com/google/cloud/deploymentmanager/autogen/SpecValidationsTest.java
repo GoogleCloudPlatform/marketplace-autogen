@@ -30,6 +30,7 @@ import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validat
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateSingleVmPostDeployInfo;
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateStackdriver;
 import static com.google.cloud.deploymentmanager.autogen.SpecValidations.validateStartupScript;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.cloud.deploymentmanager.autogen.proto.AcceleratorSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.ApplicationStatusSpec;
@@ -41,6 +42,8 @@ import com.google.cloud.deploymentmanager.autogen.proto.DeployInputField.EmailBo
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputSection;
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputSection.Placement;
 import com.google.cloud.deploymentmanager.autogen.proto.DeployInputSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec;
+import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.DiskSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.DiskSpec.DeviceName;
 import com.google.cloud.deploymentmanager.autogen.proto.DiskSpec.DiskSize;
@@ -68,11 +71,13 @@ import com.google.cloud.deploymentmanager.autogen.proto.StackdriverSpec;
 import com.google.cloud.deploymentmanager.autogen.proto.TierVmInstance;
 import com.google.cloud.deploymentmanager.autogen.proto.VmTierSpec;
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Guice;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -84,6 +89,9 @@ import org.junit.runners.JUnit4;
 public class SpecValidationsTest {
 
   @Rule public ExpectedException thrown = ExpectedException.none();
+
+  private static final Autogen AUTOGEN =
+      Guice.createInjector(Autogen.getAutogenModule()).getInstance(Autogen.class);
 
   @Test
   public void missingAnyTier() {
@@ -1683,6 +1691,30 @@ public class SpecValidationsTest {
     validate(builder.build());
   }
 
+  @Test
+  public void validateTerraformSpec() {
+    IllegalArgumentException exception =
+        Assert.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                AUTOGEN.generateDeploymentPackage(
+                    invalidTerraformSpecWithApplicationStatusSpec().build(),
+                    Autogen.SharedSupportFilesStrategy.INCLUDED));
+    assertThat(exception)
+        .hasMessageThat()
+        .isEqualTo("Terraform autogen does not support Application Status.");
+  }
+
+  private DeploymentPackageInput.Builder invalidTerraformSpecWithApplicationStatusSpec() {
+    return DeploymentPackageInput.newBuilder()
+        .setPartnerId("partner-id")
+        .setSolutionId("solution-id")
+        .setSpec(
+            DeploymentPackageAutogenSpec.newBuilder()
+                .setSingleVm(newSingleSpecWithApplicationStatus().build())
+                .setDeploymentTool(DeploymentPackageAutogenSpec.DeploymentTool.TERRAFORM));
+  }
+
   private void expectIllegalArgumentException(String message) {
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage(message);
@@ -1700,6 +1732,30 @@ public class SpecValidationsTest {
 
   private SingleVmDeploymentPackageSpec.Builder newSingleSpecWithDefaults() {
     return newSingleSpec()
+        .setNetworkInterfaces(
+            NetworkInterfacesSpec.newBuilder()
+                .setMinCount(2)
+                .setMaxCount(6)
+                .setExternalIp(ExternalIpSpec.newBuilder().setDefaultType(Type.EPHEMERAL)))
+        .setMachineType(
+            MachineTypeSpec.newBuilder()
+                .setDefaultMachineType(MachineType.newBuilder().setGceMachineType("e2-standard-2")))
+        .setBootDisk(
+            DiskSpec.newBuilder()
+                .setDiskType(DiskType.newBuilder().setDefaultType("pd-ssd"))
+                .setDiskSize(DiskSize.newBuilder().setDefaultSizeGb(5))
+                .setDisplayLabel("Boot disk"))
+        .addAdditionalDisks(
+            DiskSpec.newBuilder()
+                .setDeviceNameSuffix(DeviceName.newBuilder().setName("data-disk"))
+                .setDiskType(DiskType.newBuilder().setDefaultType("pd-ssd"))
+                .setDiskSize(DiskSize.newBuilder().setDefaultSizeGb(5))
+                .setDisplayLabel("Data Disk"));
+  }
+
+  private SingleVmDeploymentPackageSpec.Builder newSingleSpecWithApplicationStatus() {
+    return newSingleSpec()
+        .setApplicationStatus(ApplicationStatusSpec.getDefaultInstance())
         .setNetworkInterfaces(
             NetworkInterfacesSpec.newBuilder()
                 .setMinCount(2)

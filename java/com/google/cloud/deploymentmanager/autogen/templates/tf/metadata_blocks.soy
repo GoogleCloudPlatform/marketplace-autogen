@@ -104,7 +104,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
   defaultValue:
-    - EPHEMERAL
+    - {externalIpTypeName($spec.getExternalIp()!.getDefaultType())}
 {/template}
 
 
@@ -186,7 +186,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {/let}
 - name: disk{$index+1}_size
   description: {$diskSizeDescription}
-  varType: number
+  varType: integer
   defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
 - name: disk{$index+1}_type
   description: {$spec.getDisplayLabel()}

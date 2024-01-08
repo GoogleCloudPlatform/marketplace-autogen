@@ -210,16 +210,17 @@ final class SoyFunctions {
     }
   }
 
-  /**
-   * Finds the input field definition from the field name.
-   */
+  /** Finds the input field definition from the field name. */
   @VisibleForTesting
   @Singleton
   @SoyFunctionSignature(
       name = "findDeployInputField",
       value = {
         @Signature(
-            parameterTypes = {"string", "cloud.deploymentmanager.autogen.DeployInputSpec|null"},
+            parameterTypes = {
+              "string",
+              "cloud.deploymentmanager.autogen.DeployInputSpec|null|undefined"
+            },
             returnType = "cloud.deploymentmanager.autogen.DeployInputField")
       })
   static final class FindDeployInputField extends TypedSoyFunction implements SoyJavaFunction {
@@ -426,7 +427,10 @@ final class SoyFunctions {
       name = "findVmTier",
       value = {
         @Signature(
-            parameterTypes = {"string", "list<cloud.deploymentmanager.autogen.VmTierSpec>|null"},
+            parameterTypes = {
+              "string",
+              "list<cloud.deploymentmanager.autogen.VmTierSpec>|null|undefined"
+            },
             returnType = "cloud.deploymentmanager.autogen.VmTierSpec")
       })
   static final class FindVmTier extends TypedSoyFunction implements SoyJavaFunction {
@@ -500,12 +504,15 @@ final class SoyFunctions {
       name = "tierPrefixed",
       value = {
         @Signature(
-            parameterTypes = {"string", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            parameterTypes = {
+              "string",
+              "cloud.deploymentmanager.autogen.VmTierSpec|null|undefined"
+            },
             returnType = "string"),
         @Signature(
             parameterTypes = {
               "string",
-              "cloud.deploymentmanager.autogen.VmTierSpec|null",
+              "cloud.deploymentmanager.autogen.VmTierSpec|null|undefined",
               "string"
             },
             returnType = "string")
@@ -557,7 +564,7 @@ final class SoyFunctions {
         @Signature(
             parameterTypes = {
               "cloud.deploymentmanager.autogen.BooleanExpression",
-              "list<cloud.deploymentmanager.autogen.VmTierSpec>|null"
+              "list<cloud.deploymentmanager.autogen.VmTierSpec>|null|undefined"
             },
             returnType = "string")
       })
@@ -831,7 +838,7 @@ final class SoyFunctions {
             parameterTypes = {"int"},
             returnType = "string"),
         @Signature(
-            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null|undefined"},
             returnType = "string")
       })
   static final class AdditionalDiskTypePropertyName extends AbstractDiskPropertyName {
@@ -854,7 +861,7 @@ final class SoyFunctions {
             parameterTypes = {"int"},
             returnType = "string"),
         @Signature(
-            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null"},
+            parameterTypes = {"int", "cloud.deploymentmanager.autogen.VmTierSpec|null|undefined"},
             returnType = "string")
       })
   static final class AdditionalDiskSizePropertyName extends AbstractDiskPropertyName {

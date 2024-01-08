@@ -126,7 +126,7 @@ spec:
         defaultValue: true
       - name: disk1_size
         description: The super-extra-great disk size in GB
-        varType: number
+        varType: integer
         defaultValue: 1000
       - name: disk1_type
         description: The super-extra-great disk
@@ -134,7 +134,7 @@ spec:
         defaultValue: pd-standard
       - name: disk2_size
         description: The less great disk size in GB
-        varType: number
+        varType: integer
         defaultValue: 500
       - name: disk2_type
         description: The less great disk
@@ -142,7 +142,7 @@ spec:
         defaultValue: pd-standard
       - name: disk3_size
         description: The third disk size in GB
-        varType: number
+        varType: integer
         defaultValue: 10
       - name: disk3_type
         description: The third disk

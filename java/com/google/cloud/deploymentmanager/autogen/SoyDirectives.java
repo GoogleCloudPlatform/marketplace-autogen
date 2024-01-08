@@ -21,7 +21,6 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.template.soy.data.SoyProtoValue;
 import com.google.template.soy.data.SoyValue;
-import com.google.template.soy.data.restricted.NullData;
 import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.shared.restricted.SoyJavaPrintDirective;
 import com.google.template.soy.shared.restricted.SoyPrintDirective;
@@ -73,7 +72,7 @@ final class SoyDirectives {
 
     @Override
     public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
-      if (args.get(0) instanceof NullData) {
+      if (args.get(0).isNullish()) {
         return value;
       }
       String joiner = "_";
