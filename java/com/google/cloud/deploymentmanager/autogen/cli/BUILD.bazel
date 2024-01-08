@@ -8,6 +8,7 @@ java_library(
     deps = [
         "//java/com/google/cloud/deploymentmanager/autogen",
         "//java/com/google/cloud/deploymentmanager/autogen:autogen_java_proto",
+        "//java/com/google/cloud/deploymentmanager/autogen:deployment_package_autogen_spec_java_proto",
         "@maven//:aopalliance_aopalliance",
         "@maven//:com_google_code_gson_gson",
         "@maven//:com_google_common_html_types_types",

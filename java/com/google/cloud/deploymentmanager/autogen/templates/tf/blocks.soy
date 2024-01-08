@@ -354,7 +354,7 @@ ATTACHED_DISKS = join(",", {$deviceNameArray}){nil}
 {/template}
 
 {template startupScriptMetadata kind="text"}
-{@param? startupSpec: GceStartupScriptSpec|undefined}
+{@param? startupSpec: GceStartupScriptSpec|null}
 {if $startupSpec?.getBashScriptContent()}
 startup-script = <<-EOT
 #!/bin/bash
