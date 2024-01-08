@@ -340,6 +340,24 @@ variable "{$field.getName()}" {lb}
 {/for}
 {/template}
 
+{template diskMetadata kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+{if length($diskSpecs)}
+{let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + '.name' for $a, $i in $diskSpecs]/}
+ATTACHED_DISKS = join(",", {$deviceNameArray}){nil}
+{/if}
+{/template}
+
+{template startupScriptMetadata kind="text"}
+{@param? startupSpec: GceStartupScriptSpec|undefined}
+{if $startupSpec?.getBashScriptContent()}
+startup-script = <<-EOT
+#!/bin/bash
+{$startupSpec?.getBashScriptContent()}
+EOT{nil}
+{/if}
+{/template}
+
 {template stackdriverMetadata kind="text"}
 {@param? stackdriver: StackdriverSpec|null}
 google-logging-enable = {nil}

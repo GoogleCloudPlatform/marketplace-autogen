@@ -193,6 +193,12 @@ enable_cloud_monitoring:
     gceNetwork:
       allowSharedVpcs: true
       machineTypeVariable: machine_type
+    {if length($spec.getLabelsList()) > 0}
+      labels:
+      {for $label in $spec.getLabelsList()}
+      - {$label}
+      {/for}
+    {/if}
 {'sub_' + $nameSuffix |tierprefixed: $tier}:
   name: {'sub' + $nameSuffix |tierprefixed: $tier}
   title: Subnetwork name

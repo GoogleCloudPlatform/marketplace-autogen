@@ -23,7 +23,16 @@ import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentman
     {param stackdriver: $spec.getStackdriver() /}
   {/call}
 {/let}
-
+{let $diskMetadata}
+  {call blocks.diskMetadata}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+  {/call}
+{/let}
+{let $startupScriptMetadata}
+  {call blocks.startupScriptMetadata}
+    {param startupSpec: $spec.getGceStartupScript()/}
+  {/call}
+{/let}
 provider "google" {lb}
   project = var.project_id
 {rb}
@@ -45,6 +54,12 @@ locals {lb}
   {/if}
   {if $stackdriverMetadata}
     {$stackdriverMetadata |indent: 4}
+  {/if}
+  {if $diskMetadata}
+    {$diskMetadata |indent: 4}
+  {/if}
+  {if $startupScriptMetadata}
+    {$startupScriptMetadata |indent: 4}
   {/if}
   {rb}
 {rb}

@@ -96,6 +96,10 @@ spec:
             gceNetwork:
               allowSharedVpcs: true
               machineTypeVariable: machine_type
+              labels:
+              - Main
+              - Management
+              - Extra
         sub_networks:
           name: subnetworks
           title: Subnetwork name

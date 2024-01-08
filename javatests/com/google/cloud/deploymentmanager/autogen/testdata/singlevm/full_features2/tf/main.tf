@@ -28,6 +28,11 @@ locals {
     extra-lb-zone1 = var.extraLbZone1
     google-logging-enable = var.enable_cloud_logging ? "1" : "0"
     google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+    ATTACHED_DISKS = join(",", [google_compute_disk.disk1.name, google_compute_disk.disk2.name, google_compute_disk.disk3.name])
+    startup-script = <<-EOT
+    #!/bin/bash
+    echo SUCCESS > /var/log/startup-log.txt
+    EOT
   }
 }
 
