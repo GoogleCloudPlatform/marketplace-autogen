@@ -441,7 +441,7 @@ final class SoyDirectives {
   }
 
   /**
-   * Removes all characters that are not letters, spaces, or '-', '_'
+   * Removes all characters that are not letters, numbers, spaces, or '-', '_'
    *
    * <p>This removes characters that are not supported as Terraform identifiers. See:
    * https://developer.hashicorp.com/terraform/language/syntax/configuration#identifiers
@@ -459,7 +459,7 @@ final class SoyDirectives {
 
     @Override
     public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
-      return StringData.forValue(value.coerceToString().replaceAll("[^\\p{L}\\p{Z}_-]", ""));
+      return StringData.forValue(value.coerceToString().replaceAll("[^\\p{L}\\p{N}\\p{Z}_-]", ""));
     }
   }
 
