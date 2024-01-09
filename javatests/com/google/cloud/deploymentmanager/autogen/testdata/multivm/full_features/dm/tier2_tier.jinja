@@ -64,7 +64,6 @@ resources:
             - 'https://www.googleapis.com/auth/devstorage.read_only'
             - 'https://www.googleapis.com/auth/logging.write'
             - 'https://www.googleapis.com/auth/monitoring.write'
-            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
       metadata:
         items:
           - key: admin-password
@@ -75,23 +74,12 @@ resources:
           - key: optional-password
             value: {{ properties["generatedPassword2"] }}
           {% endif %}
-          {% if enableStatusWaiter %}
-          - key: status-config-url
-            value: $(ref.software-status.config-url)
-          - key: status-variable-path
-            value: $(ref.software-status.variable-path)
-          - key: status-uptime-deadline
-            value: 360
-          - key: startup-script
-            value: $(ref.software-status-script.startup-script)
-          {% else %}
           - key: startup-script
             value: |-
               #!/bin/bash
               cd /tmp
               echo STARTED >> /tmp/startup_log
               cd -
-          {% endif %}
           - key: main-0
             value: {{ env["deployment"] }}-main-vm-0
           - key: main-1
@@ -129,31 +117,6 @@ resources:
           - {{ env["deployment"] }}-deployment
           - {{ env["deployment"] }}-tier2-tier
   {% endfor %}
-  {% if enableStatusWaiter %}
-  {% if instanceCount > 0 %}
-  - name: software-status
-    type: software_status.py
-    properties:
-      timeout: 360
-      prefix: {{ env['deployment'] }}-tier2
-      waiterDependsOn:
-        {% for vmIndex in range(instanceCount) %}
-        - {{ env["deployment"] }}-tier2-vm-{{ vmIndex }}
-        {% endfor %}
-      {% if instanceCount > 1 %}
-      successNumber: {{ instanceCount }}
-      {% endif %}
-  - name: software-status-script
-    type: software_status_script.py
-    properties:
-      initScript: |-
-        cd /tmp
-        echo STARTED >> /tmp/startup_log
-        cd -
-      checkScript: |-
-        return 0
-  {% endif %}
-  {% endif %}
   {% if properties["enableTcp9878"] %}
   - name: {{ env["deployment"] }}-tier2-tcp-9878
     type: compute.v1.firewall

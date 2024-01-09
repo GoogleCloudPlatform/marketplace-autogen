@@ -100,7 +100,6 @@ resources:
             {% if enableProjecthostingApi %}
             - 'https://www.googleapis.com/auth/projecthosting'
             {% endif %}
-            - 'https://www.googleapis.com/auth/cloudruntimeconfig'
       metadata:
         items:
           - key: admin-password
@@ -117,14 +116,6 @@ resources:
               start_up.sh
               echo done
               echo SUCCESS
-          {% if enableStatusWaiter %}
-          - key: status-config-url
-            value: $(ref.software-status.config-url)
-          - key: status-variable-path
-            value: $(ref.software-status.variable-path)
-          - key: status-uptime-deadline
-            value: 300
-          {% endif %}
           - key: fixed-key
             value: fixed-value
           - key: tier2-addresses
@@ -162,22 +153,6 @@ resources:
           - {{ env["deployment"] }}-deployment
           - {{ env["deployment"] }}-main-tier
   {% endfor %}
-  {% if enableStatusWaiter %}
-  {% if instanceCount > 0 %}
-  - name: software-status
-    type: software_status.py
-    properties:
-      timeout: 300
-      prefix: {{ env['deployment'] }}-main
-      waiterDependsOn:
-        {% for vmIndex in range(instanceCount) %}
-        - {{ env["deployment"] }}-main-vm-{{ vmIndex }}
-        {% endfor %}
-      {% if instanceCount > 1 %}
-      successNumber: {{ instanceCount }}
-      {% endif %}
-  {% endif %}
-  {% endif %}
   {% if properties["enableTcp80"] %}
   - name: {{ env["deployment"] }}-main-tcp-80
     type: compute.v1.firewall
