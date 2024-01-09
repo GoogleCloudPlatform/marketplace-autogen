@@ -112,6 +112,7 @@ public class Autogen {
           "singlevm/outputs.tf.soy",
           "singlevm/metadata.yaml.soy",
           "singlevm/metadata.display.yaml.soy",
+          "multivm/main.tf.soy",
           "blocks.soy",
           "constants.soy",
           "util.soy",
@@ -345,16 +346,25 @@ public class Autogen {
   /** Builds the deployment package for {@link MultiVmDeploymentPackageSpec} */
   private SolutionPackage buildMultiVm(
       DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
-    if (input.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)) {
-      throw new UnsupportedOperationException(
-          "Terraform Autogen doesn't currently support multi-vm deployment");
+    switch (input.getSpec().getDeploymentTool()) {
+      case DEPLOYMENT_TOOL_UNSPECIFIED:
+      case DEPLOYMENT_MANAGER:
+        return buildDmMultiVm(input, sharedSupportFilesStrategy);
+      case TERRAFORM:
+        return buildTerraformMultiVm(input);
+      case UNRECOGNIZED:
+        throw new AssertionError("unrecognized deployment tool");
     }
+    throw new AssertionError("unreachable");
+  }
 
+  private SolutionPackage buildDmMultiVm(
+      DeploymentPackageInput input, SharedSupportFilesStrategy sharedSupportFilesStrategy) {
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     String solutionId = input.getSolutionId();
     ImageInfo imageInfo = generateImages(input, builder);
     MultiVmDeploymentPackageSpec spec = input.getSpec().getMultiVm();
-    Map<String, Object> params = makeMultiVmParams(input, imageInfo);
+    ImmutableMap<String, Object> params = makeMultiVmParams(input, imageInfo);
 
     for (VmTierSpec tierSpec : spec.getTiersList()) {
       ImmutableMap<String, Object> tierParams = ImmutableMap.of(
@@ -413,6 +423,17 @@ public class Autogen {
         }
       }
     }
+    return builder.build();
+  }
+
+  private SolutionPackage buildTerraformMultiVm(DeploymentPackageInput input) {
+    SolutionPackage.Builder builder = SolutionPackage.newBuilder();
+    ImageInfo imageInfo = ImageInfo.builder().build();
+    ImmutableMap<String, Object> params = makeMultiVmParams(input, imageInfo);
+    builder.addFiles(
+        SolutionPackage.File.newBuilder()
+            .setPath("main.tf")
+            .setContent(fileSet.newRenderer("vm.multi.tf.main").setData(params).render()));
     return builder.build();
   }
 
