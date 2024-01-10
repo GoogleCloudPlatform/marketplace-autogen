@@ -6,9 +6,6 @@ metadata:
     autogenSpecType: SINGLE_VM
     config.kubernetes.io/local-config: "true"
 spec:
-  info:
-    title: Google Cloud Marketplace Terraform Module
-    source: {}
   ui:
     input:
       variables:
