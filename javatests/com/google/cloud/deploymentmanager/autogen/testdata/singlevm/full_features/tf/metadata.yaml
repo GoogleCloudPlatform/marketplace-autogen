@@ -7,8 +7,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
 spec:
   info:
-    title: 'WordPress: Apache & PHP Template'
-    source: {}
+    title: Google Cloud Marketplace Terraform Module
     version: '1.00'
     actuationTool:
       flavor: Terraform

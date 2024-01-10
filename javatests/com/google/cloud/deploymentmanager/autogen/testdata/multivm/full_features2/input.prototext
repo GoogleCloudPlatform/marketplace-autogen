@@ -134,12 +134,6 @@ spec {
       gce_startup_script {
         bash_script_content: "start_up.sh\necho done\necho SUCCESS"
       }
-      application_status {
-        type: WAITER
-        waiter {
-          waiter_timeout_secs: 300
-        }
-      }
       network_interfaces {
         external_ip {
           default_type: NONE
@@ -246,15 +240,6 @@ spec {
       }
       local_ssds {
         count_from_deploy_input_field: "tier2LocalSSDs"
-      }
-      application_status {
-        type: WAITER
-        waiter {
-          waiter_timeout_secs: 360
-          script {
-            check_script_content: "return 0" # dummy check - says it's ok at first try
-          }
-        }
       }
       firewall_rules {
         protocol: TCP
@@ -368,12 +353,6 @@ spec {
       }
       gce_startup_script {
         bash_script_content: "cd /tmp\necho STARTED >> /tmp/startup_log\ncd -"
-      }
-      application_status {
-        type: WAITER
-        waiter {
-          waiter_timeout_secs: 300
-        }
       }
       accelerators {
         types: ["nvidia-tesla-k80", "nvidia-tesla-v100", "nvidia-tesla-p4-vws"]
