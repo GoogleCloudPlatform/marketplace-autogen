@@ -43,10 +43,11 @@ public final class AutogenCli {
     SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
             ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
     if (solution.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)
+        && solution.getSpec().hasMultiVm()
         && !settings.isDevFeaturesEnabled()) {
       throw new IllegalArgumentException(
-          "Terraform deployment tool cannot be used without enabling --dev_features. WARNING:"
-              + " Terraform Autogen in development and does not support full Autogen feature"
+          "Terraform MultiVm cannot be used without enabling --dev_features. WARNING: Terraform"
+              + " MultiVm Autogen is in development and does not support full Autogen feature"
               + " support");
     }
 

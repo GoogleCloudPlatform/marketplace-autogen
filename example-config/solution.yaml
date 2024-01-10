@@ -47,6 +47,7 @@ logo:
   description: Solution Logo
 spec:
   version: 1.0
+  deploymentTool: TERRAFORM
   # multiVm option is also available
   singleVm:
     images:
