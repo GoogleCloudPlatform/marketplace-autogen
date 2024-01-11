@@ -1,12 +1,32 @@
 {namespace vm.multi.variables}
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
-import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
 variable "project_id" {lb}
   description = "{constants.PROJECT_ID_VAR_DESC}"
   type        = string
+{rb}
+{for $tier in $spec.getTiersList()}
+{call tierVariables}
+{param tier: $tier /}
+{/call}
+{/for}
+{/template}
+
+{template tierVariables kind="text" visibility="private"}
+{@param tier: VmTierSpec}
+{let $instanceCount: $tier.getInstanceCount()!/}
+{\n}
+variable "{'instance_count' |tierprefixed: $tier}" {lb}
+{if $instanceCount.getDescription()}
+  description = "{$instanceCount.getDescription() |doublequoted}"
+{elseif $instanceCount.getTooltip()}
+  description = "{$instanceCount.getTooltip() |doublequoted}"
+{/if}
+  type        = number
+  default     = {$instanceCount.getDefaultValue()}
 {rb}
 {/template}

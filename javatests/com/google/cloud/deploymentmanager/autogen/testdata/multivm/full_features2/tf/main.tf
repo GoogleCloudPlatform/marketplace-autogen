@@ -4,16 +4,19 @@ provider "google" {
 
 module "main" {
   source = "./modules/main"
-  instance_count = 3
+
+  instance_count = var.main_instance_count
 }
 
 module "tier2" {
   source = "./modules/tier2"
-  instance_count = 2
+
+  instance_count = var.tier2_instance_count
 }
 
 module "tier3" {
   source = "./modules/tier3"
-  instance_count = 1
+
+  instance_count = var.tier3_instance_count
 }
 

@@ -114,6 +114,8 @@ public class Autogen {
           "singlevm/metadata.display.yaml.soy",
           "multivm/main.tf.soy",
           "multivm/variables.tf.soy",
+          "multivm/metadata.yaml.soy",
+          "multivm/metadata.display.yaml.soy",
           "multivm/tier.main.tf.soy",
           "multivm/tier.variables.tf.soy",
           "blocks.soy",
@@ -462,7 +464,19 @@ public class Autogen {
             SolutionPackage.File.newBuilder()
                 .setPath("variables.tf")
                 .setContent(
-                    fileSet.newRenderer("vm.multi.variables.main").setData(params).render()));
+                    fileSet.newRenderer("vm.multi.variables.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.yaml")
+                .setContent(fileSet.newRenderer("vm.multi.metadata.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("metadata.display.yaml")
+                .setContent(
+                    fileSet
+                        .newRenderer("vm.multi.metadata.display.main")
+                        .setData(params)
+                        .render()));
     return builder.build();
   }
 
