@@ -3,6 +3,12 @@ variable "project_id" {
   type        = string
 }
 
+variable "zone" {
+  description = "The zone for the solution to be deployed."
+  type        = string
+  default     = "us-west1-b"
+}
+
 variable "main_instance_count" {
   description = "A custom description for instance count."
   type        = number

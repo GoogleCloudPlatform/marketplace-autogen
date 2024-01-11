@@ -9,6 +9,14 @@ variable "project_id" {lb}
   description = "{constants.PROJECT_ID_VAR_DESC}"
   type        = string
 {rb}
+{\n}
+variable "zone" {lb}
+  description = "{constants.ZONE_VAR_DESC}"
+  type        = string
+  {if $spec.getZone()?.getDefaultZone()}
+  default     = "{$spec.getZone().getDefaultZone()}"
+  {/if}
+{rb}
 {for $tier in $spec.getTiersList()}
 {call tierVariables}
 {param tier: $tier /}

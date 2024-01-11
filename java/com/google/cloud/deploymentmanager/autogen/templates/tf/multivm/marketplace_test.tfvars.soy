@@ -1,0 +1,13 @@
+{namespace vm.multi.tfvars}
+
+import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main}
+{@param spec: MultiVmDeploymentPackageSpec}
+{let $defaultMap: getTestConfigDefaultValues($spec)/}
+
+{for $entry in $defaultMap.entries()}
+{$entry.key} = "{$entry.value}"{\n}
+{/for}
+
+{/template}

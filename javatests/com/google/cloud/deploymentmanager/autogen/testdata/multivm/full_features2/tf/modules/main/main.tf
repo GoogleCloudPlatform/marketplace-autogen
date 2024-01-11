@@ -1,7 +1,7 @@
 resource "google_compute_instance" "instance" {
   count = var.instance_count
   name = "hardcode-${count.index}"
-  zone = "us-central1-a"
+  zone = var.zone
   machine_type = "e2-medium"
   boot_disk {
     initialize_params {
