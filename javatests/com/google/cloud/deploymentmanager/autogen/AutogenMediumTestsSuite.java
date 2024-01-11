@@ -47,7 +47,7 @@ public class AutogenMediumTestsSuite {
 
   static final String TESTDATA_PATH =
       System.getenv("JAVA_RUNFILES")
-          + "/__main__/"
+          + "/google3/third_party/java/marketplace_autogen/"
           + RELATIVE_TESTDATA_PATH;
   static final File ROOT = new File(TESTDATA_PATH);
 

@@ -5,5 +5,19 @@ import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/u
 import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+{@param solutionId: string}
 
+provider "google" {lb}
+  project  = var.project_id
+{rb}
+{\n}
+{for $tier in $spec.getTiersList()}
+module "{$tier.getName() |sanitize}" {lb}
+  source = "./modules/{$tier.getName() |doublequoted}"
+
+  instance_count = {$tier.getInstanceCount()!.getDefaultValue()}
+{rb}
+{\n}
+{/for}
 {/template}
