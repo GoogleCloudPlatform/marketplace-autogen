@@ -1,0 +1,12 @@
+{namespace vm.multi.variables}
+
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+variable "project_id" {lb}
+  description = "{constants.PROJECT_ID_VAR_DESC}"
+  type        = string
+{rb}
+{/template}

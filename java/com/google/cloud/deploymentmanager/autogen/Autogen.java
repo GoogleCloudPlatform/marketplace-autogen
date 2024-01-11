@@ -113,6 +113,9 @@ public class Autogen {
           "singlevm/metadata.yaml.soy",
           "singlevm/metadata.display.yaml.soy",
           "multivm/main.tf.soy",
+          "multivm/variables.tf.soy",
+          "multivm/tier.main.tf.soy",
+          "multivm/tier.variables.tf.soy",
           "blocks.soy",
           "constants.soy",
           "util.soy",
@@ -430,10 +433,36 @@ public class Autogen {
     SolutionPackage.Builder builder = SolutionPackage.newBuilder();
     ImageInfo imageInfo = ImageInfo.builder().build();
     ImmutableMap<String, Object> params = makeMultiVmParams(input, imageInfo);
-    builder.addFiles(
-        SolutionPackage.File.newBuilder()
-            .setPath("main.tf")
-            .setContent(fileSet.newRenderer("vm.multi.tf.main").setData(params).render()));
+    MultiVmDeploymentPackageSpec spec = input.getSpec().getMultiVm();
+    for (VmTierSpec tierSpec : spec.getTiersList()) {
+      ImmutableMap<String, Object> tierParams = ImmutableMap.of(
+          "spec", tierSpec, "packageSpec", spec);
+      builder
+          .addFiles(
+              SolutionPackage.File.newBuilder()
+                  .setPath(String.format("modules/%s/main.tf", tierSpec.getName()))
+                  .setContent(
+                      fileSet.newRenderer("vm.multi.tierTf.main").setData(tierParams).render()))
+          .addFiles(
+              SolutionPackage.File.newBuilder()
+                  .setPath(String.format("modules/%s/variables.tf", tierSpec.getName()))
+                  .setContent(
+                      fileSet
+                          .newRenderer("vm.multi.tier.variables.main")
+                          .setData(tierParams)
+                          .render()));
+    }
+
+    builder
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("main.tf")
+                .setContent(fileSet.newRenderer("vm.multi.tf.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("variables.tf")
+                .setContent(
+                    fileSet.newRenderer("vm.multi.variables.main").setData(params).render()));
     return builder.build();
   }
 
