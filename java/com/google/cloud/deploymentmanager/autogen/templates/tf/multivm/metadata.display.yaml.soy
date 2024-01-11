@@ -1,0 +1,67 @@
+{namespace vm.multi.metadata.display}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/metadata_display_blocks.soy';
+import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
+
+{template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools-display
+  annotations:
+    autogenSpecType: MULTI_VM
+    config.kubernetes.io/local-config: "true"
+spec:
+  ui:
+    input:
+      variables:
+        {let $projectIdDisplay kind="text"}
+          {call blocks.projectIdPropertyDisplay/}
+        {/let}
+        {$projectIdDisplay |indent: 8, true}{nil}
+        {for $tier in $spec.getTiersList()}
+        {let $tierVariablesDisplay kind="text"}
+          {call tierVariables}
+            {param tier: $tier/}
+          {/call}
+        {/let}
+        {$tierVariablesDisplay |indent: 8, true}{nil}
+        {/for}
+      sections:
+      {for $tier in $spec.getTiersList()}
+        - name: {call tierSectionName}{param tier: $tier/}{/call}
+          title: {$tier.getTitle() |yamlprimitive: 6}
+      {/for}
+{/template}
+
+{template tierVariables kind="text" visibility="private"}
+{@param tier: VmTierSpec}
+{let $spec: $tier.getInstanceCount()!/}
+{'instance_count' |tierprefixed: $tier}:
+  name: {'instance_count' |tierprefixed: $tier}
+  title: Instance Count
+  {if $spec.getTooltip()}
+  tooltip: {$spec.getTooltip() |yamlprimitive: 2}
+  {/if}
+  {if $spec.getDescription()}
+  subtext: {$spec.getDescription() |yamlprimitive: 2}
+  {/if}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {if $spec.getRange()}
+  min: {$spec.getRange().getStartValue()}
+  max: {$spec.getRange().getEndValue()}
+  {elseif $spec.getList()}
+  enumValueLabels:
+    {for $value in $spec.getList().getValuesList()}
+    - label: "{$value}"
+      value: "{$value}"
+    {/for}
+  {/if}
+{/template}
+
+{template tierSectionName kind="text" visibility="private"}
+{@param tier: VmTierSpec}
+{$tier.getName() + '_tier' |lowercased}{nil}
+{/template}

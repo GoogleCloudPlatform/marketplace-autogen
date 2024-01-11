@@ -15,8 +15,8 @@ provider "google" {lb}
 {for $tier in $spec.getTiersList()}
 module "{$tier.getName() |sanitize}" {lb}
   source = "./modules/{$tier.getName() |doublequoted}"
-
-  instance_count = {$tier.getInstanceCount()!.getDefaultValue()}
+{\n}
+  instance_count = var.{'instance_count' |tierprefixed: $tier}
 {rb}
 {\n}
 {/for}
