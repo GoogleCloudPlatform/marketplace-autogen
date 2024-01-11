@@ -6,7 +6,7 @@ resource "google_compute_instance" "instance" {lb}
 
   // Hard code values initially for development
   name = "hardcode-${lb}count.index{rb}"
-  zone = "us-central1-a"
+  zone = var.zone
   machine_type = "e2-medium"
 
   boot_disk {lb}

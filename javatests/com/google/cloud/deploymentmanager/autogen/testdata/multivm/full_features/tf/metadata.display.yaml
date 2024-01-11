@@ -13,6 +13,17 @@ spec:
           name: project_id
           title: Project Id
           invisible: true
+        zone:
+          name: zone
+          title: Zone
+          subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+            gceZone:
+              allowlistedZones:
+              - us-east4-a
+              allowlistedRegions:
+              - europe-west1
         main_instance_count:
           name: main_instance_count
           title: Instance Count

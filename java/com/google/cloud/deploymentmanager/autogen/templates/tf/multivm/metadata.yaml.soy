@@ -47,6 +47,15 @@ spec:
       {/call}
     {/let}
     {$projectIdProp |indent: 6, true}{nil}
+
+    {let $zoneProp kind="text"}
+      {call blocks.zoneProperty}
+        {param name: 'zone'/}
+        {param zoneSpec: $spec.getZone()/}
+      {/call}
+    {/let}
+    {$zoneProp |indent: 6, true}{nil}
+
     {for $tier in $spec.getTiersList()}
     {let $tierVariablesMetadata kind="text"}
       {call tierVariables}

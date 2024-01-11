@@ -1,6 +1,13 @@
 {namespace vm.multi.tier.variables}
 
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+
 {template main kind="text"}
+variable "zone" {lb}
+  type        = string
+  description = "{constants.ZONE_VAR_DESC}"
+{rb}
+{\n}
 variable "instance_count" {lb}
   type        = number
 {rb}

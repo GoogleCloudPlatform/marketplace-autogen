@@ -21,6 +21,14 @@ spec:
           {call blocks.projectIdPropertyDisplay/}
         {/let}
         {$projectIdDisplay |indent: 8, true}{nil}
+        {let $zoneDisplay kind="text"}
+          {call blocks.zonePropertyDisplay}
+            {param name: 'zone'/}
+            {param solutionHasGpus: solutionHasGpus($spec) /}
+            {param zoneSpec: $spec.getZone() /}
+          {/call}
+        {/let}
+        {$zoneDisplay |indent: 8, true}{nil}
         {for $tier in $spec.getTiersList()}
         {let $tierVariablesDisplay kind="text"}
           {call tierVariables}
