@@ -1,9 +1,26 @@
 {namespace vm.multi.tierTf}
 
-import {VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: VmTierSpec}
+{@param packageSpec: MultiVmDeploymentPackageSpec}
+{let $passwordMetadata}
+  {call blocks.passwordMetadata}
+    {param specList: $packageSpec.getPasswordsList() /}
+    {param passwordFromVar: true /}
+  {/call}
+{/let}
+
+locals {lb}
+  metadata = {lb}
+  {if $passwordMetadata}
+    {$passwordMetadata |indent: 4}
+  {/if}
+  {rb}
+{rb}
+{\n}
 resource "google_compute_instance" "instance" {lb}
   count = var.instance_count
 
@@ -17,7 +34,9 @@ resource "google_compute_instance" "instance" {lb}
       image = "debian-cloud/debian-11"
     {rb}
   {rb}
-
+{\n}
+  metadata = local.metadata
+{\n}
   network_interface {lb}
     network = "default"
   {rb}

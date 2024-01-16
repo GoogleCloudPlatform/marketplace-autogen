@@ -10,7 +10,6 @@ import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmana
 {@param spec: MultiVmDeploymentPackageSpec}
 
 {if $spec.getSiteUrl()}
-{\n}
 {let $siteUrl}
   {call util.makeUrlExpression}
     {param spec: $spec.getSiteUrl() /}
@@ -34,4 +33,9 @@ output "admin_url" {lb}
   value       = "{$adminUrl}"
 {rb}
 {/if}
+
+{call blocks.passwordOutputs}
+  {param specList: $spec.getPasswordsList() /}
+  {param deployInput: $spec.getDeployInput() /}
+{/call}
 {/template}

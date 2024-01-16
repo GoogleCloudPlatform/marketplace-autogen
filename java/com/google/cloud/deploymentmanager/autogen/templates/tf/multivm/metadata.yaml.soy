@@ -79,6 +79,12 @@ spec:
       - name: admin_url
         description: {constants.ADMIN_URL_OUT_DESC}
     {/if}
+    {let $passwordOutputs}
+      {call blocks.passwordOutputs}
+        {param specList: $spec.getPasswordsList() /}
+      {/call}
+    {/let}
+    {$passwordOutputs |indent: 6, true}{nil}
 {/template}
 
 {template tierVariables kind="text" visibility="private"}

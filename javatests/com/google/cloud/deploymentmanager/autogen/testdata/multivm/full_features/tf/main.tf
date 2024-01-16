@@ -8,6 +8,9 @@ module "main" {
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.main_instance_count
   zone            = var.zone
+  admin_password = random_password.admin.result
+  ghost_mysql_password = random_password.ghost_mysql.result
+  this_is_optional_password = random_password.this_is_optional.result
 }
 
 module "tier2" {
@@ -16,6 +19,9 @@ module "tier2" {
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.tier2_instance_count
   zone            = var.zone
+  admin_password = random_password.admin.result
+  ghost_mysql_password = random_password.ghost_mysql.result
+  this_is_optional_password = random_password.this_is_optional.result
 }
 
 module "tier3" {
@@ -24,5 +30,23 @@ module "tier3" {
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.tier3_instance_count
   zone            = var.zone
+  admin_password = random_password.admin.result
+  ghost_mysql_password = random_password.ghost_mysql.result
+  this_is_optional_password = random_password.this_is_optional.result
 }
 
+
+resource "random_password" "admin" {
+  length = 8
+  special = false
+}
+
+resource "random_password" "ghost_mysql" {
+  length = 8
+  special = false
+}
+
+resource "random_password" "this_is_optional" {
+  length = 8
+  special = false
+}
