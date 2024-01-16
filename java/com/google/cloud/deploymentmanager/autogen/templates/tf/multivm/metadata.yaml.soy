@@ -70,6 +70,15 @@ spec:
     {/let}
     {$tierVariablesMetadata |indent: 6, true}{nil}
     {/for}
+    outputs:
+    {if $spec.getSiteUrl()}
+      - name: site_url
+        description: {constants.SITE_URL_OUT_DESC}
+    {/if}
+    {if $spec.getAdminUrl()}
+      - name: admin_url
+        description: {constants.ADMIN_URL_OUT_DESC}
+    {/if}
 {/template}
 
 {template tierVariables kind="text" visibility="private"}

@@ -1,0 +1,37 @@
+{namespace vm.multi.outputs}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+
+{template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+
+{if $spec.getSiteUrl()}
+{\n}
+{let $siteUrl}
+  {call util.makeUrlExpression}
+    {param spec: $spec.getSiteUrl() /}
+  {/call}
+{/let}
+output "site_url" {lb}
+  description = "{constants.SITE_URL_OUT_DESC}"
+  value       = "{$siteUrl}"
+{rb}
+{/if}
+
+{if $spec.getAdminUrl()}
+{\n}
+{let $adminUrl}
+  {call util.makeUrlExpression}
+    {param spec: $spec.getAdminUrl() /}
+  {/call}
+{/let}
+output "admin_url" {lb}
+  description = "{constants.ADMIN_URL_OUT_DESC}"
+  value       = "{$adminUrl}"
+{rb}
+{/if}
+{/template}

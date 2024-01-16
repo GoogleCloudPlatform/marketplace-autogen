@@ -51,3 +51,8 @@ spec:
         description: "Specify a value between 1 and 10."
         varType: integer
         defaultValue: 1
+    outputs:
+      - name: site_url
+        description: Site Url
+      - name: admin_url
+        description: Admin Url
