@@ -3,6 +3,11 @@
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 
 {template main kind="text"}
+variable "deployment_name" {lb}
+  type        = string
+  description = "{constants.DEPLOYMENT_NAME_VAR_DESC}"
+{rb}
+{\n}
 variable "zone" {lb}
   type        = string
   description = "{constants.ZONE_VAR_DESC}"

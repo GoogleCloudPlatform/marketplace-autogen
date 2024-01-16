@@ -21,6 +21,13 @@ spec:
           {call blocks.projectIdPropertyDisplay/}
         {/let}
         {$projectIdDisplay |indent: 8, true}{nil}
+
+        {let $deploymentNameDisplay kind="text"}
+          {call blocks.deploymentNamePropertyDisplay}
+          {/call}
+        {/let}
+        {$deploymentNameDisplay |indent: 8, true}{nil}
+
         {let $zoneDisplay kind="text"}
           {call blocks.zonePropertyDisplay}
             {param name: 'zone'/}
@@ -29,6 +36,7 @@ spec:
           {/call}
         {/let}
         {$zoneDisplay |indent: 8, true}{nil}
+
         {for $tier in $spec.getTiersList()}
         {let $tierVariablesDisplay kind="text"}
           {call tierVariables}

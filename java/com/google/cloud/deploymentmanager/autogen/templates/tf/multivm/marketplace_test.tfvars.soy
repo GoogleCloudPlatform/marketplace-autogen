@@ -6,6 +6,8 @@ import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmana
 {@param spec: MultiVmDeploymentPackageSpec}
 {let $defaultMap: getTestConfigDefaultValues($spec)/}
 
+goog_cm_deployment_name = "test-deployment"{\n}
+
 {for $entry in $defaultMap.entries()}
 {$entry.key} = "{$entry.value}"{\n}
 {/for}
