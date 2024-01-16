@@ -207,7 +207,7 @@ spec:
       - name: instance_nat_ip
         description: External IP of the compute instance.
       - name: instance_network
-        description: Machine type for the compute instance.
+        description: Self-link for the network of the compute instance.
       - name: instance_self_link
         description: Self-link for the compute instance.
       - name: instance_zone

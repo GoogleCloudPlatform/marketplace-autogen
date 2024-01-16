@@ -68,6 +68,6 @@ output "instance_nat_ip" {
 }
 
 output "instance_network" {
-  description = "Machine type for the compute instance."
+  description = "Self-link for the network of the compute instance."
   value       = var.networks[0]
 }
