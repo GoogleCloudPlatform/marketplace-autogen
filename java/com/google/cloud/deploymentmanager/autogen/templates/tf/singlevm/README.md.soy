@@ -1,9 +1,9 @@
 {namespace vm.single.readme}
 
 import {SingleVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
-import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/autogen/marketing_info.proto';
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 
 {template main kind="text"}
 {@param spec: SingleVmDeploymentPackageSpec}
@@ -11,16 +11,57 @@ import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf
 {\n}
 This module deploys a product from Google Cloud Marketplace.
 {\n}
-## Usage
-Perform the following commands on the root folder:
-{\n}
-- `terraform init` to get the plugins
-- `terraform plan` to see the infrastructure plan
-- `terraform apply` to apply the infrastructure build
-- `terraform destroy` to destroy the built infrastructure
-{\n}
-## Inputs
 
+## Usage
+The provided test configuration can be used by executing:
+{\n}
+```
+terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT>
+```
+{\n}
+
+## Inputs
+{let $defaultZone: $spec.getZone()?.getDefaultZone() ? $spec.getZone()?.getDefaultZone() : null/}
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| project_id | {constants.PROJECT_ID_VAR_DESC} | `string` | `null` | yes |
+| goog_cm_deployment_name | {constants.DEPLOYMENT_NAME_VAR_DESC} | `string` | `null` | yes |
+| source_image | {constants.SOURCE_IMAGE_VAR_DESC} | `string` | `"{call util.imageUri}{param spec: $spec.getImagesList()[0]/}{/call}"` | no |
+| zone | {constants.ZONE_VAR_DESC} | `string` | `"{$defaultZone}"` | {$defaultZone ? 'no' : 'yes'} |
+| machine_type | {constants.MACHINE_TYPE_VAR_DESC} | `string` | `"{$spec.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"` | no |
+| boot_disk_type | {constants.BOOT_DISK_TYPE_VAR_DESC} | `string` | `"{$spec.getBootDisk()!.getDiskType()!.getDefaultType()}"` | no |
+| boot_disk_size | {constants.BOOT_DISK_SIZE_VAR_DESC} | `number` | `{$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}` | no |
+{if $spec.getAdditionalDisksList()}
+  {call blocks.additionalDisksReadme}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $spec.getDeployInput() /}
+  {/call}
+{/if}
+| networks | {constants.NETWORKS_VAR_DESC} | `list(string)` | `["default"]` | no |
+| sub_networks | {constants.SUB_NETWORKS_VAR_DESC} | `list(string)` | `[]` | no |
+| external_ips | {constants.EXTERNAL_IPS_VAR_DESC} | `list(string)` | `["EPHEMERAL"]` | no |
+{if $spec.getIpForwarding()}
+  {call blocks.ipForwardingReadme}
+    {param name: "ip_forward" /}
+    {param ipForwarding: $spec.getIpForwarding() /}
+  {/call}
+{/if}
+{call blocks.firewallReadme}{param specList: $spec.getFirewallRulesList()/}{/call}
+
+{if solutionHasGpus($spec)}
+  {call blocks.acceleratorReadme}
+    {param spec: $spec.getAcceleratorsList()[0]/}
+  {/call}
+{/if}
+
+{if $spec.getDeployInput()}
+  {call blocks.deployInputsReadme}{param spec: $spec.getDeployInput() /}{/call}
+{/if}
+
+{call blocks.stackdriverReadme}{param stackdriver: $spec.getStackdriver() /}{/call}
+
+{call blocks.gcpAuthScopesReadme}{param specs: $spec.getGcpAuthScopesList() /}{/call}
 {\n}
 ## Outputs
 
@@ -38,31 +79,33 @@ Perform the following commands on the root folder:
   {param deployInput: $spec.getDeployInput() /}
 {/call}
 | instance_self_link | {constants.INSTANCE_SELF_LINK_OUT_DESC} |
-| instance_zone | {constants.INSTANCE_SELF_LINK_OUT_DESC} |
+| instance_zone | {constants.INSTANCE_ZONE_OUT_DESC} |
 | instance_machine_type | {constants.INSTANCE_MACHINE_TYPE_OUT_DESC} |
 | instance_nat_ip | {constants.INSTANCE_NAT_IP_OUT_DESC} |
 | instance_network | {constants.INSTANCE_NETWORK_OUT_DESC} |
-
-
 {\n}
 
 ## Requirements
-### Terraform plugins
-{literal}- [Terraform](https://developer.hashicorp.com/terraform/downloads){/literal}
+### Terraform
+{\n}
+Be sure you have the correct Terraform version (1.2.0+), you can choose the binary here:
+{\n}
+https://releases.hashicorp.com/terraform/
 {\n}
 
 ### Configure a Service Account
 In order to execute this module you must have a Service Account with the following project roles:
 {\n}
-- roles/compute.admin
-- roles/iam.serviceAccountUser
-- roles/compute.networkAdmin
+- `roles/compute.admin`
+- `roles/iam.serviceAccountUser`
 {\n}
-`roles/compute.networkAdmin` is required on the host project if a shared VPC is used.
+If you are using a shared VPC:
+{\n}
+- `roles/compute.networkAdmin` is required on the Shared VPC host project.
 {\n}
 
 ### Enable API
 In order to operate with the Service Account you must activate the following APIs on the project where the Service Account was created:
 {\n}
-- Compute Engine API - compute.googleapis.com
+- Compute Engine API - `compute.googleapis.com`
 {/template}

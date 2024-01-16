@@ -70,6 +70,7 @@ final class SoyDirectives {
       soyDirectiveSetBinder.addBinding().to(Uppercased.class);
       soyDirectiveSetBinder.addBinding().to(YamlPrimitive.class);
       soyDirectiveSetBinder.addBinding().to(Sanitize.class);
+      soyDirectiveSetBinder.addBinding().to(MarkdownTable.class);
     }
   }
 
@@ -460,6 +461,33 @@ final class SoyDirectives {
     @Override
     public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
       return StringData.forValue(value.coerceToString().replaceAll("[^\\p{L}\\p{N}\\p{Z}_-]", ""));
+    }
+  }
+
+  /**
+   * Escapes values inside a markdown table.
+   *
+   * <pre><code>
+   * key: {'|' |markdowntable} // Would produce \|
+   * </code></pre>
+   */
+  @VisibleForTesting
+  @Singleton
+  static class MarkdownTable extends BaseDirective {
+    @Inject
+    MarkdownTable() {}
+
+    private static final Escaper ESCAPER =
+        new CharEscaperBuilder().addEscape('|', "\\|").addEscape('\n', "<br>").toEscaper();
+
+    @Override
+    public String getName() {
+      return "|markdowntable";
+    }
+
+    @Override
+    public SoyValue applyForJava(SoyValue value, List<SoyValue> args) {
+      return StringData.forValue(ESCAPER.escape(value.coerceToString()));
     }
   }
 

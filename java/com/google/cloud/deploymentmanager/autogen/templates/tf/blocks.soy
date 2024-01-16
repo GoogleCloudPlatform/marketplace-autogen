@@ -90,6 +90,31 @@ variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
 {rb}
 {/template}
 
+/**
+ * Produces two inputs in the README for each FirewallRuleSpec
+ */
+{template firewallReadme kind="text"}
+  {@param specList: list<FirewallRuleSpec>}
+
+  {for $spec in $specList}
+    {let $firewallRuleVariable}
+      {call util.firewallRuleVarName}{param spec: $spec/}{/call}
+    {/let}
+    {let $firewallRuleDescription}
+      {call util.firewallVariableDescription}{param spec: $spec/}{/call}
+    {/let}
+    {let $firewallRangeVariable}
+      {call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
+    {/let}
+    {let $firewallRangeDescription}
+      {call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}
+    {/let}
+
+| {$firewallRuleVariable} | {$firewallRuleDescription} | `bool` | `{not $spec.getDefaultOff()}` | no |
+| {$firewallRangeVariable} | {$firewallRangeDescription} | `string` | `""` | no |
+  {/for}
+{/template}
+
 {template acceleratorVariables kind="text"}
 {@param spec: AcceleratorSpec}
 variable "accelerator_type" {lb}
@@ -103,6 +128,12 @@ variable "accelerator_count" {lb}
   type        = number
   default     = "{$spec.getDefaultCount() ?? 0}"
 {rb}
+{/template}
+
+{template acceleratorReadme kind="text"}
+{@param spec: AcceleratorSpec}
+| accelerator_type | {constants.ACCELERATOR_TYPE_VAR_DESC} | `string` | `"{$spec.getDefaultType()}"` | no |
+| accelerator_count | {constants.ACCELERATOR_COUNT_VAR_DESC} | `number` | `{$spec.getDefaultCount() ?? 0}` | no |
 {/template}
 
 {template additionalDiskVariables kind="text"}
@@ -138,6 +169,31 @@ variable "disk{$index+1}_size" {lb}
   type        = number
   default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
 {rb}
+{/template}
+
+{template additionalDisksReadme kind="text"}
+{@param diskSpecs: list<DiskSpec>}
+{@param? deployInput: DeployInputSpec|null}
+  {for $spec, $index in $diskSpecs}
+    {call additionalDiskReadme}
+      {param spec: $spec /}
+      {param index: $index /}
+      {param deployInput: $deployInput /}
+    {/call}
+  {/for}
+{/template}
+
+{template additionalDiskReadme kind="text"}
+{@param spec: DiskSpec}
+{@param index: number}
+{@param? deployInput: DeployInputSpec|null}
+{let $diskSizeDescription}
+  {call util.diskSizeDescription}
+    {param spec: $spec /}
+  {/call}
+{/let}
+| disk{$index+1}_type | {$spec.getDisplayLabel() |markdowntable} | `string` | `"{$spec.getDiskType()!.getDefaultType()}"` | no |
+| disk{$index+1}_size | {$diskSizeDescription |markdowntable} | `number` | `{$spec.getDiskSize()!.getDefaultSizeGb()}` | no |
 {/template}
 
 {template additionalDiskResources kind="text"}
@@ -313,6 +369,74 @@ variable "{$field.getName()}" {lb}
 {rb}
 {/template}
 
+{template deployInputsReadme kind="text"}
+{@param spec: DeployInputSpec}
+{let $fields: listDeployInputFields($spec)/}
+{for $field in $fields}
+  {call deployInputReadme}{param field: $field/}{/call}
+{/for}
+{/template}
+
+{template deployInputReadme kind="text"}
+{@param field: DeployInputField}
+{let $description kind="text"}
+  {if $field.getDescription()}
+    {$field.getDescription()}{nil}
+  {elseif $field.getTooltip()}
+    {$field.getTooltip()}{nil}
+  {/if}
+{/let}
+{let $type kind="text"}
+  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+    bool{nil}
+  {elseif $field.getIntegerBox() or $field.getIntegerDropdown()}
+    number{nil}
+  {else}
+    string{nil}
+  {/if}
+{/let}
+{let $defaultValue kind="text"}
+  {if $field.getBooleanCheckbox()}
+    {$field.getBooleanCheckbox().getDefaultValue()}{nil}
+  {elseif $field.getGroupedBooleanCheckbox()}
+    {$field.getGroupedBooleanCheckbox().getDefaultValue()}{nil}
+  {elseif $field.getIntegerBox()}
+    {let $box: $field.getIntegerBox()/}
+    {if $box.getDefaultValue()}
+      {$box.getDefaultValue().getValue() ?? 0}{nil}
+    {/if}
+  {elseif $field.getIntegerDropdown()}
+    {let $dropdown: $field.getIntegerDropdown()/}
+    {if $dropdown.getDefaultValueIndex()}
+    {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
+      {$dropdown.getValuesList()[$defaultIndex]}{nil}
+    {/if}
+  {elseif $field.getStringBox()}
+    {let $box: $field.getStringBox()/}
+    {if $box.getDefaultValue()}
+      "{$box.getDefaultValue()}"{nil}
+    {/if}
+  {elseif $field.getEmailBox()}
+    {let $box: $field.getEmailBox()/}
+    {if $box.getDefaultValue()}
+      "{$box.getDefaultValue()}"{nil}
+    {/if}
+  {elseif $field.getStringDropdown()}
+    {let $dropdown: $field.getStringDropdown()/}
+    {if $dropdown.getDefaultValueIndex()}
+      {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
+      {$dropdown.getValuesList()[$defaultIndex]}{nil}
+    {/if}
+  {elseif $field.getZoneDropdown()}
+    {let $dropdown: $field.getZoneDropdown()/}
+    {if $dropdown.getDefaultValue()}
+      "{$dropdown.getDefaultValue().getValue() ?? ''}"{nil}
+    {/if}
+  {/if}
+{/let}
+| {$field.getName()} | {$description |markdowntable} | `{$type}` | `{$defaultValue ? $defaultValue : 'null'}` | {$defaultValue ? 'no' : 'yes'} |
+{/template}
+
 /**
  *  Produces metadata for a list of GceMetadataItems.
  *  Format: {key1} = {value1}
@@ -399,6 +523,16 @@ variable "enable_cloud_monitoring" {lb}
 {/if}
 {/template}
 
+{template stackdriverReadme kind="text"}
+{@param? stackdriver: StackdriverSpec|null}
+{if $stackdriver?.getLogging()}
+| enable_cloud_logging | {constants.ENABLE_CLOUD_LOGGING_VAR_DESC} | `bool` | `{$stackdriver?.getLogging()!.getDefaultOn()}` | no |
+{/if}
+{if $stackdriver?.getMonitoring()}
+enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` | `{$stackdriver?.getMonitoring()!.getDefaultOn()}` | no |
+{/if}
+{/template}
+
 {template gcpAuthScopeVariables kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
   {for $spec, $index in $specs}
@@ -426,6 +560,30 @@ variable "{$name}" {lb}
   type        = bool
   default     = {not $spec!.getDefaultOff()}
 {rb}
+{/template}
+
+{template gcpAuthScopesReadme kind="text"}
+{@param specs: list<GcpAuthScopeSpec>}
+  {for $spec, $index in $specs}
+    {call gcpAuthScopeReadme}
+      {param spec: $spec /}
+    {/call}
+  {/for}
+{/template}
+
+{template gcpAuthScopeReadme kind="text"}
+{@param spec: GcpAuthScopeSpec}
+{let $name}
+  {call util.gcpAuthScopePropertyName}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+{let $description}
+  {call util.authScopeDescription}
+    {param scope: $spec.getScope() /}
+  {/call}
+{/let}
+| {$name} | {$description} | `string` | `{not $spec!.getDefaultOff()}` | no |
 {/template}
 
 {template passwordOutputsReadme kind="text"}
@@ -463,9 +621,9 @@ variable "{$name}" {lb}
 | {$sanitizedPasswordLabel}_user | {$usernameDescription} |
 {elseif $password.getUsernameFromDeployInputField()}
 {let $field: findDeployInputField($password.getUsernameFromDeployInputField(), $deployInput)/}
-| {$sanitizedPasswordLabel}_user | {$usernameDescription} |
+| {$sanitizedPasswordLabel}_user | {$usernameDescription |markdowntable} |
 {/if}
-| {$sanitizedPasswordLabel}_password | {$passwordDescription} |
+| {$sanitizedPasswordLabel}_password | {$passwordDescription |markdowntable} |
 {/template}
 
 {template passwordOutputs kind="text"}
@@ -559,4 +717,10 @@ variable "ip_forward" {lb}
   type        = bool
   default     = {not $ipForwarding!.getDefaultOff()}
 {rb}
+{/template}
+
+{template ipForwardingReadme kind="text"}
+{@param name: string}
+{@param ipForwarding: IpForwardingSpec}
+| ip_forward | {constants.IP_FORWARD_VAR_DESC} | `bool` | `{not $ipForwarding!.getDefaultOff()}` | no |
 {/template}

@@ -19,6 +19,7 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Doublequoted;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Indent;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Lowercased;
+import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.MarkdownTable;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Quoted;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.ReplaceAll;
 import com.google.cloud.deploymentmanager.autogen.soy.SoyDirectives.Sanitize;
@@ -48,6 +49,7 @@ public class SoyDirectivesTest {
   Uppercased uppercased;
   YamlPrimitive yamlPrimitive;
   Sanitize sanitize;
+  MarkdownTable markdownTable;
 
   @Before
   public void createDirectives() {
@@ -60,6 +62,7 @@ public class SoyDirectivesTest {
     uppercased = new Uppercased();
     yamlPrimitive = new YamlPrimitive();
     sanitize = new Sanitize();
+    markdownTable = new MarkdownTable();
   }
 
   @Test
@@ -143,6 +146,13 @@ public class SoyDirectivesTest {
     assertOutput("abc", "abc", sanitize);
     assertOutput("abc", "a@\"b#'c", sanitize);
     assertOutput("-_z ", "-_z ", sanitize);
+  }
+
+  @Test
+  public void testMarkdownTable() {
+    assertOutput("abc", "abc", markdownTable);
+    assertOutput("foo<br>bar", "foo\nbar", markdownTable);
+    assertOutput("foo\\|bar\\|baz", "foo|bar|baz", markdownTable);
   }
 
   private static void assertOutput(
