@@ -1,0 +1,18 @@
+{namespace vm.multi.tier.outputs}
+
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import {VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+
+{template main kind="text"}
+{@param spec: VmTierSpec}
+locals {lb}
+  network_interfaces = google_compute_instance.instance[*].network_interface[0]
+  instance_ips       = [for nic in local.network_interfaces:  length(nic.access_config) > 0 ? nic.access_config[0].nat_ip : nic.network_ip]
+{rb}
+
+output "instance_ips" {lb}
+  description = "The IPs of all compute instances."
+  value = local.instance_ips
+{rb}
+{/template}

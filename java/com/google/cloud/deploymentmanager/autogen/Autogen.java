@@ -115,10 +115,12 @@ public class Autogen {
           "multivm/main.tf.soy",
           "multivm/variables.tf.soy",
           "multivm/marketplace_test.tfvars.soy",
+          "multivm/outputs.tf.soy",
           "multivm/metadata.yaml.soy",
           "multivm/metadata.display.yaml.soy",
           "multivm/tier.main.tf.soy",
           "multivm/tier.variables.tf.soy",
+          "multivm/tier.outputs.tf.soy",
           "blocks.soy",
           "constants.soy",
           "util.soy",
@@ -453,6 +455,14 @@ public class Autogen {
                       fileSet
                           .newRenderer("vm.multi.tier.variables.main")
                           .setData(tierParams)
+                          .render()))
+          .addFiles(
+              SolutionPackage.File.newBuilder()
+                  .setPath(String.format("modules/%s/outputs.tf", tierSpec.getName()))
+                  .setContent(
+                      fileSet
+                          .newRenderer("vm.multi.tier.outputs.main")
+                          .setData(tierParams)
                           .render()));
     }
 
@@ -466,6 +476,10 @@ public class Autogen {
                 .setPath("variables.tf")
                 .setContent(
                     fileSet.newRenderer("vm.multi.variables.main").setData(params).render()))
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("outputs.tf")
+                .setContent(fileSet.newRenderer("vm.multi.outputs.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("marketplace_test.tfvars")
