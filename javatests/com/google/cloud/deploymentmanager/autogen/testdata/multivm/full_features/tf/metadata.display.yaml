@@ -13,6 +13,9 @@ spec:
           name: project_id
           title: Project Id
           invisible: true
+        goog_cm_deployment_name:
+          name: goog_cm_deployment_name
+          title: Goog Cm Deployment Name
         zone:
           name: zone
           title: Zone

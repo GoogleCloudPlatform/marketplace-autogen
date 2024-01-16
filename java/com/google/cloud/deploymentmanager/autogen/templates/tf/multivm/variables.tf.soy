@@ -10,6 +10,12 @@ variable "project_id" {lb}
   type        = string
 {rb}
 {\n}
+{literal}// Marketplace requires this variable name to be declared{/literal}
+variable "goog_cm_deployment_name" {lb}
+  description = "{constants.DEPLOYMENT_NAME_VAR_DESC}"
+  type        = string
+{rb}
+{\n}
 variable "zone" {lb}
   description = "{constants.ZONE_VAR_DESC}"
   type        = string

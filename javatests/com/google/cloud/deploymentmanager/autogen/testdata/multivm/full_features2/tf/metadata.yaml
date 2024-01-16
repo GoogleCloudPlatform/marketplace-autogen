@@ -32,6 +32,10 @@ spec:
         description: The ID of the project in which to provision resources.
         varType: string
         required: true
+      - name: goog_cm_deployment_name
+        description: The name of the deployment and VM instance.
+        varType: string
+        required: true
       - name: zone
         description: The zone for the solution to be deployed.
         varType: string

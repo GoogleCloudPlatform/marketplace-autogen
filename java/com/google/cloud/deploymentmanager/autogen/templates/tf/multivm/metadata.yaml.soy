@@ -48,6 +48,12 @@ spec:
     {/let}
     {$projectIdProp |indent: 6, true}{nil}
 
+    {let $deploymentNameProp kind="text"}
+      {call blocks.deploymentNameProperty}
+      {/call}
+    {/let}
+    {$deploymentNameProp |indent: 6, true}{nil}
+
     {let $zoneProp kind="text"}
       {call blocks.zoneProperty}
         {param name: 'zone'/}

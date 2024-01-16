@@ -1,6 +1,6 @@
 resource "google_compute_instance" "instance" {
   count = var.instance_count
-  name = "hardcode-${count.index}"
+  name = "${var.deployment_name}-tier3-vm-${count.index}"
   zone = var.zone
   machine_type = "e2-medium"
   boot_disk {

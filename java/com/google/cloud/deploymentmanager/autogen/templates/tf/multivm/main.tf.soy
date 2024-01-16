@@ -14,10 +14,11 @@ provider "google" {lb}
 {\n}
 {for $tier in $spec.getTiersList()}
 module "{$tier.getName() |sanitize}" {lb}
-  source         = "./modules/{$tier.getName() |doublequoted}"
+  source          = "./modules/{$tier.getName() |doublequoted}"
 {\n}
-  instance_count = var.{'instance_count' |tierprefixed: $tier}
-  zone           = var.zone
+  deployment_name = var.goog_cm_deployment_name
+  instance_count  = var.{'instance_count' |tierprefixed: $tier}
+  zone            = var.zone
 {rb}
 {\n}
 {/for}
