@@ -289,6 +289,7 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 
 {template passwordMetadata kind="text"}
   {@param specList: list<PasswordSpec>}
+  {@param? passwordFromVar: bool}
 
   {for $spec, $index in $specList}
     {let $sanitizedPasswordLabel}
@@ -297,7 +298,12 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
       {/call}
     {/let}
 
-    {$spec.getMetadataKey()} = random_password.{$sanitizedPasswordLabel}.result{nil}
+    {$spec.getMetadataKey()} = {nil}
+    {if $passwordFromVar}
+      var.{$sanitizedPasswordLabel}_password{nil}
+    {else}
+      random_password.{$sanitizedPasswordLabel}.result{nil}
+    {/if}
     {if $index != $specList.length - 1}
       {\n}
     {/if}

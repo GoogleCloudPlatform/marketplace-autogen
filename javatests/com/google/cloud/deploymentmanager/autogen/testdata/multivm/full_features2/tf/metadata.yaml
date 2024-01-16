@@ -56,3 +56,15 @@ spec:
         description: Site Url
       - name: admin_url
         description: Admin Url
+      - name: admin_user
+        description: Username for Admin password.
+      - name: admin_password
+        description: Password for Admin.
+      - name: ghost_mysql_user
+        description: Username for Ghost MySQL password.
+      - name: ghost_mysql_password
+        description: Password for Ghost MySQL.
+      - name: this_is_optional_user
+        description: Username for This is optional password.
+      - name: this_is_optional_password
+        description: Password for This is optional.
