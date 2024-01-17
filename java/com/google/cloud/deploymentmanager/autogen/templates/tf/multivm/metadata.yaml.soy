@@ -132,4 +132,18 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{call blocks.networkProperties}
+  {param nameSuffix: 'networks' /}
+  {param spec: $tier.getNetworkInterfaces()! /}
+  {param tier: $tier /}
+{/call}
+
+{if $tier.getIpForwarding()}
+  {call blocks.ipForwardingProperty}
+    {param name: 'ip_forward' /}
+    {param spec: $tier.getIpForwarding() /}
+    {param tier: $tier /}
+  {/call}
+{/if}
+
 {/template}

@@ -115,6 +115,24 @@ variable "main_boot_disk_size" {
   default     = 10
 }
 
+variable "main_networks" {
+  description = "The network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+}
+
+variable "main_sub_networks" {
+  description = "The sub network name to attach the VM instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "main_external_ips" {
+  description = "The external IPs assigned to the VM for public access."
+  type        = list(string)
+  default     = ["EPHEMERAL"]
+}
+
 variable "tier2_instance_count" {
   type        = number
   default     = 2
@@ -141,6 +159,24 @@ variable "tier2_boot_disk_size" {
   description = "The boot disk size for the VM instance in GBs"
   type        = number
   default     = 10
+}
+
+variable "tier2_networks" {
+  description = "The network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+}
+
+variable "tier2_sub_networks" {
+  description = "The sub network name to attach the VM instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "tier2_external_ips" {
+  description = "The external IPs assigned to the VM for public access."
+  type        = list(string)
+  default     = ["EPHEMERAL"]
 }
 
 variable "tier3_instance_count" {
@@ -170,4 +206,22 @@ variable "tier3_boot_disk_size" {
   description = "The boot disk size for the VM instance in GBs"
   type        = number
   default     = 10
+}
+
+variable "tier3_networks" {
+  description = "The network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+}
+
+variable "tier3_sub_networks" {
+  description = "The sub network name to attach the VM instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "tier3_external_ips" {
+  description = "The external IPs assigned to the VM for public access."
+  type        = list(string)
+  default     = ["EPHEMERAL"]
 }

@@ -149,6 +149,15 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if $tier.getIpForwarding()}
+  {call blocks.networkPropertiesDisplay}
+    {param nameSuffix: 'networks' /}
+    {param zonePropertyName: 'zone' /}
+    {param spec: $tier.getNetworkInterfaces()! /}
+    {param tier: $tier /}
+  {/call}
+{/if}
+
 {/template}
 
 {template tierSectionName kind="text" visibility="private"}
