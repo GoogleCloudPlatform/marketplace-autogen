@@ -107,27 +107,48 @@ spec:
 
 {template tierVariables kind="text" visibility="private"}
 {@param tier: VmTierSpec}
-{let $spec: $tier.getInstanceCount()!/}
+
+{let $instanceCount: $tier.getInstanceCount()!/}
 {'instance_count' |tierprefixed: $tier}:
   name: {'instance_count' |tierprefixed: $tier}
   title: Instance Count
-  {if $spec.getTooltip()}
-  tooltip: {$spec.getTooltip() |yamlprimitive: 2}
+  {if $instanceCount.getTooltip()}
+  tooltip: {$instanceCount.getTooltip() |yamlprimitive: 2}
   {/if}
-  {if $spec.getDescription()}
-  subtext: {$spec.getDescription() |yamlprimitive: 2}
+  {if $instanceCount.getDescription()}
+  subtext: {$instanceCount.getDescription() |yamlprimitive: 2}
   {/if}
   section: {call tierSectionName}{param tier: $tier/}{/call}
-  {if $spec.getRange()}
-  min: {$spec.getRange().getStartValue()}
-  max: {$spec.getRange().getEndValue()}
-  {elseif $spec.getList()}
+  {if $instanceCount.getRange()}
+  min: {$instanceCount.getRange().getStartValue()}
+  max: {$instanceCount.getRange().getEndValue()}
+  {elseif $instanceCount.getList()}
   enumValueLabels:
-    {for $value in $spec.getList().getValuesList()}
+    {for $value in $instanceCount.getList().getValuesList()}
     - label: "{$value}"
       value: "{$value}"
     {/for}
   {/if}
+
+{call blocks.imagePropertyDisplay}
+  {param name: 'source_image' /}
+  {param imagesList: $tier.getImagesList() /}
+  {param tier: $tier /}
+{/call}
+
+{call blocks.machineTypePropertyDisplay}
+  {param name: 'machine_type' /}
+  {param spec: $tier.getMachineType()! /}
+  {param zonePropertyName: 'zone' /}
+  {param tier: $tier /}
+{/call}
+
+{call blocks.bootDiskPropertiesDisplay}
+  {param spec: $tier.getBootDisk()! /}
+  {param zonePropertyName: 'zone' /}
+  {param tier: $tier /}
+{/call}
+
 {/template}
 
 {template tierSectionName kind="text" visibility="private"}

@@ -4,8 +4,36 @@ variable "deployment_name" {
 }
 
 variable "zone" {
-  type        = string
   description = "The zone for the solution to be deployed."
+  type        = string
+}
+
+variable "instance_count" {
+  type        = number
+}
+
+variable "source_image" {
+  description = "The image name for the disk for the VM instance."
+  type        = string
+  default     = "projects/click-to-deploy-images/global/images/jenkins-v20180130"
+}
+
+variable "machine_type" {
+  description = "The machine type to create, e.g. e2-small"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "boot_disk_type" {
+  description = "The boot disk type for the VM instance."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "boot_disk_size" {
+  description = "The boot disk size for the VM instance in GBs"
+  type        = number
+  default     = 10
 }
 
 variable "admin_password" {
@@ -26,9 +54,6 @@ variable "this_is_optional_password" {
   sensitive   = true
 }
 
-variable "instance_count" {
-  type        = number
-}
 
 variable "enable_cloud_logging" {
   description = "Enables Cloud Logging."

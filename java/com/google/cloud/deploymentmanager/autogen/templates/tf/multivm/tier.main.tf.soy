@@ -35,11 +35,13 @@ resource "google_compute_instance" "instance" {lb}
   // Hard code values initially for development
   name = "${lb}var.deployment_name{rb}-{$spec.getName()}-vm-${lb}count.index{rb}"
   zone = var.zone
-  machine_type = "e2-medium"
+  machine_type = var.machine_type
 
   boot_disk {lb}
     initialize_params {lb}
-      image = "debian-cloud/debian-11"
+      size = var.boot_disk_size
+      type = var.boot_disk_type
+      image = var.source_image
     {rb}
   {rb}
 {\n}
