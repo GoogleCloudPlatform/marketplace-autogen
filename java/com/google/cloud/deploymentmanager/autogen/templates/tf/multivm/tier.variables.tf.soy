@@ -7,14 +7,46 @@ import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/de
 
 {template main kind="text"}
 {@param packageSpec: MultiVmDeploymentPackageSpec}
+{@param spec: VmTierSpec}
 variable "deployment_name" {lb}
   type        = string
   description = "{constants.DEPLOYMENT_NAME_VAR_DESC}"
 {rb}
 {\n}
 variable "zone" {lb}
-  type        = string
   description = "{constants.ZONE_VAR_DESC}"
+  type        = string
+  {if $packageSpec.getZone()?.getDefaultZone()}
+  default     = "{$packageSpec.getZone().getDefaultZone()}"
+  {/if}
+{rb}
+{\n}
+variable "instance_count" {lb}
+  type        = number
+{rb}
+{\n}
+variable "source_image" {lb}
+  description = "{constants.SOURCE_IMAGE_VAR_DESC}"
+  type        = string
+  default     = "{call util.imageUri}{param spec: $spec.getImagesList()[0]/}{/call}"
+{rb}
+{\n}
+variable "machine_type" {lb}
+  description = "{constants.MACHINE_TYPE_VAR_DESC}"
+  type        = string
+  default     = "{$spec.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"
+{rb}
+{\n}
+variable "boot_disk_type" {lb}
+  description = "{constants.BOOT_DISK_TYPE_VAR_DESC}"
+  type        = string
+  default     = "{$spec.getBootDisk()!.getDiskType()!.getDefaultType()}"
+{rb}
+{\n}
+variable "boot_disk_size" {lb}
+  description = "{constants.BOOT_DISK_SIZE_VAR_DESC}"
+  type        = number
+  default     = {$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 {\n}
 {for $password in $packageSpec.getPasswordsList()}
@@ -35,9 +67,6 @@ variable "{$sanitizedPasswordLabel}_password" {lb}
 {rb}
 {\n}
 {/for}
-variable "instance_count" {lb}
-  type        = number
-{rb}
 
 {call blocks.stackdriverVariables}{param stackdriver: $packageSpec.getStackdriver() /}{/call}
 {/template}

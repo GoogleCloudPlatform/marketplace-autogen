@@ -92,13 +92,82 @@ variable "main_instance_count" {
   default     = 3
 }
 
+variable "main_source_image" {
+  description = "The image name for the disk for the VM instance."
+  type        = string
+  default     = "projects/click-to-deploy-images/global/images/jenkins-v20180130"
+}
+variable "main_machine_type" {
+  description = "The machine type to create, e.g. e2-small"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "main_boot_disk_type" {
+  description = "The boot disk type for the VM instance."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "main_boot_disk_size" {
+  description = "The boot disk size for the VM instance in GBs"
+  type        = number
+  default     = 10
+}
+
 variable "tier2_instance_count" {
   type        = number
   default     = 2
+}
+
+variable "tier2_source_image" {
+  description = "The image name for the disk for the VM instance."
+  type        = string
+  default     = "projects/click-to-deploy-images/global/images/jenkins-v20180130"
+}
+variable "tier2_machine_type" {
+  description = "The machine type to create, e.g. e2-small"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "tier2_boot_disk_type" {
+  description = "The boot disk type for the VM instance."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "tier2_boot_disk_size" {
+  description = "The boot disk size for the VM instance in GBs"
+  type        = number
+  default     = 10
 }
 
 variable "tier3_instance_count" {
   description = "Specify a value between 1 and 10."
   type        = number
   default     = 1
+}
+
+variable "tier3_source_image" {
+  description = "The image name for the disk for the VM instance."
+  type        = string
+  default     = "projects/click-to-deploy-images/global/images/jenkins-v20180130"
+}
+variable "tier3_machine_type" {
+  description = "The machine type to create, e.g. e2-small"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "tier3_boot_disk_type" {
+  description = "The boot disk type for the VM instance."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "tier3_boot_disk_size" {
+  description = "The boot disk size for the VM instance in GBs"
+  type        = number
+  default     = 10
 }

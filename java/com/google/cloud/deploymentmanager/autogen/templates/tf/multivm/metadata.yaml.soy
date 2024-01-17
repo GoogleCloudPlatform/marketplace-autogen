@@ -114,4 +114,22 @@ spec:
 {/if}
   varType: integer
   defaultValue: {$instanceCount.getDefaultValue()}
+
+{call blocks.imageProperty}
+  {param name: 'source_image'/}
+  {param imagesList: $tier.getImagesList() /}
+  {param tier: $tier /}
+{/call}
+
+{call blocks.machineTypeProperty}
+  {param name: 'machine_type' /}
+  {param spec: $tier.getMachineType()! /}
+  {param tier: $tier /}
+{/call}
+
+{call blocks.bootDiskProperties}
+  {param spec: $tier.getBootDisk()! /}
+  {param tier: $tier /}
+{/call}
+
 {/template}

@@ -19,7 +19,12 @@ module "{$tier.getName() |sanitize}" {lb}
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.{'instance_count' |tierprefixed: $tier}
   zone            = var.zone
-
+{\n}
+  source_image    = var.{'source_image' |tierprefixed: $tier}
+  machine_type    = var.{'machine_type' |tierprefixed: $tier}
+  boot_disk_type  = var.{'boot_disk_type' |tierprefixed: $tier}
+  boot_disk_size  = var.{'boot_disk_size' |tierprefixed: $tier}
+{\n}
   {for $password in $spec.getPasswordsList()}
     {let $sanitizedPasswordLabel}
       {call util.sanitizePasswordLabel}

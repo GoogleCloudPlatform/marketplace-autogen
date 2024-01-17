@@ -112,6 +112,42 @@ spec:
           section: main_tier
           min: 1
           max: 10
+        main_source_image:
+          name: main_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+            - label: jenkins-v20180123
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180123
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        main_machine_type:
+          name: main_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.7000000476837158
+        main_boot_disk_type:
+          name: main_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        main_boot_disk_size:
+          name: main_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: main_boot_disk_type
         tier2_instance_count:
           name: tier2_instance_count
           title: Instance Count
@@ -123,6 +159,40 @@ spec:
               value: "2"
             - label: "4"
               value: "4"
+        tier2_source_image:
+          name: tier2_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        tier2_machine_type:
+          name: tier2_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.7000000476837158
+        tier2_boot_disk_type:
+          name: tier2_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        tier2_boot_disk_size:
+          name: tier2_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: tier2_boot_disk_type
         tier3_instance_count:
           name: tier3_instance_count
           title: Instance Count
@@ -130,6 +200,40 @@ spec:
           section: tier3_tier
           min: 1
           max: 10
+        tier3_source_image:
+          name: tier3_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        tier3_machine_type:
+          name: tier3_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.690000057220459
+        tier3_boot_disk_type:
+          name: tier3_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        tier3_boot_disk_size:
+          name: tier3_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: tier3_boot_disk_type
       sections:
         - name: main_tier
           title: Main Tier

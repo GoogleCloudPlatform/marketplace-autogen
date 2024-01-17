@@ -12,10 +12,12 @@ resource "google_compute_instance" "instance" {
   count = var.instance_count
   name = "${var.deployment_name}-tier3-vm-${count.index}"
   zone = var.zone
-  machine_type = "e2-medium"
+  machine_type = var.machine_type
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-11"
+      size = var.boot_disk_size
+      type = var.boot_disk_type
+      image = var.source_image
     }
   }
 
