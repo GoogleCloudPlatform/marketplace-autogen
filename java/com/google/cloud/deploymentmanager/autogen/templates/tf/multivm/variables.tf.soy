@@ -29,6 +29,8 @@ variable "zone" {lb}
   {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
 {/if}
 
+{call blocks.stackdriverVariables}{param stackdriver: $spec.getStackdriver() /}{/call}
+
 {for $tier in $spec.getTiersList()}
 {call tierVariables}
 {param tier: $tier /}

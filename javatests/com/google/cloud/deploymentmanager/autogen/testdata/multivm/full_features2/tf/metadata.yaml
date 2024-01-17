@@ -80,6 +80,14 @@ spec:
       - name: extraLbZone1
         varType: string
         required: true
+      - name: enable_cloud_logging
+        description: Enables Cloud Logging.
+        varType: bool
+        defaultValue: false
+      - name: enable_cloud_monitoring
+        description: Enables Cloud Monitoring.
+        varType: bool
+        defaultValue: true
       - name: main_instance_count
         description: "A custom description for instance count."
         varType: integer

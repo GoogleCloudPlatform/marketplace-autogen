@@ -29,3 +29,15 @@ variable "this_is_optional_password" {
 variable "instance_count" {
   type        = number
 }
+
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = false
+}
+
+variable "enable_cloud_monitoring" {
+  description = "Enables Cloud Monitoring."
+  type        = bool
+  default     = true
+}

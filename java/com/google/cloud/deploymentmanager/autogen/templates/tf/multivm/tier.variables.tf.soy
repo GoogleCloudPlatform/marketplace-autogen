@@ -1,5 +1,6 @@
 {namespace vm.multi.tier.variables}
 
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
@@ -37,4 +38,6 @@ variable "{$sanitizedPasswordLabel}_password" {lb}
 variable "instance_count" {lb}
   type        = number
 {rb}
+
+{call blocks.stackdriverVariables}{param stackdriver: $packageSpec.getStackdriver() /}{/call}
 {/template}

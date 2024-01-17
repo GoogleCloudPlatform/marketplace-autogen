@@ -28,6 +28,14 @@ module "{$tier.getName() |sanitize}" {lb}
     {/let}
   {$sanitizedPasswordLabel}_password = random_password.{$sanitizedPasswordLabel}.result
   {/for}
+
+  {if $spec.getStackdriver()?.getLogging()}
+  enable_cloud_logging    = var.enable_cloud_logging
+  {/if}
+
+  {if $spec.getStackdriver()?.getMonitoring()}
+  enable_cloud_monitoring = var.enable_cloud_monitoring
+  {/if}
 {rb}
 {\n}
 {/for}
