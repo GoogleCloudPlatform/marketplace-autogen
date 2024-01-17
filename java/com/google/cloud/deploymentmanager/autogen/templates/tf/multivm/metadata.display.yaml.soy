@@ -71,6 +71,21 @@ spec:
         {/call}
       {/let}
       {$deploymentInputBottomSections |indent: 8, true}{nil}
+    {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
+    {if $actionItems.length > 0}
+    runtime:
+      suggestedActions:
+      {for $action in $actionItems}
+        - heading: {$action.getHeading() |yamlprimitive: 10}
+        {if $action.getDescription()}
+          description: {$action.getDescription() |yamlprimitive: 10}
+        {/if}
+        {if $action.getSnippet()}
+          snippet: {$action.getSnippet() |yamlprimitive: 10}
+        {/if}
+        // TODO(b/309686695): Include "showIf" once template expressions are supported for TF
+      {/for}
+    {/if}
 {/template}
 
 {template tierVariables kind="text" visibility="private"}

@@ -134,3 +134,15 @@ spec:
           title: Third Tier
         - name: LOAD_BALANCERS
           title: Additional zones for load balancers
+    runtime:
+      suggestedActions:
+        - heading: Conditional step
+          description: This step is displayed conditionally. Unselect the checkbox to hide it.
+          snippet: e^(i * pi) + 1 = 0
+        - heading: Conditional step - negation
+          description: This step is displayed conditionally. Select the checkbox to hide it.
+          snippet: a^2 + b^2 = c^2
+        - heading: External IP action
+          description: Some action
+        - heading: Internal IP action
+          description: Some action
