@@ -14,6 +14,66 @@ variable "zone" {
   type        = string
 }
 
+variable "domain" {
+  description = "Your domain"
+  type        = string
+  default     = "google.com"
+}
+
+variable "adminEmailAddress" {
+  description = "The e-mail address used to create the administrator account for WordPress."
+  type        = string
+  default     = "aX9-YD_8W.3@example.com"
+}
+
+variable "optionalEmailAddress" {
+  type        = string
+}
+
+variable "showConditionals" {
+  type        = bool
+  default     = true
+}
+
+variable "generateOptionalPassword" {
+  type        = bool
+  default     = true
+}
+
+variable "tier2LocalSSDs" {
+  type        = number
+  default     = 0
+}
+
+variable "superExtraDiskName" {
+  type        = string
+  default     = "the-super-extra-disk"
+}
+
+variable "imageCaching" {
+  type        = string
+  default     = "none"
+}
+
+variable "imageCompression" {
+  type        = bool
+  default     = false
+}
+
+variable "imageSizing" {
+  type        = bool
+  default     = true
+}
+
+variable "extraLbZone0" {
+  type        = string
+  default     = "us-west1-a"
+}
+
+variable "extraLbZone1" {
+  type        = string
+}
+
 variable "main_instance_count" {
   description = "A custom description for instance count."
   type        = number

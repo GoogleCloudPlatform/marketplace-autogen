@@ -1,2 +1,5 @@
 goog_cm_deployment_name = "test-deployment"
 zone = "us-central1-f"
+domain = "test.google.com"
+adminEmailAddress = "aX9-YD_8W.3@example.com"
+optionalEmailAddress = "test_default_value@example.com"
