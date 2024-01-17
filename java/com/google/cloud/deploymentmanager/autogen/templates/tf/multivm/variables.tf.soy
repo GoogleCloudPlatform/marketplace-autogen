@@ -1,5 +1,6 @@
 {namespace vm.multi.variables}
 
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
@@ -23,6 +24,11 @@ variable "zone" {lb}
   default     = "{$spec.getZone().getDefaultZone()}"
   {/if}
 {rb}
+
+{if $spec.getDeployInput()}
+  {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
+{/if}
+
 {for $tier in $spec.getTiersList()}
 {call tierVariables}
 {param tier: $tier /}

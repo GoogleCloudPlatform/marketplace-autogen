@@ -37,6 +37,15 @@ spec:
         {/let}
         {$zoneDisplay |indent: 8, true}{nil}
 
+        {if $spec.getDeployInput()}
+        {let $deployInputDisplay kind="text"}
+          {call blocks.deployInputPropertiesDisplay}
+            {param spec: $spec.getDeployInput() /}
+          {/call}
+        {/let}
+        {$deployInputDisplay |indent: 8, true}{nil}
+        {/if}
+
         {for $tier in $spec.getTiersList()}
         {let $tierVariablesDisplay kind="text"}
           {call tierVariables}
@@ -46,10 +55,22 @@ spec:
         {$tierVariablesDisplay |indent: 8, true}{nil}
         {/for}
       sections:
+      {let $deploymentInputTopSections kind="text"}
+        {call blocks.topSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputTopSections |indent: 8, true}{nil}
       {for $tier in $spec.getTiersList()}
         - name: {call tierSectionName}{param tier: $tier/}{/call}
           title: {$tier.getTitle() |yamlprimitive: 6}
       {/for}
+      {let $deploymentInputBottomSections kind="text"}
+        {call blocks.bottomSections}
+          {param spec: $spec.getDeployInput()/}
+        {/call}
+      {/let}
+      {$deploymentInputBottomSections |indent: 8, true}{nil}
 {/template}
 
 {template tierVariables kind="text" visibility="private"}

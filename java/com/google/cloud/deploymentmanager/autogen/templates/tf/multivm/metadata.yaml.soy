@@ -62,6 +62,15 @@ spec:
     {/let}
     {$zoneProp |indent: 6, true}{nil}
 
+    {if $spec.getDeployInput()}
+    {let $deployInputProps kind="text"}
+      {call blocks.deployInputProperties}
+        {param inputSpec: $spec.getDeployInput() /}
+      {/call}
+    {/let}
+    {$deployInputProps |indent: 6, true}{nil}
+    {/if}
+
     {for $tier in $spec.getTiersList()}
     {let $tierVariablesMetadata kind="text"}
       {call tierVariables}

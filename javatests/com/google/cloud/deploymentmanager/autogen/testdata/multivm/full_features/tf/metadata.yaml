@@ -40,6 +40,46 @@ spec:
         description: The zone for the solution to be deployed.
         varType: string
         defaultValue: us-west1-b
+      - name: domain
+        description: Your domain
+        varType: string
+        defaultValue: google.com
+      - name: adminEmailAddress
+        description: The e-mail address used to create the administrator account for WordPress.
+        varType: string
+        defaultValue: aX9-YD_8W.3@example.com
+        description: Please enter a valid email address
+      - name: optionalEmailAddress
+        varType: string
+        required: true
+        description: Please enter a valid email address
+      - name: showConditionals
+        varType: bool
+        defaultValue: true
+      - name: generateOptionalPassword
+        varType: bool
+        defaultValue: true
+      - name: tier2LocalSSDs
+        varType: integer
+        defaultValue: 0
+      - name: superExtraDiskName
+        varType: string
+        defaultValue: the-super-extra-disk
+      - name: imageCaching
+        varType: string
+        defaultValue: none
+      - name: imageCompression
+        varType: bool
+        defaultValue: false
+      - name: imageSizing
+        varType: bool
+        defaultValue: true
+      - name: extraLbZone0
+        varType: string
+        defaultValue: us-west1-a
+      - name: extraLbZone1
+        varType: string
+        required: true
       - name: main_instance_count
         description: "A custom description for instance count."
         varType: integer

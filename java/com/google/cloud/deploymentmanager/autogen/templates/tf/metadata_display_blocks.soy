@@ -358,7 +358,7 @@ disk{$index+1}_type:
 
 {if $field.getGroupedBooleanCheckbox()}
   {let $displayGroup: findDisplayGroup($field, $section)/}
-  boolean_group: {$displayGroup.getName() |yamlprimitive: 2}
+  booleanGroup: {$displayGroup.getName() |yamlprimitive: 2}
 
 {elseif $field.getIntegerBox()}
   {let $box: $field.getIntegerBox() /}

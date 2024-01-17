@@ -276,13 +276,13 @@ spec:
           title: Enable compression
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size

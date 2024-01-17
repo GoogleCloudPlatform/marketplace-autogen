@@ -27,6 +27,78 @@ spec:
               - us-east4-a
               allowlistedRegions:
               - europe-west1
+        domain:
+          name: domain
+          title: Domain
+          subtext: Your domain
+          placeholder: mydomain.com
+          regexValidation: '[a-zA-Z0-9-]+.[a-z]{2,}'
+          validation: A valid domain has to be entered
+        adminEmailAddress:
+          name: adminEmailAddress
+          title: Administrator e-mail address
+          tooltip: The e-mail address used to create the administrator account for WordPress.
+          placeholder: user@example.com
+          regexValidation: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+$
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        optionalEmailAddress:
+          name: optionalEmailAddress
+          title: Optional e-mail address
+          placeholder: user@example.com
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        showConditionals:
+          name: showConditionals
+          title: Show conditional values
+        generateOptionalPassword:
+          name: generateOptionalPassword
+          title: Generate optional password
+        tier2LocalSSDs:
+          name: tier2LocalSSDs
+          title: Tier 2 - local SSDs
+          min: 0
+          max: 5
+        superExtraDiskName:
+          name: superExtraDiskName
+          title: Super-extra disk name
+        imageCaching:
+          name: imageCaching
+          title: Image caching
+          level: 1
+          enumValueLabels:
+            - label: Not cached
+              value: none
+            - label: Cached with redis
+              value: redis
+            - label: Cached with memcached
+              value: memcached
+        imageCompression:
+          name: imageCompression
+          title: Enable compression
+          level: 1
+          booleanGroup: IMAGE_CACHING_OPTIONS
+        imageSizing:
+          name: imageSizing
+          title: Dynamic sizing
+          level: 1
+          booleanGroup: IMAGE_CACHING_OPTIONS
+        extraLbZone0:
+          name: extraLbZone0
+          title: Zone
+          level: 1
+          section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+        extraLbZone1:
+          name: extraLbZone1
+          title: Zone
+          level: 1
+          section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
         main_instance_count:
           name: main_instance_count
           title: Instance Count
@@ -60,3 +132,5 @@ spec:
           title: Secondary Tier
         - name: tier3_tier
           title: Third Tier
+        - name: LOAD_BALANCERS
+          title: Additional zones for load balancers
