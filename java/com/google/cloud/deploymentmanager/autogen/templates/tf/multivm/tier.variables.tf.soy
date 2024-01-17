@@ -49,6 +49,32 @@ variable "boot_disk_size" {lb}
   default     = {$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 {\n}
+variable "networks" {lb}
+  description = "{constants.NETWORKS_VAR_DESC}"
+  type        = list(string)
+  default     = ["default"]
+{rb}
+{\n}
+variable "sub_networks" {lb}
+  description = "{constants.SUB_NETWORKS_VAR_DESC}"
+  type        = list(string)
+  default     = []
+{rb}
+{\n}
+variable "external_ips" {lb}
+  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
+  type        = list(string)
+  default     = ["EPHEMERAL"]
+{rb}
+
+{if $spec.getIpForwarding()}
+{\n}
+  {call blocks.ipForwardingVariable}
+    {param name: "ip_forward" /}
+    {param ipForwarding: $spec.getIpForwarding() /}
+  {/call}
+{/if}
+
 {for $password in $packageSpec.getPasswordsList()}
   {let $sanitizedPasswordLabel}
     {call util.sanitizePasswordLabel}
@@ -60,12 +86,12 @@ variable "boot_disk_size" {lb}
     {param spec: $password /}
   {/call}
 {/let}
+{\n}
 variable "{$sanitizedPasswordLabel}_password" {lb}
   type        = string
   description = "{$passwordDescription |doublequoted}"
   sensitive   = true
 {rb}
-{\n}
 {/for}
 
 {call blocks.stackdriverVariables}{param stackdriver: $packageSpec.getStackdriver() /}{/call}

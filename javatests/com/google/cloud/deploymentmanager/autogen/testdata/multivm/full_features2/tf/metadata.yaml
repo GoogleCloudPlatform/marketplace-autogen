@@ -108,6 +108,19 @@ spec:
         description: The boot disk size for the VM instance in GBs
         varType: integer
         defaultValue: 10
+      - name: main_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: main_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: main_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - NONE
       - name: tier2_instance_count
         varType: integer
         defaultValue: 2
@@ -127,6 +140,19 @@ spec:
         description: The boot disk size for the VM instance in GBs
         varType: integer
         defaultValue: 10
+      - name: tier2_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: tier2_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: tier2_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - EPHEMERAL
       - name: tier3_instance_count
         description: "Specify a value between 1 and 10."
         varType: integer
@@ -147,6 +173,19 @@ spec:
         description: The boot disk size for the VM instance in GBs
         varType: integer
         defaultValue: 10
+      - name: tier3_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: tier3_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: tier3_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - EPHEMERAL
     outputs:
       - name: site_url
         description: Site Url

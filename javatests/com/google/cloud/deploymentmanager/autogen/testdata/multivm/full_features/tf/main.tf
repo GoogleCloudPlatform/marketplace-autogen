@@ -14,6 +14,10 @@ module "main" {
   boot_disk_type  = var.main_boot_disk_type
   boot_disk_size  = var.main_boot_disk_size
 
+  networks        = var.main_networks
+  sub_networks    = var.main_sub_networks
+  external_ips    = var.main_external_ips
+
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
@@ -33,6 +37,10 @@ module "tier2" {
   boot_disk_type  = var.tier2_boot_disk_type
   boot_disk_size  = var.tier2_boot_disk_size
 
+  networks        = var.tier2_networks
+  sub_networks    = var.tier2_sub_networks
+  external_ips    = var.tier2_external_ips
+
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
@@ -51,6 +59,10 @@ module "tier3" {
   machine_type    = var.tier3_machine_type
   boot_disk_type  = var.tier3_boot_disk_type
   boot_disk_size  = var.tier3_boot_disk_size
+
+  networks        = var.tier3_networks
+  sub_networks    = var.tier3_sub_networks
+  external_ips    = var.tier3_external_ips
 
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result

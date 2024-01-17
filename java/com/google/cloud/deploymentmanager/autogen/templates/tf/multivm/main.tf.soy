@@ -25,6 +25,13 @@ module "{$tier.getName() |sanitize}" {lb}
   boot_disk_type  = var.{'boot_disk_type' |tierprefixed: $tier}
   boot_disk_size  = var.{'boot_disk_size' |tierprefixed: $tier}
 {\n}
+  networks        = var.{'networks' |tierprefixed: $tier}
+  sub_networks    = var.{'sub_networks' |tierprefixed: $tier}
+  external_ips    = var.{'external_ips' |tierprefixed: $tier}
+  {if $tier.getIpForwarding()}
+  ip_forward      = var.{'ip_forward' |tierprefixed: $tier}
+  {/if}
+{\n}
   {for $password in $spec.getPasswordsList()}
     {let $sanitizedPasswordLabel}
       {call util.sanitizePasswordLabel}

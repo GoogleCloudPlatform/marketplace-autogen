@@ -37,6 +37,24 @@ variable "boot_disk_size" {
   default     = 10
 }
 
+variable "networks" {
+  description = "The network name to attach the VM instance."
+  type        = list(string)
+  default     = ["default"]
+}
+
+variable "sub_networks" {
+  description = "The sub network name to attach the VM instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "external_ips" {
+  description = "The external IPs assigned to the VM for public access."
+  type        = list(string)
+  default     = ["EPHEMERAL"]
+}
+
 variable "admin_password" {
   type        = string
   description = "Password for Admin."
@@ -54,7 +72,6 @@ variable "this_is_optional_password" {
   description = "Password for This is optional."
   sensitive   = true
 }
-
 
 variable "enable_cloud_logging" {
   description = "Enables Cloud Logging."
