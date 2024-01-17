@@ -12,11 +12,19 @@ import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/de
     {param passwordFromVar: true /}
   {/call}
 {/let}
+{let $stackdriverMetadata}
+  {call blocks.stackdriverMetadata}
+    {param stackdriver: $packageSpec.getStackdriver() /}
+  {/call}
+{/let}
 
 locals {lb}
   metadata = {lb}
   {if $passwordMetadata}
     {$passwordMetadata |indent: 4}
+  {/if}
+  {if $stackdriverMetadata}
+    {$stackdriverMetadata |indent: 4}
   {/if}
   {rb}
 {rb}

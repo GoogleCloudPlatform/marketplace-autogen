@@ -75,6 +75,18 @@ variable "extraLbZone1" {
   type        = string
 }
 
+variable "enable_cloud_logging" {
+  description = "Enables Cloud Logging."
+  type        = bool
+  default     = false
+}
+
+variable "enable_cloud_monitoring" {
+  description = "Enables Cloud Monitoring."
+  type        = bool
+  default     = true
+}
+
 variable "main_instance_count" {
   description = "A custom description for instance count."
   type        = number

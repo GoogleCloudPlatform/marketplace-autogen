@@ -11,6 +11,8 @@ module "main" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+  enable_cloud_logging    = var.enable_cloud_logging
+  enable_cloud_monitoring = var.enable_cloud_monitoring
 }
 
 module "tier2" {
@@ -22,6 +24,8 @@ module "tier2" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+  enable_cloud_logging    = var.enable_cloud_logging
+  enable_cloud_monitoring = var.enable_cloud_monitoring
 }
 
 module "tier3" {
@@ -33,6 +37,8 @@ module "tier3" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+  enable_cloud_logging    = var.enable_cloud_logging
+  enable_cloud_monitoring = var.enable_cloud_monitoring
 }
 
 

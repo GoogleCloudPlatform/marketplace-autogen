@@ -46,6 +46,15 @@ spec:
         {$deployInputDisplay |indent: 8, true}{nil}
         {/if}
 
+        {if $spec.getStackdriver()}
+        {let $stackdriverDisplay kind="text"}
+          {call blocks.stackdriverPropertyDisplay}
+            {param stackdriver: $spec.getStackdriver()/}
+          {/call}
+        {/let}
+        {$stackdriverDisplay |indent: 8, true}{nil}
+        {/if}
+
         {for $tier in $spec.getTiersList()}
         {let $tierVariablesDisplay kind="text"}
           {call tierVariables}
@@ -71,6 +80,14 @@ spec:
         {/call}
       {/let}
       {$deploymentInputBottomSections |indent: 8, true}{nil}
+      {if $spec.getStackdriver()}
+      {let $stackdriverBottomSections kind="text"}
+        {call blocks.stackdriverBottomSections}
+          {param stackdriver: $spec.getStackdriver()/}
+        {/call}
+      {/let}
+      {$stackdriverBottomSections |indent: 8, true}{nil}
+      {/if}
     {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
     {if $actionItems.length > 0}
     runtime:

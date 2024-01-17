@@ -94,6 +94,16 @@ spec:
           section: LOAD_BALANCERS
           xGoogleProperty:
             type: ET_GCE_ZONE
+        enable_cloud_logging:
+          name: enable_cloud_logging
+          title: Enable Cloud Logging
+          tooltip: 'Cloud Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+          section: google_cloud_operations
+        enable_cloud_monitoring:
+          name: enable_cloud_monitoring
+          title: Enable Cloud Monitoring
+          tooltip: 'Cloud Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+          section: google_cloud_operations
         main_instance_count:
           name: main_instance_count
           title: Instance Count
@@ -129,6 +139,9 @@ spec:
           title: Third Tier
         - name: LOAD_BALANCERS
           title: Additional zones for load balancers
+        - name: google_cloud_operations
+          title: Google Cloud Operations
+          subtext: Monitoring and management for services, containers, applications, and infrastructure
     runtime:
       suggestedActions:
         - heading: Conditional step

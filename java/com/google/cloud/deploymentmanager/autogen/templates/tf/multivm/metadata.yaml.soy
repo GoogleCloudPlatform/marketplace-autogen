@@ -71,6 +71,13 @@ spec:
     {$deployInputProps |indent: 6, true}{nil}
     {/if}
 
+    {let $stackdriver kind="text"}
+      {call blocks.stackdriver}
+        {param stackdriver: $spec.getStackdriver() /}
+      {/call}
+    {/let}
+    {$stackdriver |indent: 6, true}{nil}
+
     {for $tier in $spec.getTiersList()}
     {let $tierVariablesMetadata kind="text"}
       {call tierVariables}
