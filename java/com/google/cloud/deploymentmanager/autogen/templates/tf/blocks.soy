@@ -306,7 +306,7 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 
 {template passwordMetadata kind="text"}
   {@param specList: list<PasswordSpec>}
-  {@param? passwordFromVar: bool}
+  {@param? passwordFromVar: bool|null}
 
   {for $spec, $index in $specList}
     {let $sanitizedPasswordLabel}
