@@ -149,15 +149,27 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{call blocks.networkPropertiesDisplay}
+  {param nameSuffix: 'networks' /}
+  {param zonePropertyName: 'zone' /}
+  {param spec: $tier.getNetworkInterfaces()! /}
+  {param tier: $tier /}
+{/call}
+
+{for $firewallRule in $tier.getFirewallRulesList()}
+{call blocks.firewallPropertiesDisplay}
+  {param spec: $firewallRule /}
+  {param tier: $tier /}
+{/call}
+{/for}
+
 {if $tier.getIpForwarding()}
-  {call blocks.networkPropertiesDisplay}
-    {param nameSuffix: 'networks' /}
-    {param zonePropertyName: 'zone' /}
-    {param spec: $tier.getNetworkInterfaces()! /}
+  {call blocks.ipForwardingPropertyDisplay}
+    {param name: 'ip_forward' /}
+    {param spec: $tier.getIpForwarding() /}
     {param tier: $tier /}
   {/call}
 {/if}
-
 {/template}
 
 {template tierSectionName kind="text" visibility="private"}

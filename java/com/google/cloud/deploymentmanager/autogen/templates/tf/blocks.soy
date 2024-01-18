@@ -13,11 +13,12 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
  */
 {template firewallResources kind="text"}
   {@param specList: list<FirewallRuleSpec>}
-
+  {@param? tier: VmTierSpec|null}
   {for $spec in $specList}
     {\n}
     {call firewallResource}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -28,10 +29,15 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
  */
 {template firewallResource kind="text"}
 {@param spec: FirewallRuleSpec}
+{@param? tier: VmTierSpec|null}
+{let $firewallNameSuffix}
+  {call util.firewallRuleNameSuffix}{param spec: $spec/}{param tier: $tier/}{/call}
+{/let}
+{let $deploymentName: $tier ? 'deployment_name' : 'goog_cm_deployment_name' /}
 resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
   count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
 {\n}
-  name = "${lb}var.goog_cm_deployment_name{rb}-{call util.firewallRuleNameSuffix}{param spec: $spec/}{/call}"
+  name = "${lb}var.{$deploymentName}{rb}-{$firewallNameSuffix}"
   network = element(var.networks, 0)
 {\n}
   allow {lb}{if $spec.getPort().length > 0}
@@ -41,7 +47,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 {\n}
   source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
 {\n}
-  target_tags = ["{call util.deploymentTag /}"]
+  target_tags = ["{call util.deploymentTag}{param tier: $tier/}{/call}"]
 {rb}
 {/template}
 
@@ -52,15 +58,18 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
  */
 {template firewallVariables kind="text"}
   {@param specList: list<FirewallRuleSpec>}
+  {@param? tier: VmTierSpec|null}
 
   {for $spec in $specList}
     {\n}
     {call firewallVariable}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
     {\n}
     {call firewallSourceRangesVariable}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -71,7 +80,11 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
  */
 {template firewallVariable kind="text"}
 {@param spec: FirewallRuleSpec}
-variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
+{@param? tier: VmTierSpec|null}
+{let $varname}
+  {call util.firewallRuleVarName}{param spec: $spec/}{/call}
+{/let}
+variable "{$varname |tierprefixed: $tier}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
   type        = bool
   default     = {not $spec.getDefaultOff()}
@@ -83,7 +96,11 @@ variable "{call util.firewallRuleVarName}{param spec: $spec/}{/call}" {lb}
  */
 {template firewallSourceRangesVariable kind="text"}
 {@param spec: FirewallRuleSpec}
-variable "{call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}" {lb}
+{@param? tier: VmTierSpec|null}
+{let $varname}
+  {call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
+{/let}
+variable "{$varname |tierprefixed: $tier}" {lb}
   description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
   type        = string
   default     = ""

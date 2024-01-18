@@ -42,28 +42,29 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
       ICMP{nil}
   {/switch}
 {/template}
+
 /**
  * Produces Terraform variable name for firewall sources range
- * Format: {protocol}_{port}_source_ranges or {protocol}_source_ranges
+ * Format: [{tier}_]?{protocol}[_{port}]?_source_ranges
  * Ex: tcp_443_source_ranges
  */
 {template firewallRuleSourceRangesVarName kind="text"}
   {@param spec: FirewallRuleSpec}
-
-  {call firewallRuleProtocol}
-    {param spec: $spec /}
-  {/call}
-  {$spec.getPort().length > 0 ? '_' + $spec.getPort() : ''}_source_ranges{nil}
+  {@param? tier: VmTierSpec|null}
+  {let $portSuffix: $spec.getPort().length > 0 ? '_' + $spec.getPort(): '' /}
+  {let $protocol}
+    {call firewallRuleProtocol}{param spec: $spec /}{/call}
+  {/let}
+  {$protocol + $portSuffix |tierprefixed: $tier, '_'}_source_ranges{nil}
 {/template}
 
 /**
  * Produces Terraform resource name for a firewall rule.
- * Format: {protocol}_{port} or {protocol}
+ * Format: {tier}_{protocol}_{port} or {protocol}
  * Ex: tcp_443
  */
 {template firewallRuleResourceName kind="text"}
   {@param spec: FirewallRuleSpec}
-
   {call firewallRuleProtocol}
     {param spec: $spec /}
   {/call}
@@ -72,16 +73,17 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
 
 /**
  * Produces the suffix of the GCP name for a firewall rule.
- * Format: {protocol}-{port} or {protocol}
+ * Format: [{tier}-]?{protocol}[{-port}]?
  * Ex: tcp-80
  */
 {template firewallRuleNameSuffix kind="text"}
   {@param spec: FirewallRuleSpec}
-
-  {call firewallRuleProtocol}
-    {param spec: $spec /}
-  {/call}
-  {$spec.getPort().length > 0 ? '-' + $spec.getPort() : ''}{nil}
+  {@param? tier: VmTierSpec|null}
+  {let $portSuffix: $spec.getPort().length > 0 ? '-' + $spec.getPort(): '' /}
+  {let $protocol}
+    {call firewallRuleProtocol}{param spec: $spec /}{/call}
+  {/let}
+  {$protocol + $portSuffix |tierprefixed: $tier, '-'}{nil}
 {/template}
 
 /**
@@ -227,7 +229,12 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
  * Format: {deployment}-deployment
  */
 {template deploymentTag kind="text"}
+{@param? tier: VmTierSpec|null}
+{if $tier}
+${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
+{else}
 ${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
+{/if}
 {/template}
 
 /** Produces the property name for an API scope. */

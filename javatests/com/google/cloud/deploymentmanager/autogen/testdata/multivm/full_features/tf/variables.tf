@@ -134,6 +134,66 @@ variable "main_external_ips" {
   default     = ["EPHEMERAL"]
 }
 
+variable "main_enable_tcp_80" {
+  description = "Allow HTTP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "main_tcp_80_source_ranges" {
+  description = "Source IP ranges for HTTP traffic"
+  type        = string
+  default     = ""
+}
+
+variable "main_enable_tcp_443" {
+  description = "Allow HTTPS traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "main_tcp_443_source_ranges" {
+  description = "Source IP ranges for HTTPS traffic"
+  type        = string
+  default     = ""
+}
+
+variable "main_enable_icmp" {
+  description = "Allow ICMP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "main_icmp_source_ranges" {
+  description = "Source IP ranges for ICMP traffic"
+  type        = string
+  default     = ""
+}
+
+variable "main_enable_tcp_7000-7001" {
+  description = "Allow TCP port 7000-7001 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "main_tcp_7000-7001_source_ranges" {
+  description = "Source IP ranges for TCP port 7000-7001 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "main_enable_udp" {
+  description = "Allow UDP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "main_udp_source_ranges" {
+  description = "Source IP ranges for UDP traffic"
+  type        = string
+  default     = ""
+}
+
 variable "tier2_instance_count" {
   type        = number
   default     = 2
@@ -178,6 +238,30 @@ variable "tier2_external_ips" {
   description = "The external IPs assigned to the VM for public access."
   type        = list(string)
   default     = ["EPHEMERAL"]
+}
+
+variable "tier2_enable_tcp_9878" {
+  description = "Allow TCP port 9878 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tier2_tcp_9878_source_ranges" {
+  description = "Source IP ranges for TCP port 9878 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "tier2_enable_udp_2555" {
+  description = "Allow UDP port 2555 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tier2_udp_2555_source_ranges" {
+  description = "Source IP ranges for UDP port 2555 traffic"
+  type        = string
+  default     = ""
 }
 
 variable "tier3_instance_count" {
@@ -225,4 +309,28 @@ variable "tier3_external_ips" {
   description = "The external IPs assigned to the VM for public access."
   type        = list(string)
   default     = ["EPHEMERAL"]
+}
+
+variable "tier3_enable_tcp_9000" {
+  description = "Allow TCP port 9000 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tier3_tcp_9000_source_ranges" {
+  description = "Source IP ranges for TCP port 9000 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "tier3_enable_udp_2333" {
+  description = "Allow UDP port 2333 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tier3_udp_2333_source_ranges" {
+  description = "Source IP ranges for UDP port 2333 traffic"
+  type        = string
+  default     = ""
 }

@@ -153,6 +153,111 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_boot_disk_type
+        main_networks:
+          name: main_networks
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        main_sub_networks:
+          name: main_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: main_networks
+        main_external_ips:
+          name: main_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: main_networks
+              notConfigurable: false
+              allowStaticIps: true
+        main_enable_tcp_80:
+          name: main_enable_tcp_80
+          title: Allow HTTP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_tcp_80_source_ranges:
+          name: main_tcp_80_source_ranges
+          title: Source IP ranges for HTTP traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_tcp_80
+        main_enable_tcp_443:
+          name: main_enable_tcp_443
+          title: Allow HTTPS traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_tcp_443_source_ranges:
+          name: main_tcp_443_source_ranges
+          title: Source IP ranges for HTTPS traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_tcp_443
+        main_enable_icmp:
+          name: main_enable_icmp
+          title: Allow ICMP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_enable_tcp_7000-7001:
+          name: main_enable_tcp_7000-7001
+          title: Allow TCP port 7000-7001 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_enable_udp:
+          name: main_enable_udp
+          title: Allow UDP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_udp_source_ranges:
+          name: main_udp_source_ranges
+          title: Source IP ranges for UDP traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_udp
         tier2_instance_count:
           name: tier2_instance_count
           title: Instance Count
@@ -198,6 +303,57 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: tier2_boot_disk_type
+        tier2_networks:
+          name: tier2_networks
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        tier2_sub_networks:
+          name: tier2_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: tier2_networks
+        tier2_external_ips:
+          name: tier2_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: tier2_networks
+              notConfigurable: true
+              allowStaticIps: true
+        tier2_enable_tcp_9878:
+          name: tier2_enable_tcp_9878
+          title: Allow TCP port 9878 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier2_networks
+        tier2_enable_udp_2555:
+          name: tier2_enable_udp_2555
+          title: Allow UDP port 2555 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier2_networks
         tier3_instance_count:
           name: tier3_instance_count
           title: Instance Count
@@ -239,6 +395,57 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: tier3_boot_disk_type
+        tier3_networks:
+          name: tier3_networks
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        tier3_sub_networks:
+          name: tier3_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: tier3_networks
+        tier3_external_ips:
+          name: tier3_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: tier3_networks
+              notConfigurable: false
+              allowStaticIps: true
+        tier3_enable_tcp_9000:
+          name: tier3_enable_tcp_9000
+          title: Allow TCP port 9000 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier3_networks
+        tier3_enable_udp_2333:
+          name: tier3_enable_udp_2333
+          title: Allow UDP port 2333 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier3_networks
       sections:
         - name: main_tier
           title: Main Tier

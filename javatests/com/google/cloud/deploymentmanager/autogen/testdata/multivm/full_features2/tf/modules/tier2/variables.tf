@@ -54,6 +54,30 @@ variable "external_ips" {
   default     = ["EPHEMERAL"]
 }
 
+variable "enable_tcp_9878" {
+  description = "Allow TCP port 9878 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tcp_9878_source_ranges" {
+  description = "Source IP ranges for TCP port 9878 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_udp_2555" {
+  description = "Allow UDP port 2555 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "udp_2555_source_ranges" {
+  description = "Source IP ranges for UDP port 2555 traffic"
+  type        = string
+  default     = ""
+}
+
 variable "admin_password" {
   type        = string
   description = "Password for Admin."

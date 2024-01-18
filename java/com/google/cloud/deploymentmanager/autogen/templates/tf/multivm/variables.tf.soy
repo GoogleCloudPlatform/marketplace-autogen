@@ -103,4 +103,9 @@ variable "{'external_ips' |tierprefixed: $tier}" {lb}
     {param tier: $tier /}
   {/call}
 {/if}
+
+{call blocks.firewallVariables}
+  {param specList: $tier.getFirewallRulesList() /}
+  {param tier: $tier /}
+{/call}
 {/template}

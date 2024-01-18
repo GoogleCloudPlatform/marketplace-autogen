@@ -54,6 +54,30 @@ variable "external_ips" {
   default     = ["EPHEMERAL"]
 }
 
+variable "enable_tcp_9000" {
+  description = "Allow TCP port 9000 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tcp_9000_source_ranges" {
+  description = "Source IP ranges for TCP port 9000 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_udp_2333" {
+  description = "Allow UDP port 2333 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "udp_2333_source_ranges" {
+  description = "Source IP ranges for UDP port 2333 traffic"
+  type        = string
+  default     = ""
+}
+
 variable "admin_password" {
   type        = string
   description = "Password for Admin."

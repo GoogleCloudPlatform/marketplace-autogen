@@ -72,4 +72,9 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {rb}
+
+{call blocks.firewallResources}
+  {param specList: $spec.getFirewallRulesList()/}
+  {param tier: $spec /}
+{/call}
 {/template}

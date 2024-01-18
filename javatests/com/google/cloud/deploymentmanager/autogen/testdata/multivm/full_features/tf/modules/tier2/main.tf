@@ -46,3 +46,35 @@ resource "google_compute_instance" "instance" {
     }
   }
 }
+
+resource "google_compute_firewall" tcp_9878 {
+  count = var.enable_tcp_9878 ? 1 : 0
+
+  name = "${var.deployment_name}-tier2-tcp-9878"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["9878"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_9878_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-tier2-tier"]
+}
+
+resource "google_compute_firewall" udp_2555 {
+  count = var.enable_udp_2555 ? 1 : 0
+
+  name = "${var.deployment_name}-tier2-udp-2555"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["2555"]
+    protocol = "udp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.udp_2555_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-tier2-tier"]
+}

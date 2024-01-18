@@ -138,6 +138,13 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{for $firewallRule in $tier.getFirewallRulesList()}
+{call blocks.firewallProperties}
+  {param spec: $firewallRule /}
+  {param tier: $tier /}
+{/call}
+{/for}
+
 {if $tier.getIpForwarding()}
   {call blocks.ipForwardingProperty}
     {param name: 'ip_forward' /}

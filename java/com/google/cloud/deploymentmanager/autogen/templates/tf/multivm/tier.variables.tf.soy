@@ -75,6 +75,10 @@ variable "external_ips" {lb}
   {/call}
 {/if}
 
+{call blocks.firewallVariables}
+  {param specList: $spec.getFirewallRulesList()/}
+{/call}
+
 {for $password in $packageSpec.getPasswordsList()}
   {let $sanitizedPasswordLabel}
     {call util.sanitizePasswordLabel}

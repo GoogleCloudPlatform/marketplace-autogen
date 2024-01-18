@@ -121,6 +121,46 @@ spec:
         varType: list(string)
         defaultValue:
           - NONE
+      - name: main_enable_tcp_80
+        description: Allow HTTP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_80_source_ranges
+        description: Source IP ranges for HTTP traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_tcp_443
+        description: Allow HTTPS traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_443_source_ranges
+        description: Source IP ranges for HTTPS traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_icmp
+        description: Allow ICMP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_icmp_source_ranges
+        description: Source IP ranges for ICMP traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_tcp_7000-7001
+        description: Allow TCP port 7000-7001 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_7000-7001_source_ranges
+        description: Source IP ranges for TCP port 7000-7001 traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_udp
+        description: Allow UDP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_udp_source_ranges
+        description: Source IP ranges for UDP traffic
+        varType: string
+        defaultValue: ""
       - name: tier2_instance_count
         varType: integer
         defaultValue: 2
@@ -153,6 +193,22 @@ spec:
         varType: list(string)
         defaultValue:
           - EPHEMERAL
+      - name: tier2_enable_tcp_9878
+        description: Allow TCP port 9878 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier2_tcp_9878_source_ranges
+        description: Source IP ranges for TCP port 9878 traffic
+        varType: string
+        defaultValue: ""
+      - name: tier2_enable_udp_2555
+        description: Allow UDP port 2555 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier2_udp_2555_source_ranges
+        description: Source IP ranges for UDP port 2555 traffic
+        varType: string
+        defaultValue: ""
       - name: tier3_instance_count
         description: "Specify a value between 1 and 10."
         varType: integer
@@ -186,6 +242,22 @@ spec:
         varType: list(string)
         defaultValue:
           - EPHEMERAL
+      - name: tier3_enable_tcp_9000
+        description: Allow TCP port 9000 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier3_tcp_9000_source_ranges
+        description: Source IP ranges for TCP port 9000 traffic
+        varType: string
+        defaultValue: ""
+      - name: tier3_enable_udp_2333
+        description: Allow UDP port 2333 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier3_udp_2333_source_ranges
+        description: Source IP ranges for UDP port 2333 traffic
+        varType: string
+        defaultValue: ""
     outputs:
       - name: site_url
         description: Site Url

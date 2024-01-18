@@ -46,3 +46,81 @@ resource "google_compute_instance" "instance" {
     }
   }
 }
+
+resource "google_compute_firewall" tcp_80 {
+  count = var.enable_tcp_80 ? 1 : 0
+
+  name = "${var.deployment_name}-main-tcp-80"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["80"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_80_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-main-tier"]
+}
+
+resource "google_compute_firewall" tcp_443 {
+  count = var.enable_tcp_443 ? 1 : 0
+
+  name = "${var.deployment_name}-main-tcp-443"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["443"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_443_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-main-tier"]
+}
+
+resource "google_compute_firewall" icmp {
+  count = var.enable_icmp ? 1 : 0
+
+  name = "${var.deployment_name}-main-icmp"
+  network = element(var.networks, 0)
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-main-tier"]
+}
+
+resource "google_compute_firewall" tcp_7000-7001 {
+  count = var.enable_tcp_7000-7001 ? 1 : 0
+
+  name = "${var.deployment_name}-main-tcp-7000-7001"
+  network = element(var.networks, 0)
+
+  allow {
+    ports = ["7000-7001"]
+    protocol = "tcp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.tcp_7000-7001_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-main-tier"]
+}
+
+resource "google_compute_firewall" udp {
+  count = var.enable_udp ? 1 : 0
+
+  name = "${var.deployment_name}-main-udp"
+  network = element(var.networks, 0)
+
+  allow {
+    protocol = "udp"
+  }
+
+  source_ranges =  compact([for range in split(",", var.udp_source_ranges) : trimspace(range)])
+
+  target_tags = ["${var.deployment_name}-main-tier"]
+}

@@ -55,6 +55,66 @@ variable "external_ips" {
   default     = ["EPHEMERAL"]
 }
 
+variable "enable_tcp_80" {
+  description = "Allow HTTP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tcp_80_source_ranges" {
+  description = "Source IP ranges for HTTP traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_tcp_443" {
+  description = "Allow HTTPS traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tcp_443_source_ranges" {
+  description = "Source IP ranges for HTTPS traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_icmp" {
+  description = "Allow ICMP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "icmp_source_ranges" {
+  description = "Source IP ranges for ICMP traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_tcp_7000-7001" {
+  description = "Allow TCP port 7000-7001 traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "tcp_7000-7001_source_ranges" {
+  description = "Source IP ranges for TCP port 7000-7001 traffic"
+  type        = string
+  default     = ""
+}
+
+variable "enable_udp" {
+  description = "Allow UDP traffic from the Internet"
+  type        = bool
+  default     = true
+}
+
+variable "udp_source_ranges" {
+  description = "Source IP ranges for UDP traffic"
+  type        = string
+  default     = ""
+}
+
 variable "admin_password" {
   type        = string
   description = "Password for Admin."
