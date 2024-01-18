@@ -190,7 +190,7 @@ spec:
         {call blocks.customBooleanGroups}{param spec: $spec.getDeployInput()/}{/call}
       {/let}
       {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
-      boolean_groups:
+      booleanGroups:
         {$authScopeBooleanGroups |indent: 8, true}{nil}
         {$customBooleanGroups |indent: 8, true}{nil}
       {/if}

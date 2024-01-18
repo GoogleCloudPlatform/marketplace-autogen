@@ -166,6 +166,7 @@ enable_cloud_monitoring:
       {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
+  title: GPU Count
   {if $spec.getMinCount() > 0}
   min: {$spec.getMinCount()}
   {/if}
@@ -472,7 +473,7 @@ disk{$index+1}_type:
   name: {$name}
   title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
   section: API_ACCESS
-  boolean_group: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
+  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
 {/template}
 
 {template tierSectionName kind="text"}
