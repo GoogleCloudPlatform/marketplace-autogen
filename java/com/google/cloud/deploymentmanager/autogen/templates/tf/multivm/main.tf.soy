@@ -5,5 +5,64 @@ import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/u
 import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+{@param solutionId: string}
 
+provider "google" {lb}
+  project  = var.project_id
+{rb}
+{\n}
+{for $tier in $spec.getTiersList()}
+module "{$tier.getName() |sanitize}" {lb}
+  source          = "./modules/{$tier.getName() |doublequoted}"
+{\n}
+  deployment_name = var.goog_cm_deployment_name
+  instance_count  = var.{'instance_count' |tierprefixed: $tier}
+  zone            = var.zone
+{\n}
+  source_image    = var.{'source_image' |tierprefixed: $tier}
+  machine_type    = var.{'machine_type' |tierprefixed: $tier}
+  boot_disk_type  = var.{'boot_disk_type' |tierprefixed: $tier}
+  boot_disk_size  = var.{'boot_disk_size' |tierprefixed: $tier}
+{\n}
+  networks        = var.{'networks' |tierprefixed: $tier}
+  sub_networks    = var.{'sub_networks' |tierprefixed: $tier}
+  external_ips    = var.{'external_ips' |tierprefixed: $tier}
+  {if $tier.getIpForwarding()}
+  ip_forward      = var.{'ip_forward' |tierprefixed: $tier}
+  {/if}
+  {for $firewall in $tier.getFirewallRulesList()}
+  {let $ruleVarname}
+    {call util.firewallRuleVarName}{param spec: $firewall/}{/call}
+  {/let}
+  {let $rangeVarname}
+    {call util.firewallRuleSourceRangesVarName}{param spec: $firewall/}{/call}
+  {/let}
+  {$ruleVarname}  = var.{$ruleVarname |tierprefixed: $tier}
+  {$rangeVarname} = var.{$rangeVarname |tierprefixed: $tier}
+  {/for}
+{\n}
+  {for $password in $spec.getPasswordsList()}
+    {let $sanitizedPasswordLabel}
+      {call util.sanitizePasswordLabel}
+        {param spec: $password /}
+      {/call}
+    {/let}
+  {$sanitizedPasswordLabel}_password = random_password.{$sanitizedPasswordLabel}.result
+  {/for}
+
+  {if $spec.getStackdriver()?.getLogging()}
+  enable_cloud_logging    = var.enable_cloud_logging
+  {/if}
+
+  {if $spec.getStackdriver()?.getMonitoring()}
+  enable_cloud_monitoring = var.enable_cloud_monitoring
+  {/if}
+{rb}
+{\n}
+{/for}
+
+{call blocks.passwordResources}
+  {param specList: $spec.getPasswordsList() /}
+{/call}
 {/template}

@@ -110,24 +110,22 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template firewallProperties kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec|null}
+{@param? tier: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
-    // TODO: support tiers for multi-VM
   {/call}
 {/let}
 {let $firewallSourceRangesPropName kind="text"}
   {call util.firewallRuleSourceRangesVarName}
     {param spec: $spec /}
-    // TODO: support tiers for multi-VM
   {/call}
 {/let}
-- name: {$firewallPropName}
+- name: {$firewallPropName |tierprefixed: $tier}
   description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
-- name: {$firewallSourceRangesPropName}
+- name: {$firewallSourceRangesPropName |tierprefixed: $tier}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   varType: string
   defaultValue: ""

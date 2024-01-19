@@ -47,6 +47,7 @@ spec:
                 - nvidia-tesla-k80
         accelerator_count:
           name: accelerator_count
+          title: GPU Count
           xGoogleProperty:
             type: ET_GCE_GPU_COUNT
             gceGpuCount:
@@ -178,12 +179,12 @@ spec:
           name: enable_compute_api
           title: Allow read write access to Google Compute Engine APIs on the VM
           section: API_ACCESS
-          boolean_group: COMPUTE_API_ACCESS
+          booleanGroup: COMPUTE_API_ACCESS
         enable_compute_readonly_api:
           name: enable_compute_readonly_api
           title: Allow read access to Google Compute Engine APIs on the VM
           section: API_ACCESS
-          boolean_group: COMPUTE_READONLY_API_ACCESS
+          booleanGroup: COMPUTE_READONLY_API_ACCESS
         disk1_size:
           name: disk1_size
           title: The super-extra-great disk size in GB
@@ -285,13 +286,13 @@ spec:
           title: Enable compression
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size
@@ -366,7 +367,7 @@ spec:
         - name: google_cloud_operations
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
-      boolean_groups:
+      booleanGroups:
         - name: COMPUTE_API_ACCESS
           title: Compute API
         - name: COMPUTE_READONLY_API_ACCESS

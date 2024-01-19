@@ -45,11 +45,12 @@ public class AutogenMediumTestsSuite {
   static final String RELATIVE_TESTDATA_PATH =
       "javatests/com/google/cloud/deploymentmanager/autogen/testdata/";
 
-  static final String TESTDATA_PATH =
-      System.getenv("JAVA_RUNFILES")
-          + "/__main__/"
-          + RELATIVE_TESTDATA_PATH;
-  static final File ROOT = new File(TESTDATA_PATH);
+  static final Path TESTDATA_PATH =
+      Path.of(
+          System.getenv("TEST_SRCDIR"),
+          System.getenv("TEST_WORKSPACE"),
+          RELATIVE_TESTDATA_PATH);
+  static final File ROOT = TESTDATA_PATH.toFile();
 
   static final Autogen AUTOGEN =
       Guice.createInjector(Autogen.getAutogenModule()).getInstance(Autogen.class);
@@ -83,8 +84,7 @@ public class AutogenMediumTestsSuite {
     }
     
     static Stream<Solution> getSolutions(File inputSpecFile) {
-      File solutionFolder =
-          new File(TESTDATA_PATH + relativePathFunction(ROOT, inputSpecFile.getParentFile()));
+      File solutionFolder = inputSpecFile.getParentFile();
       File dmGoldenFolder = new File(solutionFolder, "dm");
       File terraformGoldenFolder = new File(solutionFolder, "tf");
       if (!dmGoldenFolder.exists() && !terraformGoldenFolder.exists()) {

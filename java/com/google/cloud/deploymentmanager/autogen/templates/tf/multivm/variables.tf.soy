@@ -1,0 +1,111 @@
+{namespace vm.multi.variables}
+
+import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
+import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+
+{template main kind="text"}
+{@param spec: MultiVmDeploymentPackageSpec}
+variable "project_id" {lb}
+  description = "{constants.PROJECT_ID_VAR_DESC}"
+  type        = string
+{rb}
+{\n}
+{literal}// Marketplace requires this variable name to be declared{/literal}
+variable "goog_cm_deployment_name" {lb}
+  description = "{constants.DEPLOYMENT_NAME_VAR_DESC}"
+  type        = string
+{rb}
+{\n}
+variable "zone" {lb}
+  description = "{constants.ZONE_VAR_DESC}"
+  type        = string
+  {if $spec.getZone()?.getDefaultZone()}
+  default     = "{$spec.getZone().getDefaultZone()}"
+  {/if}
+{rb}
+
+{if $spec.getDeployInput()}
+  {call blocks.deployInputVariables}{param spec: $spec.getDeployInput() /}{/call}
+{/if}
+
+{call blocks.stackdriverVariables}{param stackdriver: $spec.getStackdriver() /}{/call}
+
+{for $tier in $spec.getTiersList()}
+{call tierVariables}
+{param tier: $tier /}
+{/call}
+{/for}
+{/template}
+
+{template tierVariables kind="text" visibility="private"}
+{@param tier: VmTierSpec}
+{let $instanceCount: $tier.getInstanceCount()!/}
+{\n}
+variable "{'instance_count' |tierprefixed: $tier}" {lb}
+{if $instanceCount.getDescription()}
+  description = "{$instanceCount.getDescription() |doublequoted}"
+{elseif $instanceCount.getTooltip()}
+  description = "{$instanceCount.getTooltip() |doublequoted}"
+{/if}
+  type        = number
+  default     = {$instanceCount.getDefaultValue()}
+{rb}
+{\n}
+variable "{'source_image' |tierprefixed:$tier}" {lb}
+  description = "{constants.SOURCE_IMAGE_VAR_DESC}"
+  type        = string
+  default     = "{call util.imageUri}{param spec: $tier.getImagesList()[0]/}{/call}"
+{rb}
+variable "{'machine_type' |tierprefixed: $tier}" {lb}
+  description = "{constants.MACHINE_TYPE_VAR_DESC}"
+  type        = string
+  default     = "{$tier.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"
+{rb}
+{\n}
+variable "{'boot_disk_type' |tierprefixed: $tier}" {lb}
+  description = "{constants.BOOT_DISK_TYPE_VAR_DESC}"
+  type        = string
+  default     = "{$tier.getBootDisk()!.getDiskType()!.getDefaultType()}"
+{rb}
+{\n}
+variable "{'boot_disk_size' |tierprefixed: $tier}" {lb}
+  description = "{constants.BOOT_DISK_SIZE_VAR_DESC}"
+  type        = number
+  default     = {$tier.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
+{rb}
+{\n}
+
+variable "{'networks' |tierprefixed: $tier}" {lb}
+  description = "{constants.NETWORKS_VAR_DESC}"
+  type        = list(string)
+  default     = ["default"]
+{rb}
+{\n}
+variable "{'sub_networks' |tierprefixed: $tier}" {lb}
+  description = "{constants.SUB_NETWORKS_VAR_DESC}"
+  type        = list(string)
+  default     = []
+{rb}
+{\n}
+variable "{'external_ips' |tierprefixed: $tier}" {lb}
+  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
+  type        = list(string)
+  default     = ["EPHEMERAL"]
+{rb}
+
+{if $tier.getIpForwarding()}
+{\n}
+  {call blocks.ipForwardingVariable}
+    {param name: "ip_forward" /}
+    {param ipForwarding: $tier.getIpForwarding() /}
+    {param tier: $tier /}
+  {/call}
+{/if}
+
+{call blocks.firewallVariables}
+  {param specList: $tier.getFirewallRulesList() /}
+  {param tier: $tier /}
+{/call}
+{/template}

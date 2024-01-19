@@ -47,6 +47,7 @@ spec:
                 - nvidia-tesla-k80
         accelerator_count:
           name: accelerator_count
+          title: GPU Count
           xGoogleProperty:
             type: ET_GCE_GPU_COUNT
             gceGpuCount:
@@ -276,13 +277,13 @@ spec:
           title: Enable compression
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
           section: CONTENT_SETTINGS
-          boolean_group: IMAGE_CACHING_OPTIONS
+          booleanGroup: IMAGE_CACHING_OPTIONS
         imageCacheSize:
           name: imageCacheSize
           title: Image cache size
@@ -354,7 +355,7 @@ spec:
         - name: google_cloud_operations
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
-      boolean_groups:
+      booleanGroups:
         - name: IMAGE_CACHING_OPTIONS
           title: Image caching options
           tooltip: <a href='http://wordpress.com/help'>Learn more</a>

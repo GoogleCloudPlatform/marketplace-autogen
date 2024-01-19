@@ -1,0 +1,467 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools-display
+  annotations:
+    autogenSpecType: MULTI_VM
+    config.kubernetes.io/local-config: "true"
+spec:
+  ui:
+    input:
+      variables:
+        project_id:
+          name: project_id
+          title: Project Id
+          invisible: true
+        goog_cm_deployment_name:
+          name: goog_cm_deployment_name
+          title: Goog Cm Deployment Name
+        zone:
+          name: zone
+          title: Zone
+          subtext: 'GPU availability is limited to certain zones. <a href="https://cloud.google.com/compute/docs/gpus">Learn more</a>'
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+        domain:
+          name: domain
+          title: Domain
+          subtext: Your domain
+          placeholder: mydomain.com
+          regexValidation: '[a-zA-Z0-9-]+.[a-z]{2,}'
+          validation: A valid domain has to be entered
+        adminEmailAddress:
+          name: adminEmailAddress
+          title: Administrator e-mail address
+          tooltip: The e-mail address used to create the administrator account for WordPress.
+          placeholder: user@example.com
+          regexValidation: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+$
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        optionalEmailAddress:
+          name: optionalEmailAddress
+          title: Optional e-mail address
+          placeholder: user@example.com
+          validation: Please enter a valid email address
+          xGoogleProperty:
+            type: ET_EMAIL_ADDRESS
+        showConditionals:
+          name: showConditionals
+          title: Show conditional values
+        generateOptionalPassword:
+          name: generateOptionalPassword
+          title: Generate optional password
+        tier2LocalSSDs:
+          name: tier2LocalSSDs
+          title: Tier 2 - local SSDs
+          min: 0
+          max: 5
+        superExtraDiskName:
+          name: superExtraDiskName
+          title: Super-extra disk name
+        imageCaching:
+          name: imageCaching
+          title: Image caching
+          level: 1
+          enumValueLabels:
+            - label: Not cached
+              value: none
+            - label: Cached with redis
+              value: redis
+            - label: Cached with memcached
+              value: memcached
+        imageCompression:
+          name: imageCompression
+          title: Enable compression
+          level: 1
+          booleanGroup: IMAGE_CACHING_OPTIONS
+        imageSizing:
+          name: imageSizing
+          title: Dynamic sizing
+          level: 1
+          booleanGroup: IMAGE_CACHING_OPTIONS
+        extraLbZone0:
+          name: extraLbZone0
+          title: Zone
+          level: 1
+          section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+        extraLbZone1:
+          name: extraLbZone1
+          title: Zone
+          level: 1
+          section: LOAD_BALANCERS
+          xGoogleProperty:
+            type: ET_GCE_ZONE
+        enable_cloud_logging:
+          name: enable_cloud_logging
+          title: Enable Cloud Logging
+          tooltip: 'Cloud Logging allows you to store, search, analyze, monitor, and alert on log data and events. <a href="https://cloud.google.com/logging/">Learn more</a>'
+          section: google_cloud_operations
+        enable_cloud_monitoring:
+          name: enable_cloud_monitoring
+          title: Enable Cloud Monitoring
+          tooltip: 'Cloud Monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. <a href="https://cloud.google.com/monitoring/">Learn more</a>'
+          section: google_cloud_operations
+        main_instance_count:
+          name: main_instance_count
+          title: Instance Count
+          tooltip: Specify a value between 1 and 10.
+          subtext: A custom description for instance count.
+          section: main_tier
+          min: 1
+          max: 10
+        main_source_image:
+          name: main_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+            - label: jenkins-v20180123
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180123
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        main_machine_type:
+          name: main_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.7000000476837158
+        main_boot_disk_type:
+          name: main_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        main_boot_disk_size:
+          name: main_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: main_boot_disk_type
+        main_networks:
+          name: main_networks
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        main_sub_networks:
+          name: main_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: main_networks
+        main_external_ips:
+          name: main_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: main_networks
+              notConfigurable: false
+              allowStaticIps: true
+        main_enable_tcp_80:
+          name: main_enable_tcp_80
+          title: Allow HTTP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_tcp_80_source_ranges:
+          name: main_tcp_80_source_ranges
+          title: Source IP ranges for HTTP traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_tcp_80
+        main_enable_tcp_443:
+          name: main_enable_tcp_443
+          title: Allow HTTPS traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_tcp_443_source_ranges:
+          name: main_tcp_443_source_ranges
+          title: Source IP ranges for HTTPS traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_tcp_443
+        main_enable_icmp:
+          name: main_enable_icmp
+          title: Allow ICMP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_enable_tcp_7000-7001:
+          name: main_enable_tcp_7000-7001
+          title: Allow TCP port 7000-7001 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_enable_udp:
+          name: main_enable_udp
+          title: Allow UDP traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: main_networks
+        main_udp_source_ranges:
+          name: main_udp_source_ranges
+          title: Source IP ranges for UDP traffic
+          tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
+          placeholder: '0.0.0.0/0, 192.169.0.2/24'
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL_RANGE
+            gceFirewallRange:
+              firewallVariable: enable_udp
+        tier2_instance_count:
+          name: tier2_instance_count
+          title: Instance Count
+          section: tier2_tier
+          enumValueLabels:
+            - label: "1"
+              value: "1"
+            - label: "2"
+              value: "2"
+            - label: "4"
+              value: "4"
+        tier2_source_image:
+          name: tier2_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        tier2_machine_type:
+          name: tier2_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.7000000476837158
+        tier2_boot_disk_type:
+          name: tier2_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        tier2_boot_disk_size:
+          name: tier2_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: tier2_boot_disk_type
+        tier2_networks:
+          name: tier2_networks
+          title: Network name
+          minItems: 1
+          maxItems: 5
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        tier2_sub_networks:
+          name: tier2_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 5
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: tier2_networks
+        tier2_external_ips:
+          name: tier2_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 5
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: tier2_networks
+              notConfigurable: true
+              allowStaticIps: true
+        tier2_enable_tcp_9878:
+          name: tier2_enable_tcp_9878
+          title: Allow TCP port 9878 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier2_networks
+        tier2_enable_udp_2555:
+          name: tier2_enable_udp_2555
+          title: Allow UDP port 2555 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier2_networks
+        tier3_instance_count:
+          name: tier3_instance_count
+          title: Instance Count
+          tooltip: Specify a value between 1 and 10.
+          section: tier3_tier
+          min: 1
+          max: 10
+        tier3_source_image:
+          name: tier3_source_image
+          title: Image version
+          enumValueLabels:
+            - label: jenkins-v20180130
+              value: projects/click-to-deploy-images/global/images/jenkins-v20180130
+          xGoogleProperty:
+            type: ET_GCE_DISK_IMAGE
+        tier3_machine_type:
+          name: tier3_machine_type
+          title: Machine type
+          xGoogleProperty:
+            type: ET_GCE_MACHINE_TYPE
+            zoneProperty: zone
+            gceMachineType:
+              minCpu: 1
+              minRamGb: 1.690000057220459
+        tier3_boot_disk_type:
+          name: tier3_boot_disk_type
+          title: Boot disk type
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        tier3_boot_disk_size:
+          name: tier3_boot_disk_size
+          title: Boot disk size in GB
+          min: 10
+          max: 10000
+          section: boot_disk
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: tier3_boot_disk_type
+        tier3_networks:
+          name: tier3_networks
+          title: Network name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_NETWORK
+            gceNetwork:
+              allowSharedVpcs: true
+              machineTypeVariable: machine_type
+        tier3_sub_networks:
+          name: tier3_subnetworks
+          title: Subnetwork name
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_SUBNETWORK
+            zoneProperty: zone
+            gceSubnetwork:
+              networkVariable: tier3_networks
+        tier3_external_ips:
+          name: tier3_external_ips
+          title: External IP
+          tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
+          minItems: 1
+          maxItems: 1
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_EXTERNAL_IP
+            gceExternalIp:
+              networkVariable: tier3_networks
+              notConfigurable: false
+              allowStaticIps: true
+        tier3_enable_tcp_9000:
+          name: tier3_enable_tcp_9000
+          title: Allow TCP port 9000 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier3_networks
+        tier3_enable_udp_2333:
+          name: tier3_enable_udp_2333
+          title: Allow UDP port 2333 traffic from the Internet
+          section: networking
+          xGoogleProperty:
+            type: ET_GCE_FIREWALL
+            gceFirewall:
+              networkVariable: tier3_networks
+      sections:
+        - name: main_tier
+          title: Main Tier
+        - name: tier2_tier
+          title: Secondary Tier
+        - name: tier3_tier
+          title: Third Tier
+        - name: LOAD_BALANCERS
+          title: Additional zones for load balancers
+        - name: google_cloud_operations
+          title: Google Cloud Operations
+          subtext: Monitoring and management for services, containers, applications, and infrastructure
+    runtime:
+      suggestedActions:
+        - heading: Conditional step
+          description: This step is displayed conditionally. Unselect the checkbox to hide it.
+          snippet: e^(i * pi) + 1 = 0
+        - heading: Conditional step - negation
+          description: This step is displayed conditionally. Select the checkbox to hide it.
+          snippet: a^2 + b^2 = c^2
+        - heading: External IP action
+          description: Some action
+        - heading: Internal IP action
+          description: Some action

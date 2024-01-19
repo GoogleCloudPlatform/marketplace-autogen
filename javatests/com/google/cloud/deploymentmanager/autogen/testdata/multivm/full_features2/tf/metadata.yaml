@@ -1,0 +1,277 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: marketplace-tools
+  annotations:
+    autogenSpecType: MULTI_VM
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    title: Google Cloud Marketplace Terraform Module
+    version: '1.00'
+    actuationTool:
+      flavor: Terraform
+      version: ">= 1.2"
+    description: {}
+    softwareGroups:
+      - type: SG_OS
+        software:
+          - title: Debian
+            version: "9"
+      - software:
+          - title: Apache
+            version: "2.4.10"
+          - title: Jenkins
+            version: "2.46.3"
+          - title: OpenJDK
+            version: "1.8.0"
+  content: {}
+  interfaces:
+    variables:
+      - name: project_id
+        description: The ID of the project in which to provision resources.
+        varType: string
+        required: true
+      - name: goog_cm_deployment_name
+        description: The name of the deployment and VM instance.
+        varType: string
+        required: true
+      - name: zone
+        description: The zone for the solution to be deployed.
+        varType: string
+        required: true
+      - name: domain
+        description: Your domain
+        varType: string
+        defaultValue: google.com
+      - name: adminEmailAddress
+        description: The e-mail address used to create the administrator account for WordPress.
+        varType: string
+        defaultValue: aX9-YD_8W.3@example.com
+        description: Please enter a valid email address
+      - name: optionalEmailAddress
+        varType: string
+        required: true
+        description: Please enter a valid email address
+      - name: showConditionals
+        varType: bool
+        defaultValue: true
+      - name: generateOptionalPassword
+        varType: bool
+        defaultValue: true
+      - name: tier2LocalSSDs
+        varType: integer
+        defaultValue: 0
+      - name: superExtraDiskName
+        varType: string
+        defaultValue: the-super-extra-disk
+      - name: imageCaching
+        varType: string
+        defaultValue: none
+      - name: imageCompression
+        varType: bool
+        defaultValue: false
+      - name: imageSizing
+        varType: bool
+        defaultValue: true
+      - name: extraLbZone0
+        varType: string
+        defaultValue: us-west1-a
+      - name: extraLbZone1
+        varType: string
+        required: true
+      - name: enable_cloud_logging
+        description: Enables Cloud Logging.
+        varType: bool
+        defaultValue: false
+      - name: enable_cloud_monitoring
+        description: Enables Cloud Monitoring.
+        varType: bool
+        defaultValue: true
+      - name: main_instance_count
+        description: "A custom description for instance count."
+        varType: integer
+        defaultValue: 3
+      - name: main_source_image
+        description: The image name for the disk for the VM instance.
+        varType: string
+        defaultValue: projects/click-to-deploy-images/global/images/jenkins-v20180130
+      - name: main_machine_type
+        description: The machine type to create, e.g. e2-small
+        varType: string
+        defaultValue: e2-standard-2
+      - name: main_boot_disk_type
+        description: The boot disk type for the VM instance.
+        varType: string
+        defaultValue: pd-standard
+      - name: main_boot_disk_size
+        description: The boot disk size for the VM instance in GBs
+        varType: integer
+        defaultValue: 10
+      - name: main_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: main_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: main_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - NONE
+      - name: main_enable_tcp_80
+        description: Allow HTTP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_80_source_ranges
+        description: Source IP ranges for HTTP traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_tcp_443
+        description: Allow HTTPS traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_443_source_ranges
+        description: Source IP ranges for HTTPS traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_icmp
+        description: Allow ICMP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_icmp_source_ranges
+        description: Source IP ranges for ICMP traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_tcp_7000-7001
+        description: Allow TCP port 7000-7001 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_tcp_7000-7001_source_ranges
+        description: Source IP ranges for TCP port 7000-7001 traffic
+        varType: string
+        defaultValue: ""
+      - name: main_enable_udp
+        description: Allow UDP traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: main_udp_source_ranges
+        description: Source IP ranges for UDP traffic
+        varType: string
+        defaultValue: ""
+      - name: tier2_instance_count
+        varType: integer
+        defaultValue: 2
+      - name: tier2_source_image
+        description: The image name for the disk for the VM instance.
+        varType: string
+        defaultValue: projects/click-to-deploy-images/global/images/jenkins-v20180130
+      - name: tier2_machine_type
+        description: The machine type to create, e.g. e2-small
+        varType: string
+        defaultValue: e2-standard-2
+      - name: tier2_boot_disk_type
+        description: The boot disk type for the VM instance.
+        varType: string
+        defaultValue: pd-standard
+      - name: tier2_boot_disk_size
+        description: The boot disk size for the VM instance in GBs
+        varType: integer
+        defaultValue: 10
+      - name: tier2_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: tier2_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: tier2_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - EPHEMERAL
+      - name: tier2_enable_tcp_9878
+        description: Allow TCP port 9878 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier2_tcp_9878_source_ranges
+        description: Source IP ranges for TCP port 9878 traffic
+        varType: string
+        defaultValue: ""
+      - name: tier2_enable_udp_2555
+        description: Allow UDP port 2555 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier2_udp_2555_source_ranges
+        description: Source IP ranges for UDP port 2555 traffic
+        varType: string
+        defaultValue: ""
+      - name: tier3_instance_count
+        description: "Specify a value between 1 and 10."
+        varType: integer
+        defaultValue: 1
+      - name: tier3_source_image
+        description: The image name for the disk for the VM instance.
+        varType: string
+        defaultValue: projects/click-to-deploy-images/global/images/jenkins-v20180130
+      - name: tier3_machine_type
+        description: The machine type to create, e.g. e2-small
+        varType: string
+        defaultValue: e2-standard-2
+      - name: tier3_boot_disk_type
+        description: The boot disk type for the VM instance.
+        varType: string
+        defaultValue: pd-standard
+      - name: tier3_boot_disk_size
+        description: The boot disk size for the VM instance in GBs
+        varType: integer
+        defaultValue: 10
+      - name: tier3_networks
+        description: The network name to attach the VM instance.
+        varType: list(string)
+        defaultValue:
+          - default
+      - name: tier3_sub_networks
+        description: The sub network name to attach the VM instance.
+        varType: list(string)
+      - name: tier3_external_ips
+        description: The external IPs assigned to the VM for public access.
+        varType: list(string)
+        defaultValue:
+          - EPHEMERAL
+      - name: tier3_enable_tcp_9000
+        description: Allow TCP port 9000 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier3_tcp_9000_source_ranges
+        description: Source IP ranges for TCP port 9000 traffic
+        varType: string
+        defaultValue: ""
+      - name: tier3_enable_udp_2333
+        description: Allow UDP port 2333 traffic from the Internet
+        varType: bool
+        defaultValue: true
+      - name: tier3_udp_2333_source_ranges
+        description: Source IP ranges for UDP port 2333 traffic
+        varType: string
+        defaultValue: ""
+    outputs:
+      - name: site_url
+        description: Site Url
+      - name: admin_url
+        description: Admin Url
+      - name: admin_user
+        description: Username for Admin password.
+      - name: admin_password
+        description: Password for Admin.
+      - name: ghost_mysql_user
+        description: Username for Ghost MySQL password.
+      - name: ghost_mysql_password
+        description: Password for Ghost MySQL.
+      - name: this_is_optional_user
+        description: Username for This is optional password.
+      - name: this_is_optional_password
+        description: Password for This is optional.

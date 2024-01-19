@@ -15,11 +15,14 @@
 package com.google.cloud.deploymentmanager.autogen;
 
 import static com.google.common.truth.Truth.assertWithMessage;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
@@ -44,7 +47,9 @@ public class VerifyAutogenFileContent {
 
   @Parameters(name = "File {2} from Solution {0}")
   public static Collection<String[]> data() {
-    return AutogenMediumTestsSuite.Solution.allSolutionsActualFilesDesc();
+    var solutions = AutogenMediumTestsSuite.Solution.allSolutionsActualFilesDesc();
+    Preconditions.checkArgument(!solutions.isEmpty(), "Did not find any test solutions");
+    return solutions;
   }
 
   @Test
@@ -67,6 +72,24 @@ public class VerifyAutogenFileContent {
       // Because of that we need to compare actual vs expected as well
 
       String diffMessage = generateDiffMessage(tempDir);
+
+      // This overwrites the test files when using bazel run
+      if (System.getenv("BUILD_WORKSPACE_DIRECTORY") != null
+          && (!StringUtils.difference(expected, fileContent).isEmpty()
+              || !StringUtils.difference(fileContent, expected).isEmpty())) {
+        File overwriteFile =
+            new File(
+                Path.of(
+                        System.getenv("BUILD_WORKSPACE_DIRECTORY"),
+                        ".",
+                        AutogenMediumTestsSuite.RELATIVE_TESTDATA_PATH,
+                        Path.of(solutionName).getParent().toString(),
+                        Path.of(goldenFolder).getFileName().toString(),
+                        fileRelativePath)
+                    .toString());
+        Files.write(fileContent.getBytes(UTF_8), overwriteFile);
+      }
+
       assertWithMessage(diffMessage).that(StringUtils.difference(expected, fileContent)).isEmpty();
       assertWithMessage(diffMessage).that(StringUtils.difference(fileContent, expected)).isEmpty();
     }

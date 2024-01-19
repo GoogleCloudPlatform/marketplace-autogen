@@ -166,6 +166,7 @@ enable_cloud_monitoring:
       {/for}
 {$namePrefix + '_count' |tierprefixed: $tier}:
   name: {$namePrefix + '_count' |tierprefixed: $tier}
+  title: GPU Count
   {if $spec.getMinCount() > 0}
   min: {$spec.getMinCount()}
   {/if}
@@ -227,30 +228,28 @@ enable_cloud_monitoring:
 
 {template firewallPropertiesDisplay kind="text"}
 {@param spec: FirewallRuleSpec}
-{@param? tierSpec: VmTierSpec|null}
+{@param? tier: VmTierSpec|null}
 {let $firewallPropName kind="text"}
   {call util.firewallRuleVarName}
     {param spec: $spec /}
-    // TODO: support tiers for multi-VM
   {/call}
 {/let}
 {let $firewallSourceRangesPropName kind="text"}
   {call util.firewallRuleSourceRangesVarName}
     {param spec: $spec /}
-    // TODO: support tiers for multi-VM
   {/call}
 {/let}
-{$firewallPropName}:
-  name: {$firewallPropName}
+{$firewallPropName |tierprefixed: $tier}:
+  name: {$firewallPropName |tierprefixed: $tier}
   title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
   section: networking
   xGoogleProperty:
     type: ET_GCE_FIREWALL
     gceFirewall:
-      networkVariable: {'networks' |tierprefixed: $tierSpec}
+      networkVariable: {'networks' |tierprefixed: $tier}
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
-{$firewallSourceRangesPropName}:
-  name: {$firewallSourceRangesPropName}
+{$firewallSourceRangesPropName |tierprefixed: $tier}:
+  name: {$firewallSourceRangesPropName |tierprefixed: $tier}
   title: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
   placeholder: '0.0.0.0/0, 192.169.0.2/24'
@@ -358,7 +357,7 @@ disk{$index+1}_type:
 
 {if $field.getGroupedBooleanCheckbox()}
   {let $displayGroup: findDisplayGroup($field, $section)/}
-  boolean_group: {$displayGroup.getName() |yamlprimitive: 2}
+  booleanGroup: {$displayGroup.getName() |yamlprimitive: 2}
 
 {elseif $field.getIntegerBox()}
   {let $box: $field.getIntegerBox() /}
@@ -474,7 +473,7 @@ disk{$index+1}_type:
   name: {$name}
   title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
   section: API_ACCESS
-  boolean_group: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
+  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
 {/template}
 
 {template tierSectionName kind="text"}
