@@ -282,11 +282,13 @@ enable_cloud_monitoring:
 {template additionalDisksPropertiesDisplay kind="text"}
 {@param diskSpecs: list<DiskSpec>}
 {@param zonePropertyName: string}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDisksPropertyDisplay}
       {param spec: $spec /}
       {param index: $index /}
       {param zonePropertyName: $zonePropertyName /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -295,8 +297,9 @@ enable_cloud_monitoring:
 {@param spec: DiskSpec}
 {@param index: number}
 {@param zonePropertyName: string}
-disk{$index+1}_size:
-  name: disk{$index+1}_size
+{@param? tier: VmTierSpec|null}
+{'disk' + ($index+1) + '_size' |tierprefixed: $tier}:
+  name: {'disk' + ($index+1) + '_size' |tierprefixed: $tier}
   title: {$spec.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   max: 10000
@@ -305,8 +308,8 @@ disk{$index+1}_size:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
       diskTypeVariable: disk{$index+1}_type
-disk{$index+1}_type:
-  name: disk{$index+1}_type
+{'disk' + ($index+1) + '_type' |tierprefixed: $tier}:
+  name: {'disk' + ($index+1) + '_type' |tierprefixed: $tier}
   title: {$spec.getDisplayLabel() + ' type' |yamlprimitive: 2}
   section: additional_disks
   xGoogleProperty:

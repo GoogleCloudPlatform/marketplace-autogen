@@ -18,6 +18,12 @@ import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/de
     {param stackdriver: $packageSpec.getStackdriver() /}
   {/call}
 {/let}
+{let $diskMetadata}
+  {call blocks.diskMetadata}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param tier: $spec /}
+  {/call}
+{/let}
 
 locals {lb}
   network_interfaces = [ for i, n in var.networks : {lb}
@@ -26,17 +32,15 @@ locals {lb}
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     {rb}
   ]
-{\n}
-  metadata = {lb}
-  {if $passwordMetadata}
-    {$passwordMetadata |indent: 4}
-  {/if}
-  {if $stackdriverMetadata}
-    {$stackdriverMetadata |indent: 4}
-  {/if}
-  {rb}
 {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.additionalDiskResources}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param deployInput: $packageSpec.getDeployInput() /}
+    {param tier: $spec /}
+  {/call}
+{/if}
 resource "google_compute_instance" "instance" {lb}
   count = var.instance_count
 {\n}
@@ -47,6 +51,8 @@ resource "google_compute_instance" "instance" {lb}
   tags = ["{call util.deploymentTag}{param tier: $spec/}{/call}", "{call util.tierTag}{param tier: $spec/}{/call}"]
 {\n}
   boot_disk {lb}
+    device_name = "${lb}var.deployment_name{rb}-{$spec.getName()}-vm-tmpl-${lb}count.index{rb}-boot-disk"
+{\n}
     initialize_params {lb}
       size = var.boot_disk_size
       type = var.boot_disk_type
@@ -54,11 +60,34 @@ resource "google_compute_instance" "instance" {lb}
     {rb}
   {rb}
 {\n}
+{if $spec.getAdditionalDisksList()}
+  {call blocks.attachDisks}
+    {param diskSpecs: $spec.getAdditionalDisksList() /}
+    {param tier: $spec /}
+  {/call}
+{/if}
+{if $spec.getLocalSsds()}
+  {call blocks.localSsds}
+    {param localSsdSpec: $spec.getLocalSsds() /}
+    {param deployInput: $packageSpec.getDeployInput() /}
+  {/call}
+{/if}
+
 {if $spec.getIpForwarding()}
   can_ip_forward = var.ip_forward
 {\n}
 {/if}
-  metadata = local.metadata
+  metadata = {lb}
+  {if $passwordMetadata}
+    {$passwordMetadata |indent: 4}
+  {/if}
+  {if $stackdriverMetadata}
+    {$stackdriverMetadata |indent: 4}
+  {/if}
+  {if $diskMetadata}
+    {$diskMetadata |indent: 4}
+  {/if}
+  {rb}
 {\n}
   dynamic "network_interface" {lb}
     for_each = local.network_interfaces

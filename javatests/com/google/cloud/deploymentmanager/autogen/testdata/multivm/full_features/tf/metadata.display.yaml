@@ -153,6 +153,57 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_boot_disk_type
+        main_disk1_size:
+          name: main_disk1_size
+          title: Very-extra disk size in GB
+          min: 10
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk1_type
+        main_disk1_type:
+          name: main_disk1_type
+          title: Very-extra disk type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        main_disk2_size:
+          name: main_disk2_size
+          title: Extra disk size in GB
+          min: 10
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk2_type
+        main_disk2_type:
+          name: main_disk2_type
+          title: Extra disk type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
+        main_disk3_size:
+          name: main_disk3_size
+          title: Super Extra disk size in GB
+          min: 10
+          max: 10000
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_SIZE
+            gceDiskSize:
+              diskTypeVariable: disk3_type
+        main_disk3_type:
+          name: main_disk3_type
+          title: Super Extra disk type
+          section: additional_disks
+          xGoogleProperty:
+            type: ET_GCE_DISK_TYPE
+            zoneProperty: zone
         main_networks:
           name: main_networks
           title: Network name

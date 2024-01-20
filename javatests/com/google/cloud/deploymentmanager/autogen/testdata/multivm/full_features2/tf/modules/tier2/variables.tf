@@ -108,6 +108,51 @@ variable "this_is_optional_password" {
   sensitive   = true
 }
 
+variable "domain" {
+  description = "Your domain"
+  type        = string
+  default     = "google.com"
+}
+
+variable "showConditionals" {
+  type        = bool
+  default     = true
+}
+
+variable "generateOptionalPassword" {
+  type        = bool
+  default     = true
+}
+
+variable "tier2LocalSSDs" {
+  type        = number
+  default     = 0
+}
+
+variable "imageCaching" {
+  type        = string
+  default     = "none"
+}
+
+variable "imageCompression" {
+  type        = bool
+  default     = false
+}
+
+variable "imageSizing" {
+  type        = bool
+  default     = true
+}
+
+variable "extraLbZone0" {
+  type        = string
+  default     = "us-west1-a"
+}
+
+variable "extraLbZone1" {
+  type        = string
+}
+
 variable "enable_cloud_logging" {
   description = "Enables Cloud Logging."
   type        = bool

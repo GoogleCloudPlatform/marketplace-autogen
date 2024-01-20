@@ -157,6 +157,14 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if $tier.getAdditionalDisksList()}
+{call blocks.additionalDisksPropertiesDisplay}
+  {param diskSpecs: $tier.getAdditionalDisksList() /}
+  {param zonePropertyName: 'zone' /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.networkPropertiesDisplay}
   {param nameSuffix: 'networks' /}
   {param zonePropertyName: 'zone' /}

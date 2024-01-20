@@ -108,6 +108,30 @@ spec:
         description: The boot disk size for the VM instance in GBs
         varType: integer
         defaultValue: 10
+      - name: main_disk1_size
+        description: Very-extra disk size in GB
+        varType: integer
+        defaultValue: 10
+      - name: main_disk1_type
+        description: Very-extra disk
+        varType: string
+        defaultValue: pd-standard
+      - name: main_disk2_size
+        description: Extra disk size in GB
+        varType: integer
+        defaultValue: 10
+      - name: main_disk2_type
+        description: Extra disk
+        varType: string
+        defaultValue: pd-standard
+      - name: main_disk3_size
+        description: Super Extra disk size in GB
+        varType: integer
+        defaultValue: 10
+      - name: main_disk3_type
+        description: Super Extra disk
+        varType: string
+        defaultValue: pd-standard
       - name: main_networks
         description: The network name to attach the VM instance.
         varType: list(string)

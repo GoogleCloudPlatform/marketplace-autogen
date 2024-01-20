@@ -5,14 +5,6 @@ locals {
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     }
   ]
-
-  metadata = {
-    admin-password = var.admin_password
-    ghost-db-password = var.ghost_mysql_password
-    optional-password = var.this_is_optional_password
-    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
-    google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
-  }
 }
 
 resource "google_compute_instance" "instance" {
@@ -25,6 +17,8 @@ resource "google_compute_instance" "instance" {
   tags = ["${var.deployment_name}-deployment", "${var.deployment_name}-tier3-tier"]
 
   boot_disk {
+    device_name = "${var.deployment_name}-tier3-vm-tmpl-${count.index}-boot-disk"
+
     initialize_params {
       size = var.boot_disk_size
       type = var.boot_disk_type
@@ -32,7 +26,13 @@ resource "google_compute_instance" "instance" {
     }
   }
 
-  metadata = local.metadata
+  metadata = {
+    admin-password = var.admin_password
+    ghost-db-password = var.ghost_mysql_password
+    optional-password = var.this_is_optional_password
+    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
+    google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+  }
 
   dynamic "network_interface" {
     for_each = local.network_interfaces

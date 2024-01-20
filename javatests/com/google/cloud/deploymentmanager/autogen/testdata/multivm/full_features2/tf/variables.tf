@@ -115,6 +115,42 @@ variable "main_boot_disk_size" {
   default     = 10
 }
 
+variable "main_disk1_type" {
+  description = "Very-extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "main_disk1_size" {
+  description = "Very-extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
+variable "main_disk2_type" {
+  description = "Extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "main_disk2_size" {
+  description = "Extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
+variable "main_disk3_type" {
+  description = "Super Extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "main_disk3_size" {
+  description = "Super Extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
 variable "main_networks" {
   description = "The network name to attach the VM instance."
   type        = list(string)

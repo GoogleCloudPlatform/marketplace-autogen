@@ -14,6 +14,13 @@ module "main" {
   boot_disk_type  = var.main_boot_disk_type
   boot_disk_size  = var.main_boot_disk_size
 
+  disk1_type = var.main_disk1_type
+  disk1_size = var.main_disk1_size
+  disk2_type = var.main_disk2_type
+  disk2_size = var.main_disk2_size
+  disk3_type = var.main_disk3_type
+  disk3_size = var.main_disk3_size
+
   networks        = var.main_networks
   sub_networks    = var.main_sub_networks
   external_ips    = var.main_external_ips
@@ -37,6 +44,15 @@ module "main" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+
+  domain = var.domain
+  generateOptionalPassword = var.generateOptionalPassword
+  superExtraDiskName = var.superExtraDiskName
+  imageCaching = var.imageCaching
+  imageCompression = var.imageCompression
+  imageSizing = var.imageSizing
+  extraLbZone0 = var.extraLbZone0
+  extraLbZone1 = var.extraLbZone1
   enable_cloud_logging    = var.enable_cloud_logging
   enable_cloud_monitoring = var.enable_cloud_monitoring
 }
@@ -67,6 +83,16 @@ module "tier2" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+
+  domain = var.domain
+  showConditionals = var.showConditionals
+  generateOptionalPassword = var.generateOptionalPassword
+  tier2LocalSSDs = var.tier2LocalSSDs
+  imageCaching = var.imageCaching
+  imageCompression = var.imageCompression
+  imageSizing = var.imageSizing
+  extraLbZone0 = var.extraLbZone0
+  extraLbZone1 = var.extraLbZone1
   enable_cloud_logging    = var.enable_cloud_logging
   enable_cloud_monitoring = var.enable_cloud_monitoring
 }
@@ -97,6 +123,7 @@ module "tier3" {
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
+
   enable_cloud_logging    = var.enable_cloud_logging
   enable_cloud_monitoring = var.enable_cloud_monitoring
 }

@@ -140,6 +140,13 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if $tier.getAdditionalDisksList()}
+{call blocks.additionalDisksProperties}
+  {param diskSpecs: $tier.getAdditionalDisksList() /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.networkProperties}
   {param nameSuffix: 'networks' /}
   {param spec: $tier.getNetworkInterfaces()! /}

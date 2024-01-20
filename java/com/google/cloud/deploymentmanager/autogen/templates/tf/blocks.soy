@@ -164,11 +164,13 @@ variable "{'accelerator_count' |tierprefixed: $tier}" {lb}
 {template additionalDiskVariables kind="text"}
 {@param diskSpecs: list<DiskSpec>}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskVariable}
       {param spec: $spec /}
       {param index: $index /}
       {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -178,18 +180,19 @@ variable "{'accelerator_count' |tierprefixed: $tier}" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
   {/call}
 {/let}
-variable "disk{$index+1}_type" {lb}
+variable "{'disk' + ($index+1) + '_type' |tierprefixed: $tier}" {lb}
   description = "{$spec.getDisplayLabel() |doublequoted}"
   type        = string
   default     = "{$spec.getDiskType()!.getDefaultType()}"
 {rb}
 {\n}
-variable "disk{$index+1}_size" {lb}
+variable "{'disk' + ($index+1) + '_size' |tierprefixed: $tier}" {lb}
   description = "{$diskSizeDescription |doublequoted}"
   type        = number
   default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
@@ -224,11 +227,14 @@ variable "disk{$index+1}_size" {lb}
 {template additionalDiskResources kind="text"}
   {@param diskSpecs: list<DiskSpec>}
   {@param? deployInput: DeployInputSpec|null}
+  {@param? tier: VmTierSpec|null}
+
   {for $spec, $index in $diskSpecs}
     {call additionalDiskResource}
       {param spec: $spec /}
       {param index: $index /}
       {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -238,6 +244,16 @@ variable "disk{$index+1}_size" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
+
+{let $deviceNamePrefix kind="text"}
+  {if $tier}
+    ${lb}var.deployment_name{rb}-{$tier.getName()}-vm-${lb}count.index{rb}{nil}
+  {else}
+    ${lb}var.goog_cm_deployment_name{rb}-vm{nil}
+  {/if}
+{/let}
+
 {let $deviceNameSuffix kind="text"}
   {if $spec.getDeviceNameSuffix()!.getName()}
     {$spec.getDeviceNameSuffix()!.getName()}{nil}
@@ -247,7 +263,11 @@ variable "disk{$index+1}_size" {lb}
   {/if}
 {/let}
 resource "google_compute_disk" "disk{$index + 1}" {lb}
-  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceNameSuffix}"
+  {if $tier}
+  count = var.instance_count
+{\n}
+  {/if}
+  name = "{$deviceNamePrefix}-{$deviceNameSuffix}"
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size
@@ -256,11 +276,11 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisks kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec|null}
+  {@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call attachDisk}
       {param index: $index /}
-      {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -268,10 +288,11 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisk kind="text"}
 {@param index: number}
-{@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
+{let $cntIndex: $tier ? '[count.index]' : '' /}
   attached_disk {lb}
-    source      = google_compute_disk.disk{$index + 1}.id
-    device_name = google_compute_disk.disk{$index + 1}.name
+    source      = google_compute_disk.disk{$index + 1}{$cntIndex}.id
+    device_name = google_compute_disk.disk{$index + 1}{$cntIndex}.name
   {rb}
 {/template}
 
@@ -337,7 +358,8 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 
 {template deployInputVariables kind="text"}
 {@param spec: DeployInputSpec}
-{let $fields: listDeployInputFields($spec)/}
+{@param? tier: VmTierSpec|null}
+{let $fields: $tier ? listDeployInputFields($spec, $tier) :  listDeployInputFields($spec)/}
 {for $field in $fields}
   {\n}
   {call deployInputVariable}{param field: $field/}{/call}
@@ -502,8 +524,10 @@ variable "{$field.getName()}" {lb}
 
 {template diskMetadata kind="text"}
 {@param diskSpecs: list<DiskSpec>}
+{@param? tier: VmTierSpec|null}
 {if length($diskSpecs)}
-{let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + '.name' for $a, $i in $diskSpecs]/}
+{let $cntIndex: $tier ? '[count.index]': '' /}
+{let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + $cntIndex + '.name' for $a, $i in $diskSpecs]/}
 ATTACHED_DISKS = join(",", {$deviceNameArray}){nil}
 {/if}
 {/template}

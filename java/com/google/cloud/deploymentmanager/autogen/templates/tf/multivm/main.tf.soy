@@ -25,6 +25,14 @@ module "{$tier.getName() |sanitize}" {lb}
   boot_disk_type  = var.{'boot_disk_type' |tierprefixed: $tier}
   boot_disk_size  = var.{'boot_disk_size' |tierprefixed: $tier}
 {\n}
+  {for $disk, $index in $tier.getAdditionalDisksList()}
+  {'disk' + ($index+1) + '_type'} = var.{'disk' + ($index+1) + '_type' |tierprefixed: $tier}
+  {'disk' + ($index+1) + '_size'} = var.{'disk' + ($index+1) + '_size' |tierprefixed: $tier}
+  {/for}
+
+  {if length($tier.getAdditionalDisksList()) > 0}
+{\n}
+  {/if}
   networks        = var.{'networks' |tierprefixed: $tier}
   sub_networks    = var.{'sub_networks' |tierprefixed: $tier}
   external_ips    = var.{'external_ips' |tierprefixed: $tier}
@@ -63,6 +71,13 @@ module "{$tier.getName() |sanitize}" {lb}
     {/let}
   {$sanitizedPasswordLabel}_password = random_password.{$sanitizedPasswordLabel}.result
   {/for}
+
+  {if $spec.getDeployInput()}
+{\n}
+  {for $field in listDeployInputFields($spec.getDeployInput(), $tier)}
+  {$field.getName()} = var.{$field.getName()}
+  {/for}
+  {/if}
 
   {if $spec.getStackdriver()?.getLogging()}
   enable_cloud_logging    = var.enable_cloud_logging

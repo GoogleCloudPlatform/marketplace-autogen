@@ -36,6 +36,42 @@ variable "boot_disk_size" {
   default     = 10
 }
 
+variable "disk1_type" {
+  description = "Very-extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk1_size" {
+  description = "Very-extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
+variable "disk2_type" {
+  description = "Extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk2_size" {
+  description = "Extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
+variable "disk3_type" {
+  description = "Super Extra disk"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "disk3_size" {
+  description = "Super Extra disk size in GB"
+  type        = number
+  default     = 10
+}
+
 variable "networks" {
   description = "The network name to attach the VM instance."
   type        = list(string)
@@ -130,6 +166,46 @@ variable "this_is_optional_password" {
   type        = string
   description = "Password for This is optional."
   sensitive   = true
+}
+
+variable "domain" {
+  description = "Your domain"
+  type        = string
+  default     = "google.com"
+}
+
+variable "generateOptionalPassword" {
+  type        = bool
+  default     = true
+}
+
+variable "superExtraDiskName" {
+  type        = string
+  default     = "the-super-extra-disk"
+}
+
+variable "imageCaching" {
+  type        = string
+  default     = "none"
+}
+
+variable "imageCompression" {
+  type        = bool
+  default     = false
+}
+
+variable "imageSizing" {
+  type        = bool
+  default     = true
+}
+
+variable "extraLbZone0" {
+  type        = string
+  default     = "us-west1-a"
+}
+
+variable "extraLbZone1" {
+  type        = string
 }
 
 variable "enable_cloud_logging" {
