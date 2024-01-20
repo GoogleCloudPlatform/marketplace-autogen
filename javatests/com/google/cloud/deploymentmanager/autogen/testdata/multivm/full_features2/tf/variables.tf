@@ -193,6 +193,42 @@ variable "main_udp_source_ranges" {
   default     = ""
 }
 
+variable "main_enable_cloud_readonly_api" {
+  description = "Allow read only access to all of Google Cloud Platform APIs on the VM"
+  type        = bool
+  default     = true
+}
+
+variable "main_enable_cloud_api" {
+  description = "Allow full access to all of Google Cloud Platform APIs on the VM"
+  type        = bool
+  default     = true
+}
+
+variable "main_enable_compute_readonly_api" {
+  description = "Allow read access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = true
+}
+
+variable "main_enable_compute_api" {
+  description = "Allow read write access to Google Compute Engine APIs on the VM"
+  type        = bool
+  default     = true
+}
+
+variable "main_enable_source_read_write_api" {
+  description = "Allow read write access to Google Cloud Source Repositories APIs on the VM"
+  type        = bool
+  default     = true
+}
+
+variable "main_enable_projecthosting_api" {
+  description = "Allow project hosting access to (Deprecated) Google Code Project Hosting APIs on the VM"
+  type        = bool
+  default     = true
+}
+
 variable "tier2_instance_count" {
   type        = number
   default     = 2

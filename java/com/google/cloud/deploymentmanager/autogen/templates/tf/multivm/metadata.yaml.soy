@@ -161,4 +161,11 @@ spec:
   {/call}
 {/if}
 
+{if $tier.getGcpAuthScopesList()}
+{call blocks.gcpAuthScopesProperties}
+  {param specs: $tier.getGcpAuthScopesList() /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {/template}

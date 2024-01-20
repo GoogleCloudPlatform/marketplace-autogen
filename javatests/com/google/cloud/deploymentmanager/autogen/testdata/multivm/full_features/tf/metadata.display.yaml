@@ -258,6 +258,36 @@ spec:
             type: ET_GCE_FIREWALL_RANGE
             gceFirewallRange:
               firewallVariable: enable_udp
+        main_enable_cloud_readonly_api:
+          name: main_enable_cloud_readonly_api
+          title: Allow read only access to all of Google Cloud Platform APIs on the VM
+          section: API_ACCESS
+          booleanGroup: CLOUD_PLATFORM_READONLY_API_ACCESS
+        main_enable_cloud_api:
+          name: main_enable_cloud_api
+          title: Allow full access to all of Google Cloud Platform APIs on the VM
+          section: API_ACCESS
+          booleanGroup: CLOUD_PLATFORM_API_ACCESS
+        main_enable_compute_readonly_api:
+          name: main_enable_compute_readonly_api
+          title: Allow read access to Google Compute Engine APIs on the VM
+          section: API_ACCESS
+          booleanGroup: COMPUTE_READONLY_API_ACCESS
+        main_enable_compute_api:
+          name: main_enable_compute_api
+          title: Allow read write access to Google Compute Engine APIs on the VM
+          section: API_ACCESS
+          booleanGroup: COMPUTE_API_ACCESS
+        main_enable_source_read_write_api:
+          name: main_enable_source_read_write_api
+          title: Allow read write access to Google Cloud Source Repositories APIs on the VM
+          section: API_ACCESS
+          booleanGroup: SOURCE_READ_WRITE_API_ACCESS
+        main_enable_projecthosting_api:
+          name: main_enable_projecthosting_api
+          title: Allow project hosting access to (Deprecated) Google Code Project Hosting APIs on the VM
+          section: API_ACCESS
+          booleanGroup: PROJECT_HOSTING_API_ACCESS
         tier2_instance_count:
           name: tier2_instance_count
           title: Instance Count

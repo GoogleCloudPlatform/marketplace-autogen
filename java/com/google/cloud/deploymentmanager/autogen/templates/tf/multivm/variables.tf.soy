@@ -116,4 +116,9 @@ variable "{'external_ips' |tierprefixed: $tier}" {lb}
     {param tier: $tier /}
   {/call}
 {/if}
+
+{call blocks.gcpAuthScopeVariables}
+  {param specs: $tier.getGcpAuthScopesList() /}
+  {param tier: $tier /}
+{/call}
 {/template}

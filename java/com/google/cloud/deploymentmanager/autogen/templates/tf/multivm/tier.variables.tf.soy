@@ -106,4 +106,6 @@ variable "{$sanitizedPasswordLabel}_password" {lb}
 {/for}
 
 {call blocks.stackdriverVariables}{param stackdriver: $packageSpec.getStackdriver() /}{/call}
+
+{call blocks.gcpAuthScopeVariables}{param specs: $spec.getGcpAuthScopesList() /}{/call}
 {/template}

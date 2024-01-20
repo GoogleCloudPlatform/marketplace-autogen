@@ -55,6 +55,16 @@ resource "google_compute_instance" "instance" {
     // GPUs do not support live migration
     on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
   }
+
+  service_account {
+    email = "default"
+    scopes = compact([
+      "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
+    ])
+  }
 }
 
 resource "google_compute_firewall" tcp_9878 {

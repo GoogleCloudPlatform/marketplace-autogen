@@ -45,6 +45,22 @@ resource "google_compute_instance" "instance" {
       }
     }
   }
+
+  service_account {
+    email = "default"
+    scopes = compact([
+      "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
+      ,var.enable_cloud_readonly_api == true ? "https://www.googleapis.com/auth/cloud-platform.read-only" : null
+      ,var.enable_cloud_api == true ? "https://www.googleapis.com/auth/cloud-platform" : null
+      ,var.enable_compute_readonly_api == true ? "https://www.googleapis.com/auth/compute.readonly" : null
+      ,var.enable_compute_api == true ? "https://www.googleapis.com/auth/compute" : null
+      ,var.enable_source_read_write_api == true ? "https://www.googleapis.com/auth/source.read_write" : null
+      ,var.enable_projecthosting_api == true ? "https://www.googleapis.com/auth/projecthosting" : null
+    ])
+  }
 }
 
 resource "google_compute_firewall" tcp_80 {

@@ -178,6 +178,13 @@ spec:
     {param tier: $tier /}
   {/call}
 {/if}
+
+{for $gcpAuthScopeSpec in $tier.getGcpAuthScopesList()}
+{call blocks.gcpAuthScopesPropertyDisplay}
+  {param scope: $gcpAuthScopeSpec.getScope() /}
+  {param tier: $tier /}
+{/call}
+{/for}
 {/template}
 
 {template tierSectionName kind="text" visibility="private"}

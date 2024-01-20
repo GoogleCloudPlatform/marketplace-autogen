@@ -464,13 +464,14 @@ disk{$index+1}_type:
 
 {template gcpAuthScopesPropertyDisplay kind="text"}
 {@param scope: GcpAuthScopeSpec.Scope}
+{@param? tier: VmTierSpec|null}
 {let $name kind="text"}
   {call util.gcpAuthScopePropertyName}
     {param scope: $scope/}
   {/call}
 {/let}
-{$name}:
-  name: {$name}
+{$name |tierprefixed: $tier}:
+  name: {$name |tierprefixed: $tier}
   title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
   section: API_ACCESS
   booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{/call}

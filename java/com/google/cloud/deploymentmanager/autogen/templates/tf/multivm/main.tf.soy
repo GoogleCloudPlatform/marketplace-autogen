@@ -47,6 +47,14 @@ module "{$tier.getName() |sanitize}" {lb}
   accelerator_count = var.{'accelerator_count' |tierprefixed: $tier}
 {\n}
 {/if}
+
+  {for $scope in $tier.getGcpAuthScopesList()}
+  {let $varName}
+    {call util.gcpAuthScopePropertyName}{param scope: $scope.getScope() /}{/call}
+  {/let}
+  {$varName} = var.{$varName |tierprefixed: $tier}
+  {/for}
+
   {for $password in $spec.getPasswordsList()}
     {let $sanitizedPasswordLabel}
       {call util.sanitizePasswordLabel}

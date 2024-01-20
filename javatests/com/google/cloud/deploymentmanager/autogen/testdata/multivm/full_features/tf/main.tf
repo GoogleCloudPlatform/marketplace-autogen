@@ -28,6 +28,12 @@ module "main" {
   enable_udp  = var.main_enable_udp
   udp_source_ranges = var.main_udp_source_ranges
 
+  enable_cloud_readonly_api = var.main_enable_cloud_readonly_api
+  enable_cloud_api = var.main_enable_cloud_api
+  enable_compute_readonly_api = var.main_enable_compute_readonly_api
+  enable_compute_api = var.main_enable_compute_api
+  enable_source_read_write_api = var.main_enable_source_read_write_api
+  enable_projecthosting_api = var.main_enable_projecthosting_api
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result

@@ -559,16 +559,19 @@ enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` 
 
 {template gcpAuthScopeVariables kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $specs}
     {\n}
     {call gcpAuthScopeVariable}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
 
 {template gcpAuthScopeVariable kind="text"}
 {@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec|null}
 {let $name}
   {call util.gcpAuthScopePropertyName}
     {param scope: $spec.getScope() /}
@@ -579,7 +582,7 @@ enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` 
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-variable "{$name}" {lb}
+variable "{$name |tierprefixed: $tier}" {lb}
   description = "Allow {$description} on the VM"
   type        = bool
   default     = {not $spec!.getDefaultOff()}

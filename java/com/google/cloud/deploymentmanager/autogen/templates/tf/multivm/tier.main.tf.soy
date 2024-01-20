@@ -83,6 +83,10 @@ resource "google_compute_instance" "instance" {lb}
     on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
   {rb}
 {/if}
+{\n}
+  {call blocks.serviceAccount}
+    {param gcpAuthScopesList: $spec.getGcpAuthScopesList() /}
+  {/call}
 {rb}
 
 {call blocks.firewallResources}

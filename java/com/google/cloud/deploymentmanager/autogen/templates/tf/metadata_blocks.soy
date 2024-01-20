@@ -144,21 +144,24 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template gcpAuthScopesProperties kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $specs}
     {call gcpAuthScopesProperty}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
 
 {template gcpAuthScopesProperty kind="text"}
 {@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec|null}
 {let $name kind="text"}
   {call util.gcpAuthScopePropertyName}
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-- name: {$name}
+- name: {$name |tierprefixed: $tier}
   description: Allow {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call} on the VM
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
