@@ -21,6 +21,9 @@ resource "google_compute_instance" "instance" {
   name = "${var.deployment_name}-main-vm-${count.index}"
   zone = var.zone
   machine_type = var.machine_type
+
+  tags = ["${var.deployment_name}-deployment", "${var.deployment_name}-main-tier"]
+
   boot_disk {
     initialize_params {
       size = var.boot_disk_size

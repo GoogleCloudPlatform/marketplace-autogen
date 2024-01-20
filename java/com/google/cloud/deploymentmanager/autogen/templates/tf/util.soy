@@ -231,10 +231,15 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {template deploymentTag kind="text"}
 {@param? tier: VmTierSpec|null}
 {if $tier}
-${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
+${lb}var.deployment_name{rb}-deployment{nil}
 {else}
 ${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
 {/if}
+{/template}
+
+{template tierTag kind="text"}
+{@param tier: VmTierSpec}
+${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
 {/template}
 
 /** Produces the property name for an API scope. */

@@ -1,6 +1,7 @@
 {namespace vm.multi.tierTf}
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
+import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
 import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
@@ -42,7 +43,9 @@ resource "google_compute_instance" "instance" {lb}
   name = "${lb}var.deployment_name{rb}-{$spec.getName()}-vm-${lb}count.index{rb}"
   zone = var.zone
   machine_type = var.machine_type
-
+{\n}
+  tags = ["{call util.deploymentTag}{param tier: $spec/}{/call}", "{call util.tierTag}{param tier: $spec/}{/call}"]
+{\n}
   boot_disk {lb}
     initialize_params {lb}
       size = var.boot_disk_size

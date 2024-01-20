@@ -34,6 +34,13 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
   {call util.firewallRuleNameSuffix}{param spec: $spec/}{param tier: $tier/}{/call}
 {/let}
 {let $deploymentName: $tier ? 'deployment_name' : 'goog_cm_deployment_name' /}
+{let $firewallTag kind="text"}
+  {if $tier}
+    {call util.tierTag}{param tier: $tier/}{/call}{nil}
+  {else}
+    {call util.deploymentTag}{/call}{nil}
+  {/if}
+{/let}
 resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
   count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
 {\n}
@@ -47,7 +54,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 {\n}
   source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
 {\n}
-  target_tags = ["{call util.deploymentTag}{param tier: $tier/}{/call}"]
+  target_tags = ["{$firewallTag}"]
 {rb}
 {/template}
 
