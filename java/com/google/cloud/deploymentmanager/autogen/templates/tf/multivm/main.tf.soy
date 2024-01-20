@@ -42,6 +42,11 @@ module "{$tier.getName() |sanitize}" {lb}
   {$rangeVarname} = var.{$rangeVarname |tierprefixed: $tier}
   {/for}
 {\n}
+{if length($tier.getAcceleratorsList()) > 0}
+  accelerator_type  = var.{'accelerator_type' |tierprefixed: $tier}
+  accelerator_count = var.{'accelerator_count' |tierprefixed: $tier}
+{\n}
+{/if}
   {for $password in $spec.getPasswordsList()}
     {let $sanitizedPasswordLabel}
       {call util.sanitizePasswordLabel}

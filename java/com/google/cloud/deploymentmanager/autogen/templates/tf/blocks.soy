@@ -134,13 +134,14 @@ variable "{$varname |tierprefixed: $tier}" {lb}
 
 {template acceleratorVariables kind="text"}
 {@param spec: AcceleratorSpec}
-variable "accelerator_type" {lb}
+{@param? tier: VmTierSpec|null}
+variable "{'accelerator_type' |tierprefixed: $tier}" {lb}
   description = "{constants.ACCELERATOR_TYPE_VAR_DESC}"
   type        = string
   default     = "{$spec.getDefaultType()}"
 {rb}
 {\n}
-variable "accelerator_count" {lb}
+variable "{'accelerator_count' |tierprefixed: $tier}" {lb}
   description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
   default     = "{$spec.getDefaultCount() ?? 0}"

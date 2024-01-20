@@ -45,6 +45,16 @@ resource "google_compute_instance" "instance" {
       }
     }
   }
+
+  guest_accelerator {
+    type = var.accelerator_type
+    count = var.accelerator_count
+  }
+
+  scheduling {
+    // GPUs do not support live migration
+    on_host_maintenance = var.accelerator_count > 0 ? "TERMINATE" : "MIGRATE"
+  }
 }
 
 resource "google_compute_firewall" tcp_9878 {

@@ -55,6 +55,9 @@ module "tier2" {
   enable_udp_2555  = var.tier2_enable_udp_2555
   udp_2555_source_ranges = var.tier2_udp_2555_source_ranges
 
+  accelerator_type  = var.tier2_accelerator_type
+  accelerator_count = var.tier2_accelerator_count
+
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result
   this_is_optional_password = random_password.this_is_optional.result
@@ -81,6 +84,9 @@ module "tier3" {
   tcp_9000_source_ranges = var.tier3_tcp_9000_source_ranges
   enable_udp_2333  = var.tier3_enable_udp_2333
   udp_2333_source_ranges = var.tier3_udp_2333_source_ranges
+
+  accelerator_type  = var.tier3_accelerator_type
+  accelerator_count = var.tier3_accelerator_count
 
   admin_password = random_password.admin.result
   ghost_mysql_password = random_password.ghost_mysql.result

@@ -143,6 +143,14 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if length($tier.getAcceleratorsList()) > 0}
+{call blocks.acceleratorPropertiesDisplay}
+  {param namePrefix: 'accelerator' /}
+  {param spec: $tier.getAcceleratorsList()[0] /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.bootDiskPropertiesDisplay}
   {param spec: $tier.getBootDisk()! /}
   {param zonePropertyName: 'zone' /}

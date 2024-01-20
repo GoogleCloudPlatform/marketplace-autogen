@@ -108,4 +108,12 @@ variable "{'external_ips' |tierprefixed: $tier}" {lb}
   {param specList: $tier.getFirewallRulesList() /}
   {param tier: $tier /}
 {/call}
+
+{if length($tier.getAcceleratorsList()) > 0}
+{\n}
+  {call blocks.acceleratorVariables}
+    {param spec: $tier.getAcceleratorsList()[0]/}
+    {param tier: $tier /}
+  {/call}
+{/if}
 {/template}

@@ -79,6 +79,13 @@ variable "external_ips" {lb}
   {param specList: $spec.getFirewallRulesList()/}
 {/call}
 
+{if length($spec.getAcceleratorsList()) > 0}
+{\n}
+  {call blocks.acceleratorVariables}
+    {param spec: $spec.getAcceleratorsList()[0]/}
+  {/call}
+{/if}
+
 {for $password in $packageSpec.getPasswordsList()}
   {let $sanitizedPasswordLabel}
     {call util.sanitizePasswordLabel}

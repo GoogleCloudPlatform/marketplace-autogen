@@ -281,6 +281,24 @@ spec:
             gceMachineType:
               minCpu: 1
               minRamGb: 1.7000000476837158
+        tier2_accelerator_type:
+          name: tier2_accelerator_type
+          title: GPUs
+          xGoogleProperty:
+            type: ET_GCE_GPU_TYPE
+            gceGpuType:
+              machineType: tier2_machine_type
+              gpuType:
+                - nvidia-tesla-k80
+                - nvidia-tesla-p100
+        tier2_accelerator_count:
+          name: tier2_accelerator_count
+          title: GPU Count
+          min: 2
+          xGoogleProperty:
+            type: ET_GCE_GPU_COUNT
+            gceGpuCount:
+              machineTypeVariable: tier2_machine_type
         tier2_boot_disk_type:
           name: tier2_boot_disk_type
           title: Boot disk type
@@ -373,6 +391,24 @@ spec:
             gceMachineType:
               minCpu: 1
               minRamGb: 1.690000057220459
+        tier3_accelerator_type:
+          name: tier3_accelerator_type
+          title: GPUs
+          xGoogleProperty:
+            type: ET_GCE_GPU_TYPE
+            gceGpuType:
+              machineType: tier3_machine_type
+              gpuType:
+                - nvidia-tesla-k80
+                - nvidia-tesla-v100
+                - nvidia-tesla-p4-vws
+        tier3_accelerator_count:
+          name: tier3_accelerator_count
+          title: GPU Count
+          xGoogleProperty:
+            type: ET_GCE_GPU_COUNT
+            gceGpuCount:
+              machineTypeVariable: tier3_machine_type
         tier3_boot_disk_type:
           name: tier3_boot_disk_type
           title: Boot disk type

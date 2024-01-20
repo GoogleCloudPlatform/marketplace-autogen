@@ -127,6 +127,14 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if length($tier.getAcceleratorsList()) > 0}
+{call blocks.acceleratorProperties}
+  {param namePrefix: 'accelerator' /}
+  {param spec: $tier.getAcceleratorsList()[0] /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.bootDiskProperties}
   {param spec: $tier.getBootDisk()! /}
   {param tier: $tier /}

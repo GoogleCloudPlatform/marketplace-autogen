@@ -263,6 +263,18 @@ variable "tier2_udp_2555_source_ranges" {
   default     = ""
 }
 
+variable "tier2_accelerator_type" {
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  type        = string
+  default     = "nvidia-tesla-k80"
+}
+
+variable "tier2_accelerator_count" {
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = "2"
+}
+
 variable "tier3_instance_count" {
   description = "Specify a value between 1 and 10."
   type        = number
@@ -332,4 +344,16 @@ variable "tier3_udp_2333_source_ranges" {
   description = "Source IP ranges for UDP port 2333 traffic"
   type        = string
   default     = ""
+}
+
+variable "tier3_accelerator_type" {
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  type        = string
+  default     = "nvidia-tesla-v100"
+}
+
+variable "tier3_accelerator_count" {
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = "0"
 }

@@ -79,6 +79,18 @@ variable "udp_2333_source_ranges" {
   default     = ""
 }
 
+variable "accelerator_type" {
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  type        = string
+  default     = "nvidia-tesla-v100"
+}
+
+variable "accelerator_count" {
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = "0"
+}
+
 variable "admin_password" {
   type        = string
   description = "Password for Admin."
