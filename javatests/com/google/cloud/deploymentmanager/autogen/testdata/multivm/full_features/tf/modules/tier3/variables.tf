@@ -56,27 +56,15 @@ variable "external_ips" {
 }
 
 variable "enable_tcp_9000" {
-  description = "Allow TCP port 9000 traffic from the Internet"
+  description = "Allow TCP port 9000 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tcp_9000_source_ranges" {
-  description = "Source IP ranges for TCP port 9000 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "enable_udp_2333" {
-  description = "Allow UDP port 2333 traffic from the Internet"
+  description = "Allow UDP port 2333 traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "udp_2333_source_ranges" {
-  description = "Source IP ranges for UDP port 2333 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "accelerator_type" {

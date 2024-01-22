@@ -176,8 +176,8 @@ spec:
             type: ET_GCE_FIREWALL_RANGE
             gceFirewallRange:
               firewallVariable: enable_icmp
-        disk1_type:
-          name: disk1_type
+        disk1_size:
+          name: disk1_size
           title: The "super-extra-great" disk size in GB
           min: 20
           max: 10000
@@ -186,15 +186,15 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: disk1_type
-        disk1_size:
-          name: disk1_size
+        disk1_type:
+          name: disk1_type
           title: The "super-extra-great" disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
-        disk2_type:
-          name: disk2_type
+        disk2_size:
+          name: disk2_size
           title: The less great disk size in GB
           min: 15
           max: 10000
@@ -203,15 +203,15 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: disk2_type
-        disk2_size:
-          name: disk2_size
+        disk2_type:
+          name: disk2_type
           title: The less great disk type
           section: additional_disks
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
-        disk3_type:
-          name: disk3_type
+        disk3_size:
+          name: disk3_size
           title: The third disk size in GB
           min: 10
           max: 10000
@@ -220,8 +220,8 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: disk3_type
-        disk3_size:
-          name: disk3_size
+        disk3_type:
+          name: disk3_type
           title: The third disk type
           section: additional_disks
           xGoogleProperty:

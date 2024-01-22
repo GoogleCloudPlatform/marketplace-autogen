@@ -174,7 +174,7 @@ resource "google_compute_firewall" icmp {
     protocol = "icmp"
   }
 
-  source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
+  source_tags = ["${var.deployment_name}-deployment"]
 
   target_tags = ["${var.deployment_name}-main-tier"]
 }
@@ -190,7 +190,7 @@ resource "google_compute_firewall" tcp_7000-7001 {
     protocol = "tcp"
   }
 
-  source_ranges =  compact([for range in split(",", var.tcp_7000-7001_source_ranges) : trimspace(range)])
+  source_tags = ["${var.deployment_name}-main-tier"]
 
   target_tags = ["${var.deployment_name}-main-tier"]
 }

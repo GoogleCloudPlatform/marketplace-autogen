@@ -55,27 +55,15 @@ variable "external_ips" {
 }
 
 variable "enable_tcp_9878" {
-  description = "Allow TCP port 9878 traffic from the Internet"
+  description = "Allow TCP port 9878 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tcp_9878_source_ranges" {
-  description = "Source IP ranges for TCP port 9878 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "enable_udp_2555" {
-  description = "Allow UDP port 2555 traffic from the Internet"
+  description = "Allow UDP port 2555 traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "udp_2555_source_ranges" {
-  description = "Source IP ranges for UDP port 2555 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "accelerator_type" {

@@ -115,27 +115,15 @@ variable "tcp_443_source_ranges" {
 }
 
 variable "enable_icmp" {
-  description = "Allow ICMP traffic from the Internet"
+  description = "Allow ICMP traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "icmp_source_ranges" {
-  description = "Source IP ranges for ICMP traffic"
-  type        = string
-  default     = ""
 }
 
 variable "enable_tcp_7000-7001" {
-  description = "Allow TCP port 7000-7001 traffic from the Internet"
+  description = "Allow TCP port 7000-7001 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tcp_7000-7001_source_ranges" {
-  description = "Source IP ranges for TCP port 7000-7001 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "enable_udp" {

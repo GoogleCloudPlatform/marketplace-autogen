@@ -150,8 +150,8 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_boot_disk_type
-        main_disk1_type:
-          name: main_disk1_type
+        main_disk1_size:
+          name: main_disk1_size
           title: Very-extra disk size in GB
           min: 10
           max: 10000
@@ -160,15 +160,15 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_disk1_type
-        main_disk1_size:
-          name: main_disk1_size
+        main_disk1_type:
+          name: main_disk1_type
           title: Very-extra disk type
           section: main_tier
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
-        main_disk2_type:
-          name: main_disk2_type
+        main_disk2_size:
+          name: main_disk2_size
           title: Extra disk size in GB
           min: 10
           max: 10000
@@ -177,15 +177,15 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_disk2_type
-        main_disk2_size:
-          name: main_disk2_size
+        main_disk2_type:
+          name: main_disk2_type
           title: Extra disk type
           section: main_tier
           xGoogleProperty:
             type: ET_GCE_DISK_TYPE
             zoneProperty: zone
-        main_disk3_type:
-          name: main_disk3_type
+        main_disk3_size:
+          name: main_disk3_size
           title: Super Extra disk size in GB
           min: 10
           max: 10000
@@ -194,8 +194,8 @@ spec:
             type: ET_GCE_DISK_SIZE
             gceDiskSize:
               diskTypeVariable: main_disk3_type
-        main_disk3_size:
-          name: main_disk3_size
+        main_disk3_type:
+          name: main_disk3_type
           title: Super Extra disk type
           section: main_tier
           xGoogleProperty:
@@ -274,7 +274,7 @@ spec:
               firewallVariable: main_enable_tcp_443
         main_enable_icmp:
           name: main_enable_icmp
-          title: Allow ICMP traffic from the Internet
+          title: Allow ICMP traffic from other VMs in this deployment
           section: main_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -282,7 +282,7 @@ spec:
               networkVariable: main_networks
         main_enable_tcp_7000-7001:
           name: main_enable_tcp_7000-7001
-          title: Allow TCP port 7000-7001 traffic from the Internet
+          title: Allow TCP port 7000-7001 traffic between VMs in this group
           section: main_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -439,7 +439,7 @@ spec:
               allowStaticIps: true
         tier2_enable_tcp_9878:
           name: tier2_enable_tcp_9878
-          title: Allow TCP port 9878 traffic from the Internet
+          title: Allow TCP port 9878 traffic between VMs in this group
           section: tier2_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -447,7 +447,7 @@ spec:
               networkVariable: tier2_networks
         tier2_enable_udp_2555:
           name: tier2_enable_udp_2555
-          title: Allow UDP port 2555 traffic from the Internet
+          title: Allow UDP port 2555 traffic from other VMs in this deployment
           section: tier2_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -552,7 +552,7 @@ spec:
               allowStaticIps: true
         tier3_enable_tcp_9000:
           name: tier3_enable_tcp_9000
-          title: Allow TCP port 9000 traffic from the Internet
+          title: Allow TCP port 9000 traffic between VMs in this group
           section: tier3_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL
@@ -560,7 +560,7 @@ spec:
               networkVariable: tier3_networks
         tier3_enable_udp_2333:
           name: tier3_enable_udp_2333
-          title: Allow UDP port 2333 traffic from the Internet
+          title: Allow UDP port 2333 traffic from other VMs in this deployment
           section: tier3_tier
           xGoogleProperty:
             type: ET_GCE_FIREWALL

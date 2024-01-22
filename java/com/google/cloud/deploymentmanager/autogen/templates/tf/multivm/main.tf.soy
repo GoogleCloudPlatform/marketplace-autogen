@@ -2,7 +2,7 @@
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {FirewallRuleSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
@@ -39,15 +39,18 @@ module "{$tier.getName() |sanitize}" {lb}
   {if $tier.getIpForwarding()}
   ip_forward      = var.{'ip_forward' |tierprefixed: $tier}
   {/if}
+
   {for $firewall in $tier.getFirewallRulesList()}
   {let $ruleVarname}
     {call util.firewallRuleVarName}{param spec: $firewall/}{/call}
   {/let}
-  {let $rangeVarname}
-    {call util.firewallRuleSourceRangesVarName}{param spec: $firewall/}{/call}
-  {/let}
   {$ruleVarname}  = var.{$ruleVarname |tierprefixed: $tier}
+  {if $firewall.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
+    {let $rangeVarname}
+      {call util.firewallRuleSourceRangesVarName}{param spec: $firewall/}{/call}
+    {/let}
   {$rangeVarname} = var.{$rangeVarname |tierprefixed: $tier}
+  {/if}
   {/for}
 {\n}
 {if length($tier.getAcceleratorsList()) > 0}

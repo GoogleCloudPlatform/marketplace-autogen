@@ -194,27 +194,15 @@ variable "main_tcp_443_source_ranges" {
 }
 
 variable "main_enable_icmp" {
-  description = "Allow ICMP traffic from the Internet"
+  description = "Allow ICMP traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "main_icmp_source_ranges" {
-  description = "Source IP ranges for ICMP traffic"
-  type        = string
-  default     = ""
 }
 
 variable "main_enable_tcp_7000-7001" {
-  description = "Allow TCP port 7000-7001 traffic from the Internet"
+  description = "Allow TCP port 7000-7001 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "main_tcp_7000-7001_source_ranges" {
-  description = "Source IP ranges for TCP port 7000-7001 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "main_enable_udp" {
@@ -312,27 +300,15 @@ variable "tier2_external_ips" {
 }
 
 variable "tier2_enable_tcp_9878" {
-  description = "Allow TCP port 9878 traffic from the Internet"
+  description = "Allow TCP port 9878 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tier2_tcp_9878_source_ranges" {
-  description = "Source IP ranges for TCP port 9878 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "tier2_enable_udp_2555" {
-  description = "Allow UDP port 2555 traffic from the Internet"
+  description = "Allow UDP port 2555 traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "tier2_udp_2555_source_ranges" {
-  description = "Source IP ranges for UDP port 2555 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "tier2_accelerator_type" {
@@ -395,27 +371,15 @@ variable "tier3_external_ips" {
 }
 
 variable "tier3_enable_tcp_9000" {
-  description = "Allow TCP port 9000 traffic from the Internet"
+  description = "Allow TCP port 9000 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tier3_tcp_9000_source_ranges" {
-  description = "Source IP ranges for TCP port 9000 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "tier3_enable_udp_2333" {
-  description = "Allow UDP port 2333 traffic from the Internet"
+  description = "Allow UDP port 2333 traffic from other VMs in this deployment"
   type        = bool
   default     = true
-}
-
-variable "tier3_udp_2333_source_ranges" {
-  description = "Source IP ranges for UDP port 2333 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "tier3_accelerator_type" {

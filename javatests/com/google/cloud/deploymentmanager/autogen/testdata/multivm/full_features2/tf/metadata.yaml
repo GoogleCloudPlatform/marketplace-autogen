@@ -162,7 +162,7 @@ spec:
         varType: string
         defaultValue: ""
       - name: main_enable_icmp
-        description: Allow ICMP traffic from the Internet
+        description: Allow ICMP traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
       - name: main_icmp_source_ranges
@@ -170,7 +170,7 @@ spec:
         varType: string
         defaultValue: ""
       - name: main_enable_tcp_7000-7001
-        description: Allow TCP port 7000-7001 traffic from the Internet
+        description: Allow TCP port 7000-7001 traffic between VMs in this group
         varType: bool
         defaultValue: true
       - name: main_tcp_7000-7001_source_ranges
@@ -250,7 +250,7 @@ spec:
         defaultValue:
           - EPHEMERAL
       - name: tier2_enable_tcp_9878
-        description: Allow TCP port 9878 traffic from the Internet
+        description: Allow TCP port 9878 traffic between VMs in this group
         varType: bool
         defaultValue: true
       - name: tier2_tcp_9878_source_ranges
@@ -258,7 +258,7 @@ spec:
         varType: string
         defaultValue: ""
       - name: tier2_enable_udp_2555
-        description: Allow UDP port 2555 traffic from the Internet
+        description: Allow UDP port 2555 traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
       - name: tier2_udp_2555_source_ranges
@@ -307,7 +307,7 @@ spec:
         defaultValue:
           - EPHEMERAL
       - name: tier3_enable_tcp_9000
-        description: Allow TCP port 9000 traffic from the Internet
+        description: Allow TCP port 9000 traffic between VMs in this group
         varType: bool
         defaultValue: true
       - name: tier3_tcp_9000_source_ranges
@@ -315,7 +315,7 @@ spec:
         varType: string
         defaultValue: ""
       - name: tier3_enable_udp_2333
-        description: Allow UDP port 2333 traffic from the Internet
+        description: Allow UDP port 2333 traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
       - name: tier3_udp_2333_source_ranges

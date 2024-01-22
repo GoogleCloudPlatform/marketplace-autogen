@@ -41,6 +41,9 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
     {call util.deploymentTag}{/call}{nil}
   {/if}
 {/let}
+{let $firewallRuleSource}
+  {call firewallRuleSource}{param spec: $spec/}{param tier: $tier/}{/call}
+{/let}
 resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
   count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
 {\n}
@@ -52,13 +55,27 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
     protocol = "{call util.firewallRuleProtocol}{param spec: $spec/}{/call}"
   {rb}
 {\n}
-  source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
+  {$firewallRuleSource}
 {\n}
   target_tags = ["{$firewallTag}"]
 {rb}
 {/template}
 
-
+{template firewallRuleSource kind="text"}
+{@param spec: FirewallRuleSpec}
+{@param? tier: VmTierSpec|null}
+  {switch $spec.getAllowedSource()}
+    {case FirewallRuleSpec.TrafficSource.PUBLIC}
+      {let $firewallRangeVarName}
+        {call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}
+      {/let}
+      source_ranges =  compact([for range in split(",", var.{$firewallRangeVarName}) : trimspace(range)]){nil}
+    {case FirewallRuleSpec.TrafficSource.TIER}
+      source_tags = ["{call util.tierTag}{param tier: $tier!/}{/call}"]{nil}
+    {case FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+      source_tags = ["{call util.deploymentTag}{param tier: $tier/}{/call}"]{nil}
+  {/switch}
+{/template}
 
 /**
  * Produces two terraform variables for each FirewallRuleSpec
@@ -73,7 +90,6 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
       {param spec: $spec /}
       {param tier: $tier /}
     {/call}
-    {\n}
     {call firewallSourceRangesVariable}
       {param spec: $spec /}
       {param tier: $tier /}
@@ -104,14 +120,17 @@ variable "{$varname |tierprefixed: $tier}" {lb}
 {template firewallSourceRangesVariable kind="text"}
 {@param spec: FirewallRuleSpec}
 {@param? tier: VmTierSpec|null}
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $varname}
   {call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
 {/let}
+{\n}
 variable "{$varname |tierprefixed: $tier}" {lb}
   description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
   type        = string
   default     = ""
 {rb}
+{/if}
 {/template}
 
 /**

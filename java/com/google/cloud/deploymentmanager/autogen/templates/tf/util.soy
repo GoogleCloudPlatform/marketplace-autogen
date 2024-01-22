@@ -120,7 +120,18 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
   {/call}
 {/let}
 
-Allow {$firewallTitle} traffic from the Internet{nil}
+{let $firewallSourceLabel kind="text"}
+  {switch $spec.getAllowedSource()}
+  {case FirewallRuleSpec.TrafficSource.PUBLIC}
+    from the Internet{nil}
+  {case FirewallRuleSpec.TrafficSource.TIER}
+    between VMs in this group{nil}
+  {case FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+    from other VMs in this deployment{nil}
+  {/switch}
+{/let}
+
+Allow {$firewallTitle} traffic {$firewallSourceLabel}{nil}
 {/template}
 
 /**

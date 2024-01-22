@@ -345,8 +345,8 @@ enable_cloud_monitoring:
 {let $diskSizeVariable kind="text"}
   {'disk' + ($index + 1) + '_size' |tierprefixed: $tier}{nil}
 {/let}
-{$diskTypeVariable}:
-  name: {$diskTypeVariable}
+{$diskSizeVariable}:
+  name: {$diskSizeVariable}
   title: {$spec.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   max: 10000
@@ -359,8 +359,8 @@ enable_cloud_monitoring:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
       diskTypeVariable: {$diskTypeVariable}
-{$diskSizeVariable}:
-  name: {$diskSizeVariable}
+{$diskTypeVariable}:
+  name: {$diskTypeVariable}
   title: {$spec.getDisplayLabel() + ' type' |yamlprimitive: 2}
   {if $tier}
   section: {call tierSectionName}{param tier: $tier/}{/call}
