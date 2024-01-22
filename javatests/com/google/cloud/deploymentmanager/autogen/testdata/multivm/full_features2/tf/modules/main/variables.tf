@@ -208,6 +208,10 @@ variable "extraLbZone1" {
   type        = string
 }
 
+variable "tier2_instance_count" {
+  type        = number
+}
+
 variable "enable_cloud_logging" {
   description = "Enables Cloud Logging."
   type        = bool

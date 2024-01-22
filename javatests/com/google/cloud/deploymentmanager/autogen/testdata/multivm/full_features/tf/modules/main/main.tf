@@ -80,9 +80,24 @@ resource "google_compute_instance" "instance" {
     admin-password = var.admin_password
     ghost-db-password = var.ghost_mysql_password
     optional-password = var.this_is_optional_password
+    fixed-key = "fixed-value"
+    tier2-addresses = join("|", formatlist("${var.deployment_name}-tier2-vm-%s", range(var.tier2_instance_count)))
+    domain-name = var.domain
+    condition-to-generate-password = title(var.generateOptionalPassword)
+    image-caching = var.imageCaching
+    image-compression = title(var.imageCompression)
+    image-sizing = title(var.imageSizing)
+    extra-lb-zone0 = var.extraLbZone0
+    extra-lb-zone1 = var.extraLbZone1
     google-logging-enable = var.enable_cloud_logging ? "1" : "0"
     google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
     ATTACHED_DISKS = join(",", [google_compute_disk.disk1[count.index].name, google_compute_disk.disk2[count.index].name, google_compute_disk.disk3[count.index].name])
+    startup-script = <<-EOT
+    #!/bin/bash
+    start_up.sh
+    echo done
+    echo SUCCESS
+    EOT
   }
 
   dynamic "network_interface" {

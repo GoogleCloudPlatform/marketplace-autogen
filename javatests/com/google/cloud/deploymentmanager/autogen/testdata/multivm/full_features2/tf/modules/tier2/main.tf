@@ -30,8 +30,24 @@ resource "google_compute_instance" "instance" {
     admin-password = var.admin_password
     ghost-db-password = var.ghost_mysql_password
     optional-password = var.this_is_optional_password
+    main-0 = "${var.deployment_name}-main-vm-0"
+    main-1 = "${var.deployment_name}-main-vm-${(var.main_instance_count - 1)}"
+    domain-name = var.domain
+    show-conditionals = title(var.showConditionals)
+    condition-to-generate-password = title(var.generateOptionalPassword)
+    image-caching = var.imageCaching
+    image-compression = title(var.imageCompression)
+    image-sizing = title(var.imageSizing)
+    extra-lb-zone0 = var.extraLbZone0
+    extra-lb-zone1 = var.extraLbZone1
     google-logging-enable = var.enable_cloud_logging ? "1" : "0"
     google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+    startup-script = <<-EOT
+    #!/bin/bash
+    cd /tmp
+    echo STARTED >> /tmp/startup_log
+    cd -
+    EOT
   }
 
   dynamic "network_interface" {

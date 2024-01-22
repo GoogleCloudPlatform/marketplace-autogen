@@ -32,6 +32,12 @@ resource "google_compute_instance" "instance" {
     optional-password = var.this_is_optional_password
     google-logging-enable = var.enable_cloud_logging ? "1" : "0"
     google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+    startup-script = <<-EOT
+    #!/bin/bash
+    cd /tmp
+    echo STARTED >> /tmp/startup_log
+    cd -
+    EOT
   }
 
   dynamic "network_interface" {

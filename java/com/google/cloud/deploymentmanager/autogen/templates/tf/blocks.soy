@@ -499,6 +499,7 @@ variable "{$field.getName()}" {lb}
 {template gceMetadata kind="text"}
 {@param specList: list<GceMetadataItem>}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tiers: list<VmTierSpec>|null}
 {for $metadata, $index in $specList}
 {$metadata.getKey()} = {nil}
 
@@ -514,7 +515,31 @@ variable "{$field.getName()}" {lb}
   var.{$field.getName()}{nil}
   {/if}
 
-  {/if /* $metadata.value */}
+  {elseif $metadata.getTierVmNames()}
+
+  {let $tierVmNames: $metadata.getTierVmNames()/}
+  {let $tier: findVmTier($tierVmNames.getTier(), $tiers)/}
+  {let $vmPrefix: '${var.deployment_name}-' + $tierVmNames.getTier() + '-vm' /}
+  {let $instanceCntVar kind="text"}
+    var.{'instance_count' |tierprefixed: $tier}{nil}
+  {/let}
+
+  {if $metadata.getTierVmNames().getAllVms()}
+  {let $delimeter kind="text"}
+  "{$metadata.getTierVmNames().getAllVms().getDelimiter() |doublequoted}"{nil}
+  {/let}
+  join({$delimeter}, formatlist("{$vmPrefix}-%s", range({$instanceCntVar}))){nil}
+
+  {else}
+  {let $vmIndex: $tierVmNames.getVmIndex() ?? 0/}
+  {if $vmIndex >= 0}
+  "{$vmPrefix}-{$vmIndex}"{nil}
+  {else}
+  "{$vmPrefix}-${lb}({$instanceCntVar} - {-$vmIndex}){rb}"{nil}
+  {/if}
+
+  {/if /* $metadata.getTierVmNames().getAllVms() */}
+  {/if /* $metadata.getValue() */}
 
   {if $index != $specList.length - 1}
     {\n}

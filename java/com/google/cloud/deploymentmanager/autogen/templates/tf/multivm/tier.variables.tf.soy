@@ -118,6 +118,13 @@ variable "{$sanitizedPasswordLabel}_password" {lb}
   {/call}
 {/if}
 
+{for $depTier in dependentTiers($spec, $packageSpec)}
+{\n}
+variable "{'instance_count' |tierprefixed: $depTier}" {lb}
+  type        = number
+{rb}
+{/for}
+
 {call blocks.stackdriverVariables}{param stackdriver: $packageSpec.getStackdriver() /}{/call}
 
 {call blocks.gcpAuthScopeVariables}{param specs: $spec.getGcpAuthScopesList() /}{/call}

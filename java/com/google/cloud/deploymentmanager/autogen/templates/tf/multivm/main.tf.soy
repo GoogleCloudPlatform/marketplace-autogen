@@ -79,6 +79,13 @@ module "{$tier.getName() |sanitize}" {lb}
   {/for}
   {/if}
 
+  {for $depTier in dependentTiers($tier, $spec)}
+  {let $varName kind="text"}
+    {'instance_count' |tierprefixed: $depTier}{nil}
+  {/let}
+  {$varName} = var.{$varName}
+  {/for}
+
   {if $spec.getStackdriver()?.getLogging()}
   enable_cloud_logging    = var.enable_cloud_logging
   {/if}

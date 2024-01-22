@@ -13,6 +13,13 @@ import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/de
     {param passwordFromVar: true /}
   {/call}
 {/let}
+{let $gceMetadata}
+  {call blocks.gceMetadata}
+    {param specList: $spec.getGceMetadataItemsList() /}
+    {param deployInput: $packageSpec.getDeployInput() /}
+    {param tiers: $packageSpec.getTiersList() /}
+  {/call}
+{/let}
 {let $stackdriverMetadata}
   {call blocks.stackdriverMetadata}
     {param stackdriver: $packageSpec.getStackdriver() /}
@@ -22,6 +29,11 @@ import {VmTierSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/de
   {call blocks.diskMetadata}
     {param diskSpecs: $spec.getAdditionalDisksList() /}
     {param tier: $spec /}
+  {/call}
+{/let}
+{let $startupScriptMetadata}
+  {call blocks.startupScriptMetadata}
+    {param startupSpec: $spec.getGceStartupScript()/}
   {/call}
 {/let}
 
@@ -81,11 +93,17 @@ resource "google_compute_instance" "instance" {lb}
   {if $passwordMetadata}
     {$passwordMetadata |indent: 4}
   {/if}
+  {if $gceMetadata}
+    {$gceMetadata |indent: 4}
+  {/if}
   {if $stackdriverMetadata}
     {$stackdriverMetadata |indent: 4}
   {/if}
   {if $diskMetadata}
     {$diskMetadata |indent: 4}
+  {/if}
+  {if $startupScriptMetadata}
+    {$startupScriptMetadata |indent: 4}
   {/if}
   {rb}
 {\n}

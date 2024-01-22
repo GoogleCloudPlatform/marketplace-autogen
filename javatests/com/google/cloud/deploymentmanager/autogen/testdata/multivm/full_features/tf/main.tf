@@ -53,6 +53,7 @@ module "main" {
   imageSizing = var.imageSizing
   extraLbZone0 = var.extraLbZone0
   extraLbZone1 = var.extraLbZone1
+  tier2_instance_count = var.tier2_instance_count
   enable_cloud_logging    = var.enable_cloud_logging
   enable_cloud_monitoring = var.enable_cloud_monitoring
 }
@@ -93,6 +94,7 @@ module "tier2" {
   imageSizing = var.imageSizing
   extraLbZone0 = var.extraLbZone0
   extraLbZone1 = var.extraLbZone1
+  main_instance_count = var.main_instance_count
   enable_cloud_logging    = var.enable_cloud_logging
   enable_cloud_monitoring = var.enable_cloud_monitoring
 }
