@@ -71,7 +71,7 @@ spec:
       {/let}
       {$deploymentInputTopSections |indent: 8, true}{nil}
       {for $tier in $spec.getTiersList()}
-        - name: {call tierSectionName}{param tier: $tier/}{/call}
+        - name: {call blocks.tierSectionName}{param tier: $tier/}{/call}
           title: {$tier.getTitle() |yamlprimitive: 6}
       {/for}
       {let $deploymentInputBottomSections kind="text"}
@@ -118,7 +118,7 @@ spec:
   {if $instanceCount.getDescription()}
   subtext: {$instanceCount.getDescription() |yamlprimitive: 2}
   {/if}
-  section: {call tierSectionName}{param tier: $tier/}{/call}
+  section: {call blocks.tierSectionName}{param tier: $tier/}{/call}
   {if $instanceCount.getRange()}
   min: {$instanceCount.getRange().getStartValue()}
   max: {$instanceCount.getRange().getEndValue()}
@@ -193,9 +193,4 @@ spec:
   {param tier: $tier /}
 {/call}
 {/for}
-{/template}
-
-{template tierSectionName kind="text" visibility="private"}
-{@param tier: VmTierSpec}
-{$tier.getName() + '_tier' |lowercased}{nil}
 {/template}
