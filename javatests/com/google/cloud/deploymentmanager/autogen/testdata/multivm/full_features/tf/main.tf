@@ -4,6 +4,7 @@ provider "google" {
 
 module "main" {
   source          = "./modules/main"
+  count           = var.main_instance_count > 0 ? 1 : 0
 
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.main_instance_count
@@ -58,6 +59,7 @@ module "main" {
 
 module "tier2" {
   source          = "./modules/tier2"
+  count           = var.tier2_instance_count > 0 ? 1 : 0
 
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.tier2_instance_count
@@ -97,6 +99,7 @@ module "tier2" {
 
 module "tier3" {
   source          = "./modules/tier3"
+  count           = var.tier3_instance_count > 0 ? 1 : 0
 
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.tier3_instance_count

@@ -15,6 +15,7 @@ provider "google" {lb}
 {for $tier in $spec.getTiersList()}
 module "{$tier.getName() |sanitize}" {lb}
   source          = "./modules/{$tier.getName() |doublequoted}"
+  count           = var.{'instance_count' |tierprefixed: $tier} > 0 ? 1 : 0
 {\n}
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.{'instance_count' |tierprefixed: $tier}

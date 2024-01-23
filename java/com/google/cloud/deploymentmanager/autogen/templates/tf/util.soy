@@ -216,7 +216,7 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {let $tierVm: $spec.getTierVm() /}
 {let $ip kind="text"}
   {if $tierVm}
-    ${lb}module.{$tierVm.getTier()}.instance_ips[{$tierVm.getIndex()}]{rb}{nil}
+    ${lb}module.{$tierVm.getTier()}[0].instance_ips[{$tierVm.getIndex()}]{rb}{nil}
   {else}
     ${lb}local.instance_ip{rb}{nil}
   {/if}
