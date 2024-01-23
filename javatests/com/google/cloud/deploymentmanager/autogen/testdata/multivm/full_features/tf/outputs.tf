@@ -1,3 +1,7 @@
+output "total_instance_count" {
+  description = "Total compute instances."
+  value       = sum([var.main_instance_count, var.tier2_instance_count, var.tier3_instance_count])
+}
 output "site_url" {
   description = "Site Url"
   value       = "http://${module.main.instance_ips[0]}/"

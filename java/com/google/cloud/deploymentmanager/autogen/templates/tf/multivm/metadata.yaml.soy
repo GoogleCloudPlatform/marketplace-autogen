@@ -87,6 +87,8 @@ spec:
     {$tierVariablesMetadata |indent: 6, true}{nil}
     {/for}
     outputs:
+      - name: total_instance_count
+        description: {constants.TOTAL_INSTANCE_COUNT_OUT_DESC}
     {if $spec.getSiteUrl()}
       - name: site_url
         description: {constants.SITE_URL_OUT_DESC}

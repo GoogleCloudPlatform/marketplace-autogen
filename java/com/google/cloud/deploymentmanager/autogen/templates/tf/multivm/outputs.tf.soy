@@ -8,6 +8,11 @@ import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmana
 
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
+{let $tierInstanceCountVars: ['var.' + tierPrefixed('instance_count', $tier) for $tier in $spec.getTiersList()]/}
+output "total_instance_count" {lb}
+  description = "{constants.TOTAL_INSTANCE_COUNT_OUT_DESC}"
+  value       = sum({$tierInstanceCountVars})
+{rb}
 
 {if $spec.getSiteUrl()}
 {let $siteUrl}

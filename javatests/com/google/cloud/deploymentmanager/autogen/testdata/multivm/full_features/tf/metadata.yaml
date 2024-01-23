@@ -323,6 +323,8 @@ spec:
         varType: string
         defaultValue: ""
     outputs:
+      - name: total_instance_count
+        description: Total compute instances.
       - name: site_url
         description: Site Url
       - name: admin_url
