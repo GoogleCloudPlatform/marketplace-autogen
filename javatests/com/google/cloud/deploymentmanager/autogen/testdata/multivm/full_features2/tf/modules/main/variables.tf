@@ -87,7 +87,7 @@ variable "sub_networks" {
 variable "external_ips" {
   description = "The external IPs assigned to the VM for public access."
   type        = list(string)
-  default     = ["EPHEMERAL"]
+  default     = ["NONE"]
 }
 
 variable "enable_tcp_80" {

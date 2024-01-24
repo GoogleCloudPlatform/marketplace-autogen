@@ -52,7 +52,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | extraLbZone0 |  | `string` | `"us-west1-a"` | no |
 | extraLbZone1 |  | `string` | `null` | yes |
 | enable_cloud_logging | Enables Cloud Logging. | `bool` | `true` | no |
-enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
+| enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
 | enable_compute_api | read write access to Google Compute Engine APIs | `string` | `false` | no |
 | enable_compute_readonly_api | read access to Google Compute Engine APIs | `string` | `true` | no |
 

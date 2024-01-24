@@ -67,11 +67,10 @@ variable "sub_networks" {lb}
   default     = []
 {rb}
 {\n}
-variable "external_ips" {lb}
-  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
-  type        = list(string)
-  default     = ["EPHEMERAL"]
-{rb}
+
+{call blocks.externalIpVariable}
+  {param spec: $spec.getNetworkInterfaces()!.getExternalIp()! /}
+{/call}
 
 {if $spec.getIpForwarding()}
 {\n}

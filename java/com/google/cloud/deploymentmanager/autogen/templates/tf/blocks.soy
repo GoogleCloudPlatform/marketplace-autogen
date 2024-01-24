@@ -6,7 +6,7 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, InstanceUrlSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, ExternalIpSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, InstanceUrlSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces a google_compute_firewall resource for each FirewallRuleSpec
@@ -156,6 +156,22 @@ variable "{$varname |tierprefixed: $tier}" {lb}
 | {$firewallRuleVariable} | {$firewallRuleDescription} | `bool` | `{not $spec.getDefaultOff()}` | no |
 | {$firewallRangeVariable} | {$firewallRangeDescription} | `string` | `""` | no |
   {/for}
+{/template}
+
+
+{template externalIpVariable kind="text"}
+{@param spec: ExternalIpSpec}
+{@param? tier: VmTierSpec|null}
+variable "{'external_ips' |tierprefixed: $tier}" {lb}
+  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
+  type        = list(string)
+  default     = ["{externalIpTypeName($spec.getDefaultType())}"]
+{rb}
+{/template}
+
+{template externalIpReadme kind="text"}
+{@param spec: ExternalIpSpec}
+| external_ips | {constants.EXTERNAL_IPS_VAR_DESC} | `list(string)` | `["{externalIpTypeName($spec.getDefaultType())}"]` | no |
 {/template}
 
 {template acceleratorVariables kind="text"}
@@ -628,7 +644,7 @@ variable "enable_cloud_monitoring" {lb}
 | enable_cloud_logging | {constants.ENABLE_CLOUD_LOGGING_VAR_DESC} | `bool` | `{$stackdriver?.getLogging()!.getDefaultOn()}` | no |
 {/if}
 {if $stackdriver?.getMonitoring()}
-enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` | `{$stackdriver?.getMonitoring()!.getDefaultOn()}` | no |
+| enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` | `{$stackdriver?.getMonitoring()!.getDefaultOn()}` | no |
 {/if}
 {/template}
 

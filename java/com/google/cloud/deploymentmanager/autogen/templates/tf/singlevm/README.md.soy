@@ -28,7 +28,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | project_id | {constants.PROJECT_ID_VAR_DESC} | `string` | `null` | yes |
 | goog_cm_deployment_name | {constants.DEPLOYMENT_NAME_VAR_DESC} | `string` | `null` | yes |
 | source_image | {constants.SOURCE_IMAGE_VAR_DESC} | `string` | `"{call util.imageUri}{param spec: $spec.getImagesList()[0]/}{/call}"` | no |
-| zone | {constants.ZONE_VAR_DESC} | `string` | `"{$defaultZone}"` | {$defaultZone ? 'no' : 'yes'} |
+| zone | {constants.ZONE_VAR_DESC} | `string` | `{$defaultZone ? '"' + $defaultZone + '"' : null}` | {$defaultZone ? 'no' : 'yes'} |
 | machine_type | {constants.MACHINE_TYPE_VAR_DESC} | `string` | `"{$spec.getMachineType()!.getDefaultMachineType()!.getGceMachineType()}"` | no |
 | boot_disk_type | {constants.BOOT_DISK_TYPE_VAR_DESC} | `string` | `"{$spec.getBootDisk()!.getDiskType()!.getDefaultType()}"` | no |
 | boot_disk_size | {constants.BOOT_DISK_SIZE_VAR_DESC} | `number` | `{$spec.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}` | no |
@@ -40,7 +40,9 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 {/if}
 | networks | {constants.NETWORKS_VAR_DESC} | `list(string)` | `["default"]` | no |
 | sub_networks | {constants.SUB_NETWORKS_VAR_DESC} | `list(string)` | `[]` | no |
-| external_ips | {constants.EXTERNAL_IPS_VAR_DESC} | `list(string)` | `["EPHEMERAL"]` | no |
+{call blocks.externalIpReadme}
+  {param spec: $spec.getNetworkInterfaces()!.getExternalIp()! /}
+{/call}
 {if $spec.getIpForwarding()}
   {call blocks.ipForwardingReadme}
     {param name: "ip_forward" /}

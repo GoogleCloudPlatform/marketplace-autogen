@@ -15,7 +15,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | project_id | The ID of the project in which to provision resources. | `string` | `null` | yes |
 | goog_cm_deployment_name | The name of the deployment and VM instance. | `string` | `null` | yes |
 | source_image | The image name for the disk for the VM instance. | `string` | `"projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"` | no |
-| zone | The zone for the solution to be deployed. | `string` | `"null"` | yes |
+| zone | The zone for the solution to be deployed. | `string` | `null` | yes |
 | machine_type | The machine type to create, e.g. e2-small | `string` | `"f1-micro"` | no |
 | boot_disk_type | The boot disk type for the VM instance. | `string` | `"pd-standard"` | no |
 | boot_disk_size | The boot disk size for the VM instance in GBs | `number` | `10` | no |
