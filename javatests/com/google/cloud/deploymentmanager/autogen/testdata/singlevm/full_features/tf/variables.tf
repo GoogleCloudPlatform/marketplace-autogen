@@ -144,7 +144,7 @@ variable "accelerator_type" {
 variable "accelerator_count" {
   description = "The number of the guest accelerator cards exposed to this instance."
   type        = number
-  default     = "1"
+  default     = 1
 }
 
 variable "domain" {
@@ -158,6 +158,7 @@ variable "adminEmailAddress" {
 }
 
 variable "optionalEmailAddress" {
+  description = "Please enter a valid email address"
   type        = string
   default     = "default_value@example.com"
 }

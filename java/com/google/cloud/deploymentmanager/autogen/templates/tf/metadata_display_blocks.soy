@@ -52,7 +52,11 @@ enable_cloud_monitoring:
 {'boot_disk_type' |tierprefixed: $tier}:
   name: {'boot_disk_type' |tierprefixed: $tier}
   title: Boot disk type
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: boot_disk
+  {/if}
   xGoogleProperty:
     type: ET_GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
@@ -63,7 +67,11 @@ enable_cloud_monitoring:
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   {/if}
   max: 10000
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: boot_disk
+  {/if}
   xGoogleProperty:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
@@ -121,6 +129,9 @@ enable_cloud_monitoring:
     - label: {$label}
       value: projects/{$image.getProject()}/global/images/{$image.getName()}
   {/for}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_DISK_IMAGE
 {/template}
@@ -134,6 +145,9 @@ enable_cloud_monitoring:
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Machine type
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_MACHINE_TYPE
     zoneProperty: {$zonePropertyName}
@@ -156,6 +170,9 @@ enable_cloud_monitoring:
 {$namePrefix + '_type' |tierprefixed: $tier}:
   name: {$namePrefix + '_type' |tierprefixed: $tier}
   title: GPUs
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_GPU_TYPE
     gceGpuType:
@@ -188,12 +205,16 @@ enable_cloud_monitoring:
   title: Network name
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   xGoogleProperty:
     type: ET_GCE_NETWORK
     gceNetwork:
       allowSharedVpcs: true
-      machineTypeVariable: machine_type
+      machineTypeVariable: {'machine_type' |tierprefixed: $tier}
     {if length($spec.getLabelsList()) > 0}
       labels:
       {for $label in $spec.getLabelsList()}
@@ -205,7 +226,11 @@ enable_cloud_monitoring:
   title: Subnetwork name
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   xGoogleProperty:
     type: ET_GCE_SUBNETWORK
     zoneProperty: {$zonePropertyName}
@@ -217,7 +242,11 @@ enable_cloud_monitoring:
   tooltip: 'An external IP address associated with this instance. Selecting "None" will result in the instance having no external internet access. <a href="https://cloud.google.com/compute/docs/configure-instance-ip-addresses">Learn more</a>'
   minItems: {$spec.getMinCount()}
   maxItems: {$spec.getMaxCount()}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   xGoogleProperty:
     type: ET_GCE_EXTERNAL_IP
     gceExternalIp:
@@ -242,7 +271,11 @@ enable_cloud_monitoring:
 {$firewallPropName |tierprefixed: $tier}:
   name: {$firewallPropName |tierprefixed: $tier}
   title: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   xGoogleProperty:
     type: ET_GCE_FIREWALL
     gceFirewall:
@@ -253,11 +286,15 @@ enable_cloud_monitoring:
   title: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   tooltip: 'Traffic is only allowed from sources within these IP address ranges. Use CIDR notation when entering ranges. <a href="https://cloud.google.com/compute/docs/networking#firewalls">Learn more</a>'
   placeholder: '0.0.0.0/0, 192.169.0.2/24'
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   xGoogleProperty:
     type: ET_GCE_FIREWALL_RANGE
     gceFirewallRange:
-      firewallVariable: {$firewallPropName}
+      firewallVariable: {$firewallPropName |tierprefixed: $tier}
 {/if}
 {/template}
 
@@ -270,7 +307,11 @@ enable_cloud_monitoring:
   name: {$name |tierprefixed: $tier}
   title: IP forwarding
   tooltip: 'Forwarding allows the instance to help route packets. <a href="https://cloud.google.com/compute/docs/networking#canipforward">Learn more</a>'
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: networking
+  {/if}
   level: 1
   xGoogleProperty:
     type: ET_GCE_IP_FORWARDING
@@ -282,11 +323,13 @@ enable_cloud_monitoring:
 {template additionalDisksPropertiesDisplay kind="text"}
 {@param diskSpecs: list<DiskSpec>}
 {@param zonePropertyName: string}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDisksPropertyDisplay}
       {param spec: $spec /}
       {param index: $index /}
       {param zonePropertyName: $zonePropertyName /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -295,20 +338,35 @@ enable_cloud_monitoring:
 {@param spec: DiskSpec}
 {@param index: number}
 {@param zonePropertyName: string}
-disk{$index+1}_size:
-  name: disk{$index+1}_size
+{@param? tier: VmTierSpec|null}
+{let $diskTypeVariable kind="text"}
+  {'disk' + ($index + 1) + '_type' |tierprefixed: $tier}{nil}
+{/let}
+{let $diskSizeVariable kind="text"}
+  {'disk' + ($index + 1) + '_size' |tierprefixed: $tier}{nil}
+{/let}
+{$diskSizeVariable}:
+  name: {$diskSizeVariable}
   title: {$spec.getDisplayLabel() + ' size in GB' |yamlprimitive: 2}
   min: {$spec.getDiskSize()!.getMinSizeGb()}
   max: 10000
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: additional_disks
+  {/if}
   xGoogleProperty:
     type: ET_GCE_DISK_SIZE
     gceDiskSize:
-      diskTypeVariable: disk{$index+1}_type
-disk{$index+1}_type:
-  name: disk{$index+1}_type
+      diskTypeVariable: {$diskTypeVariable}
+{$diskTypeVariable}:
+  name: {$diskTypeVariable}
   title: {$spec.getDisplayLabel() + ' type' |yamlprimitive: 2}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
   section: additional_disks
+  {/if}
   xGoogleProperty:
     type: ET_GCE_DISK_TYPE
     zoneProperty: {$zonePropertyName}
@@ -316,13 +374,14 @@ disk{$index+1}_type:
 
 {template deployInputPropertiesDisplay kind="text"}
 {@param spec: DeployInputSpec}
-// TODO: support tiers section for multi-VMs
+{@param? tierList: list<VmTierSpec>|null}
 {for $section in $spec.getSectionsList()}
 {for $field in $section.getFieldsList()}
 {let $fieldDisplay kind="text"}
   {call deployInputFieldDisplay}
     {param section: $section /}
     {param field: $field /}
+    {param tierList: $tierList /}
   {/call}
 {/let}
 {$fieldDisplay}{nil}
@@ -352,7 +411,8 @@ disk{$index+1}_type:
   {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
       $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
   section: {$section.getName() |yamlprimitive: 2}
-  // TODO: Support tier section for multi-VMs
+  {elseif $section.getPlacement() == DeployInputSection.Placement.TIER}
+  section: {call tierSectionName}{param tier: findVmTier($section.getTier(), $tierList)/}{/call}
   {/if}
 
 {if $field.getGroupedBooleanCheckbox()}
@@ -464,21 +524,26 @@ disk{$index+1}_type:
 
 {template gcpAuthScopesPropertyDisplay kind="text"}
 {@param scope: GcpAuthScopeSpec.Scope}
+{@param? tier: VmTierSpec|null}
 {let $name kind="text"}
   {call util.gcpAuthScopePropertyName}
     {param scope: $scope/}
   {/call}
 {/let}
-{$name}:
-  name: {$name}
-  title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
-  section: API_ACCESS
-  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
+{$name |tierprefixed: $tier}:
+  name: {$name |tierprefixed: $tier}
+  title: {call util.authScopeDescription}{param scope: $scope/}{/call}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
+  section: api_access
+  {/if}
+  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{param tier: $tier/}{/call}
 {/template}
 
 {template tierSectionName kind="text"}
-{@param spec: VmTierSpec}
-{$spec.getName() |uppercased}_TIER{nil}
+{@param tier: VmTierSpec}
+{$tier.getName() + '_tier' |lowercased}{nil}
 {/template}
 
 {template authScopeBooleanGroups kind="text"}
@@ -505,21 +570,21 @@ disk{$index+1}_type:
 {@param scope: GcpAuthScopeSpec.Scope}
 {@param? tier: VmTierSpec|null}
 {if $tier}
-{call tierSectionName}{param spec: $tier/}{/call}_{nil}
+{call tierSectionName}{param tier: $tier/}{/call}_{nil}
 {/if}
 {switch $scope}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
-    CLOUD_PLATFORM_READONLY_API_ACCESS{nil}
+    cloud_platform_readonly_api_access{nil}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
-    CLOUD_PLATFORM_API_ACCESS{nil}
+    cloud_platform_api_access{nil}
   {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
-    COMPUTE_READONLY_API_ACCESS{nil}
+    compute_readonly_api_access{nil}
   {case GcpAuthScopeSpec.Scope.COMPUTE}
-    COMPUTE_API_ACCESS{nil}
+    compute_api_access{nil}
   {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
-    SOURCE_READ_WRITE_API_ACCESS{nil}
+    source_read_write_api_access{nil}
   {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
-    PROJECT_HOSTING_API_ACCESS{nil}
+    project_hosting_api_access{nil}
 {/switch}
 {/template}
 

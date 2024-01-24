@@ -3,7 +3,7 @@
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {DeployInputSpec, MultiVmDeploymentPackageSpec, VmTierSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
@@ -35,12 +35,14 @@ variable "zone" {lb}
 {for $tier in $spec.getTiersList()}
 {call tierVariables}
 {param tier: $tier /}
+{param deployInput: $spec.getDeployInput() /}
 {/call}
 {/for}
 {/template}
 
 {template tierVariables kind="text" visibility="private"}
 {@param tier: VmTierSpec}
+{@param? deployInput: DeployInputSpec|null}
 {let $instanceCount: $tier.getInstanceCount()!/}
 {\n}
 variable "{'instance_count' |tierprefixed: $tier}" {lb}
@@ -76,7 +78,13 @@ variable "{'boot_disk_size' |tierprefixed: $tier}" {lb}
   default     = {$tier.getBootDisk()!.getDiskSize()!.getDefaultSizeGb()}
 {rb}
 {\n}
-
+{if $tier.getAdditionalDisksList()}
+  {call blocks.additionalDiskVariables}
+    {param diskSpecs: $tier.getAdditionalDisksList() /}
+    {param deployInput: $deployInput /}
+    {param tier: $tier /}
+  {/call}
+{/if}
 variable "{'networks' |tierprefixed: $tier}" {lb}
   description = "{constants.NETWORKS_VAR_DESC}"
   type        = list(string)
@@ -89,11 +97,11 @@ variable "{'sub_networks' |tierprefixed: $tier}" {lb}
   default     = []
 {rb}
 {\n}
-variable "{'external_ips' |tierprefixed: $tier}" {lb}
-  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
-  type        = list(string)
-  default     = ["EPHEMERAL"]
-{rb}
+
+{call blocks.externalIpVariable}
+  {param spec: $tier.getNetworkInterfaces()!.getExternalIp()! /}
+  {param tier: $tier /}
+{/call}
 
 {if $tier.getIpForwarding()}
 {\n}
@@ -106,6 +114,19 @@ variable "{'external_ips' |tierprefixed: $tier}" {lb}
 
 {call blocks.firewallVariables}
   {param specList: $tier.getFirewallRulesList() /}
+  {param tier: $tier /}
+{/call}
+
+{if length($tier.getAcceleratorsList()) > 0}
+{\n}
+  {call blocks.acceleratorVariables}
+    {param spec: $tier.getAcceleratorsList()[0]/}
+    {param tier: $tier /}
+  {/call}
+{/if}
+
+{call blocks.gcpAuthScopeVariables}
+  {param specs: $tier.getGcpAuthScopesList() /}
   {param tier: $tier /}
 {/call}
 {/template}

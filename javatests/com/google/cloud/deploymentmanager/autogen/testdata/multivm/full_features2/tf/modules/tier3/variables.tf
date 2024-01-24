@@ -55,27 +55,27 @@ variable "external_ips" {
 }
 
 variable "enable_tcp_9000" {
-  description = "Allow TCP port 9000 traffic from the Internet"
+  description = "Allow TCP port 9000 traffic between VMs in this group"
   type        = bool
   default     = true
-}
-
-variable "tcp_9000_source_ranges" {
-  description = "Source IP ranges for TCP port 9000 traffic"
-  type        = string
-  default     = ""
 }
 
 variable "enable_udp_2333" {
-  description = "Allow UDP port 2333 traffic from the Internet"
+  description = "Allow UDP port 2333 traffic from other VMs in this deployment"
   type        = bool
   default     = true
 }
 
-variable "udp_2333_source_ranges" {
-  description = "Source IP ranges for UDP port 2333 traffic"
+variable "accelerator_type" {
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
   type        = string
-  default     = ""
+  default     = "nvidia-tesla-v100"
+}
+
+variable "accelerator_count" {
+  description = "The number of the guest accelerator cards exposed to this instance."
+  type        = number
+  default     = 0
 }
 
 variable "admin_password" {

@@ -120,7 +120,18 @@ import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, Pass
   {/call}
 {/let}
 
-Allow {$firewallTitle} traffic from the Internet{nil}
+{let $firewallSourceLabel kind="text"}
+  {switch $spec.getAllowedSource()}
+  {case FirewallRuleSpec.TrafficSource.PUBLIC}
+    from the Internet{nil}
+  {case FirewallRuleSpec.TrafficSource.TIER}
+    between VMs in this group{nil}
+  {case FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+    from other VMs in this deployment{nil}
+  {/switch}
+{/let}
+
+Allow {$firewallTitle} traffic {$firewallSourceLabel}{nil}
 {/template}
 
 /**
@@ -205,7 +216,7 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {let $tierVm: $spec.getTierVm() /}
 {let $ip kind="text"}
   {if $tierVm}
-    ${lb}module.{$tierVm.getTier()}.instance_ips[{$tierVm.getIndex()}]{rb}{nil}
+    ${lb}module.{$tierVm.getTier()}[0].instance_ips[{$tierVm.getIndex()}]{rb}{nil}
   {else}
     ${lb}local.instance_ip{rb}{nil}
   {/if}
@@ -231,10 +242,15 @@ Username for {$spec.getDisplayLabel()!} password.{nil}
 {template deploymentTag kind="text"}
 {@param? tier: VmTierSpec|null}
 {if $tier}
-${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
+${lb}var.deployment_name{rb}-deployment{nil}
 {else}
 ${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
 {/if}
+{/template}
+
+{template tierTag kind="text"}
+{@param tier: VmTierSpec}
+${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
 {/template}
 
 /** Produces the property name for an API scope. */
@@ -260,6 +276,7 @@ ${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
 /** Produces the description for an API scope. */
 {template authScopeDescription kind="text"}
 {@param scope: GcpAuthScopeSpec.Scope}
+Allow {nil}
 {switch $scope}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     read only access to all of Google Cloud Platform APIs{nil}
@@ -274,6 +291,7 @@ ${lb}var.goog_cm_deployment_name{rb}-deployment{nil}
   {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     project hosting access to (Deprecated) Google Code Project Hosting APIs{nil}
 {/switch}
+ {plsp}on the VM{nil}
 {/template}
 
 /** Produces the URL for an API scope. */

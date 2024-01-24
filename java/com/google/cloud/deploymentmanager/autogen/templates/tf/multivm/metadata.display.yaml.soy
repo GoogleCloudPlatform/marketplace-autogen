@@ -41,6 +41,7 @@ spec:
         {let $deployInputDisplay kind="text"}
           {call blocks.deployInputPropertiesDisplay}
             {param spec: $spec.getDeployInput() /}
+            {param tierList: $spec.getTiersList() /}
           {/call}
         {/let}
         {$deployInputDisplay |indent: 8, true}{nil}
@@ -71,7 +72,7 @@ spec:
       {/let}
       {$deploymentInputTopSections |indent: 8, true}{nil}
       {for $tier in $spec.getTiersList()}
-        - name: {call tierSectionName}{param tier: $tier/}{/call}
+        - name: {call blocks.tierSectionName}{param tier: $tier/}{/call}
           title: {$tier.getTitle() |yamlprimitive: 6}
       {/for}
       {let $deploymentInputBottomSections kind="text"}
@@ -87,6 +88,17 @@ spec:
         {/call}
       {/let}
       {$stackdriverBottomSections |indent: 8, true}{nil}
+      {/if}
+      {let $authScopeBooleanGroups kind="text"}
+        {call blocks.authScopeBooleanGroups}{param multiVmSpec: $spec/}{/call}
+      {/let}
+      {let $customBooleanGroups kind="text"}
+        {call blocks.customBooleanGroups}{param spec: $spec.getDeployInput()/}{/call}
+      {/let}
+      {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
+      booleanGroups:
+        {$authScopeBooleanGroups |indent: 8, true}{nil}
+        {$customBooleanGroups |indent: 8, true}{nil}
       {/if}
     {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
     {if $actionItems.length > 0}
@@ -118,7 +130,7 @@ spec:
   {if $instanceCount.getDescription()}
   subtext: {$instanceCount.getDescription() |yamlprimitive: 2}
   {/if}
-  section: {call tierSectionName}{param tier: $tier/}{/call}
+  section: {call blocks.tierSectionName}{param tier: $tier/}{/call}
   {if $instanceCount.getRange()}
   min: {$instanceCount.getRange().getStartValue()}
   max: {$instanceCount.getRange().getEndValue()}
@@ -143,11 +155,27 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if length($tier.getAcceleratorsList()) > 0}
+{call blocks.acceleratorPropertiesDisplay}
+  {param namePrefix: 'accelerator' /}
+  {param spec: $tier.getAcceleratorsList()[0] /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.bootDiskPropertiesDisplay}
   {param spec: $tier.getBootDisk()! /}
   {param zonePropertyName: 'zone' /}
   {param tier: $tier /}
 {/call}
+
+{if $tier.getAdditionalDisksList()}
+{call blocks.additionalDisksPropertiesDisplay}
+  {param diskSpecs: $tier.getAdditionalDisksList() /}
+  {param zonePropertyName: 'zone' /}
+  {param tier: $tier /}
+{/call}
+{/if}
 
 {call blocks.networkPropertiesDisplay}
   {param nameSuffix: 'networks' /}
@@ -170,9 +198,11 @@ spec:
     {param tier: $tier /}
   {/call}
 {/if}
-{/template}
 
-{template tierSectionName kind="text" visibility="private"}
-{@param tier: VmTierSpec}
-{$tier.getName() + '_tier' |lowercased}{nil}
+{for $gcpAuthScopeSpec in $tier.getGcpAuthScopesList()}
+{call blocks.gcpAuthScopesPropertyDisplay}
+  {param scope: $gcpAuthScopeSpec.getScope() /}
+  {param tier: $tier /}
+{/call}
+{/for}
 {/template}

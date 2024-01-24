@@ -82,6 +82,7 @@ spec:
       - name: sub_networks
         description: The sub network name to attach the VM instance.
         varType: list(string)
+        defaultValue: []
       - name: external_ips
         description: The external IPs assigned to the VM for public access.
         varType: list(string)
@@ -155,11 +156,10 @@ spec:
         description: The e-mail address used to create the administrator account for WordPress.
         varType: string
         required: true
-        description: Please enter a valid email address
       - name: optionalEmailAddress
+        description: Please enter a valid email address
         varType: string
         defaultValue: default_value@example.com
-        description: Please enter a valid email address
       - name: showConditionalRowAndAction
         varType: bool
         defaultValue: true

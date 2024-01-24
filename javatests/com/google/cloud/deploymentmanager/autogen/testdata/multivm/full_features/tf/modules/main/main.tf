@@ -5,14 +5,33 @@ locals {
     external_ip = length(var.external_ips) > i ? element(var.external_ips, i) : "NONE"
     }
   ]
+}
 
-  metadata = {
-    admin-password = var.admin_password
-    ghost-db-password = var.ghost_mysql_password
-    optional-password = var.this_is_optional_password
-    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
-    google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
-  }
+resource "google_compute_disk" "disk1" {
+  count = var.instance_count
+
+  name = "${var.deployment_name}-main-vm-${count.index}-super-disk"
+  type = var.disk1_type
+  zone = var.zone
+  size = var.disk1_size
+}
+
+resource "google_compute_disk" "disk2" {
+  count = var.instance_count
+
+  name = "${var.deployment_name}-main-vm-${count.index}-extra-disk"
+  type = var.disk2_type
+  zone = var.zone
+  size = var.disk2_size
+}
+
+resource "google_compute_disk" "disk3" {
+  count = var.instance_count
+
+  name = "${var.deployment_name}-main-vm-${count.index}-${var.superExtraDiskName}"
+  type = var.disk3_type
+  zone = var.zone
+  size = var.disk3_size
 }
 
 resource "google_compute_instance" "instance" {
@@ -21,7 +40,12 @@ resource "google_compute_instance" "instance" {
   name = "${var.deployment_name}-main-vm-${count.index}"
   zone = var.zone
   machine_type = var.machine_type
+
+  tags = ["${var.deployment_name}-deployment", "${var.deployment_name}-main-tier"]
+
   boot_disk {
+    device_name = "${var.deployment_name}-main-vm-tmpl-${count.index}-boot-disk"
+
     initialize_params {
       size = var.boot_disk_size
       type = var.boot_disk_type
@@ -29,7 +53,52 @@ resource "google_compute_instance" "instance" {
     }
   }
 
-  metadata = local.metadata
+  attached_disk {
+    source      = google_compute_disk.disk1[count.index].id
+    device_name = google_compute_disk.disk1[count.index].name
+  }
+
+  attached_disk {
+    source      = google_compute_disk.disk2[count.index].id
+    device_name = google_compute_disk.disk2[count.index].name
+  }
+
+  attached_disk {
+    source      = google_compute_disk.disk3[count.index].id
+    device_name = google_compute_disk.disk3[count.index].name
+  }
+
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  metadata = {
+    admin-password = var.admin_password
+    ghost-db-password = var.ghost_mysql_password
+    optional-password = var.this_is_optional_password
+    fixed-key = "fixed-value"
+    tier2-addresses = join("|", formatlist("${var.deployment_name}-tier2-vm-%s", range(var.tier2_instance_count)))
+    domain-name = var.domain
+    condition-to-generate-password = title(var.generateOptionalPassword)
+    image-caching = var.imageCaching
+    image-compression = title(var.imageCompression)
+    image-sizing = title(var.imageSizing)
+    extra-lb-zone0 = var.extraLbZone0
+    extra-lb-zone1 = var.extraLbZone1
+    google-logging-enable = var.enable_cloud_logging ? "1" : "0"
+    google-monitoring-enable = var.enable_cloud_monitoring ? "1" : "0"
+    ATTACHED_DISKS = join(",", [google_compute_disk.disk1[count.index].name, google_compute_disk.disk2[count.index].name, google_compute_disk.disk3[count.index].name])
+    startup-script = <<-EOT
+    #!/bin/bash
+    start_up.sh
+    echo done
+    echo SUCCESS
+    EOT
+  }
 
   dynamic "network_interface" {
     for_each = local.network_interfaces
@@ -44,6 +113,22 @@ resource "google_compute_instance" "instance" {
         }
       }
     }
+  }
+
+  service_account {
+    email = "default"
+    scopes = compact([
+      "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring.write"
+      ,var.enable_cloud_readonly_api == true ? "https://www.googleapis.com/auth/cloud-platform.read-only" : null
+      ,var.enable_cloud_api == true ? "https://www.googleapis.com/auth/cloud-platform" : null
+      ,var.enable_compute_readonly_api == true ? "https://www.googleapis.com/auth/compute.readonly" : null
+      ,var.enable_compute_api == true ? "https://www.googleapis.com/auth/compute" : null
+      ,var.enable_source_read_write_api == true ? "https://www.googleapis.com/auth/source.read_write" : null
+      ,var.enable_projecthosting_api == true ? "https://www.googleapis.com/auth/projecthosting" : null
+    ])
   }
 }
 
@@ -89,7 +174,7 @@ resource "google_compute_firewall" icmp {
     protocol = "icmp"
   }
 
-  source_ranges =  compact([for range in split(",", var.icmp_source_ranges) : trimspace(range)])
+  source_tags = ["${var.deployment_name}-deployment"]
 
   target_tags = ["${var.deployment_name}-main-tier"]
 }
@@ -105,7 +190,7 @@ resource "google_compute_firewall" tcp_7000-7001 {
     protocol = "tcp"
   }
 
-  source_ranges =  compact([for range in split(",", var.tcp_7000-7001_source_ranges) : trimspace(range)])
+  source_tags = ["${var.deployment_name}-main-tier"]
 
   target_tags = ["${var.deployment_name}-main-tier"]
 }

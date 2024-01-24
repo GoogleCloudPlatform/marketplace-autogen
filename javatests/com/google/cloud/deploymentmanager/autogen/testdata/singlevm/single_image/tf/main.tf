@@ -34,6 +34,13 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  dynamic "scratch_disk" {
+    for_each = range(var.localSsdsCount)
+    content {
+      interface = "SCSI"
+    }
+  }
+
   metadata = local.metadata
 
   dynamic "network_interface" {

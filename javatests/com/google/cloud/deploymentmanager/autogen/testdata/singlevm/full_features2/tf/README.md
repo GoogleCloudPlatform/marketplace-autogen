@@ -15,7 +15,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | project_id | The ID of the project in which to provision resources. | `string` | `null` | yes |
 | goog_cm_deployment_name | The name of the deployment and VM instance. | `string` | `null` | yes |
 | source_image | The image name for the disk for the VM instance. | `string` | `"projects/bitnami-launchpad/global/images/bitnami-wordpress-4-5-3-1-r16-linux-debian-8-x86-64"` | no |
-| zone | The zone for the solution to be deployed. | `string` | `"null"` | yes |
+| zone | The zone for the solution to be deployed. | `string` | `null` | yes |
 | machine_type | The machine type to create, e.g. e2-small | `string` | `"f1-micro"` | no |
 | boot_disk_type | The boot disk type for the VM instance. | `string` | `"pd-standard"` | no |
 | boot_disk_size | The boot disk size for the VM instance in GBs | `number` | `10` | no |
@@ -38,11 +38,11 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `1` | no |
 | domain | Your Wordpress "blog" domain | `string` | `null` | yes |
 | adminEmailAddress | The e-mail address used to create the "administrator account" for WordPress. | `string` | `null` | yes |
-| optionalEmailAddress |  | `string` | `"default_value@example.com"` | no |
+| optionalEmailAddress | Please enter a valid email address | `string` | `"default_value@example.com"` | no |
 | showConditionalRowAndAction |  | `bool` | `true` | no |
 | generateOptionalPassword |  | `bool` | `true` | no |
 | installPhpMyAdmin |  | `bool` | `true` | no |
-| imageCaching |  | `string` | `none` | no |
+| imageCaching |  | `string` | `"none"` | no |
 | imageCompression |  | `bool` | `false` | no |
 | imageSizing |  | `bool` | `true` | no |
 | imageCacheSize |  | `number` | `50000` | no |
@@ -51,7 +51,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | extraLbZone0 |  | `string` | `"us-west1-a"` | no |
 | extraLbZone1 |  | `string` | `null` | yes |
 | enable_cloud_logging | Enables Cloud Logging. | `bool` | `true` | no |
-enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
+| enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
 
 ## Outputs
 

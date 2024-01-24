@@ -6,7 +6,7 @@
 
 import * as constants from 'com/google/cloud/deploymentmanager/autogen/templates/tf/constants.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, InstanceUrlSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpec, DiskSpec, ExternalIpSpec, FirewallRuleSpec, GceMetadataItem, GceStartupScriptSpec, GcpAuthScopeSpec, ImageSpec, InstanceUrlSpec, IpForwardingSpec, LocalSsdSpec, MachineTypeSpec, NetworkInterfacesSpec, PasswordSpec, StackdriverSpec, VmTierSpec, ZoneSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces a google_compute_firewall resource for each FirewallRuleSpec
@@ -34,6 +34,16 @@ import {AcceleratorSpec, ApplicationStatusSpec, DeployInputField, DeployInputSpe
   {call util.firewallRuleNameSuffix}{param spec: $spec/}{param tier: $tier/}{/call}
 {/let}
 {let $deploymentName: $tier ? 'deployment_name' : 'goog_cm_deployment_name' /}
+{let $firewallTag kind="text"}
+  {if $tier}
+    {call util.tierTag}{param tier: $tier/}{/call}{nil}
+  {else}
+    {call util.deploymentTag}{/call}{nil}
+  {/if}
+{/let}
+{let $firewallRuleSource}
+  {call firewallRuleSource}{param spec: $spec/}{param tier: $tier/}{/call}
+{/let}
 resource "google_compute_firewall" {call util.firewallRuleResourceName}{param spec: $spec/}{/call} {lb}
   count = var.{call util.firewallRuleVarName}{param spec: $spec/}{/call} ? 1 : 0
 {\n}
@@ -45,13 +55,27 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
     protocol = "{call util.firewallRuleProtocol}{param spec: $spec/}{/call}"
   {rb}
 {\n}
-  source_ranges =  compact([for range in split(",", var.{call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}) : trimspace(range)])
+  {$firewallRuleSource}
 {\n}
-  target_tags = ["{call util.deploymentTag}{param tier: $tier/}{/call}"]
+  target_tags = ["{$firewallTag}"]
 {rb}
 {/template}
 
-
+{template firewallRuleSource kind="text"}
+{@param spec: FirewallRuleSpec}
+{@param? tier: VmTierSpec|null}
+  {switch $spec.getAllowedSource()}
+    {case FirewallRuleSpec.TrafficSource.PUBLIC}
+      {let $firewallRangeVarName}
+        {call util.firewallRuleSourceRangesVarName}{param spec: $spec /}{/call}
+      {/let}
+      source_ranges =  compact([for range in split(",", var.{$firewallRangeVarName}) : trimspace(range)]){nil}
+    {case FirewallRuleSpec.TrafficSource.TIER}
+      source_tags = ["{call util.tierTag}{param tier: $tier!/}{/call}"]{nil}
+    {case FirewallRuleSpec.TrafficSource.DEPLOYMENT}
+      source_tags = ["{call util.deploymentTag}{param tier: $tier/}{/call}"]{nil}
+  {/switch}
+{/template}
 
 /**
  * Produces two terraform variables for each FirewallRuleSpec
@@ -66,7 +90,6 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
       {param spec: $spec /}
       {param tier: $tier /}
     {/call}
-    {\n}
     {call firewallSourceRangesVariable}
       {param spec: $spec /}
       {param tier: $tier /}
@@ -97,14 +120,17 @@ variable "{$varname |tierprefixed: $tier}" {lb}
 {template firewallSourceRangesVariable kind="text"}
 {@param spec: FirewallRuleSpec}
 {@param? tier: VmTierSpec|null}
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 {let $varname}
   {call util.firewallRuleSourceRangesVarName}{param spec: $spec/}{/call}
 {/let}
+{\n}
 variable "{$varname |tierprefixed: $tier}" {lb}
   description = "{call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}"
   type        = string
   default     = ""
 {rb}
+{/if}
 {/template}
 
 /**
@@ -112,6 +138,7 @@ variable "{$varname |tierprefixed: $tier}" {lb}
  */
 {template firewallReadme kind="text"}
   {@param specList: list<FirewallRuleSpec>}
+  {@param? tier: VmTierSpec|null}
 
   {for $spec in $specList}
     {let $firewallRuleVariable}
@@ -127,40 +154,63 @@ variable "{$varname |tierprefixed: $tier}" {lb}
       {call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}
     {/let}
 
-| {$firewallRuleVariable} | {$firewallRuleDescription} | `bool` | `{not $spec.getDefaultOff()}` | no |
-| {$firewallRangeVariable} | {$firewallRangeDescription} | `string` | `""` | no |
+| {$firewallRuleVariable |tierprefixed: $tier} | {$firewallRuleDescription} | `bool` | `{not $spec.getDefaultOff()}` | no |
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
+| {$firewallRangeVariable |tierprefixed: $tier} | {$firewallRangeDescription} | `string` | `""` | no |
+{/if}
   {/for}
+{/template}
+
+
+{template externalIpVariable kind="text"}
+{@param spec: ExternalIpSpec}
+{@param? tier: VmTierSpec|null}
+variable "{'external_ips' |tierprefixed: $tier}" {lb}
+  description = "{constants.EXTERNAL_IPS_VAR_DESC}"
+  type        = list(string)
+  default     = ["{externalIpTypeName($spec.getDefaultType())}"]
+{rb}
+{/template}
+
+{template externalIpReadme kind="text"}
+{@param spec: ExternalIpSpec}
+{@param? tier: VmTierSpec|null}
+| {'external_ips' |tierprefixed: $tier} | {constants.EXTERNAL_IPS_VAR_DESC} | `list(string)` | `["{externalIpTypeName($spec.getDefaultType())}"]` | no |
 {/template}
 
 {template acceleratorVariables kind="text"}
 {@param spec: AcceleratorSpec}
-variable "accelerator_type" {lb}
+{@param? tier: VmTierSpec|null}
+variable "{'accelerator_type' |tierprefixed: $tier}" {lb}
   description = "{constants.ACCELERATOR_TYPE_VAR_DESC}"
   type        = string
   default     = "{$spec.getDefaultType()}"
 {rb}
 {\n}
-variable "accelerator_count" {lb}
+variable "{'accelerator_count' |tierprefixed: $tier}" {lb}
   description = "{constants.ACCELERATOR_COUNT_VAR_DESC}"
   type        = number
-  default     = "{$spec.getDefaultCount() ?? 0}"
+  default     = {$spec.getDefaultCount() ?? 0}
 {rb}
 {/template}
 
 {template acceleratorReadme kind="text"}
 {@param spec: AcceleratorSpec}
-| accelerator_type | {constants.ACCELERATOR_TYPE_VAR_DESC} | `string` | `"{$spec.getDefaultType()}"` | no |
-| accelerator_count | {constants.ACCELERATOR_COUNT_VAR_DESC} | `number` | `{$spec.getDefaultCount() ?? 0}` | no |
+{@param? tier: VmTierSpec|null}
+| {'accelerator_type' |tierprefixed: $tier} | {constants.ACCELERATOR_TYPE_VAR_DESC} | `string` | `"{$spec.getDefaultType()}"` | no |
+| {'accelerator_count' |tierprefixed: $tier} | {constants.ACCELERATOR_COUNT_VAR_DESC} | `number` | `{$spec.getDefaultCount() ?? 0}` | no |
 {/template}
 
 {template additionalDiskVariables kind="text"}
 {@param diskSpecs: list<DiskSpec>}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskVariable}
       {param spec: $spec /}
       {param index: $index /}
       {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -170,18 +220,19 @@ variable "accelerator_count" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
   {/call}
 {/let}
-variable "disk{$index+1}_type" {lb}
+variable "{'disk' + ($index+1) + '_type' |tierprefixed: $tier}" {lb}
   description = "{$spec.getDisplayLabel() |doublequoted}"
   type        = string
   default     = "{$spec.getDiskType()!.getDefaultType()}"
 {rb}
 {\n}
-variable "disk{$index+1}_size" {lb}
+variable "{'disk' + ($index+1) + '_size' |tierprefixed: $tier}" {lb}
   description = "{$diskSizeDescription |doublequoted}"
   type        = number
   default     = {$spec.getDiskSize()!.getDefaultSizeGb()}
@@ -191,11 +242,13 @@ variable "disk{$index+1}_size" {lb}
 {template additionalDisksReadme kind="text"}
 {@param diskSpecs: list<DiskSpec>}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDiskReadme}
       {param spec: $spec /}
       {param index: $index /}
       {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -204,23 +257,27 @@ variable "disk{$index+1}_size" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
   {/call}
 {/let}
-| disk{$index+1}_type | {$spec.getDisplayLabel() |markdowntable} | `string` | `"{$spec.getDiskType()!.getDefaultType()}"` | no |
-| disk{$index+1}_size | {$diskSizeDescription |markdowntable} | `number` | `{$spec.getDiskSize()!.getDefaultSizeGb()}` | no |
+| {'disk' + ($index+1) + '_type' |tierprefixed: $tier} | {$spec.getDisplayLabel() |markdowntable} | `string` | `"{$spec.getDiskType()!.getDefaultType()}"` | no |
+| {'disk' + ($index+1) + '_size' |tierprefixed: $tier} | {$diskSizeDescription |markdowntable} | `number` | `{$spec.getDiskSize()!.getDefaultSizeGb()}` | no |
 {/template}
 
 {template additionalDiskResources kind="text"}
   {@param diskSpecs: list<DiskSpec>}
   {@param? deployInput: DeployInputSpec|null}
+  {@param? tier: VmTierSpec|null}
+
   {for $spec, $index in $diskSpecs}
     {call additionalDiskResource}
       {param spec: $spec /}
       {param index: $index /}
       {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -230,6 +287,16 @@ variable "disk{$index+1}_size" {lb}
 {@param spec: DiskSpec}
 {@param index: number}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
+
+{let $deviceNamePrefix kind="text"}
+  {if $tier}
+    ${lb}var.deployment_name{rb}-{$tier.getName()}-vm-${lb}count.index{rb}{nil}
+  {else}
+    ${lb}var.goog_cm_deployment_name{rb}-vm{nil}
+  {/if}
+{/let}
+
 {let $deviceNameSuffix kind="text"}
   {if $spec.getDeviceNameSuffix()!.getName()}
     {$spec.getDeviceNameSuffix()!.getName()}{nil}
@@ -239,7 +306,11 @@ variable "disk{$index+1}_size" {lb}
   {/if}
 {/let}
 resource "google_compute_disk" "disk{$index + 1}" {lb}
-  name = "${lb}var.goog_cm_deployment_name{rb}-vm-{$deviceNameSuffix}"
+  {if $tier}
+  count = var.instance_count
+{\n}
+  {/if}
+  name = "{$deviceNamePrefix}-{$deviceNameSuffix}"
   type = var.disk{$index + 1}_type
   zone = var.zone
   size = var.disk{$index + 1}_size
@@ -248,11 +319,11 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisks kind="text"}
   {@param diskSpecs: list<DiskSpec>}
-  {@param? deployInput: DeployInputSpec|null}
+  {@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call attachDisk}
       {param index: $index /}
-      {param deployInput: $deployInput /}
+      {param tier: $tier /}
     {/call}
     {\n}
   {/for}
@@ -260,24 +331,34 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 
 {template attachDisk kind="text"}
 {@param index: number}
-{@param? deployInput: DeployInputSpec|null}
+{@param? tier: VmTierSpec|null}
+{let $cntIndex: $tier ? '[count.index]' : '' /}
   attached_disk {lb}
-    source      = google_compute_disk.disk{$index + 1}.id
-    device_name = google_compute_disk.disk{$index + 1}.name
+    source      = google_compute_disk.disk{$index + 1}{$cntIndex}.id
+    device_name = google_compute_disk.disk{$index + 1}{$cntIndex}.name
   {rb}
 {/template}
 
 {template localSsds kind="text"}
   {@param localSsdSpec: LocalSsdSpec}
   {@param? deployInput: DeployInputSpec|null}
+  {if $localSsdSpec.getCountFromDeployInputField()}
   {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
-  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?? 0)/}
-  {for $i in range(0, $count)}
+  dynamic "scratch_disk" {lb}
+    for_each = range(var.{$field.getName()})
+    content {lb}
+      interface = "SCSI"
+    {rb}
+  {rb}
+  {\n}
+  {else}
+  {for $i in range(0, $localSsdSpec.getCount())}
   scratch_disk {lb}
     interface = "SCSI"
   {rb}
   {\n}
   {/for}
+  {/if}
 {/template}
 
 {template passwordResources kind="text"}
@@ -329,7 +410,8 @@ resource "random_password" "{$sanitizedPasswordLabel}" {lb}
 
 {template deployInputVariables kind="text"}
 {@param spec: DeployInputSpec}
-{let $fields: listDeployInputFields($spec)/}
+{@param? tier: VmTierSpec|null}
+{let $fields: $tier ? listDeployInputFields($spec, $tier) :  listDeployInputFields($spec)/}
 {for $field in $fields}
   {\n}
   {call deployInputVariable}{param field: $field/}{/call}
@@ -343,6 +425,8 @@ variable "{$field.getName()}" {lb}
   description = "{$field.getDescription() |doublequoted}"
 {elseif $field.getTooltip()}
   description = "{$field.getTooltip() |doublequoted}"
+{elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+  description = "{$field.getEmailBox()?.getValidation()?.getDescription()}"
 {/if}
 {if $field.getBooleanCheckbox()}
   type        = bool
@@ -407,6 +491,8 @@ variable "{$field.getName()}" {lb}
     {$field.getDescription()}{nil}
   {elseif $field.getTooltip()}
     {$field.getTooltip()}{nil}
+  {elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+    {$field.getEmailBox()?.getValidation()?.getDescription()}{nil}
   {/if}
 {/let}
 {let $type kind="text"}
@@ -448,7 +534,7 @@ variable "{$field.getName()}" {lb}
     {let $dropdown: $field.getStringDropdown()/}
     {if $dropdown.getDefaultValueIndex()}
       {let $defaultIndex: $dropdown.getDefaultValueIndex().getValue() ?? 0/}
-      {$dropdown.getValuesList()[$defaultIndex]}{nil}
+      "{$dropdown.getValuesList()[$defaultIndex]}"{nil}
     {/if}
   {elseif $field.getZoneDropdown()}
     {let $dropdown: $field.getZoneDropdown()/}
@@ -469,6 +555,7 @@ variable "{$field.getName()}" {lb}
 {template gceMetadata kind="text"}
 {@param specList: list<GceMetadataItem>}
 {@param? deployInput: DeployInputSpec|null}
+{@param? tiers: list<VmTierSpec>|null}
 {for $metadata, $index in $specList}
 {$metadata.getKey()} = {nil}
 
@@ -484,7 +571,31 @@ variable "{$field.getName()}" {lb}
   var.{$field.getName()}{nil}
   {/if}
 
-  {/if /* $metadata.value */}
+  {elseif $metadata.getTierVmNames()}
+
+  {let $tierVmNames: $metadata.getTierVmNames()/}
+  {let $tier: findVmTier($tierVmNames.getTier(), $tiers)/}
+  {let $vmPrefix: '${var.deployment_name}-' + $tierVmNames.getTier() + '-vm' /}
+  {let $instanceCntVar kind="text"}
+    var.{'instance_count' |tierprefixed: $tier}{nil}
+  {/let}
+
+  {if $metadata.getTierVmNames().getAllVms()}
+  {let $delimeter kind="text"}
+  "{$metadata.getTierVmNames().getAllVms().getDelimiter() |doublequoted}"{nil}
+  {/let}
+  join({$delimeter}, formatlist("{$vmPrefix}-%s", range({$instanceCntVar}))){nil}
+
+  {else}
+  {let $vmIndex: $tierVmNames.getVmIndex() ?? 0/}
+  {if $vmIndex >= 0}
+  "{$vmPrefix}-{$vmIndex}"{nil}
+  {else}
+  "{$vmPrefix}-${lb}({$instanceCntVar} - {-$vmIndex}){rb}"{nil}
+  {/if}
+
+  {/if /* $metadata.getTierVmNames().getAllVms() */}
+  {/if /* $metadata.getValue() */}
 
   {if $index != $specList.length - 1}
     {\n}
@@ -494,8 +605,10 @@ variable "{$field.getName()}" {lb}
 
 {template diskMetadata kind="text"}
 {@param diskSpecs: list<DiskSpec>}
+{@param? tier: VmTierSpec|null}
 {if length($diskSpecs)}
-{let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + '.name' for $a, $i in $diskSpecs]/}
+{let $cntIndex: $tier ? '[count.index]': '' /}
+{let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + $cntIndex + '.name' for $a, $i in $diskSpecs]/}
 ATTACHED_DISKS = join(",", {$deviceNameArray}){nil}
 {/if}
 {/template}
@@ -552,22 +665,25 @@ variable "enable_cloud_monitoring" {lb}
 | enable_cloud_logging | {constants.ENABLE_CLOUD_LOGGING_VAR_DESC} | `bool` | `{$stackdriver?.getLogging()!.getDefaultOn()}` | no |
 {/if}
 {if $stackdriver?.getMonitoring()}
-enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` | `{$stackdriver?.getMonitoring()!.getDefaultOn()}` | no |
+| enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` | `{$stackdriver?.getMonitoring()!.getDefaultOn()}` | no |
 {/if}
 {/template}
 
 {template gcpAuthScopeVariables kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $specs}
     {\n}
     {call gcpAuthScopeVariable}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
 
 {template gcpAuthScopeVariable kind="text"}
 {@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec|null}
 {let $name}
   {call util.gcpAuthScopePropertyName}
     {param scope: $spec.getScope() /}
@@ -578,8 +694,8 @@ enable_cloud_monitoring | {constants.ENABLE_CLOUD_MONITORING_VAR_DESC} | `bool` 
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-variable "{$name}" {lb}
-  description = "Allow {$description} on the VM"
+variable "{$name |tierprefixed: $tier}" {lb}
+  description = "{$description}"
   type        = bool
   default     = {not $spec!.getDefaultOff()}
 {rb}
@@ -587,15 +703,18 @@ variable "{$name}" {lb}
 
 {template gcpAuthScopesReadme kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $specs}
     {call gcpAuthScopeReadme}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
 
 {template gcpAuthScopeReadme kind="text"}
 {@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec|null}
 {let $name}
   {call util.gcpAuthScopePropertyName}
     {param scope: $spec.getScope() /}
@@ -606,7 +725,7 @@ variable "{$name}" {lb}
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-| {$name} | {$description} | `string` | `{not $spec!.getDefaultOff()}` | no |
+| {$name |tierprefixed: $tier} | {$description} | `bool` | `{not $spec!.getDefaultOff()}` | no |
 {/template}
 
 {template passwordOutputsReadme kind="text"}
@@ -746,5 +865,6 @@ variable "{'ip_forward' |tierprefixed: $tier}" {lb}
 {template ipForwardingReadme kind="text"}
 {@param name: string}
 {@param ipForwarding: IpForwardingSpec}
-| ip_forward | {constants.IP_FORWARD_VAR_DESC} | `bool` | `{not $ipForwarding!.getDefaultOff()}` | no |
+{@param? tier: VmTierSpec|null}
+| {'ip_forward' |tierprefixed: $tier} | {constants.IP_FORWARD_VAR_DESC} | `bool` | `{not $ipForwarding!.getDefaultOff()}` | no |
 {/template}

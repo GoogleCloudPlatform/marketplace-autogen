@@ -2,7 +2,7 @@
 
 import * as blocks from 'com/google/cloud/deploymentmanager/autogen/templates/tf/blocks.soy';
 import * as util from 'com/google/cloud/deploymentmanager/autogen/templates/tf/util.soy';
-import {MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {FirewallRuleSpec, MultiVmDeploymentPackageSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 {template main kind="text"}
 {@param spec: MultiVmDeploymentPackageSpec}
@@ -15,6 +15,7 @@ provider "google" {lb}
 {for $tier in $spec.getTiersList()}
 module "{$tier.getName() |sanitize}" {lb}
   source          = "./modules/{$tier.getName() |doublequoted}"
+  count           = var.{'instance_count' |tierprefixed: $tier} > 0 ? 1 : 0
 {\n}
   deployment_name = var.goog_cm_deployment_name
   instance_count  = var.{'instance_count' |tierprefixed: $tier}
@@ -25,23 +26,47 @@ module "{$tier.getName() |sanitize}" {lb}
   boot_disk_type  = var.{'boot_disk_type' |tierprefixed: $tier}
   boot_disk_size  = var.{'boot_disk_size' |tierprefixed: $tier}
 {\n}
+  {for $disk, $index in $tier.getAdditionalDisksList()}
+  {'disk' + ($index+1) + '_type'} = var.{'disk' + ($index+1) + '_type' |tierprefixed: $tier}
+  {'disk' + ($index+1) + '_size'} = var.{'disk' + ($index+1) + '_size' |tierprefixed: $tier}
+  {/for}
+
+  {if length($tier.getAdditionalDisksList()) > 0}
+{\n}
+  {/if}
   networks        = var.{'networks' |tierprefixed: $tier}
   sub_networks    = var.{'sub_networks' |tierprefixed: $tier}
   external_ips    = var.{'external_ips' |tierprefixed: $tier}
   {if $tier.getIpForwarding()}
   ip_forward      = var.{'ip_forward' |tierprefixed: $tier}
   {/if}
+
   {for $firewall in $tier.getFirewallRulesList()}
   {let $ruleVarname}
     {call util.firewallRuleVarName}{param spec: $firewall/}{/call}
   {/let}
-  {let $rangeVarname}
-    {call util.firewallRuleSourceRangesVarName}{param spec: $firewall/}{/call}
-  {/let}
   {$ruleVarname}  = var.{$ruleVarname |tierprefixed: $tier}
+  {if $firewall.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
+    {let $rangeVarname}
+      {call util.firewallRuleSourceRangesVarName}{param spec: $firewall/}{/call}
+    {/let}
   {$rangeVarname} = var.{$rangeVarname |tierprefixed: $tier}
+  {/if}
   {/for}
 {\n}
+{if length($tier.getAcceleratorsList()) > 0}
+  accelerator_type  = var.{'accelerator_type' |tierprefixed: $tier}
+  accelerator_count = var.{'accelerator_count' |tierprefixed: $tier}
+{\n}
+{/if}
+
+  {for $scope in $tier.getGcpAuthScopesList()}
+  {let $varName}
+    {call util.gcpAuthScopePropertyName}{param scope: $scope.getScope() /}{/call}
+  {/let}
+  {$varName} = var.{$varName |tierprefixed: $tier}
+  {/for}
+
   {for $password in $spec.getPasswordsList()}
     {let $sanitizedPasswordLabel}
       {call util.sanitizePasswordLabel}
@@ -49,6 +74,20 @@ module "{$tier.getName() |sanitize}" {lb}
       {/call}
     {/let}
   {$sanitizedPasswordLabel}_password = random_password.{$sanitizedPasswordLabel}.result
+  {/for}
+
+  {if $spec.getDeployInput()}
+{\n}
+  {for $field in listDeployInputFields($spec.getDeployInput(), $tier)}
+  {$field.getName()} = var.{$field.getName()}
+  {/for}
+  {/if}
+
+  {for $depTier in dependentTiers($tier, $spec)}
+  {let $varName kind="text"}
+    {'instance_count' |tierprefixed: $depTier}{nil}
+  {/let}
+  {$varName} = var.{$varName}
   {/for}
 
   {if $spec.getStackdriver()?.getLogging()}

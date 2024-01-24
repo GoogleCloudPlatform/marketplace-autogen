@@ -39,7 +39,12 @@ spec:
       {/let}
       {$softwareGroups |indent: 4, true}{nil}
     {/if}
-  content: {lb}{rb}
+  content:
+    subBlueprints:
+  {for $tier in $spec.getTiersList()}
+      - name: {$tier.getName()}
+        location: modules/{$tier.getName()}
+  {/for}
   interfaces:
     variables:
     {let $projectIdProp kind="text"}
@@ -87,6 +92,8 @@ spec:
     {$tierVariablesMetadata |indent: 6, true}{nil}
     {/for}
     outputs:
+      - name: total_instance_count
+        description: {constants.TOTAL_INSTANCE_COUNT_OUT_DESC}
     {if $spec.getSiteUrl()}
       - name: site_url
         description: {constants.SITE_URL_OUT_DESC}
@@ -127,10 +134,25 @@ spec:
   {param tier: $tier /}
 {/call}
 
+{if length($tier.getAcceleratorsList()) > 0}
+{call blocks.acceleratorProperties}
+  {param namePrefix: 'accelerator' /}
+  {param spec: $tier.getAcceleratorsList()[0] /}
+  {param tier: $tier /}
+{/call}
+{/if}
+
 {call blocks.bootDiskProperties}
   {param spec: $tier.getBootDisk()! /}
   {param tier: $tier /}
 {/call}
+
+{if $tier.getAdditionalDisksList()}
+{call blocks.additionalDisksProperties}
+  {param diskSpecs: $tier.getAdditionalDisksList() /}
+  {param tier: $tier /}
+{/call}
+{/if}
 
 {call blocks.networkProperties}
   {param nameSuffix: 'networks' /}
@@ -151,6 +173,13 @@ spec:
     {param spec: $tier.getIpForwarding() /}
     {param tier: $tier /}
   {/call}
+{/if}
+
+{if $tier.getGcpAuthScopesList()}
+{call blocks.gcpAuthScopesProperties}
+  {param specs: $tier.getGcpAuthScopesList() /}
+  {param tier: $tier /}
+{/call}
 {/if}
 
 {/template}

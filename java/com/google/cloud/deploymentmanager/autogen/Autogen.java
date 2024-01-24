@@ -112,6 +112,7 @@ public class Autogen {
           "singlevm/outputs.tf.soy",
           "singlevm/metadata.yaml.soy",
           "singlevm/metadata.display.yaml.soy",
+          "multivm/README.md.soy",
           "multivm/main.tf.soy",
           "multivm/variables.tf.soy",
           "multivm/marketplace_test.tfvars.soy",
@@ -467,6 +468,10 @@ public class Autogen {
     }
 
     builder
+        .addFiles(
+            SolutionPackage.File.newBuilder()
+                .setPath("README.md")
+                .setContent(fileSet.newRenderer("vm.multi.readme.main").setData(params).render()))
         .addFiles(
             SolutionPackage.File.newBuilder()
                 .setPath("main.tf")

@@ -39,11 +39,11 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `1` | no |
 | domain | Your Wordpress blog domain | `string` | `null` | yes |
 | adminEmailAddress | The e-mail address used to create the administrator account for WordPress. | `string` | `null` | yes |
-| optionalEmailAddress |  | `string` | `"default_value@example.com"` | no |
+| optionalEmailAddress | Please enter a valid email address | `string` | `"default_value@example.com"` | no |
 | showConditionalRowAndAction |  | `bool` | `true` | no |
 | generateOptionalPassword |  | `bool` | `true` | no |
 | installPhpMyAdmin |  | `bool` | `true` | no |
-| imageCaching |  | `string` | `none` | no |
+| imageCaching |  | `string` | `"none"` | no |
 | imageCompression |  | `bool` | `false` | no |
 | imageSizing |  | `bool` | `true` | no |
 | imageCacheSize |  | `number` | `50000` | no |
@@ -52,9 +52,9 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | extraLbZone0 |  | `string` | `"us-west1-a"` | no |
 | extraLbZone1 |  | `string` | `null` | yes |
 | enable_cloud_logging | Enables Cloud Logging. | `bool` | `true` | no |
-enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
-| enable_compute_api | read write access to Google Compute Engine APIs | `string` | `false` | no |
-| enable_compute_readonly_api | read access to Google Compute Engine APIs | `string` | `true` | no |
+| enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
+| enable_compute_api | Allow read write access to Google Compute Engine APIs on the VM | `bool` | `false` | no |
+| enable_compute_readonly_api | Allow read access to Google Compute Engine APIs on the VM | `bool` | `true` | no |
 
 ## Outputs
 

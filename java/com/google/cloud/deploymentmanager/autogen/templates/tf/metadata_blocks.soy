@@ -100,6 +100,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {'sub_' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
+  defaultValue: []
 - name: {'external_ips' |tierprefixed: $tier}
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
@@ -125,10 +126,12 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 - name: {$firewallSourceRangesPropName |tierprefixed: $tier}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   varType: string
   defaultValue: ""
+{/if}
 {/template}
 
 
@@ -144,32 +147,37 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template gcpAuthScopesProperties kind="text"}
 {@param specs: list<GcpAuthScopeSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $specs}
     {call gcpAuthScopesProperty}
       {param spec: $spec /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
 
 {template gcpAuthScopesProperty kind="text"}
 {@param spec: GcpAuthScopeSpec}
+{@param? tier: VmTierSpec|null}
 {let $name kind="text"}
   {call util.gcpAuthScopePropertyName}
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-- name: {$name}
-  description: Allow {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call} on the VM
+- name: {$name |tierprefixed: $tier}
+  description: {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}
 
 {template additionalDisksProperties kind="text"}
 {@param diskSpecs: list<DiskSpec>}
+{@param? tier: VmTierSpec|null}
   {for $spec, $index in $diskSpecs}
     {call additionalDisksProperty}
       {param spec: $spec /}
       {param index: $index /}
+      {param tier: $tier /}
     {/call}
   {/for}
 {/template}
@@ -177,16 +185,17 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 {template additionalDisksProperty kind="text"}
 {@param spec: DiskSpec}
 {@param index: number}
+{@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}
     {param spec: $spec /}
   {/call}
 {/let}
-- name: disk{$index+1}_size
+- name: {'disk' + ($index+1) + '_size' |tierprefixed: $tier}
   description: {$diskSizeDescription}
   varType: integer
   defaultValue: {$spec.getDiskSize()!.getDefaultSizeGb()}
-- name: disk{$index+1}_type
+- name: {'disk' + ($index+1) + '_type' |tierprefixed: $tier}
   description: {$spec.getDisplayLabel()}
   varType: string
   defaultValue: {$spec.getDiskType()!.getDefaultType()}
@@ -194,8 +203,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template deployInputProperties kind="text"}
 {@param inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec|null}
-// TODO: support tiers section for multi-VMs
 {let $fields: listDeployInputFields($inputSpec)/}
 {for $field in $fields}
 {let $fieldProp kind="text"}
@@ -213,6 +220,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {$field.getDescription() |yamlprimitive: 2}
   {elseif $field.getTooltip()}
   description: {$field.getTooltip() |yamlprimitive: 2}
+  {elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+  description: {$field.getEmailBox()?.getValidation()?.getDescription() |yamlprimitive: 2}
   {/if}
 {if $field.getBooleanCheckbox()}
   varType: bool
@@ -248,9 +257,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
   {else}
   required: true
-  {/if}
-  {if $box.getValidation()?.getDescription()}
-  description: {$box.getValidation().getDescription() |yamlprimitive: 2}
   {/if}
 {elseif $field.getStringDropdown()}
   {let $dropdown: $field.getStringDropdown()/}
