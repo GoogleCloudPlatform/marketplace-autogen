@@ -42,7 +42,7 @@ variable "zone" {lb}
 
 {template tierVariables kind="text" visibility="private"}
 {@param tier: VmTierSpec}
-{@param deployInput: DeployInputSpec|undefined}
+{@param? deployInput: DeployInputSpec|null}
 {let $instanceCount: $tier.getInstanceCount()!/}
 {\n}
 variable "{'instance_count' |tierprefixed: $tier}" {lb}

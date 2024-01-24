@@ -26,6 +26,13 @@ resource "google_compute_instance" "instance" {
     }
   }
 
+  dynamic "scratch_disk" {
+    for_each = range(var.tier2LocalSSDs)
+    content {
+      interface = "SCSI"
+    }
+  }
+
   metadata = {
     admin-password = var.admin_password
     ghost-db-password = var.ghost_mysql_password

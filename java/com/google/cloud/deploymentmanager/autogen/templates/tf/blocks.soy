@@ -334,14 +334,23 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 {template localSsds kind="text"}
   {@param localSsdSpec: LocalSsdSpec}
   {@param? deployInput: DeployInputSpec|null}
+  {if $localSsdSpec.getCountFromDeployInputField()}
   {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
-  {let $count: ($localSsdSpec.getCount() != 0) ? $localSsdSpec.getCount() : ($field.getIntegerBox()?.getDefaultValue()?.getValue() ?? 0)/}
-  {for $i in range(0, $count)}
+  dynamic "scratch_disk" {lb}
+    for_each = range(var.{$field.getName()})
+    content {lb}
+      interface = "SCSI"
+    {rb}
+  {rb}
+  {\n}
+  {else}
+  {for $i in range(0, $localSsdSpec.getCount())}
   scratch_disk {lb}
     interface = "SCSI"
   {rb}
   {\n}
   {/for}
+  {/if}
 {/template}
 
 {template passwordResources kind="text"}
