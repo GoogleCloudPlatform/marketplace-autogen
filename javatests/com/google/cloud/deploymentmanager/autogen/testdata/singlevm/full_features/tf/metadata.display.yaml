@@ -178,13 +178,13 @@ spec:
         enable_compute_api:
           name: enable_compute_api
           title: Allow read write access to Google Compute Engine APIs on the VM
-          section: API_ACCESS
-          booleanGroup: COMPUTE_API_ACCESS
+          section: api_access
+          booleanGroup: compute_api_access
         enable_compute_readonly_api:
           name: enable_compute_readonly_api
           title: Allow read access to Google Compute Engine APIs on the VM
-          section: API_ACCESS
-          booleanGroup: COMPUTE_READONLY_API_ACCESS
+          section: api_access
+          booleanGroup: compute_readonly_api_access
         disk1_size:
           name: disk1_size
           title: The super-extra-great disk size in GB
@@ -368,9 +368,9 @@ spec:
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
       booleanGroups:
-        - name: COMPUTE_API_ACCESS
+        - name: compute_api_access
           title: Compute API
-        - name: COMPUTE_READONLY_API_ACCESS
+        - name: compute_readonly_api_access
           title: Compute Readonly API
         - name: IMAGE_CACHING_OPTIONS
           title: Image caching options

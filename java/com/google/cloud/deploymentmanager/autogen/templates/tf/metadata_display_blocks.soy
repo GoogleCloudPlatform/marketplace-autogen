@@ -170,6 +170,9 @@ enable_cloud_monitoring:
 {$namePrefix + '_type' |tierprefixed: $tier}:
   name: {$namePrefix + '_type' |tierprefixed: $tier}
   title: GPUs
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {/if}
   xGoogleProperty:
     type: ET_GCE_GPU_TYPE
     gceGpuType:
@@ -183,9 +186,6 @@ enable_cloud_monitoring:
   title: GPU Count
   {if $spec.getMinCount() > 0}
   min: {$spec.getMinCount()}
-  {/if}
-  {if $tier}
-  section: {call tierSectionName}{param tier: $tier/}{/call}
   {/if}
   xGoogleProperty:
     type: ET_GCE_GPU_COUNT
@@ -374,13 +374,14 @@ enable_cloud_monitoring:
 
 {template deployInputPropertiesDisplay kind="text"}
 {@param spec: DeployInputSpec}
-// TODO: support tiers section for multi-VMs
+{@param? tierList: list<VmTierSpec>|null}
 {for $section in $spec.getSectionsList()}
 {for $field in $section.getFieldsList()}
 {let $fieldDisplay kind="text"}
   {call deployInputFieldDisplay}
     {param section: $section /}
     {param field: $field /}
+    {param tierList: $tierList /}
   {/call}
 {/let}
 {$fieldDisplay}{nil}
@@ -410,7 +411,8 @@ enable_cloud_monitoring:
   {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
       $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
   section: {$section.getName() |yamlprimitive: 2}
-  // TODO: Support tier section for multi-VMs
+  {elseif $section.getPlacement() == DeployInputSection.Placement.TIER}
+  section: {call tierSectionName}{param tier: findVmTier($section.getTier(), $tierList)/}{/call}
   {/if}
 
 {if $field.getGroupedBooleanCheckbox()}
@@ -531,8 +533,12 @@ enable_cloud_monitoring:
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
   title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
-  section: API_ACCESS
-  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{/call}
+  {if $tier}
+  section: {call tierSectionName}{param tier: $tier/}{/call}
+  {else}
+  section: api_access
+  {/if}
+  booleanGroup: {call authScopeBoolGroupName}{param scope: $scope/}{param tier: $tier/}{/call}
 {/template}
 
 {template tierSectionName kind="text"}
@@ -568,17 +574,17 @@ enable_cloud_monitoring:
 {/if}
 {switch $scope}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
-    CLOUD_PLATFORM_READONLY_API_ACCESS{nil}
+    cloud_platform_readonly_api_access{nil}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM}
-    CLOUD_PLATFORM_API_ACCESS{nil}
+    cloud_platform_api_access{nil}
   {case GcpAuthScopeSpec.Scope.COMPUTE_READONLY}
-    COMPUTE_READONLY_API_ACCESS{nil}
+    compute_readonly_api_access{nil}
   {case GcpAuthScopeSpec.Scope.COMPUTE}
-    COMPUTE_API_ACCESS{nil}
+    compute_api_access{nil}
   {case GcpAuthScopeSpec.Scope.SOURCE_READ_WRITE}
-    SOURCE_READ_WRITE_API_ACCESS{nil}
+    source_read_write_api_access{nil}
   {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
-    PROJECT_HOSTING_API_ACCESS{nil}
+    project_hosting_api_access{nil}
 {/switch}
 {/template}
 

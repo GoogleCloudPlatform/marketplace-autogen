@@ -63,6 +63,7 @@ spec:
           name: imageCaching
           title: Image caching
           level: 1
+          section: main_tier
           enumValueLabels:
             - label: Not cached
               value: none
@@ -74,11 +75,13 @@ spec:
           name: imageCompression
           title: Enable compression
           level: 1
+          section: main_tier
           booleanGroup: IMAGE_CACHING_OPTIONS
         imageSizing:
           name: imageSizing
           title: Dynamic sizing
           level: 1
+          section: main_tier
           booleanGroup: IMAGE_CACHING_OPTIONS
         extraLbZone0:
           name: extraLbZone0
@@ -309,33 +312,33 @@ spec:
         main_enable_cloud_readonly_api:
           name: main_enable_cloud_readonly_api
           title: Allow read only access to all of Google Cloud Platform APIs on the VM
-          section: API_ACCESS
-          booleanGroup: CLOUD_PLATFORM_READONLY_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_cloud_platform_readonly_api_access
         main_enable_cloud_api:
           name: main_enable_cloud_api
           title: Allow full access to all of Google Cloud Platform APIs on the VM
-          section: API_ACCESS
-          booleanGroup: CLOUD_PLATFORM_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_cloud_platform_api_access
         main_enable_compute_readonly_api:
           name: main_enable_compute_readonly_api
           title: Allow read access to Google Compute Engine APIs on the VM
-          section: API_ACCESS
-          booleanGroup: COMPUTE_READONLY_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_compute_readonly_api_access
         main_enable_compute_api:
           name: main_enable_compute_api
           title: Allow read write access to Google Compute Engine APIs on the VM
-          section: API_ACCESS
-          booleanGroup: COMPUTE_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_compute_api_access
         main_enable_source_read_write_api:
           name: main_enable_source_read_write_api
           title: Allow read write access to Google Cloud Source Repositories APIs on the VM
-          section: API_ACCESS
-          booleanGroup: SOURCE_READ_WRITE_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_source_read_write_api_access
         main_enable_projecthosting_api:
           name: main_enable_projecthosting_api
           title: Allow project hosting access to (Deprecated) Google Code Project Hosting APIs on the VM
-          section: API_ACCESS
-          booleanGroup: PROJECT_HOSTING_API_ACCESS
+          section: main_tier
+          booleanGroup: main_tier_project_hosting_api_access
         tier2_instance_count:
           name: tier2_instance_count
           title: Instance Count
@@ -369,6 +372,7 @@ spec:
         tier2_accelerator_type:
           name: tier2_accelerator_type
           title: GPUs
+          section: tier2_tier
           xGoogleProperty:
             type: ET_GCE_GPU_TYPE
             gceGpuType:
@@ -380,7 +384,6 @@ spec:
           name: tier2_accelerator_count
           title: GPU Count
           min: 2
-          section: tier2_tier
           xGoogleProperty:
             type: ET_GCE_GPU_COUNT
             gceGpuCount:
@@ -482,6 +485,7 @@ spec:
         tier3_accelerator_type:
           name: tier3_accelerator_type
           title: GPUs
+          section: tier3_tier
           xGoogleProperty:
             type: ET_GCE_GPU_TYPE
             gceGpuType:
@@ -493,7 +497,6 @@ spec:
         tier3_accelerator_count:
           name: tier3_accelerator_count
           title: GPU Count
-          section: tier3_tier
           xGoogleProperty:
             type: ET_GCE_GPU_COUNT
             gceGpuCount:
@@ -578,6 +581,23 @@ spec:
         - name: google_cloud_operations
           title: Google Cloud Operations
           subtext: Monitoring and management for services, containers, applications, and infrastructure
+      booleanGroups:
+        - name: main_tier_cloud_platform_readonly_api_access
+          title: Google Cloud Platform Readonly API
+        - name: main_tier_cloud_platform_api_access
+          title: Google Cloud Platform API
+        - name: main_tier_compute_readonly_api_access
+          title: Compute Readonly API
+        - name: main_tier_compute_api_access
+          title: Compute API
+        - name: main_tier_source_read_write_api_access
+          title: Cloud Source Repositories Readwrite API
+        - name: main_tier_project_hosting_api_access
+          title: (Deprecated) Code Project Hosting APIs
+        - name: IMAGE_CACHING_OPTIONS
+          title: Image caching options
+          tooltip: <a href='http://wordpress.com/help'>Learn more</a>
+          subtext: Advanced image caching options. Don't touch unless you know.
     runtime:
       suggestedActions:
         - heading: Conditional step

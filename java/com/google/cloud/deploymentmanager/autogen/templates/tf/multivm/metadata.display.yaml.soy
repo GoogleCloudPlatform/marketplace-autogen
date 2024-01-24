@@ -41,6 +41,7 @@ spec:
         {let $deployInputDisplay kind="text"}
           {call blocks.deployInputPropertiesDisplay}
             {param spec: $spec.getDeployInput() /}
+            {param tierList: $spec.getTiersList() /}
           {/call}
         {/let}
         {$deployInputDisplay |indent: 8, true}{nil}
@@ -87,6 +88,17 @@ spec:
         {/call}
       {/let}
       {$stackdriverBottomSections |indent: 8, true}{nil}
+      {/if}
+      {let $authScopeBooleanGroups kind="text"}
+        {call blocks.authScopeBooleanGroups}{param multiVmSpec: $spec/}{/call}
+      {/let}
+      {let $customBooleanGroups kind="text"}
+        {call blocks.customBooleanGroups}{param spec: $spec.getDeployInput()/}{/call}
+      {/let}
+      {if ($authScopeBooleanGroups.length + $customBooleanGroups.length) > 0}
+      booleanGroups:
+        {$authScopeBooleanGroups |indent: 8, true}{nil}
+        {$customBooleanGroups |indent: 8, true}{nil}
       {/if}
     {let $actionItems: $spec.getPostDeploy()?.getActionItemsList() ?? [] /}
     {if $actionItems.length > 0}
