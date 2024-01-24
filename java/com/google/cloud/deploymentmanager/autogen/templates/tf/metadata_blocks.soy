@@ -100,6 +100,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {'sub_' + $nameSuffix |tierprefixed: $tier}
   description: {constants.SUB_NETWORKS_VAR_DESC}
   varType: list(string)
+  defaultValue: []
 - name: {'external_ips' |tierprefixed: $tier}
   description: {constants.EXTERNAL_IPS_VAR_DESC}
   varType: list(string)
@@ -125,10 +126,12 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
+{if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 - name: {$firewallSourceRangesPropName |tierprefixed: $tier}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
   varType: string
   defaultValue: ""
+{/if}
 {/template}
 
 
@@ -200,8 +203,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template deployInputProperties kind="text"}
 {@param inputSpec: DeployInputSpec}
-{@param? tierSpec: VmTierSpec|null}
-// TODO: support tiers section for multi-VMs
 {let $fields: listDeployInputFields($inputSpec)/}
 {for $field in $fields}
 {let $fieldProp kind="text"}
@@ -219,6 +220,8 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   description: {$field.getDescription() |yamlprimitive: 2}
   {elseif $field.getTooltip()}
   description: {$field.getTooltip() |yamlprimitive: 2}
+  {elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+  description: {$field.getEmailBox()?.getValidation()?.getDescription() |yamlprimitive: 2}
   {/if}
 {if $field.getBooleanCheckbox()}
   varType: bool
@@ -254,9 +257,6 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   defaultValue: {$box.getDefaultValue() |yamlprimitive: 2}
   {else}
   required: true
-  {/if}
-  {if $box.getValidation()?.getDescription()}
-  description: {$box.getValidation().getDescription() |yamlprimitive: 2}
   {/if}
 {elseif $field.getStringDropdown()}
   {let $dropdown: $field.getStringDropdown()/}

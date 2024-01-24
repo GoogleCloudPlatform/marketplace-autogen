@@ -25,7 +25,14 @@ spec:
             version: "2.46.3"
           - title: OpenJDK
             version: "1.8.0"
-  content: {}
+  content:
+    subBlueprints:
+      - name: main
+        location: modules/main
+      - name: tier2
+        location: modules/tier2
+      - name: tier3
+        location: modules/tier3
   interfaces:
     variables:
       - name: project_id
@@ -48,11 +55,10 @@ spec:
         description: The e-mail address used to create the administrator account for WordPress.
         varType: string
         defaultValue: aX9-YD_8W.3@example.com
-        description: Please enter a valid email address
       - name: optionalEmailAddress
+        description: Please enter a valid email address
         varType: string
         required: true
-        description: Please enter a valid email address
       - name: showConditionals
         varType: bool
         defaultValue: true
@@ -140,6 +146,7 @@ spec:
       - name: main_sub_networks
         description: The sub network name to attach the VM instance.
         varType: list(string)
+        defaultValue: []
       - name: main_external_ips
         description: The external IPs assigned to the VM for public access.
         varType: list(string)
@@ -165,18 +172,10 @@ spec:
         description: Allow ICMP traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
-      - name: main_icmp_source_ranges
-        description: Source IP ranges for ICMP traffic
-        varType: string
-        defaultValue: ""
       - name: main_enable_tcp_7000-7001
         description: Allow TCP port 7000-7001 traffic between VMs in this group
         varType: bool
         defaultValue: true
-      - name: main_tcp_7000-7001_source_ranges
-        description: Source IP ranges for TCP port 7000-7001 traffic
-        varType: string
-        defaultValue: ""
       - name: main_enable_udp
         description: Allow UDP traffic from the Internet
         varType: bool
@@ -244,6 +243,7 @@ spec:
       - name: tier2_sub_networks
         description: The sub network name to attach the VM instance.
         varType: list(string)
+        defaultValue: []
       - name: tier2_external_ips
         description: The external IPs assigned to the VM for public access.
         varType: list(string)
@@ -253,18 +253,10 @@ spec:
         description: Allow TCP port 9878 traffic between VMs in this group
         varType: bool
         defaultValue: true
-      - name: tier2_tcp_9878_source_ranges
-        description: Source IP ranges for TCP port 9878 traffic
-        varType: string
-        defaultValue: ""
       - name: tier2_enable_udp_2555
         description: Allow UDP port 2555 traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
-      - name: tier2_udp_2555_source_ranges
-        description: Source IP ranges for UDP port 2555 traffic
-        varType: string
-        defaultValue: ""
       - name: tier3_instance_count
         description: "Specify a value between 1 and 10."
         varType: integer
@@ -301,6 +293,7 @@ spec:
       - name: tier3_sub_networks
         description: The sub network name to attach the VM instance.
         varType: list(string)
+        defaultValue: []
       - name: tier3_external_ips
         description: The external IPs assigned to the VM for public access.
         varType: list(string)
@@ -310,18 +303,10 @@ spec:
         description: Allow TCP port 9000 traffic between VMs in this group
         varType: bool
         defaultValue: true
-      - name: tier3_tcp_9000_source_ranges
-        description: Source IP ranges for TCP port 9000 traffic
-        varType: string
-        defaultValue: ""
       - name: tier3_enable_udp_2333
         description: Allow UDP port 2333 traffic from other VMs in this deployment
         varType: bool
         defaultValue: true
-      - name: tier3_udp_2333_source_ranges
-        description: Source IP ranges for UDP port 2333 traffic
-        varType: string
-        defaultValue: ""
     outputs:
       - name: total_instance_count
         description: Total compute instances.

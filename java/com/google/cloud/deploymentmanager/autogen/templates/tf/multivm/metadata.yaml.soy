@@ -39,7 +39,12 @@ spec:
       {/let}
       {$softwareGroups |indent: 4, true}{nil}
     {/if}
-  content: {lb}{rb}
+  content:
+    subBlueprints:
+  {for $tier in $spec.getTiersList()}
+      - name: {$tier.getName()}
+        location: modules/{$tier.getName()}
+  {/for}
   interfaces:
     variables:
     {let $projectIdProp kind="text"}

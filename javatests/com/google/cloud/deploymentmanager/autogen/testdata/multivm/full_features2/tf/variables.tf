@@ -27,6 +27,7 @@ variable "adminEmailAddress" {
 }
 
 variable "optionalEmailAddress" {
+  description = "Please enter a valid email address"
   type        = string
 }
 

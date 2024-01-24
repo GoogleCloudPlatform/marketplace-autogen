@@ -38,7 +38,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `1` | no |
 | domain | Your Wordpress "blog" domain | `string` | `null` | yes |
 | adminEmailAddress | The e-mail address used to create the "administrator account" for WordPress. | `string` | `null` | yes |
-| optionalEmailAddress |  | `string` | `"default_value@example.com"` | no |
+| optionalEmailAddress | Please enter a valid email address | `string` | `"default_value@example.com"` | no |
 | showConditionalRowAndAction |  | `bool` | `true` | no |
 | generateOptionalPassword |  | `bool` | `true` | no |
 | installPhpMyAdmin |  | `bool` | `true` | no |

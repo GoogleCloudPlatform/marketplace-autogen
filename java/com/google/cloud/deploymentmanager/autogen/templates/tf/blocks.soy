@@ -417,6 +417,8 @@ variable "{$field.getName()}" {lb}
   description = "{$field.getDescription() |doublequoted}"
 {elseif $field.getTooltip()}
   description = "{$field.getTooltip() |doublequoted}"
+{elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+  description = "{$field.getEmailBox()?.getValidation()?.getDescription()}"
 {/if}
 {if $field.getBooleanCheckbox()}
   type        = bool
@@ -481,6 +483,8 @@ variable "{$field.getName()}" {lb}
     {$field.getDescription()}{nil}
   {elseif $field.getTooltip()}
     {$field.getTooltip()}{nil}
+  {elseif $field.getEmailBox()?.getValidation()?.getDescription()}
+    {$field.getEmailBox()?.getValidation()?.getDescription()}{nil}
   {/if}
 {/let}
 {let $type kind="text"}
