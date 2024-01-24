@@ -43,7 +43,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | showConditionalRowAndAction |  | `bool` | `true` | no |
 | generateOptionalPassword |  | `bool` | `true` | no |
 | installPhpMyAdmin |  | `bool` | `true` | no |
-| imageCaching |  | `string` | `none` | no |
+| imageCaching |  | `string` | `"none"` | no |
 | imageCompression |  | `bool` | `false` | no |
 | imageSizing |  | `bool` | `true` | no |
 | imageCacheSize |  | `number` | `50000` | no |
@@ -53,8 +53,8 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | extraLbZone1 |  | `string` | `null` | yes |
 | enable_cloud_logging | Enables Cloud Logging. | `bool` | `true` | no |
 | enable_cloud_monitoring | Enables Cloud Monitoring. | `bool` | `false` | no |
-| enable_compute_api | read write access to Google Compute Engine APIs | `string` | `false` | no |
-| enable_compute_readonly_api | read access to Google Compute Engine APIs | `string` | `true` | no |
+| enable_compute_api | Allow read write access to Google Compute Engine APIs on the VM | `bool` | `false` | no |
+| enable_compute_readonly_api | Allow read access to Google Compute Engine APIs on the VM | `bool` | `true` | no |
 
 ## Outputs
 

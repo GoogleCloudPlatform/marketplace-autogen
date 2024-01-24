@@ -322,7 +322,7 @@ variable "tier2_accelerator_type" {
 variable "tier2_accelerator_count" {
   description = "The number of the guest accelerator cards exposed to this instance."
   type        = number
-  default     = "2"
+  default     = 2
 }
 
 variable "tier3_instance_count" {
@@ -393,5 +393,5 @@ variable "tier3_accelerator_type" {
 variable "tier3_accelerator_count" {
   description = "The number of the guest accelerator cards exposed to this instance."
   type        = number
-  default     = "0"
+  default     = 0
 }

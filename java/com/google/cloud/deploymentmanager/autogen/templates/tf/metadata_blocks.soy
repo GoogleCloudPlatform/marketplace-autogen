@@ -165,7 +165,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
   {/call}
 {/let}
 - name: {$name |tierprefixed: $tier}
-  description: Allow {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call} on the VM
+  description: {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call}
   varType: bool
   defaultValue: {not $spec.getDefaultOff()}
 {/template}

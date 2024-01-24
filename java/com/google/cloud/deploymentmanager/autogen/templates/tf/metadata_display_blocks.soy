@@ -532,7 +532,7 @@ enable_cloud_monitoring:
 {/let}
 {$name |tierprefixed: $tier}:
   name: {$name |tierprefixed: $tier}
-  title: Allow {call util.authScopeDescription}{param scope: $scope/}{/call} on the VM
+  title: {call util.authScopeDescription}{param scope: $scope/}{/call}
   {if $tier}
   section: {call tierSectionName}{param tier: $tier/}{/call}
   {else}

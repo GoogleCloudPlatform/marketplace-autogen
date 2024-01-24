@@ -276,6 +276,7 @@ ${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
 /** Produces the description for an API scope. */
 {template authScopeDescription kind="text"}
 {@param scope: GcpAuthScopeSpec.Scope}
+Allow {nil}
 {switch $scope}
   {case GcpAuthScopeSpec.Scope.CLOUD_PLATFORM_READONLY}
     read only access to all of Google Cloud Platform APIs{nil}
@@ -290,6 +291,7 @@ ${lb}var.deployment_name{rb}-{$tier.getName()}-tier{nil}
   {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     project hosting access to (Deprecated) Google Code Project Hosting APIs{nil}
 {/switch}
+ {plsp}on the VM{nil}
 {/template}
 
 /** Produces the URL for an API scope. */

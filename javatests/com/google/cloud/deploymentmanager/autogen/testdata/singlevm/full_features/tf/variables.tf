@@ -144,7 +144,7 @@ variable "accelerator_type" {
 variable "accelerator_count" {
   description = "The number of the guest accelerator cards exposed to this instance."
   type        = number
-  default     = "1"
+  default     = 1
 }
 
 variable "domain" {
