@@ -47,10 +47,6 @@ To review these options at any time, provide `--help` as the argument for Autoge
 
   If this parameter is provided, Autogen will NOT include the shared support files used for deployment in this solution (look [here](./java/com/google/cloud/deploymentmanager/autogen/templates/dm/sharedsupport/common) for those files). By default, Autogen always includes these files, which is the recommended option. This is only relevant for Deployment Manager.
 
-* `--dev_features` (optional)
-
-  If this flag is provided, Autogen can use in-development features such as support for multi-VM Terraform.
-
 ### Example configurations
 
 We have provided a full featured example configuration in the [example-config](example-config/) folder.

@@ -18,7 +18,6 @@ import com.google.cloud.deploymentmanager.autogen.Autogen;
 import com.google.cloud.deploymentmanager.autogen.Autogen.SharedSupportFilesStrategy;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchInput;
 import com.google.cloud.deploymentmanager.autogen.proto.BatchOutput;
-import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageAutogenSpec.DeploymentTool;
 import com.google.cloud.deploymentmanager.autogen.proto.DeploymentPackageInput;
 import com.google.cloud.deploymentmanager.autogen.proto.SolutionPackage;
 import com.google.common.base.Supplier;
@@ -40,17 +39,10 @@ public final class AutogenCli {
 
   private static SolutionPackage getSolutionPackage(
       DeploymentPackageInput solution, AutogenSettings settings) {
-    SharedSupportFilesStrategy strategy = settings.shouldExcludeSharedSupportFiles()
-            ? SharedSupportFilesStrategy.EXCLUDED : SharedSupportFilesStrategy.INCLUDED;
-    if (solution.getSpec().getDeploymentTool().equals(DeploymentTool.TERRAFORM)
-        && solution.getSpec().hasMultiVm()
-        && !settings.isDevFeaturesEnabled()) {
-      throw new IllegalArgumentException(
-          "Terraform MultiVm cannot be used without enabling --dev_features. WARNING: Terraform"
-              + " MultiVm Autogen is in development and does not support full Autogen feature"
-              + " support");
-    }
-
+    SharedSupportFilesStrategy strategy =
+        settings.shouldExcludeSharedSupportFiles()
+            ? SharedSupportFilesStrategy.EXCLUDED
+            : SharedSupportFilesStrategy.INCLUDED;
     return injector.get().getInstance(Autogen.class).generateDeploymentPackage(solution, strategy);
   }
 
