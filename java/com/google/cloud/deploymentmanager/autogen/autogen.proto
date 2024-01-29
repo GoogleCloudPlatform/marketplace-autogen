@@ -29,39 +29,12 @@ option java_outer_classname = "AutogenProtos";
 // Input for generating a deployment package.
 //
 // (== yamlExample
+// # BEGIN Legacy field, required but will be removed in the future
 // partnerId: my-partner-id
 // solutionId: example-autogen-solution
-// partnerInfo:
-//   name: Autogen Example Co.
-//   description: |
-//     This is a long description that should be at most 2048 characters and can contain line breaks
-//     The pipe operation above denotest that this is a multi-line sentence
-//   url: https://www.google.com
-//   shortDescription: This is a short partner description, with at most 300 characters
+// # END Legacy field, required but will be removed in the future
 // solutionInfo:
 //   name: Autogen Solution Example
-//   version: 1.0
-//   description: This is a long description of the solution. Follows the same size constraints of the
-//     partnerInfo description and can contain HTML tags
-//   url: https://www.google.com
-//   tagline: Short solution description displayed right below the solution title (100 chars max)
-//   supportInfo: Some description of the support provided for this solution
-//   supportUrl: https://www.google.com
-//   eulaUrl: https://www.google.com
-//   documentations:
-//     - url: https://www.google.com
-//       title: Getting Started
-//       description: Get started docs for this example solution
-//       # List of places where this support info should be displayed
-//       # check marketing_info.proto for options
-//       destinations:
-//         - DESTINATION_POST_DEPLOY
-//     - url: https://www.google.com
-//       title: Some more docs
-//       description: Additional docs for this solution
-//       destinations:
-//         - DESTINATION_POST_DEPLOY
-//         - DESTINATION_CONFIGURATION
 //   packagedSoftwareGroups:
 //     - type: SOFTWARE_GROUP_OS
 //       components:
@@ -70,14 +43,9 @@ option java_outer_classname = "AutogenProtos";
 //     - components:
 //         - name: Apache
 //           version: 2.4.23
-// logo:
-//   raw:
-//     contentType: PNG
-//     # Base 64 encoded image
-//     content: iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
-//   description: Solution Logo
 // spec:
 //   version: 1.0
+//   deploymentTool: TERRAFORM
 //   # multiVm option is also available
 //   singleVm:
 //     images:
