@@ -19,19 +19,19 @@ goog_cm_deployment_name = "test-deployment"{\n}
 // fail if a variable is missing a default value, while DM will use the falsy value of the type.
 {if $field.getStringBox()}
   {let $box: $field.getStringBox()/}
-  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+  {if !$box.getDefaultValue() or $box.getTestDefaultValue()}
 {$field.getName()} = "{$box.getTestDefaultValue()}"{\n}
   {/if}
 {/if}
 {if $field.getIntegerBox()}
   {let $box: $field.getIntegerBox()/}
-  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+  {if !$box.getDefaultValue() or $box.getTestDefaultValue()}
 {$field.getName()} = {$box.getTestDefaultValue()?.getValue() ?? 0}{\n}
   {/if}
 {/if}
 {if $field.getEmailBox()}
   {let $box: $field.getEmailBox()/}
-  {if not $box.getDefaultValue() or $box.getTestDefaultValue()}
+  {if !$box.getDefaultValue() or $box.getTestDefaultValue()}
 {$field.getName()} = "{$box.getTestDefaultValue()}"{\n}
   {/if}
 {/if}
