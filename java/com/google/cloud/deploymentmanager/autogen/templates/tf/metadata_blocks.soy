@@ -125,7 +125,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$firewallPropName |tierprefixed: $tier}
   description: {call util.firewallVariableDescription}{param spec: $spec /}{/call}
   varType: bool
-  defaultValue: {not $spec.getDefaultOff()}
+  defaultValue: {!$spec.getDefaultOff()}
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 - name: {$firewallSourceRangesPropName |tierprefixed: $tier}
   description: {call util.firewallSourceRangesVarDescription}{param spec: $spec /}{/call}
@@ -142,7 +142,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$name |tierprefixed: $tier}
   description: {constants.IP_FORWARD_VAR_DESC}
   varType: bool
-  defaultValue: {not $spec.getDefaultOff()}
+  defaultValue: {!$spec.getDefaultOff()}
 {/template}
 
 {template gcpAuthScopesProperties kind="text"}
@@ -167,7 +167,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$name |tierprefixed: $tier}
   description: {call util.authScopeDescription}{param scope: $spec.getScope() /}{/call}
   varType: bool
-  defaultValue: {not $spec.getDefaultOff()}
+  defaultValue: {!$spec.getDefaultOff()}
 {/template}
 
 {template additionalDisksProperties kind="text"}
