@@ -38,7 +38,7 @@ enable_cloud_monitoring:
 
 {template stackdriverBottomSections kind="text"}
 {@param stackdriver: StackdriverSpec}
-{if $stackdriver?.getLogging() or $stackdriver?.getMonitoring()}
+{if $stackdriver?.getLogging() || $stackdriver?.getMonitoring()}
 - name: google_cloud_operations
   title: Google Cloud Operations
   subtext: Monitoring and management for services, containers, applications, and infrastructure
@@ -91,7 +91,7 @@ enable_cloud_monitoring:
   {/if}
   xGoogleProperty:
     type: ET_GCE_ZONE
-    {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
+    {if $zoneSpec && (length($zoneSpec.getWhitelistedZonesList()) > 0 ||
       length($zoneSpec.getWhitelistedRegionsList()) > 0)}
     gceZone:
       {if length($zoneSpec.getWhitelistedZonesList()) > 0}
@@ -408,7 +408,7 @@ enable_cloud_monitoring:
   {if $field.getLevel()}
   level: {$field.getLevel()}
   {/if}
-  {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP or
+  {if $section.getPlacement() == DeployInputSection.Placement.CUSTOM_TOP ||
       $section.getPlacement() == DeployInputSection.Placement.CUSTOM_BOTTOM}
   section: {$section.getName() |yamlprimitive: 2}
   {elseif $section.getPlacement() == DeployInputSection.Placement.TIER}
@@ -549,7 +549,7 @@ enable_cloud_monitoring:
 {template authScopeBooleanGroups kind="text"}
 {@param? singleVmSpec: SingleVmDeploymentPackageSpec|null}
 {@param? multiVmSpec: MultiVmDeploymentPackageSpec|null}
-{if $singleVmSpec and $singleVmSpec.getGcpAuthScopesList()}
+{if $singleVmSpec && $singleVmSpec.getGcpAuthScopesList()}
 {for $spec in $singleVmSpec.getGcpAuthScopesList()}
 - name: {call authScopeBoolGroupName}{param scope: $spec.getScope()/}{/call}
   title: {call authScopeBoolGroupTitle}{param scope: $spec.getScope()/}{/call}

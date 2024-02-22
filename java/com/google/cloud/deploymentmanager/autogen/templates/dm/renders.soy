@@ -263,7 +263,7 @@ sourceTags:
       {% endfor %}
       {/if}
 
-    {if $dependsOnList and length($dependsOnList) > 1}
+    {if $dependsOnList && length($dependsOnList) > 1}
     successNumber: {length($dependsOnList)}
     {elseif $dependsOnTierSpec}
     {% if {$dependsOnTierInstanceCountJinjaVarName} > 1 %}
@@ -300,7 +300,7 @@ sourceTags:
 {template startupScriptAndWaiterMetadataItemsUnconditional kind="text"}
 {@param? startupSpec: GceStartupScriptSpec|null}
 {@param? waiterSpec: ApplicationStatusSpec.WaiterSpec|null}
-{if $startupSpec?.getBashScriptContent() and !$waiterSpec?.getScript()}
+{if $startupSpec?.getBashScriptContent() && !$waiterSpec?.getScript()}
 - key: startup-script
   value: |-
     #!/bin/bash
@@ -352,7 +352,7 @@ sourceTags:
 
 /* If startup script and waiter are defined, use the startup script directly
  * when waiter usage is disabled. */
-{if $startupSpec?.getBashScriptContent() and $waiterSpec?.getScript()}
+{if $startupSpec?.getBashScriptContent() && $waiterSpec?.getScript()}
 - key: startup-script
   value: |-
     #!/bin/bash
@@ -483,12 +483,12 @@ serviceAccounts:
 {@param? zoneSpec: ZoneSpec|null}
 {$name}:
   type: string
-  {if $zoneSpec and $zoneSpec.getDefaultZone()}
+  {if $zoneSpec && $zoneSpec.getDefaultZone()}
   default: {$zoneSpec.getDefaultZone()}
   {/if}
   x-googleProperty:
     type: GCE_ZONE
-    {if $zoneSpec and (length($zoneSpec.getWhitelistedZonesList()) > 0 or
+    {if $zoneSpec && (length($zoneSpec.getWhitelistedZonesList()) > 0 ||
       length($zoneSpec.getWhitelistedRegionsList()) > 0)}
     gceZone:
       {if length($zoneSpec.getWhitelistedZonesList()) > 0}
@@ -829,7 +829,7 @@ serviceAccounts:
 {template localSsdPropertyItem kind="text"}
 {@param localSsdSpec: LocalSsdSpec}
 {@param deployInput: DeployInputSpec}
-{if $localSsdSpec.getCount() and $localSsdSpec.getCount() > 0}
+{if $localSsdSpec.getCount() && $localSsdSpec.getCount() > 0}
 localSSDs: {$localSsdSpec.getCount()}{nil}
 {elseif $localSsdSpec.getCountFromDeployInputField()}
 {let $field: findDeployInputField($localSsdSpec.getCountFromDeployInputField(), $deployInput)/}
