@@ -42,7 +42,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 - name: {$name}
   description: {constants.ZONE_VAR_DESC}
   varType: string
-  {if $zoneSpec and $zoneSpec.getDefaultZone()}
+  {if $zoneSpec && $zoneSpec.getDefaultZone()}
   defaultValue: {$zoneSpec.getDefaultZone()}
   {else}
   required: true
@@ -304,7 +304,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
     {param spec: $password /}
   {/call}
 {/let}
-{if $password.getUsername() or $password.getUsernameFromDeployInputField()}
+{if $password.getUsername() || $password.getUsernameFromDeployInputField()}
 - name: {$sanitizedPasswordLabel}_user
   description: {$usernameDescription}
 {/if}

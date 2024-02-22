@@ -496,9 +496,9 @@ variable "{$field.getName()}" {lb}
   {/if}
 {/let}
 {let $type kind="text"}
-  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  {if $field.getBooleanCheckbox() || $field.getGroupedBooleanCheckbox()}
     bool{nil}
-  {elseif $field.getIntegerBox() or $field.getIntegerDropdown()}
+  {elseif $field.getIntegerBox() || $field.getIntegerDropdown()}
     number{nil}
   {else}
     string{nil}
@@ -565,7 +565,7 @@ variable "{$field.getName()}" {lb}
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
   // Convert boolean "true" -> "True" for regression purposes
-  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  {if $field.getBooleanCheckbox() || $field.getGroupedBooleanCheckbox()}
   title(var.{$field.getName()}){nil}
   {else}
   var.{$field.getName()}{nil}
