@@ -20,7 +20,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
 /** Produces the targetTag for a firewall rule. */
 {template firewallRuleTargetTag kind="text"}
 {@param? tierSpec: VmTierSpec|null}
-{if not $tierSpec}
+{if !$tierSpec}
 {call deploymentTag data="all"/}{nil}
 {else}
 {call tierTag data="all"}{param spec: $tierSpec/}{/call}{nil}
@@ -65,7 +65,7 @@ import {FirewallRuleSpec,GcpAuthScopeSpec,InstanceUrlSpec,PasswordSpec,VmTierSpe
  */
 {template firewallRuleTargetTagSuffix kind="text"}
 {@param? tierSpec: VmTierSpec|null}
-{if not $tierSpec}
+{if !$tierSpec}
   -deployment{nil}
 {else}
   -{$tierSpec.getName()}-tier{nil}

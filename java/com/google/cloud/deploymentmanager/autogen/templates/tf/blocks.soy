@@ -110,7 +110,7 @@ resource "google_compute_firewall" {call util.firewallRuleResourceName}{param sp
 variable "{$varname |tierprefixed: $tier}" {lb}
   description = "{call util.firewallVariableDescription}{param spec: $spec/}{/call}"
   type        = bool
-  default     = {not $spec.getDefaultOff()}
+  default     = {!$spec.getDefaultOff()}
 {rb}
 {/template}
 
@@ -154,7 +154,7 @@ variable "{$varname |tierprefixed: $tier}" {lb}
       {call util.firewallSourceRangesVarDescription}{param spec: $spec/}{/call}
     {/let}
 
-| {$firewallRuleVariable |tierprefixed: $tier} | {$firewallRuleDescription} | `bool` | `{not $spec.getDefaultOff()}` | no |
+| {$firewallRuleVariable |tierprefixed: $tier} | {$firewallRuleDescription} | `bool` | `{!$spec.getDefaultOff()}` | no |
 {if $spec.getAllowedSource() == FirewallRuleSpec.TrafficSource.PUBLIC}
 | {$firewallRangeVariable |tierprefixed: $tier} | {$firewallRangeDescription} | `string` | `""` | no |
 {/if}
@@ -496,9 +496,9 @@ variable "{$field.getName()}" {lb}
   {/if}
 {/let}
 {let $type kind="text"}
-  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  {if $field.getBooleanCheckbox() || $field.getGroupedBooleanCheckbox()}
     bool{nil}
-  {elseif $field.getIntegerBox() or $field.getIntegerDropdown()}
+  {elseif $field.getIntegerBox() || $field.getIntegerDropdown()}
     number{nil}
   {else}
     string{nil}
@@ -565,7 +565,7 @@ variable "{$field.getName()}" {lb}
   {elseif $metadata.getValueFromDeployInputField()}
   {let $field: findDeployInputField($metadata.getValueFromDeployInputField(), $deployInput)/}
   // Convert boolean "true" -> "True" for regression purposes
-  {if $field.getBooleanCheckbox() or $field.getGroupedBooleanCheckbox()}
+  {if $field.getBooleanCheckbox() || $field.getGroupedBooleanCheckbox()}
   title(var.{$field.getName()}){nil}
   {else}
   var.{$field.getName()}{nil}
@@ -697,7 +697,7 @@ variable "enable_cloud_monitoring" {lb}
 variable "{$name |tierprefixed: $tier}" {lb}
   description = "{$description}"
   type        = bool
-  default     = {not $spec!.getDefaultOff()}
+  default     = {!$spec!.getDefaultOff()}
 {rb}
 {/template}
 
@@ -725,7 +725,7 @@ variable "{$name |tierprefixed: $tier}" {lb}
     {param scope: $spec.getScope() /}
   {/call}
 {/let}
-| {$name |tierprefixed: $tier} | {$description} | `bool` | `{not $spec!.getDefaultOff()}` | no |
+| {$name |tierprefixed: $tier} | {$description} | `bool` | `{!$spec!.getDefaultOff()}` | no |
 {/template}
 
 {template passwordOutputsReadme kind="text"}
@@ -858,7 +858,7 @@ output "{$sanitizedPasswordLabel}_password" {lb}
 variable "{'ip_forward' |tierprefixed: $tier}" {lb}
   description = "{constants.IP_FORWARD_VAR_DESC}"
   type        = bool
-  default     = {not $ipForwarding!.getDefaultOff()}
+  default     = {!$ipForwarding!.getDefaultOff()}
 {rb}
 {/template}
 
@@ -866,5 +866,5 @@ variable "{'ip_forward' |tierprefixed: $tier}" {lb}
 {@param name: string}
 {@param ipForwarding: IpForwardingSpec}
 {@param? tier: VmTierSpec|null}
-| {'ip_forward' |tierprefixed: $tier} | {constants.IP_FORWARD_VAR_DESC} | `bool` | `{not $ipForwarding!.getDefaultOff()}` | no |
+| {'ip_forward' |tierprefixed: $tier} | {constants.IP_FORWARD_VAR_DESC} | `bool` | `{!$ipForwarding!.getDefaultOff()}` | no |
 {/template}
