@@ -542,6 +542,13 @@ spec {
       }
       monitoring: {}
     }
+    apis {
+      service: "aiplatform.googleapis.com"
+      disable_on_destroy: true
+    }
+    apis {
+      service: "compute.googleapis.com"
+    }
   }
 }
 logo {

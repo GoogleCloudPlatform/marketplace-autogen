@@ -1,6 +1,6 @@
 {namespace util}
 
-import {DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
+import {APIServiceSpec, DiskSpec, FirewallRuleSpec, ImageSpec, InstanceUrlSpec, VmTierSpec, PasswordSpec, GcpAuthScopeSpec} from 'java/com/google/cloud/deploymentmanager/autogen/deployment_package_autogen_spec.proto';
 
 /**
  * Produces Terraform variable name for firewall boolean
@@ -311,4 +311,13 @@ Allow {nil}
   {case GcpAuthScopeSpec.Scope.PROJECTHOSTING}
     https://www.googleapis.com/auth/projecthosting{nil}
 {/switch}
+{/template}
+
+/**
+ * Produces Terraform variable name for enabling a service API
+ * Ex: aiplatform.googleapis.com -> ai_platform
+ */
+{template apiServiceName kind="text"}
+{@param spec: APIServiceSpec}
+{$spec.service.replaceAll(".","_")}{nil}
 {/template}

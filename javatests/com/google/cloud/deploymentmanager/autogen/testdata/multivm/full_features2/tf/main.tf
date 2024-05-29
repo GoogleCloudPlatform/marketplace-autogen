@@ -2,6 +2,18 @@ provider "google" {
   project  = var.project_id
 }
 
+resource "google_project_service" "aiplatform_googleapis_com" {
+  project = var.project_id
+  service = "aiplatform.googleapis.com"
+  disable_on_destroy = true
+}
+
+resource "google_project_service" "compute_googleapis_com" {
+  project = var.project_id
+  service = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
 module "main" {
   source          = "./modules/main"
   count           = var.main_instance_count > 0 ? 1 : 0

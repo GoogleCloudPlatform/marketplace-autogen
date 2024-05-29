@@ -12,6 +12,11 @@ provider "google" {lb}
   project  = var.project_id
 {rb}
 {\n}
+{if $spec.getApisList()}
+  {call blocks.apis}
+    {param apisSpecs: $spec.getApisList() /}
+  {/call}
+{/if}
 {for $tier in $spec.getTiersList()}
 module "{$tier.getName() |sanitize}" {lb}
   source          = "./modules/{$tier.getName() |doublequoted}"

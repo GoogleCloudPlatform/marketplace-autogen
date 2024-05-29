@@ -17,6 +17,10 @@ spec:
   deploymentTool: TERRAFORM
   # multiVm option is also available
   singleVm:
+    apis:
+      - service: aiplatform.googleapis.com
+        disableOnDestroy: true
+      - service: compute.googleapis.com
     images:
       # if more than one image is provided, the user will be able to select which one they want
       - project: your-project-id-that-the-image-belongs-to

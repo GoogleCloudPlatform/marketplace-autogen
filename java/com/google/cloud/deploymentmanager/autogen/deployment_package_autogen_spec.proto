@@ -50,7 +50,7 @@ message DeploymentPackageAutogenSpec {
 }
 
 // Specifies a solution that deploys a single VM.
-// Next ID: 22
+// Next ID: 23
 //
 // (== yamlExample
 // partnerId: my-partner-id
@@ -151,10 +151,13 @@ message SingleVmDeploymentPackageSpec {
 
   // Integration with Stackdriver.
   StackdriverSpec stackdriver = 20;
+
+  // APIs enablement
+  repeated APIServiceSpec apis = 22;
 }
 
 // Specifies a solution that deploys Multiple VMs.
-// Next ID: 9
+// Next ID: 10
 //
 // (== yamlExample
 // partnerId: my-partner-id
@@ -216,6 +219,9 @@ message MultiVmDeploymentPackageSpec {
 
   // Integration with Stackdriver.
   StackdriverSpec stackdriver = 8;
+
+  // APIs enablement
+  repeated APIServiceSpec apis = 9;
 }
 
 // A tier consists of one or more VMs of the same type. Each VM is
@@ -1042,6 +1048,15 @@ message BooleanExpression {
     // Multi-vm's tier name. It is required for multi vm spec.
     string tier = 2;
   }
+}
+
+// Allows to enable a single API service.
+message APIServiceSpec {
+  // The service to enable
+  string service = 1;
+
+  // API should be disabled when deployment is destroyed
+  bool disable_on_destroy = 2;
 }
 
 message OptionalInt32 {

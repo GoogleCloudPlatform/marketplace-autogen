@@ -70,6 +70,11 @@ locals {lb}
     {param deployInput: $spec.getDeployInput() /}
   {/call}
 {/if}
+{if $spec.getApisList()}
+  {call blocks.apis}
+    {param apisSpecs: $spec.getApisList() /}
+  {/call}
+{/if}
 resource "google_compute_instance" "instance" {lb}
   name = "${lb}var.goog_cm_deployment_name{rb}-vm"
   machine_type = var.machine_type

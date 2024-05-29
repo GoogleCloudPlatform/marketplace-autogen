@@ -57,6 +57,18 @@ resource "google_compute_disk" "disk3" {
   size = var.disk3_size
 }
 
+resource "google_project_service" "aiplatform_googleapis_com" {
+  project = var.project_id
+  service = "aiplatform.googleapis.com"
+  disable_on_destroy = true
+}
+
+resource "google_project_service" "compute_googleapis_com" {
+  project = var.project_id
+  service = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_compute_instance" "instance" {
   name = "${var.goog_cm_deployment_name}-vm"
   machine_type = var.machine_type
