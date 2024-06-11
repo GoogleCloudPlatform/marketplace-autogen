@@ -96,7 +96,7 @@ spec {
       }
     }
     accelerators {
-      types: "nvidia-tesla-k80"
+      types: "nvidia-tesla-p100"
       default_count: 1
     }
     boot_disk {

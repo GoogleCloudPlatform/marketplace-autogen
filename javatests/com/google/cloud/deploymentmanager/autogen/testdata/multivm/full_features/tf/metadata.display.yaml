@@ -383,7 +383,7 @@ spec:
             gceGpuType:
               machineType: tier2_machine_type
               gpuType:
-                - nvidia-tesla-k80
+                - nvidia-tesla-v100
                 - nvidia-tesla-p100
         tier2_accelerator_count:
           name: tier2_accelerator_count
@@ -496,7 +496,7 @@ spec:
             gceGpuType:
               machineType: tier3_machine_type
               gpuType:
-                - nvidia-tesla-k80
+                - nvidia-tesla-p100
                 - nvidia-tesla-v100
                 - nvidia-tesla-p4-vws
         tier3_accelerator_count:

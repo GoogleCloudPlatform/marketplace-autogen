@@ -51,13 +51,13 @@ properties:
         minRamGb: 0.5
   acceleratorType:
     type: string
-    default: nvidia-tesla-k80
+    default: nvidia-tesla-p100
     x-googleProperty:
       type: GCE_GPU_TYPE
       gceGpuType:
         machineTypeProperty: machineType
         gpuType:
-          - nvidia-tesla-k80
+          - nvidia-tesla-p100
   acceleratorCount:
     type: integer
     default: 1

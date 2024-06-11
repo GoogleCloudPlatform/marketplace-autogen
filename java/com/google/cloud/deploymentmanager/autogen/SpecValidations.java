@@ -85,7 +85,6 @@ final class SpecValidations {
   private static final ImmutableSet<String> SUPPORTED_ACCELERATOR_TYPES =
       // LINT.IfChange(gpuTypes)
       ImmutableSet.of(
-          "nvidia-tesla-k80",
           "nvidia-tesla-p100",
           "nvidia-tesla-v100",
           "nvidia-tesla-p100-vws",

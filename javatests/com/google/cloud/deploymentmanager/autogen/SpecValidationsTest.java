@@ -1306,29 +1306,30 @@ public class SpecValidationsTest {
 
   @Test
   public void validAcceleratorSpec() {
-    AcceleratorSpec accelerator = AcceleratorSpec.newBuilder()
-        .addTypes("nvidia-tesla-k80")
-        .addTypes("nvidia-tesla-p100")
-        .addTypes("nvidia-tesla-v100")
-        .setDefaultCount(1)
-        .build();
+    AcceleratorSpec accelerator =
+        AcceleratorSpec.newBuilder()
+            .addTypes("nvidia-tesla-p100")
+            .addTypes("nvidia-tesla-v100")
+            .setDefaultCount(1)
+            .build();
     validateAccelerators(ImmutableList.of(accelerator));
   }
 
   @Test
   public void invalidAcceleratorSpec_unsupportedTypes() {
     expectIllegalArgumentException("Unsupported accelerator types: [nvidia-tesla-k801]");
-    AcceleratorSpec accelerator = AcceleratorSpec.newBuilder()
-        .addTypes("nvidia-tesla-k80")
-        .addTypes("nvidia-tesla-k801")
-        .setDefaultCount(1)
-        .build();
+    AcceleratorSpec accelerator =
+        AcceleratorSpec.newBuilder()
+            .addTypes("nvidia-tesla-p100")
+            .addTypes("nvidia-tesla-k801")
+            .setDefaultCount(1)
+            .build();
     validateAccelerators(ImmutableList.of(accelerator));
   }
 
   @Test
   public void invalidAcceleratorSpec_invalidDefaultType() {
-    final List<String> types = Arrays.asList("nvidia-tesla-k80", "nvidia-tesla-v100");
+    final List<String> types = Arrays.asList("nvidia-tesla-p4", "nvidia-tesla-v100");
     final String invalidDefaultType = "nvidia-tesla-p100";
     expectIllegalArgumentException(
         String.format("Default Accelerator Type must be one of %s", types));

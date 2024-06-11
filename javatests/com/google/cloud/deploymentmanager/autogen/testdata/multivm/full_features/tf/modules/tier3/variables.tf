@@ -68,7 +68,7 @@ variable "enable_udp_2333" {
 }
 
 variable "accelerator_type" {
-  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100."
   type        = string
   default     = "nvidia-tesla-v100"
 }

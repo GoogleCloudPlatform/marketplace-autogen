@@ -313,9 +313,9 @@ variable "tier2_enable_udp_2555" {
 }
 
 variable "tier2_accelerator_type" {
-  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100."
   type        = string
-  default     = "nvidia-tesla-k80"
+  default     = "nvidia-tesla-v100"
 }
 
 variable "tier2_accelerator_count" {
@@ -384,7 +384,7 @@ variable "tier3_enable_udp_2333" {
 }
 
 variable "tier3_accelerator_type" {
-  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100."
   type        = string
   default     = "nvidia-tesla-v100"
 }
