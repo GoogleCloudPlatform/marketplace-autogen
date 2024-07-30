@@ -356,7 +356,7 @@ spec:
           tooltip: The additional disks will be attached to the instance.
         - name: networking
           title: Networking
-        - name: API_ACCESS
+        - name: api_access
           title: API Access
           tooltip: Applications running on the VM can call Google Cloud APIs. Select the API access you want to allow. <a href="https://cloud.google.com/compute/docs/authentication">Learn more</a>
         - name: CONTENT_SETTINGS
