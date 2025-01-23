@@ -97,7 +97,8 @@ final class SpecValidations {
           "nvidia-l4",
           "nvidia-l4-vws",
           "nvidia-h100-80gb",
-          "nvidia-h100-mega-80gb");
+          "nvidia-h100-mega-80gb",
+          "nvidia-h200-141gb");
   // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
