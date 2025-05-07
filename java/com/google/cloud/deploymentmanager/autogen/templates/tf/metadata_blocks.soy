@@ -184,7 +184,7 @@ import {SolutionMarketingInfo} from 'java/com/google/cloud/deploymentmanager/aut
 
 {template additionalDisksProperty kind="text"}
 {@param spec: DiskSpec}
-{@param index: number}
+{@param index: float|int}
 {@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
   {call util.diskSizeDescription}

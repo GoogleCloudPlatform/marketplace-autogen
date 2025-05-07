@@ -218,7 +218,7 @@ variable "{'accelerator_count' |tierprefixed: $tier}" {lb}
 
 {template additionalDiskVariable kind="text"}
 {@param spec: DiskSpec}
-{@param index: number}
+{@param index: float|int}
 {@param? deployInput: DeployInputSpec|null}
 {@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
@@ -255,7 +255,7 @@ variable "{'disk' + ($index+1) + '_size' |tierprefixed: $tier}" {lb}
 
 {template additionalDiskReadme kind="text"}
 {@param spec: DiskSpec}
-{@param index: number}
+{@param index: float|int}
 {@param? deployInput: DeployInputSpec|null}
 {@param? tier: VmTierSpec|null}
 {let $diskSizeDescription}
@@ -285,7 +285,7 @@ variable "{'disk' + ($index+1) + '_size' |tierprefixed: $tier}" {lb}
 
 {template additionalDiskResource kind="text"}
 {@param spec: DiskSpec}
-{@param index: number}
+{@param index: float|int}
 {@param? deployInput: DeployInputSpec|null}
 {@param? tier: VmTierSpec|null}
 
@@ -330,7 +330,7 @@ resource "google_compute_disk" "disk{$index + 1}" {lb}
 {/template}
 
 {template attachDisk kind="text"}
-{@param index: number}
+{@param index: float|int}
 {@param? tier: VmTierSpec|null}
 {let $cntIndex: $tier ? '[count.index]' : '' /}
   attached_disk {lb}
