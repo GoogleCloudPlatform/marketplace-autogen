@@ -71,7 +71,7 @@ alias autogen='docker run \
   --workdir /mounted \
   --mount type=bind,source="$(pwd)",target=/mounted \
   --user $(id -u):$(id -g) \
-  $ARTIFACT_REGISTRY/cloud-marketplace-tools/dm/autogen'
+  $ARTIFACT_REGISTRY/$PATH_TO_AUTOGEN'
 
 autogen --help
 ```
