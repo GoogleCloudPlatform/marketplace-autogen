@@ -609,7 +609,7 @@ variable "{$field.getName()}" {lb}
 {if length($diskSpecs)}
 {let $cntIndex: $tier ? '[count.index]': '' /}
 {let $deviceNameArray: ['google_compute_disk.disk' + ($i + 1) + $cntIndex + '.name' for $a, $i in $diskSpecs]/}
-ATTACHED_DISKS = join(",", {$deviceNameArray}){nil}
+ATTACHED_DISKS = join(",", [{$deviceNameArray.join(', ')}]){nil}
 {/if}
 {/template}
 
