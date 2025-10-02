@@ -99,7 +99,8 @@ final class SpecValidations {
           "nvidia-h100-80gb",
           "nvidia-h100-mega-80gb",
           "nvidia-h200-141gb",
-          "nvidia-b200");
+          "nvidia-b200",
+          "nvidia-rtx-pro-6000");
   // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
@@ -577,7 +578,7 @@ final class SpecValidations {
     checkArgument(
         VALID_GPU_COUNTS.contains(accelerator.getMinCount()),
         "Accelerator min count must be one of: %s",
-        VALID_GPU_COUNTS.toString());
+        VALID_GPU_COUNTS);
     if (accelerator.getMaxCount() != 0) {
       checkArgument(accelerator.getMaxCount() > 0, "Accelerator max count must be greater than 0.");
       checkArgument(
@@ -586,7 +587,7 @@ final class SpecValidations {
       checkArgument(
           VALID_GPU_COUNTS.contains(accelerator.getMaxCount()),
           "Accelerator max count must be one of: %s",
-          VALID_GPU_COUNTS.toString());
+          VALID_GPU_COUNTS);
     }
     if (accelerator.getDefaultCount() != 0) {
       checkArgument(
@@ -602,7 +603,7 @@ final class SpecValidations {
       checkArgument(
           VALID_GPU_COUNTS.contains(accelerator.getDefaultCount()),
           "Accelerator default count must be one of: %s",
-          VALID_GPU_COUNTS.toString());
+          VALID_GPU_COUNTS);
     }
     if (!accelerator.getDefaultType().isEmpty()) {
       checkArgument(
