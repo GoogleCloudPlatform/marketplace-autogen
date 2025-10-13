@@ -774,6 +774,7 @@ message AcceleratorSpec {
   // nvidia-h200-141gb
   // nvidia-b200
   // nvidia-rtx-pro-6000
+  // nvidia-rtx-pro-6000-vws
   repeated string types = 1;
 
   // LINT.ThenChange()
