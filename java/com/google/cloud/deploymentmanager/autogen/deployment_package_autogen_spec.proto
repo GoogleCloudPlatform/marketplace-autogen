@@ -479,6 +479,7 @@ message FirewallRuleSpec {
 // The domain is implied as the VM instance address.
 // Currently the machine IP is used, but that might change to
 // another endpoint in the future.
+
 message InstanceUrlSpec {
   // The URL scheme. Required.
   enum Scheme {
@@ -773,6 +774,7 @@ message AcceleratorSpec {
   // nvidia-h100-mega-80gb
   // nvidia-h200-141gb
   // nvidia-b200
+  // nvidia-gb200
   // nvidia-rtx-pro-6000
   // nvidia-rtx-pro-6000-vws
   repeated string types = 1;
