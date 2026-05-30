@@ -34,7 +34,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | tcp_443_source_ranges | Source IP ranges for HTTPS traffic | `string` | `""` | no |
 | enable_icmp | Allow ICMP traffic from the Internet | `bool` | `true` | no |
 | icmp_source_ranges | Source IP ranges for ICMP traffic | `string` | `""` | no |
-| accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80. | `string` | `"nvidia-tesla-k80"` | no |
+| accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100. | `string` | `"nvidia-tesla-p100"` | no |
 | accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `1` | no |
 | domain | Your Wordpress "blog" domain | `string` | `null` | yes |
 | adminEmailAddress | The e-mail address used to create the "administrator account" for WordPress. | `string` | `null` | yes |

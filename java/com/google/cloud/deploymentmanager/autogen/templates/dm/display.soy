@@ -20,7 +20,7 @@ Open {$firewallTitle} traffic{nil}
   {/if}
 {/let}
 {let $targetTagSuffix kind="text"}
-  {if not $tierSpec}
+  {if !$tierSpec}
     -deployment{nil}
   {else}
     -{$tierSpec.getName()}-tier{nil}

@@ -129,9 +129,9 @@ variable "icmp_source_ranges" {
 }
 
 variable "accelerator_type" {
-  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80."
+  description = "The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100."
   type        = string
-  default     = "nvidia-tesla-k80"
+  default     = "nvidia-tesla-p100"
 }
 
 variable "accelerator_count" {

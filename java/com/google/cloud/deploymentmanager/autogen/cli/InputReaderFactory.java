@@ -25,22 +25,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import org.yaml.snakeyaml.Yaml;
 
 class InputReaderFactory {
   static InputReader getReader(AutogenSettings settings) {
-    switch (settings.getInputType()) {
-      case PROTOTEXT:
-        return new PrototextReader(settings);
-      case JSON:
-        return new JsonReader(settings);
-      case YAML:
-        return new YamlReader(settings);
-      case WIRE:
-        return new WireReader(settings);
-    }
-    throw new IllegalArgumentException("Unknown input type: " + settings.getInputType());
+    return switch (settings.getInputType()) {
+      case PROTOTEXT -> new PrototextReader(settings);
+      case JSON -> new JsonReader(settings);
+      case YAML -> new YamlReader(settings);
+      case WIRE -> new WireReader(settings);
+    };
   }
 
   abstract static class InputReader {
@@ -93,7 +88,8 @@ class InputReaderFactory {
     void doReadInput(InputStream stream, Message.Builder builder) throws IOException {
       Yaml yaml = new Yaml();
       Gson gson = new Gson();
-      String json = gson.toJson(yaml.loadAs(new InputStreamReader(stream, UTF_8), Map.class));
+      String json =
+          gson.toJson(yaml.loadAs(new InputStreamReader(stream, UTF_8), LinkedHashMap.class));
       JsonFormat.parser().merge(json, builder);
     }
   }

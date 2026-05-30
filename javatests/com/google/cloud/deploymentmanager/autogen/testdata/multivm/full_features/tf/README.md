@@ -67,7 +67,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | tier2_external_ips | The external IPs assigned to the VM for public access. | `list(string)` | `["EPHEMERAL"]` | no |
 | tier2_enable_tcp_9878 | Allow TCP port 9878 traffic between VMs in this group | `bool` | `true` | no |
 | tier2_enable_udp_2555 | Allow UDP port 2555 traffic from other VMs in this deployment | `bool` | `true` | no |
-| tier2_accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80. | `string` | `"nvidia-tesla-k80"` | no |
+| tier2_accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100. | `string` | `"nvidia-tesla-v100"` | no |
 | tier2_accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `2` | no |
 | tier3_instance_count | Specify a value between 1 and 10. | `number` | `1` | no |
 | tier3_source_image | The image name for the disk for the VM instance. | `string` | `"projects/click-to-deploy-images/global/images/jenkins-v20180130"` | no |
@@ -79,7 +79,7 @@ terraform plan --var-file marketplace_test.tfvars --var project_id=<YOUR_PROJECT
 | tier3_external_ips | The external IPs assigned to the VM for public access. | `list(string)` | `["EPHEMERAL"]` | no |
 | tier3_enable_tcp_9000 | Allow TCP port 9000 traffic between VMs in this group | `bool` | `true` | no |
 | tier3_enable_udp_2333 | Allow UDP port 2333 traffic from other VMs in this deployment | `bool` | `true` | no |
-| tier3_accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-k80. | `string` | `"nvidia-tesla-v100"` | no |
+| tier3_accelerator_type | The accelerator type resource exposed to this instance. E.g. nvidia-tesla-p100. | `string` | `"nvidia-tesla-v100"` | no |
 | tier3_accelerator_count | The number of the guest accelerator cards exposed to this instance. | `number` | `0` | no |
 
 ## Outputs

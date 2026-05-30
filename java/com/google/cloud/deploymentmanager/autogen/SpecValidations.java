@@ -85,7 +85,6 @@ final class SpecValidations {
   private static final ImmutableSet<String> SUPPORTED_ACCELERATOR_TYPES =
       // LINT.IfChange(gpuTypes)
       ImmutableSet.of(
-          "nvidia-tesla-k80",
           "nvidia-tesla-p100",
           "nvidia-tesla-v100",
           "nvidia-tesla-p100-vws",
@@ -97,7 +96,13 @@ final class SpecValidations {
           "nvidia-a100-80gb",
           "nvidia-l4",
           "nvidia-l4-vws",
-          "nvidia-h100-80gb");
+          "nvidia-h100-80gb",
+          "nvidia-h100-mega-80gb",
+          "nvidia-h200-141gb",
+          "nvidia-b200",
+          "nvidia-gb200",
+          "nvidia-rtx-pro-6000",
+          "nvidia-rtx-pro-6000-vws");
   // LINT.ThenChange()
 
   private static final int MAX_NICS = 8;
@@ -575,7 +580,7 @@ final class SpecValidations {
     checkArgument(
         VALID_GPU_COUNTS.contains(accelerator.getMinCount()),
         "Accelerator min count must be one of: %s",
-        VALID_GPU_COUNTS.toString());
+        VALID_GPU_COUNTS);
     if (accelerator.getMaxCount() != 0) {
       checkArgument(accelerator.getMaxCount() > 0, "Accelerator max count must be greater than 0.");
       checkArgument(
@@ -584,7 +589,7 @@ final class SpecValidations {
       checkArgument(
           VALID_GPU_COUNTS.contains(accelerator.getMaxCount()),
           "Accelerator max count must be one of: %s",
-          VALID_GPU_COUNTS.toString());
+          VALID_GPU_COUNTS);
     }
     if (accelerator.getDefaultCount() != 0) {
       checkArgument(
@@ -600,7 +605,7 @@ final class SpecValidations {
       checkArgument(
           VALID_GPU_COUNTS.contains(accelerator.getDefaultCount()),
           "Accelerator default count must be one of: %s",
-          VALID_GPU_COUNTS.toString());
+          VALID_GPU_COUNTS);
     }
     if (!accelerator.getDefaultType().isEmpty()) {
       checkArgument(
@@ -672,22 +677,23 @@ final class SpecValidations {
             if (!isInBooleanGroup) {
               checkArgument(
                   checkbox.hasDisplayGroup(),
-                  String.format(
-                      "The first grouped boolean checkbox '%s' must have a display group",
-                      field.getName()));
+                  "The first grouped boolean checkbox '%s' must have a display group",
+                  field.getName());
             }
             if (checkbox.hasDisplayGroup()) {
               GroupedBooleanCheckbox.DisplayGroup displayGroup = checkbox.getDisplayGroup();
               checkArgument(
                   !displayGroup.getName().isEmpty(),
-                  String.format("Field '%s' has a display group without a name", field.getName()));
+                  "Field '%s' has a display group without a name",
+                  field.getName());
               if (!runningDisplayGroups.add(displayGroup.getName())) {
                 throw new IllegalArgumentException(
                     "Display groups with the same name: " + displayGroup.getName());
               }
               checkArgument(
                   !displayGroup.getTitle().isEmpty(),
-                  String.format("Display group '%s' must have a title", displayGroup.getName()));
+                  "Display group '%s' must have a title",
+                  displayGroup.getName());
             }
             break;
           }
@@ -697,9 +703,8 @@ final class SpecValidations {
               IntegerBox box = field.getIntegerBox();
               checkArgument(
                   box.hasDefaultValue() || box.hasTestDefaultValue(),
-                  String.format(
-                      "Field '%s' is required - it should have defaultValue or testDefaultValue",
-                      field.getName()));
+                  "Field '%s' is required - it should have defaultValue or testDefaultValue",
+                  field.getName());
             }
             break;
           }
@@ -708,7 +713,8 @@ final class SpecValidations {
             IntegerDropdown dropdown = field.getIntegerDropdown();
             checkArgument(
                 dropdown.getValuesCount() > 0,
-                String.format("Field '%s' must have at least 1 value", field.getName()));
+                "Field '%s' must have at least 1 value",
+                field.getName());
             if (dropdown.hasDefaultValueIndex()) {
               checkArgument(
                   dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),
@@ -728,9 +734,8 @@ final class SpecValidations {
               boolean hasTestDefaultValue = !Strings.isNullOrEmpty(box.getTestDefaultValue());
               checkArgument(
                   hasDefaultValue || hasTestDefaultValue,
-                  String.format(
-                      "Field '%s' is required - it should have defaultValue or testDefaultValue",
-                      field.getName()));
+                  "Field '%s' is required - it should have defaultValue or testDefaultValue",
+                  field.getName());
             }
             break;
           }
@@ -739,7 +744,8 @@ final class SpecValidations {
             StringDropdown dropdown = field.getStringDropdown();
             checkArgument(
                 dropdown.getValuesCount() > 0,
-                String.format("Field '%s' must have at least 1 value", field.getName()));
+                "Field '%s' must have at least 1 value",
+                field.getName());
             if (dropdown.hasDefaultValueIndex()) {
               checkArgument(
                   dropdown.getDefaultValueIndex().getValue() < dropdown.getValuesCount(),

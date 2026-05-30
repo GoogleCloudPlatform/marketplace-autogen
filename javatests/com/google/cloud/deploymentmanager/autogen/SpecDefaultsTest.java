@@ -732,7 +732,7 @@ public class SpecDefaultsTest {
 
   @Test
   public void defaultAccelatorTypeMultiVmIsFirstInList() {
-    List<String> types = Arrays.asList("nvidia-tesla-p100", "nvidia-tesla-k80");
+    List<String> types = Arrays.asList("nvidia-tesla-p100", "nvidia-tesla-v100");
     AcceleratorSpec acceleratorSpec = AcceleratorSpec.newBuilder().addAllTypes(types).build();
     MultiVmDeploymentPackageSpec.Builder multi = newMultiSpec();
     multi.getTiersBuilder(0).addAccelerators(acceleratorSpec);
@@ -742,7 +742,7 @@ public class SpecDefaultsTest {
 
   @Test
   public void defaultAccelatorTypeMultiVmIsDefaultType() {
-    final String defaultType = "nvidia-tesla-k80";
+    final String defaultType = "nvidia-tesla-v100";
     List<String> types = Arrays.asList("nvidia-tesla-p100", defaultType);
     AcceleratorSpec acceleratorSpec =
         AcceleratorSpec.newBuilder().addAllTypes(types).setDefaultType(defaultType).build();
@@ -754,7 +754,7 @@ public class SpecDefaultsTest {
 
   @Test
   public void defaultAccelatorTypeSingleVmIsFirstInList() {
-    List<String> types = Arrays.asList("nvidia-tesla-p100", "nvidia-tesla-k80");
+    List<String> types = Arrays.asList("nvidia-tesla-p100", "nvidia-tesla-v100");
     AcceleratorSpec acceleratorSpec = AcceleratorSpec.newBuilder().addAllTypes(types).build();
     SingleVmDeploymentPackageSpec.Builder single = newSingleSpec();
     single.addAccelerators(acceleratorSpec);
@@ -764,7 +764,7 @@ public class SpecDefaultsTest {
 
   @Test
   public void defaultAccelatorTypeSingleVmIsDefaultType() {
-    final String defaultType = "nvidia-tesla-k80";
+    final String defaultType = "nvidia-tesla-v100";
     List<String> types = Arrays.asList("nvidia-tesla-p100", defaultType);
     AcceleratorSpec acceleratorSpec =
         AcceleratorSpec.newBuilder().addAllTypes(types).setDefaultType(defaultType).build();

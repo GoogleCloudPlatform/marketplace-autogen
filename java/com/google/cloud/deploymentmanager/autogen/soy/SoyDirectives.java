@@ -32,8 +32,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.template.soy.data.SanitizedContent;
 import com.google.template.soy.data.SoyValue;
 import com.google.template.soy.data.restricted.BooleanData;
-import com.google.template.soy.data.restricted.FloatData;
 import com.google.template.soy.data.restricted.IntegerData;
+import com.google.template.soy.data.restricted.NumberData;
 import com.google.template.soy.data.restricted.PrimitiveData;
 import com.google.template.soy.data.restricted.StringData;
 import com.google.template.soy.shared.restricted.SoyJavaPrintDirective;
@@ -409,10 +409,10 @@ final class SoyDirectives {
       Node node;
       if (value instanceof BooleanData) {
         node = representer.represent(value.booleanValue());
-      } else if (value instanceof FloatData) {
-        node = representer.represent(value.floatValue());
       } else if (value instanceof IntegerData) {
         node = representer.represent(value.integerValue());
+      } else if (value instanceof NumberData) {
+        node = representer.represent(value.numberValue());
       } else {
         node = representer.represent(value.coerceToString());
       }
